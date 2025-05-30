@@ -62,19 +62,19 @@ h6 {
 	line-height: 1.2;
 }
 h1 {
-	font-size: 2.4em;
+	font-size: 2.2em;
 }
 h2 {
-	font-size: 1.9em;
+	font-size: 1.8em;
 }
 h3 {
 	font-size: 1.5em;
 }
 h4 {
-	font-size: 1.2em;
+	font-size: 1.3em;
 }
 h5 {
-	font-size: 1.1em;
+	font-size: 1.15em;
 }
 strong,
 b {
@@ -108,24 +108,21 @@ img {
 	height: auto;
 	border-radius: 8px;
 }
-code {
-	padding: 2px 5px;
-	background-color: rgba(139, 111, 71, 0.08); /* 淡棕色背景 */
-	border-radius: 2px;
-	color: var(--accent-dark);
-}
 pre {
 	padding: 1.5em;
 	border-radius: 8px;
+	font-size: 0.7em; /* 与正文一样大 */
 }
 pre > code {
-	all: unset;
+	padding: 0;
+	background-color: transparent;
+	font-size: inherit; /* 继承 pre 的字体大小 */
 }
 blockquote {
 	border-left: 4px solid var(--accent);
 	padding: 0 0 0 20px;
 	margin: 0px;
-	font-size: 1.333em;
+	font-size: 1em; /* 稍微大于正文，但不要太大 */
 	background-color: rgba(139, 111, 71, 0.05); /* 轻微的背景色 */
 	border-radius: 0 4px 4px 0;
 }
@@ -158,4 +155,19 @@ hr {
 	clip-path: inset(50%);
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
+}
+
+/* Shiki 代码块样式优化 */
+.astro-code {
+	/* 确保 Dracula 主题的深色背景与圆角边框配合良好 */
+	overflow: hidden;
+}
+
+/* 内联代码不受 Shiki 影响，保持原有样式 */
+:not(pre) > code {
+	padding: 2px 5px;
+	background-color: rgba(139, 111, 71, 0.08);
+	border-radius: 2px;
+	color: var(--accent-dark);
+	font-size: 1em;
 }

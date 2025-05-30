@@ -10,4 +10,14 @@ export default defineConfig({
   site: 'https://example.com',
   integrations: [mdx(), sitemap()],
   adapter: cloudflare(),
+  markdown: {
+    shikiConfig: {
+      theme: 'dracula',
+      // 如果想要支持浅色/深色模式切换，可以这样配置：
+      // themes: {
+      //   light: 'github-light',
+      //   dark: 'dracula',
+      // },
+    },
+  },
 });
