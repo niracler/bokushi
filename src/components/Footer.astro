@@ -1,11 +1,12 @@
 ---
 const today = new Date();
+import { SOCIAL_LINKS } from '../consts';
 ---
 
 <footer>
 	&copy; {today.getFullYear()} Niracler. All rights reserved.
 	<div class="social-links">
-		<a href="https://x.com/nini38324" target="_blank">
+		<a href={SOCIAL_LINKS.twitter} target="_blank" data-tooltip={SOCIAL_LINKS.twitter}>
 			<span class="sr-only">Follow Niracler on X</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/x"
 				><path
@@ -14,7 +15,7 @@ const today = new Date();
 				></path></svg
 			>
 		</a>
-		<a href="https://github.com/niracler" target="_blank">
+		<a href={SOCIAL_LINKS.github} target="_blank" data-tooltip={SOCIAL_LINKS.github}>
 			<span class="sr-only">Go to Niracler's GitHub</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/github"
 				><path
@@ -23,12 +24,30 @@ const today = new Date();
 				></path></svg
 			>
 		</a>
+		<a href={SOCIAL_LINKS.email} data-tooltip={SOCIAL_LINKS.email.replace('mailto:', '')}>
+			<span class="sr-only">Send email to Niracler</span>
+			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/email">
+				<path
+					fill="currentColor"
+					d="M1.922 4.731v-.65c0-.478.394-.872.872-.872h10.412c.478 0 .872.394.872.872v.65l-6.078 4.04-6.078-4.04zm0 1.296l5.628 3.739a.872.872 0 0 0 .9 0l5.628-3.739v5.479c0 .478-.394.872-.872.872H2.794a.872.872 0 0 1-.872-.872v-5.479z"
+				></path>
+			</svg>
+		</a>
+		<a href={SOCIAL_LINKS.telegram} target="_blank" data-tooltip={SOCIAL_LINKS.telegram}>
+			<span class="sr-only">Join Niracler on Telegram</span>
+			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/telegram">
+				<path
+					fill="currentColor"
+					d="M8 0C3.581 0 0 3.581 0 8s3.581 8 8 8 8-3.581 8-8-3.581-8-8-8zm3.292 5.014l-1.321 6.226c-.099.439-.358.546-.725.34l-2.01-1.482-1.104 1.062c-.122.122-.225.225-.462.225l.165-2.363 4.298-3.883c.187-.165-.041-.257-.29-.092L5.34 8.085 3.35 7.468c-.434-.135-.442-.434.09-.643l7.783-3c.363-.132.68.089.568.639z"
+				></path>
+			</svg>
+		</a>
 	</div>
 </footer>
 <style>
 	footer {
 		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
+		background: var(--background);
 		color: rgb(var(--gray));
 		text-align: center;
 	}
@@ -41,8 +60,59 @@ const today = new Date();
 	.social-links a {
 		text-decoration: none;
 		color: rgb(var(--gray));
+		position: relative;
 	}
 	.social-links a:hover {
 		color: rgb(var(--gray-dark));
+	}
+	
+	/* 自定义 tooltip 样式 - 日式优雅风格 */
+	.social-links a[data-tooltip] {
+		position: relative;
+	}
+	
+	.social-links a[data-tooltip]::before,
+	.social-links a[data-tooltip]::after {
+		position: absolute;
+		visibility: hidden;
+		opacity: 0;
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		pointer-events: none;
+		z-index: 10;
+	}
+	
+	.social-links a[data-tooltip]::before {
+		content: attr(data-tooltip);
+		bottom: 150%;
+		left: 50%;
+		transform: translateX(-50%) translateY(10px);
+		padding: 0.75em 1.25em;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 248, 248, 0.9));
+		backdrop-filter: blur(10px);
+		color: #2d2d2d;
+		font-size: 0.8rem;
+		border-radius: 8px;
+		white-space: nowrap;
+		font-weight: 500;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.06);
+		border: 1px solid rgba(0, 0, 0, 0.05);
+		letter-spacing: 0.3px;
+	}
+	
+	.social-links a[data-tooltip]::after {
+		content: '';
+		bottom: 140%;
+		left: 50%;
+		transform: translateX(-50%) translateY(10px);
+		border: 6px solid transparent;
+		border-top-color: rgba(248, 248, 248, 0.95);
+		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+	}
+	
+	.social-links a[data-tooltip]:hover::before,
+	.social-links a[data-tooltip]:hover::after {
+		visibility: visible;
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
 	}
 </style>
