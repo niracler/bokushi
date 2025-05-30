@@ -13,14 +13,185 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 	<body>
 		<Header />
 		<main>
-			<img src="https://image.niracler.com/2025/05/a7c2b95c8ae55bbdc78b5e49454d17a4.jpg" alt="博客头图" />
-			<blockquote>
-				或许每个人都只是想证明自己的确存在着，希望他人也能认知到自己确实存在于这个世上。也许大家都是基于这个单纯的行动理念进行一切行为。所盼望的只有一个，那就是"不要忘了我"这个简洁却悲痛的讯息。
-			</blockquote>
-			<p style="text-align: right; font-style: italic; margin-bottom: 3rem;">
-				—— 《凉宫春日的忧郁》
-			</p>
+			<section class="hero">
+				<h1>Hi, 我是 Niracler 👋</h1>
+				<p class="subtitle">长门大明神会梦到外星羊么？</p>
+				<p class="intro">
+					一个喜欢记录生活、思考人生的普通人。在这里，你会看到我的生活片段、技术思考、游戏体验，
+					以及一些关于人生和世界的胡思乱想。
+				</p>
+			</section>
+
+			<section class="navigation">
+				<h2>探索这里</h2>
+				<div class="nav-grid">
+					<div class="nav-item">
+						<h3>📝 <a href="/blog">博客文章</a></h3>
+						<p>技术分享、生活感悟和各种思考</p>
+					</div>
+					<div class="nav-item">
+						<h3>🗓️ 周记月记</h3>
+						<p>记录生活的点点滴滴，分享日常的思考</p>
+					</div>
+					<div class="nav-item">
+						<h3>🎮 游戏体验</h3>
+						<p>分享游戏经历和感受</p>
+					</div>
+					<div class="nav-item">
+						<h3>🤔 哲学思考</h3>
+						<p>对生活、工作和人生的思考</p>
+					</div>
+				</div>
+			</section>
+
+			<section class="recent-updates">
+				<h2>最近在做什么</h2>
+				<div class="status-grid">
+					<div class="status-item">
+						<strong>📍 当前状态：</strong> 在深圳工作中
+					</div>
+					<div class="status-item">
+						<strong>🎯 最近关注：</strong> 技术学习、生活记录
+					</div>
+					<div class="status-item">
+						<strong>📚 正在读：</strong> 各种技术文档和人生思考
+					</div>
+				</div>
+			</section>
+
+			<section class="quote-section">
+				<blockquote>
+					或许每个人都只是想证明自己的确存在着，希望他人也能认知到自己确实存在于这个世上。也许大家都是基于这个单纯的行动理念进行一切行为。所盼望的只有一个，那就是
+					<br/><strong>「不要忘了我」</strong><br/>
+					这个简洁却悲痛的讯息。
+				</blockquote>
+				<p class="quote-source">
+					—— 《凉宫春日的忧郁》
+				</p>
+			</section>
 		</main>
 		<Footer />
+
+		<style>
+			.hero {
+				text-align: center;
+				padding: 2rem 0;
+				margin-bottom: 3rem;
+			}
+
+			.hero h1 {
+				font-size: 2.5rem;
+				margin-bottom: 0.5rem;
+				color: var(--accent);
+			}
+
+			.subtitle {
+				font-size: 1.2rem;
+				color: #666;
+				margin-bottom: 1rem;
+				font-style: italic;
+			}
+
+			.intro {
+				font-size: 1.1rem;
+				line-height: 1.6;
+				max-width: 600px;
+				margin: 0 auto;
+				color: #555;
+			}
+
+			.navigation {
+				margin-bottom: 3rem;
+			}
+
+			.navigation h2 {
+				margin-bottom: 1.5rem;
+				color: var(--accent);
+			}
+
+			.nav-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 1.5rem;
+			}
+
+			.nav-item {
+				padding: 1.5rem;
+				border: 1px solid #e1e1e1;
+				border-radius: 8px;
+				transition: box-shadow 0.3s ease;
+			}
+
+			.nav-item:hover {
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			}
+
+			.nav-item h3 {
+				margin-bottom: 0.5rem;
+			}
+
+			.nav-item a {
+				text-decoration: none;
+				color: inherit;
+			}
+
+			.nav-item a:hover {
+				color: var(--accent);
+			}
+
+			.recent-updates {
+				margin-bottom: 3rem;
+			}
+
+			.recent-updates h2 {
+				margin-bottom: 1.5rem;
+				color: var(--accent);
+			}
+
+			.status-grid {
+				display: grid;
+				gap: 1rem;
+			}
+
+			.status-item {
+				padding: 1rem;
+				background: #f9f9f9;
+				border-radius: 6px;
+				border-left: 4px solid var(--accent);
+			}
+
+			.quote-section {
+				margin-top: 4rem;
+				padding-top: 2rem;
+				border-top: 1px solid #e1e1e1;
+			}
+
+			.quote-section blockquote {
+				font-style: italic;
+				margin: 0 0 1rem 0;
+				padding: 0;
+				border: none;
+				text-align: center;
+				font-size: 1.1rem;
+				line-height: 1.6;
+			}
+
+			.quote-source {
+				text-align: right;
+				font-style: italic;
+				margin: 0;
+				color: #666;
+			}
+
+			@media (max-width: 768px) {
+				.hero h1 {
+					font-size: 2rem;
+				}
+				
+				.nav-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
 	</body>
 </html>

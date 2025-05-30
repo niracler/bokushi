@@ -62,29 +62,30 @@ h6 {
 	line-height: 1.2;
 }
 h1 {
-	font-size: 3.052em;
+	font-size: 2.4em;
 }
 h2 {
-	font-size: 2.441em;
+	font-size: 1.9em;
 }
 h3 {
-	font-size: 1.953em;
+	font-size: 1.5em;
 }
 h4 {
-	font-size: 1.563em;
+	font-size: 1.2em;
 }
 h5 {
-	font-size: 1.25em;
+	font-size: 1.1em;
 }
 strong,
 b {
 	font-weight: 700;
+	color: #FB8F68;
 }
 a {
-	color: var(--accent);
+	color: #bb2a17;
 }
 a:hover {
-	color: var(--accent);
+	color: #941a1a;
 }
 p {
 	margin-bottom: 1em;
