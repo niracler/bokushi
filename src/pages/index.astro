@@ -14,6 +14,9 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 		<Header />
 		<main>
 			<section class="hero">
+				<div class="migration-notice">
+					<p>🚀 正在迁移啦，老朋友请看 <a href="https://niracler.xlog.app" target="_blank">niracler.xlog.app</a></p>
+				</div>
 				<h1>Hi, 我是 Niracler 👋</h1>
 				<p class="subtitle">去各样的地方，遇见各样的人</p>
 				<p class="intro">
@@ -73,6 +76,33 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 		<Footer />
 
 		<style>
+			.migration-notice {
+				background: #f9f9f9;
+				color: #555;
+				padding: 0.8rem 1.5rem;
+				border-radius: 8px;
+				margin-bottom: 2rem;
+				text-align: center;
+				border: 1px solid #e1e1e1;
+				border-left: 4px solid var(--accent);
+			}
+
+			.migration-notice p {
+				margin: 0;
+				font-size: 1rem;
+				font-weight: 500;
+			}
+
+			.migration-notice a {
+				color: var(--accent);
+				text-decoration: none;
+				font-weight: bold;
+			}
+
+			.migration-notice a:hover {
+				text-decoration: underline;
+			}
+
 			.hero {
 				text-align: center;
 				padding: 2rem 0;
