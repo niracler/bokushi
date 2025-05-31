@@ -23,7 +23,7 @@ export async function GET(context) {
 			}),
 		})),
 		customData: `<follow_challenge>
-			<feedId>52340201851637799</feedId>
+			<feedId>151531310966515712</feedId>
 			<userId>41434914948866048</userId>
 		</follow_challenge>`,
 		stylesheet: '/pretty-feed-v3.xsl',
