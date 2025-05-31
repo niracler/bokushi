@@ -11,7 +11,7 @@ type Props = CollectionEntry<'blog'>['data'] & {
 	body?: string;
 };
 
-const { title, description: providedDescription, pubDate, updatedDate, socialImage, body } = Astro.props;
+const { title, description: providedDescription, pubDate, updatedDate, socialImage, body, tags } = Astro.props;
 
 // 如果没有提供 description，从文章内容中提取
 const description = providedDescription || (body ? extractDescription(body) : '暂无描述');
@@ -64,6 +64,27 @@ const description = providedDescription || (body ? extractDescription(body) : '�
 			.last-updated-on {
 				font-style: italic;
 			}
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				justify-content: center;
+				margin-top: 1rem;
+			}
+			.tag {
+				display: inline-block;
+				padding: 0.25rem 0.75rem;
+				background-color: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+				border-radius: 1rem;
+				font-size: 0.85rem;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+			.tag:hover {
+				background-color: rgba(var(--accent), 0.1);
+				color: rgb(var(--accent));
+			}
 		</style>
 	</head>
 
@@ -87,6 +108,13 @@ const description = providedDescription || (body ? extractDescription(body) : '�
 								)
 							}
 						</div>
+						{tags && tags.length > 0 && (
+							<div class="tags">
+								{tags.map((tag: string) => (
+									<a href={`/tags/${tag}`} class="tag">{tag}</a>
+								))}
+							</div>
+						)}
 						<hr />
 					</div>
 					<slot />

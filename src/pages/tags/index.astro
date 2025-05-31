@@ -1,0 +1,79 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const tags = [...new Set(posts.map((post) => post.data.tags).flat())];
+
+const pageTitle = "标签索引";
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`${pageTitle} | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				width: 960px;
+			}
+			h1 {
+				font-size: 3rem;
+				font-weight: 700;
+				line-height: 1;
+				text-align: center;
+				margin-bottom: 3em;
+			}
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1rem;
+				justify-content: center;
+			}
+			.tag {
+				margin: 0;
+			}
+			.tag a {
+				display: inline-block;
+				border: 1px solid rgb(var(--gray));
+				border-radius: 2rem;
+				padding: 0.75rem 1.5rem;
+				font-size: 1.1rem;
+				color: rgb(var(--black));
+				background-color: rgb(var(--gray-light));
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+			.tag a:hover {
+				color: rgb(var(--accent));
+				border-color: rgb(var(--accent));
+				background-color: rgba(var(--accent), 0.1);
+			}
+			@media (max-width: 960px) {
+				.tags {
+					gap: 0.5rem;
+				}
+				.tag a {
+					padding: 0.5rem 1rem;
+					font-size: 1rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>{pageTitle}</h1>
+			<section>
+				<div class="tags">
+					{tags.map((tag) => (
+						<p class="tag"><a href={`/tags/${tag}`}>{tag}</a></p>
+					))}
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html> 

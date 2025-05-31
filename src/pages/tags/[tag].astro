@@ -1,0 +1,138 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+	const allPosts = await getCollection('blog');
+	const uniqueTags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
+
+	return uniqueTags.map((tag) => {
+		const filteredPosts = allPosts.filter((post) =>
+			post.data.tags.includes(tag)
+		);
+		return {
+			params: { tag },
+			props: { posts: filteredPosts },
+		};
+	});
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+
+// 按日期排序
+const sortedPosts = posts.sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`标签: ${tag} | ${SITE_TITLE}`} description={`所有标记为 "${tag}" 的文章`} />
+		<style>
+			main {
+				width: 960px;
+			}
+			h1 {
+				font-size: 2.5rem;
+				font-weight: 700;
+				line-height: 1;
+				text-align: center;
+				margin-bottom: 1em;
+			}
+			.tag-name {
+				color: rgb(var(--accent));
+			}
+			.back-link {
+				display: inline-block;
+				margin-bottom: 2rem;
+				color: rgb(var(--gray-dark));
+				text-decoration: none;
+				transition: color 0.2s ease;
+			}
+			.back-link:hover {
+				color: rgb(var(--accent));
+			}
+			ul {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			ul li {
+				width: 100%;
+				position: relative;
+			}
+			ul li * {
+				text-decoration: none;
+				transition: 0.2s ease;
+			}
+			ul li a {
+				display: flex;
+				align-items: baseline;
+				padding: 0.5rem 0;
+				gap: 0.5rem;
+			}
+			.title {
+				margin: 0;
+				color: rgb(var(--black));
+				line-height: 1.2;
+				font-size: 1.5rem;
+			}
+			.date {
+				margin: 0;
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+				white-space: nowrap;
+			}
+			ul li a:hover .title,
+			ul li a:hover .date {
+				color: rgb(var(--accent));
+			}
+			@media (max-width: 960px) {
+				ul li a {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: 0.3rem;
+				}
+				.title {
+					font-size: 1rem;
+				}
+				.date {
+					font-size: 0.85rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<a href="/tags" class="back-link">← 返回标签索引</a>
+			<h1>标签: <span class="tag-name">{tag}</span></h1>
+			<section>
+				<ul>
+					{
+						sortedPosts.map((post) => (
+							<li>
+								<a href={`/${post.id}`}>
+									<h4 class="title">{post.data.title}</h4>
+									<p class="date">
+										<FormattedDate date={post.data.pubDate} />
+									</p>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html> 
