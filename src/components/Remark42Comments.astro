@@ -1,0 +1,97 @@
+---
+export interface Props {
+  postId?: string;
+}
+
+const { postId } = Astro.props;
+
+// 这里需要配置你的 Remark42 服务器地址
+const REMARK_URL =
+  import.meta.env.PUBLIC_REMARK_URL || "https://remark42.niracler.com";
+const SITE_ID = import.meta.env.PUBLIC_REMARK_SITE_ID || "niracler";
+
+// 获取当前页面的 URL 作为评论的唯一标识
+const pageUrl = Astro.url.href;
+const pageId = postId || Astro.url.pathname;
+---
+
+<div class="remark42-wrapper">
+  <h2>评论</h2>
+  <div id="remark42"></div>
+</div>
+
+<script define:vars={{ REMARK_URL, SITE_ID, pageUrl, pageId }}>
+  // Remark42 配置
+  var remark_config = {
+    host: REMARK_URL,
+    site_id: SITE_ID,
+    url: pageUrl,
+    components: ["embed"],
+    theme: "light", // 可以设置为 'dark' 或 'light'
+    locale: "zh", // 设置为中文
+    show_email_subscription: true,
+    simple_view: false,
+    no_footer: false,
+  };
+
+  // 动态加载 Remark42 脚本
+  (function () {
+    // 检查是否已经加载
+    if (window.REMARK42) {
+      window.REMARK42.createInstance(remark_config);
+      return;
+    }
+
+    // 创建脚本标签
+    const script = document.createElement("script");
+    script.src = remark_config.host + "/web/embed.js";
+    script.defer = true;
+
+    // 添加配置到 window
+    window.remark_config = remark_config;
+    window.REMARK42 = window.REMARK42 || {};
+    window.REMARK42.createInstance =
+      window.REMARK42.createInstance ||
+      function (config) {
+        window.remark_config = config;
+      };
+
+    // 加载脚本
+    document.head.appendChild(script);
+  })();
+</script>
+
+<style>
+  .remark42-wrapper {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e1e1e1;
+  }
+
+  .remark42-wrapper h2 {
+    margin-bottom: 1.5rem;
+    color: var(--accent);
+    font-size: 1.5rem;
+  }
+
+  #remark42 {
+    min-height: 100px;
+  }
+
+  /* 自定义 Remark42 样式 */
+  :global(.remark42__root) {
+    font-family: inherit !important;
+  }
+
+  :global(.remark42__root-theme-light) {
+    --remark42-color-primary: var(--accent) !important;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .remark42-wrapper {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+    }
+  }
+</style>
