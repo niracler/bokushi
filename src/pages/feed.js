@@ -8,7 +8,7 @@ const parser = new MarkdownIt();
 
 export async function GET(context) {
 	const posts = await getCollection('blog');
-	return rss({
+	const rssResponse = rss({
 		title: SITE_TITLE,
 		description: SITE_DESCRIPTION,
 		site: context.site,
@@ -26,4 +26,10 @@ export async function GET(context) {
 		</follow_challenge>`,
 		stylesheet: '/pretty-feed-v3.xsl',
 	});
+
+	// 设置正确的响应头以避免下载问题
+	rssResponse.headers.set('Content-Type', 'application/xml; charset=utf-8');
+	rssResponse.headers.set('X-Content-Type-Options', 'nosniff');
+	
+	return rssResponse;
 }
