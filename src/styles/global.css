@@ -42,7 +42,7 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: var(--text-color); /* 使用柔和的文字颜色 */
-	font-size: 16px;
+	font-size: 18px;
 	line-height: 1.7;
 }
 main {
@@ -193,7 +193,7 @@ table code {
 @media (max-width: 600px) {
 	table {
 		font-size: 0.85em;
-		min-width: 600px; /* 确保表格有最小宽度，触发横向滚动 */
+		/* min-width: 600px; 确保表格有最小宽度，触发横向滚动 */
 	}
 	
 	th, td {
