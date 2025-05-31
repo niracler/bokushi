@@ -1,13 +1,12 @@
 ---
 title: 人 X 社区 X 物 - 2025-05-30
 tags: [ "life", "software", "hardware", "community", "people", "tools", "xlog" ]
-heroImage: https://image.niracler.com/2025/03/2e3bf667bb2c02aa253c16a0aae5b762.png
-description: 关于我关注的人和物。这个主题很个人化，我喜欢的内容，别人或许会觉得不适合。毕竟这与我的阅历和经验密切相关。不过，我希望能列出一些我认为不错的东西，给你一些启发。
+socialImage: https://image.niracler.com/2025/03/2e3bf667bb2c02aa253c16a0aae5b762.png
 pubDate: "Sep 26, 2024"
 updatedDate: "May 30, 2025"
 ---
 
-这个主题很个人化，我喜欢的内容，别人或许会觉得不适合。毕竟这与我的阅历和经验密切相关。不过，我希望能列出一些我认为不错的东西，给你一些启发。
+关于我关注的人和物。这个主题很个人化，我喜欢的内容，别人或许会觉得不适合。毕竟这与我的阅历和经验密切相关。不过，我希望能列出一些我认为不错的东西，给你一些启发。
 
 > 我一般用 RSS 订阅以下列表中的人或组织，并且几乎每篇都读。  
 > 顺序不分先后，纯靠心情

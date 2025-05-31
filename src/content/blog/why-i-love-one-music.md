@@ -2,9 +2,8 @@
 title: 我为什么会喜欢一首歌
 pubDate: 'Apr 21 2025'
 updatedDate: 'May 30 2025'
-description: 才发现是我没有文化
 tags: [ "music" ]
-heroImage: https://image.niracler.com/2025/05/ae39ee1e90c47cab490990fa54a01537.png
+socialImage: https://image.niracler.com/2025/05/ae39ee1e90c47cab490990fa54a01537.png
 ---
 
 从小，家里人就常说我「没有音乐细胞」。每逢节假日，老爸总会打开音响（顺带催我起床），而我却只觉得吵闹，常把音量调小甚至关掉。各种文艺晚会中，若是没有剧情的音乐表演，我总觉得毫无必要。我也始终无法理解有人能在思考时听音乐，例如写代码时，但凡有一丝声音我的注意力就会被分散，更喜欢单纯的降噪模式。或许我对声音格外敏感吧，也一度自嘲自己天生与音乐无缘。
