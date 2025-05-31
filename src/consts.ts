@@ -10,5 +10,5 @@ export const SOCIAL_LINKS = {
     twitter: 'https://x.com/nini38324',
     email: 'mailto:i@niracler.com',
     telegram: 'https://t.me/tomoko_channel',
-    rss: 'https://niracler.com/feed'
+    rss: '/rss.xml'
 };
