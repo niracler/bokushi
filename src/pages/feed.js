@@ -20,5 +20,9 @@ export async function GET(context) {
 				allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img'])
 			}),
 		})),
+		customData: `<follow_challenge>
+			<feedId>52340201851637799</feedId>
+			<userId>41434914948866048</userId>
+		</follow_challenge>`,
 	});
 }

@@ -9,5 +9,6 @@ export const SOCIAL_LINKS = {
     github: 'https://github.com/niracler',
     twitter: 'https://x.com/nini38324',
     email: 'mailto:i@niracler.com',
-    telegram: 'https://t.me/tomoko_channel'
+    telegram: 'https://t.me/tomoko_channel',
+    rss: '/feed'
 };
