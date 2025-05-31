@@ -46,7 +46,7 @@ body {
 	line-height: 1.7;
 }
 main {
-	width: 720px;
+	width: 960px;
 	max-width: calc(100% - 2em);
 	margin: auto;
 	padding: 3em 1em;
@@ -192,7 +192,7 @@ table code {
 /* 响应式表格 */
 @media (max-width: 600px) {
 	table {
-		font-size: 0.85em;
+		font-size: 0.7em;
 		/* min-width: 600px; 确保表格有最小宽度，触发横向滚动 */
 	}
 	
@@ -228,7 +228,7 @@ hr {
 	border: none;
 	border-top: 1px solid rgba(139, 111, 71, 0.2); /* 柔和的分割线 */
 }
-@media (max-width: 720px) {
+@media (max-width: 960px) {
 	body {
 		font-size: 18px;
 	}

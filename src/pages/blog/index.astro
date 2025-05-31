@@ -17,7 +17,7 @@ const posts = (await getCollection('blog')).sort(
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			main {
-				width: 720px;
+				width: 960px;
 			}
 			ul {
 				display: flex;
@@ -56,7 +56,7 @@ const posts = (await getCollection('blog')).sort(
 			ul li a:hover .date {
 				color: rgb(var(--accent));
 			}
-			@media (max-width: 720px) {
+			@media (max-width: 960px) {
 				ul li a {
 					flex-direction: column;
 					align-items: flex-start;
