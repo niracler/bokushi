@@ -42,7 +42,7 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: var(--text-color); /* 使用柔和的文字颜色 */
-	font-size: 20px;
+	font-size: 16px;
 	line-height: 1.7;
 }
 main {
@@ -102,7 +102,105 @@ input {
 }
 table {
 	width: 100%;
+	border-collapse: collapse;
+	margin: 2em 0;
+	font-size: 1em;
+	background-color: rgba(255, 252, 245, 0.7);
+	border: 1px solid rgba(209, 157, 91, 0.2);
+	box-shadow: 0 2px 4px rgba(209, 157, 91, 0.08);
 }
+
+thead {
+	background-color: rgba(209, 157, 91, 0.08);
+	border-bottom: 2px solid rgba(209, 157, 91, 0.3);
+}
+
+th {
+	padding: 1em 1.2em;
+	text-align: left;
+	font-weight: 600;
+	color: #D19D5B;
+	font-size: 0.95em;
+	white-space: nowrap;
+}
+
+td {
+	padding: 1em 1.2em;
+	border-bottom: 1px solid rgba(209, 157, 91, 0.15);
+	color: var(--text-color);
+	white-space: nowrap;
+}
+
+tbody tr {
+	background-color: transparent;
+	transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+	background-color: rgba(209, 157, 91, 0.05);
+}
+
+tbody tr:last-child td {
+	border-bottom: none;
+}
+
+/* 表格内的特殊样式 */
+table strong {
+	color: #D19D5B;
+	font-weight: 600;
+}
+
+table code {
+	background-color: rgba(209, 157, 91, 0.08);
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-size: 0.9em;
+	color: #D19D5B;
+	border: 1px solid rgba(209, 157, 91, 0.15);
+}
+
+/* 表格容器 - 支持横向滚动 */
+.prose table {
+	margin: 2.5em 0;
+	display: block;
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(209, 157, 91, 0.3) rgba(209, 157, 91, 0.1);
+}
+
+/* 自定义滚动条样式 */
+.prose table::-webkit-scrollbar {
+	height: 8px;
+}
+
+.prose table::-webkit-scrollbar-track {
+	background: rgba(209, 157, 91, 0.05);
+	border-radius: 4px;
+}
+
+.prose table::-webkit-scrollbar-thumb {
+	background: rgba(209, 157, 91, 0.2);
+	border-radius: 4px;
+}
+
+.prose table::-webkit-scrollbar-thumb:hover {
+	background: rgba(209, 157, 91, 0.3);
+}
+
+/* 响应式表格 */
+@media (max-width: 600px) {
+	table {
+		font-size: 0.85em;
+		min-width: 600px; /* 确保表格有最小宽度，触发横向滚动 */
+	}
+	
+	th, td {
+		padding: 0.8em 1em;
+	}
+}
+
 img {
 	max-width: 100%;
 	height: auto;
