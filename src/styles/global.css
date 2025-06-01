@@ -1,24 +1,24 @@
 /*
-  The CSS in this style tag is based off of Bear Blog's default CSS.
-  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
+  Based on Bear Blog's default CSS.
   License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
  */
 
 :root {
-	/* Shiba Inu 主题风格的护眼配色 */
-	--accent: #8b6f47; /* 柔和的棕色作为主色调 */
+	/* Shiba Inu 护眼主题配色 */
+	--accent: #8b6f47;
 	--accent-dark: #6b5637;
-	--black: 75, 65, 55; /* 柔和的深棕色 */
+	--black: 75, 65, 55;
 	--gray: 120, 110, 100;
-	--gray-light: 245, 240, 230; /* 米色背景 */
+	--gray-light: 245, 240, 230;
 	--gray-dark: 95, 85, 75;
-	--background: #f5f0e6; /* 护眼的米白色背景 */
-	--text-color: #5f564e; /* 柔和的文字颜色 */
-	--gray-gradient: #f5f0e6, #f5f0e6; /* 统一的背景色 */
-	--box-shadow:
-		0 2px 6px rgba(139, 111, 71, 15%), 0 8px 24px rgba(139, 111, 71, 20%),
-		0 16px 32px rgba(139, 111, 71, 20%);
+	--background: #f5f0e6;
+	--text-color: #5f564e;
+	--box-shadow: 0 2px 6px rgba(139, 111, 71, 0.15),
+		0 8px 24px rgba(139, 111, 71, 0.2);
+	--table-border: rgba(209, 157, 91, 0.2);
+	--table-hover: rgba(209, 157, 91, 0.05);
 }
+
 @font-face {
 	font-family: 'Atkinson';
 	src: url('/fonts/atkinson-regular.woff') format('woff');
@@ -26,6 +26,7 @@
 	font-style: normal;
 	font-display: swap;
 }
+
 @font-face {
 	font-family: 'Atkinson';
 	src: url('/fonts/atkinson-bold.woff') format('woff');
@@ -33,141 +34,90 @@
 	font-style: normal;
 	font-display: swap;
 }
+
+/* Base styles */
 body {
 	font-family: "LXGW WenKai", 'Atkinson', sans-serif;
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	background: var(--background); /* 使用统一的背景色 */
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	color: var(--text-color); /* 使用柔和的文字颜色 */
+	background: var(--background);
+	color: var(--text-color);
 	font-size: 18px;
 	line-height: 1.7;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
+
 main {
 	width: 960px;
 	max-width: calc(100% - 2em);
 	margin: auto;
 	padding: 3em 1em;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
 	margin: 0 0 0.5rem 0;
 	color: rgb(var(--black));
 	line-height: 1.2;
 }
-h1 {
-	font-size: 2.2em;
-}
-h2 {
-	font-size: 1.8em;
-}
-h3 {
-	font-size: 1.5em;
-}
-h4 {
-	font-size: 1.3em;
-}
-h5 {
-	font-size: 1.15em;
-}
-strong,
-b {
+
+h1 { font-size: 2.2em; }
+h2 { font-size: 1.8em; }
+h3 { font-size: 1.5em; }
+h4 { font-size: 1.3em; }
+h5 { font-size: 1.15em; }
+
+strong, b {
 	font-weight: 700;
 	color: #FB8F68;
 }
+
 a {
 	color: #bb2a17;
 }
+
 a:hover {
 	color: #941a1a;
 }
+
 p {
 	margin-bottom: 1em;
 }
+
 .prose p {
 	margin-bottom: 2em;
 }
-textarea {
+
+/* Form elements */
+textarea, input {
 	width: 100%;
 	font-size: 16px;
 }
-input {
-	font-size: 16px;
-}
+
+/* Table styles */
 table {
-	width: 100%;
+	width: auto;                   /* 自动宽度，根据内容调整 */
 	border-collapse: collapse;
 	margin: 2em 0;
 	font-size: 1em;
 	background-color: rgba(255, 252, 245, 0.7);
-	border: 1px solid rgba(209, 157, 91, 0.2);
+	border: 1px solid var(--table-border);
 	box-shadow: 0 2px 4px rgba(209, 157, 91, 0.08);
-}
-
-thead {
-	background-color: rgba(209, 157, 91, 0.08);
-	border-bottom: 2px solid rgba(209, 157, 91, 0.3);
-}
-
-th {
-	padding: 1em 1.2em;
-	text-align: left;
-	font-weight: 600;
-	color: #D19D5B;
-	font-size: 0.95em;
-	white-space: nowrap;
-}
-
-td {
-	padding: 1em 1.2em;
-	border-bottom: 1px solid rgba(209, 157, 91, 0.15);
-	color: var(--text-color);
-	white-space: nowrap;
-}
-
-tbody tr {
-	background-color: transparent;
-	transition: background-color 0.2s ease;
-}
-
-tbody tr:hover {
-	background-color: rgba(209, 157, 91, 0.05);
-}
-
-tbody tr:last-child td {
-	border-bottom: none;
-}
-
-/* 表格内的特殊样式 */
-table strong {
-	color: #D19D5B;
-	font-weight: 600;
-}
-
-table code {
-	background-color: rgba(209, 157, 91, 0.08);
-	padding: 2px 6px;
-	border-radius: 3px;
-	font-size: 0.9em;
-	color: #D19D5B;
-	border: 1px solid rgba(209, 157, 91, 0.15);
 }
 
 /* 表格容器 - 支持横向滚动 */
 .prose table {
-	margin: 2.5em 0;
-	display: block;
-	overflow-x: auto;
-	overflow-y: hidden;
-	-webkit-overflow-scrolling: touch;
-	scrollbar-width: thin;
-	scrollbar-color: rgba(209, 157, 91, 0.3) rgba(209, 157, 91, 0.1);
+	display: block;                /* 保持为block，确保可以设置max-width */
+	max-width: 100%;              /* 不超过父容器宽度 */
+	overflow-x: auto;             /* 允许表格在水平方向上滚动 */
+	-webkit-overflow-scrolling: touch;  /* 在iOS设备上实现平滑滚动 */
+	scrollbar-width: thin;        /* 设置滚动条宽度为细型 */
+	scrollbar-color: rgba(209, 157, 91, 0.3) rgba(209, 157, 91, 0.1);  /* 设置滚动条的前景色和背景色 */
+	width: fit-content;           /* 宽度适应内容 */
+	margin-left: 0;               /* 确保左对齐 */
+	margin-right: auto;           /* 右边自动，避免强制占满宽度 */
 }
 
 /* 自定义滚动条样式 */
@@ -189,83 +139,127 @@ table code {
 	background: rgba(209, 157, 91, 0.3);
 }
 
-/* 响应式表格 */
-@media (max-width: 600px) {
-	table {
-		font-size: 0.7em;
-		/* min-width: 600px; 确保表格有最小宽度，触发横向滚动 */
-	}
-	
-	th, td {
-		padding: 0.8em 1em;
-	}
+thead {
+	background-color: rgba(209, 157, 91, 0.08);
+	border-bottom: 2px solid rgba(209, 157, 91, 0.3);
 }
 
+th, td {
+	padding: 0.5em 1.2em;
+	text-align: left;
+	white-space: nowrap;
+}
+
+th {
+	font-weight: 600;
+	color: #D19D5B;
+	font-size: 0.95em;
+}
+
+td {
+	border-bottom: 1px solid var(--table-border);
+	color: var(--text-color);
+}
+
+tbody tr {
+	background-color: transparent;
+	transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+	background-color: var(--table-hover);
+}
+
+tbody tr:last-child td {
+	border-bottom: none;
+}
+
+/* 表格内容样式 */
+table strong {
+	color: #D19D5B;
+	font-weight: 600;
+}
+
+table code {
+	background-color: rgba(209, 157, 91, 0.08);
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-size: 0.9em;
+	color: #D19D5B;
+	border: 1px solid var(--table-border);
+}
+
+/* Media elements */
 img {
 	max-width: 100%;
 	height: auto;
 	border-radius: 8px;
 }
+
+/* Code blocks */
 pre {
 	padding: 1.5em;
 	border-radius: 8px;
-	font-size: 0.7em; /* 与正文一样大 */
+	font-size: 0.9em;
 }
+
 pre > code {
 	padding: 0;
 	background-color: transparent;
-	font-size: inherit; /* 继承 pre 的字体大小 */
+	font-size: inherit;
 }
+
+:not(pre) > code {
+	padding: 2px 5px;
+	background-color: rgba(139, 111, 71, 0.08);
+	border-radius: 2px;
+	color: var(--accent-dark);
+	font-size: 0.9em;
+}
+
+/* Quotes */
 blockquote {
 	border-left: 4px solid var(--accent);
 	padding: 0 0 0 20px;
-	margin: 0px;
-	font-size: 1em; /* 稍微大于正文，但不要太大 */
-	background-color: rgba(139, 111, 71, 0.05); /* 轻微的背景色 */
+	margin: 0;
+	font-size: 1em;
+	background-color: rgba(139, 111, 71, 0.05);
 	border-radius: 0 4px 4px 0;
 }
+
+/* Utilities */
 hr {
 	border: none;
-	border-top: 1px solid rgba(139, 111, 71, 0.2); /* 柔和的分割线 */
+	border-top: 1px solid rgba(139, 111, 71, 0.2);
 }
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Responsive */
 @media (max-width: 960px) {
 	body {
-		font-size: 18px;
+		font-size: 16px;
 	}
 	main {
 		padding: 1em;
 	}
 }
 
-.sr-only {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	position: absolute !important;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
-	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
-	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
-	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
-	white-space: nowrap;
-}
-
-/* Shiki 代码块样式优化 */
-.astro-code {
-	/* 确保 Dracula 主题的深色背景与圆角边框配合良好 */
-	overflow: hidden;
-}
-
-/* 内联代码不受 Shiki 影响，保持原有样式 */
-:not(pre) > code {
-	padding: 2px 5px;
-	background-color: rgba(139, 111, 71, 0.08);
-	border-radius: 2px;
-	color: var(--accent-dark);
-	font-size: 1em;
+@media (max-width: 600px) {
+	table {
+		font-size: 0.85em;
+	}
+	th, td {
+		padding: 0.8em 1em;
+	}
 }
