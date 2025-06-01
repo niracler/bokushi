@@ -1,0 +1,184 @@
+---
+pubDate: "Aug 2, 2023"
+updatedDate: "Aug 6, 2023"
+socialImage: https://image.niracler.com/2025/06/5ca6165075464c2825fbe0d68dd61310.png
+description: 目标是 mac 上也可以推 galgame 啦～～
+tags: [ Shell, MacBook, game_porting_toolkit ]
+title: 如何使用 Apple Game Porting Toolkit 在 M1 Air 上玩 Windows 游戏 - v1.1
+---
+
+import Spoiler from '../../components/Spoiler.astro'
+
+> 目标是 mac 上也可以推 galgame 啦～～
+
+## 背景 or TLDR ？
+
+我是不是要用这篇文章来证明一下我稍微是一个 **技术导向而不是 ACG 导向** 的人？毕竟前两篇文章都是用之前的动画游戏的点评凑数的。
+
+这个事情其实很简单，就是 **安装 game porting toolkit 然后运行** 即可，跟网上的教程也是大同小异。（<Spoiler>是的，不用看下去了，点击量骗到了🐶</Spoiler>）只不过现在这个技术还不成熟，而且晚上的文章的时效性比较强，每过一周都会有点不一样。以至于我踩了一些坑。前前后后大约花了 6 个小时的时间才跑通了这个事情。实际时间不需要 2 个小时（包括 `homebrew build` ）
+
+之所以会折腾这个，是因为我每个月都会 random 一些自己感兴趣的事情稍微做一下。（ <Spoiler>当然是在 996 的工作外，</Spoiler> ）估计以后应该会单独写一篇文章来说这个 random 的事情。
+
+所以，**研究 wine 方面的技术** 就是我上个月的随机到的课题。但最后我不务正业，就只搞了这么一点东西～～ 而且这个课题是具有时效性的，于是我就拿出来先发了。
+
+**⚠️⚠️⚠️注意时效性⚠️⚠️⚠️**
+> 若文章里面的方法有问题，请不要直接跑路了。请多多评论，我这边慢慢补充修改。毕竟我也只有一台电脑，没法预测这么多情况～～
+
+1. 时间：2023-07-20
+2. 设备:   MacBook Air with M1 chip
+3. 版本:   macOS Sonoma Public Beta
+
+## 提前说一下跟网上其他文章的区别
+
+> 主要是我在这个过程中遇到的一些问题，网上其他文章没有说到的，或者解决起来很马虎含糊的。
+
+1. **要用 x64 的 homebrew**: 我一开始是将电脑上的 brew 给卸载了（<Spoiler>破釜沉舟</Spoiler>）。事后才发现卸载 homebrew 是一个很蠢的行为，其实是不需要的，只需要将 `/opt/homebrew/` 相关目录从 PATH 中移除就好了。还能共存使用～～
+2. **game porting toolkit 当前 XCode 15 beta 3/4/5 都会 build 失败**：最后要装回 XCode beta 2 才能用。每一次 build 都 build 了我一个多小时才跟我说失败～～
+
+## 我们来开始吧
+
+### 准备工作 - 下载安装 Command Line Tools + Game porting toolkit
+
+首先，要先 **确保我们使用的是 macOS Sonoma**， 这个直接在 Setting 里面更新就好。我是更新了 Public Beta 版本。
+
+然后下载下面这两个（[点击这里下载](https://developer.apple.com/download/all/) ），登录免费的 Apple 开发者帐户。使用你常用的详细信息登录，同意条款和条件，然后我们就可以继续了。
+
+- Command Line Tools for Xcode 15 beta 2（**注意是下载 beta 2，15 beta 3/4/5 都会 build 失败**，这是第 1 个坑）
+- Game porting toolkit beta 1.0.2
+
+![](https://image.niracler.com/2025/06/4bf09c6702e4506051f7367413425428.png)
+![](https://image.niracler.com/2025/06/58a7eb3771bdd9649be72c8fde88d52c.png)
+
+> Game porting toolkit 安装后会弹出一个窗口，请忽略它，因为现在没有任何文件会执行任何操作。
+
+![](https://image.niracler.com/2025/06/5171d89a585b2defab09dd8a40fa847f.png)
+
+### homebrew 安装  Apple Game Porting Toolkit
+
+因为**当前 game porting toolkit 其实还不支持在原生 arm64 上面跑** ，所以在当前 homebrew arm64 在 build 的过程中会出现报错。
+(报错了，哈哈。这是第 2 个坑，我一开始直接将 arm64 的 brew 给删了，然后再用 rosetta 装的 x64 的 brew)
+
+![](https://image.niracler.com/2025/06/a358c90603b5a656b3d691542e0a1769.png)
+
+**但其实你是不需要卸载 arm64 的 brew 的**，因为 brew x64 的安装目录是 `/usr/local/bin/`，而 brew arm64 的安装目录是 `/opt/homebrew/bin`
+
+然后，若是没有安装 rosetta 的系统应该要跑下面这句安装
+
+```bash
+softwareupdate –install-rosetta  
+```
+
+确保你系统有 rosetta 之后， 进入 x64 版本的 zsh，删除当前 PATH 中的 brew 目录。**这个就是让 x64 和 arm64 的 homebrew 共存的关键**，需要将 `/opt/homebrew/bin` 目录从 `PATH` 环境变量中删除掉就相当于删除 arm64 的 brew 了。
+
+这样就可以在不删除 arm64 版本的 brew 的情况下去安装 x64 的 brew 了 ( **只对当前 shell session 有效**)
+
+```bash
+arch -x86_64 zsh
+dir="/opt/homebrew/bin"
+PATH="${PATH//"${dir}:"/}"
+```
+
+然后我们开始装 x64 的 homebrew 吧，然后用 eval 加载到当前 session（ 访问有问题估计要开终端代理 ）
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/usr/local/bin/brew shellenv)"
+```
+
+此时 `which brew` 应该就是输出 `/usr/local/bin/brew`
+
+接下来就是真正安装   Game Porting Toolkit 了
+
+```bash
+brew tap apple/apple http://github.com/apple/homebrew-apple  
+brew -v install apple/apple/game-porting-toolkit
+```
+
+然后？然后就可以休息了，我安装了一个多小时。然后再跑下面两句。（**TODO: 其实我整片文章都还没搞清楚 官网下载的 game-porting-toolkit， 与 brew 安装的 game-porting-toolkit 之间的关系**）
+
+```bash
+ditto /Volumes/Game\ Porting\ Toolkit-1.0/lib/ /usr/local/opt/game-porting-toolkit/lib/
+cp /Volumes/Game\ Porting\ Toolkit*/gameportingtoolkit* /usr/local/bin
+```
+
+### 设置游戏移植套件
+
+我们这里第一个目标就是给 steam 初始化一个 wine prefix 环境， `WINEPREFIX` 就是指定一个文件夹来存放 wine 的运行环境，
+
+```bash
+WINEPREFIX=~/steam /usr/local/opt/game-porting-toolkit/bin/wine64 winecfg
+```
+
+该环境中会将运行 windows 文件的一些目录以及 dll 给准备好。(如下)
+
+![](https://image.niracler.com/2025/06/0dd425a8b9f73463b4d509536a5f7222.png)
+
+运行后将弹出一个初始化环境的窗口，从下拉列表中选择 Windows 10。点击「 应用 」并单击「 确定 」关闭窗口。
+
+![](https://image.niracler.com/2025/06/7dad19c6e7301b1906695889feb87a26.png)
+
+接下来我们到 steam 的官网将 steam 的 x64版本给下载下来，[点这里下载](https://store.steampowered.com/about/)
+
+先进行安装
+
+```bash
+gameportingtoolkit ~/steam ~/Downloads/SteamSetup.exe
+```
+
+安装完之后，就可以开始运行了, `C:\Program Files (x86)/Steam/steam.exe` 路径就是安装完后 steam 在 wine 里面的路径。
+
+```
+gameportingtoolkit ~/steam 'C:\Program Files (x86)/Steam/steam.exe' 
+```
+
+（成功了，干杯🍻）
+![](https://image.niracler.com/2025/06/627ac0e6762a1a5c74eb1e6b8e0b202d.png)
+
+### 最后 - 我稍微录制了一个视频
+
+> 顺便测试一下 xLog 的视频效果
+
+使用 Apple Game Porting oolkit 在 M1 Air 上运行 WIndows X64 游戏的运行效果，一个是《带我去地下城吧》，另外一个是《八方旅人2》
+
+<https://www.bilibili.com/video/BV1xj411r7rr/>
+
+3A 游戏演示《尼尔机械纪元》
+
+<https://www.bilibili.com/video/BV1JX4y1L77Y/>
+
+<details>
+<summary>折叠了一张封面用的图片</summary>
+
+![](https://image.niracler.com/2025/06/5ca6165075464c2825fbe0d68dd61310.png)
+
+</details>
+
+## 后记 - 关于为什么对这个技术感兴趣
+
+**关于为什么对这个技术感兴趣？** 为了 mac 上也可以推 galgame ？虽说 作为 mac 用户，已经好久没能碰到 galgame 了。
+
+**主要是我前段时间买了 steam deck**。首先，我很喜欢 archlinux ，再是，我很喜欢 steam，再再是，我很喜欢掌机，也不太那么喜欢用 windows）。而 **steam deck = archlinux + steam + 掌机 - windows**， 是 Proton/Wine 让这个成为了可能，于是 TODOList 里面就有 wine 的调研了。
+
+**然后适逢那场令人震撼苹果的 Vision Pro 发布会**，以及其中的配件 Game Porting Toolkit。我是这么相信的，Game Porting Toolkit 就是 Apple 的 **Proton 时刻** 。让我对 Apple 做游戏平台有信心了，尤其是 Vision Pro 上的游戏平台。
+
+**最后**，感觉因为 xLog 的 UI 布局比较好看，搞的我有点写文章的水平提高了的错觉～～ 我不太喜欢写那种干巴巴的技术文章。不过总的来说，我写文章还是写得后继无力。例如 **这篇文章里面有很多细节以及概念是没有讲清楚的** 。但这个文章是有时效性的，而且要经过多次调试，我就先发上来，以后再改了。
+
+---
+
+## 修改
+
+- 2023-08-02 23:33 v0.2 修改了标签和一些描述
+- 2023-08-03 07:35 v0.3 更新了有声音版本的视频录制，用的是 CleanShot 进行录制的，还不错。
+- 2023-08-03 22:06 v0.4 XCode 15 beta 5 也是挂的，不用看了，详情看参考链接2
+- 2023-08-04 19:43 v0.5 被别人吐槽不要标题党，于是改了标题 「 **如何使用 Apple GPT 在 M1 Air 上玩 Win X64 小黄油** 」 ==> 「 如何使用 Apple Game Porting Toolkit 在 M1 Air 上玩 Windows 游戏 」
+- 2023-08-06 14:56 v1.0 更新 3A 游戏演示《尼尔机械纪元》
+- 2023-08-06 22:04 v1.1 将 **这篇文章与其他文章的区别** 的段落提前了。以及更新了参考资料
+
+## 参考资料
+
+- 对，我就是看着这篇文章写的: [How to use Apple Game Porting Toolkit: Play Diablo IV on macOS - Dexerto](https://www.dexerto.com/tech/how-to-use-apple-game-porting-toolkit-2175563/)
+- [Game porting toolkit build error | Apple Developer Forums](https://developer.apple.com/forums/thread/732940)
+- 不会 shell 的同学可以补一下，[Bash 脚本教程 - 网道](https://wangdoc.com/bash/)
+- [apple gaming wiki](https://www.applegamingwiki.com/wiki/Home)：这个网站可以看到哪些游戏是可以玩的
+- [How Wine works 101 | Hacker News](https://news.ycombinator.com/item?id=33156727)：关于 wine 的「 翻译 」原理
+- [Apple's Game Porting Toolkit lets Windows games run on macOS (but it's not meant for end users... yet) - Liliputing](https://liliputing.com/apples-game-porting-toolkit-lets-windows-games-run-on-macos-but-its-not-meant-for-end-users-yet/): 其实现在的目标是方便开发者移植而不是面向最终用户的
