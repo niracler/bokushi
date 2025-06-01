@@ -34,6 +34,7 @@ socialImage: https://image.niracler.com/2025/06/0e608e7ce4e762f162524078893e04ea
 
 最让我可惜的是，最后没有去成 \*Kira\* Miki 的演唱会。
 (下面是没有去成的演唱会的结局)
+
 ![bafkreia2vjipqgjtegvhg34g4xqn6m5loxe3yj7zoolzge7wjh3tsf5nuq.jpeg](https://image.niracler.com/2025/06/8ba58d6b964fdb41761b5d05bf8b2de9.jpeg)
 
 ## 后记
