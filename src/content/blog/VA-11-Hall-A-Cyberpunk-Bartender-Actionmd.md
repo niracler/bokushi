@@ -3,6 +3,7 @@ title: VA-11 Hall-A - 在赛博酒吧里寻求生活的安慰
 pubDate: "Jun 9, 2023"
 tags: [ game ]
 socialImage: https://image.niracler.com/2025/06/0e608e7ce4e762f162524078893e04ea.jpeg
+description: 遵循着赛伯朋克的知识网络，嗅到并玩了这个游戏的。没有让我失望，从一个小小的调酒师的视角窥探了一个另类而荒诞的赛伯朋克世界观。
 ---
 
 ## 基本信息
