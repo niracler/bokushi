@@ -1,0 +1,37 @@
+---
+// Astro component script (runs on server)
+---
+
+<span class="spoiler">
+  <slot />
+</span>
+
+<style>
+  .spoiler {
+    background-color: rgb(var(--black));
+    color: rgb(var(--black));
+    border-radius: 4px;
+    padding: 0 4px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    user-select: none;
+  }
+  
+  .spoiler.revealed {
+    color: rgb(var(--gray-light));
+  }
+</style>
+
+<script>
+  // Client-side script (runs in browser)
+  document.addEventListener('DOMContentLoaded', function() {
+    const spoilers = document.querySelectorAll('.spoiler');
+    
+    spoilers.forEach(spoiler => {
+      spoiler.addEventListener('click', function(event) {
+        const target = event.currentTarget as HTMLElement;
+        target.classList.toggle('revealed');
+      });
+    });
+  });
+</script> 
