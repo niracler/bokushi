@@ -16,9 +16,12 @@
     "@fontsource/lxgw-wenkai": "^5.2.5",
     "astro": "^5.8.1",
     "markdown-it": "^14.1.0",
+    "rehype-mermaid": "^3.0.0",
+    "remark-gfm": "^4.0.1",
     "sanitize-html": "^2.17.0"
   },
   "devDependencies": {
+    "playwright": "^1.52.0",
     "wrangler": "^4.18.0"
   }
 }
