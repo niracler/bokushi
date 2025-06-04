@@ -29,19 +29,16 @@ importers:
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
+      mermaid:
+        specifier: ^11.6.0
+        version: 11.6.0
       rehype-mermaid:
         specifier: ^3.0.0
         version: 3.0.0(playwright@1.52.0)
-      remark-gfm:
-        specifier: ^4.0.1
-        version: 4.0.1
       sanitize-html:
         specifier: ^2.17.0
         version: 2.17.0
     devDependencies:
-      playwright:
-        specifier: ^1.52.0
-        version: 1.52.0
       wrangler:
         specifier: ^4.18.0
         version: 4.18.0(@cloudflare/workers-types@4.20250529.0)
@@ -4869,13 +4866,15 @@ snapshots:
       exsolve: 1.0.5
       pathe: 2.0.3
 
-  playwright-core@1.52.0: {}
+  playwright-core@1.52.0:
+    optional: true
 
   playwright@1.52.0:
     dependencies:
       playwright-core: 1.52.0
     optionalDependencies:
       fsevents: 2.3.2
+    optional: true
 
   points-on-curve@0.2.0: {}
 
