@@ -17,6 +17,18 @@
 		0 8px 24px rgba(139, 111, 71, 0.2);
 	--table-border: rgba(209, 157, 91, 0.2);
 	--table-hover: rgba(209, 157, 91, 0.05);
+	
+	/* Callout 配色 - 兼容护眼主题 */
+	--callout-note: #8b7ec8;
+	--callout-note-bg: rgba(139, 126, 200, 0.08);
+	--callout-tip: #4ade80;
+	--callout-tip-bg: rgba(74, 222, 128, 0.08);
+	--callout-important: #f59e0b;
+	--callout-important-bg: rgba(245, 158, 11, 0.08);
+	--callout-warning: #f97316;
+	--callout-warning-bg: rgba(249, 115, 22, 0.08);
+	--callout-caution: #ef4444;
+	--callout-caution-bg: rgba(239, 68, 68, 0.08);
 }
 
 @font-face {
@@ -338,5 +350,152 @@ hr {
 	}
 	th, td {
 		padding: 0.8em 1em;
+	}
+}
+
+/* === GitHub Callouts 样式 === */
+.markdown-alert {
+	border-left: 4px solid var(--accent);
+	border-radius: 0 8px 8px 0;
+	padding: 1rem 1.2rem;
+	margin: 1.5rem 0;
+	background: rgba(139, 111, 71, 0.05);
+	box-shadow: 0 2px 4px rgba(139, 111, 71, 0.08);
+}
+
+.markdown-alert > *:first-child {
+	margin-top: 0;
+}
+
+.markdown-alert > *:last-child {
+	margin-bottom: 0;
+}
+
+.markdown-alert .markdown-alert-title {
+	display: flex;
+	align-items: center;
+	font-weight: 600;
+	margin-bottom: 0.8rem;
+	font-size: 1.1rem;
+	color: var(--accent-dark);
+}
+
+.markdown-alert .markdown-alert-title svg {
+	width: 1.2rem;
+	height: 1.2rem;
+	margin-right: 0.6rem;
+	flex-shrink: 0;
+}
+
+/* Note callout */
+.markdown-alert-note {
+	border-left-color: var(--callout-note);
+	background: var(--callout-note-bg);
+}
+
+.markdown-alert-note .markdown-alert-title {
+	color: var(--callout-note);
+}
+
+.markdown-alert-note .markdown-alert-title svg {
+	color: var(--callout-note);
+}
+
+/* Tip callout */
+.markdown-alert-tip {
+	border-left-color: var(--callout-tip);
+	background: var(--callout-tip-bg);
+}
+
+.markdown-alert-tip .markdown-alert-title {
+	color: var(--callout-tip);
+}
+
+.markdown-alert-tip .markdown-alert-title svg {
+	color: var(--callout-tip);
+}
+
+/* Important callout */
+.markdown-alert-important {
+	border-left-color: var(--callout-important);
+	background: var(--callout-important-bg);
+}
+
+.markdown-alert-important .markdown-alert-title {
+	color: var(--callout-important);
+}
+
+.markdown-alert-important .markdown-alert-title svg {
+	color: var(--callout-important);
+}
+
+/* Warning callout */
+.markdown-alert-warning {
+	border-left-color: var(--callout-warning);
+	background: var(--callout-warning-bg);
+}
+
+.markdown-alert-warning .markdown-alert-title {
+	color: var(--callout-warning);
+}
+
+.markdown-alert-warning .markdown-alert-title svg {
+	color: var(--callout-warning);
+}
+
+/* Caution callout */
+.markdown-alert-caution {
+	border-left-color: var(--callout-caution);
+	background: var(--callout-caution-bg);
+}
+
+.markdown-alert-caution .markdown-alert-title {
+	color: var(--callout-caution);
+}
+
+.markdown-alert-caution .markdown-alert-title svg {
+	color: var(--callout-caution);
+}
+
+/* Callout 内容样式 */
+.markdown-alert p {
+	margin-bottom: 0.8rem;
+}
+
+.markdown-alert p:last-child {
+	margin-bottom: 0;
+}
+
+.markdown-alert code {
+	background: rgba(139, 111, 71, 0.1);
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-size: 0.9em;
+}
+
+.markdown-alert pre {
+	background: rgba(139, 111, 71, 0.06);
+	border: 1px solid rgba(139, 111, 71, 0.15);
+	border-radius: 6px;
+	padding: 1rem;
+	margin: 0.8rem 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+	.markdown-alert {
+		padding: 0.8rem 1rem;
+		margin: 1rem 0;
+	}
+	
+	.markdown-alert .markdown-alert-title {
+		font-size: 1rem;
+		margin-bottom: 0.6rem;
+	}
+	
+	.markdown-alert .markdown-alert-title svg {
+		width: 1rem;
+		height: 1rem;
+		margin-right: 0.5rem;
 	}
 }
