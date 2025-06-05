@@ -5,6 +5,11 @@ import sitemap from '@astrojs/sitemap';
 import cloudflare from '@astrojs/cloudflare';
 import rehypeMermaid from "rehype-mermaid";
 import { remarkAlert } from 'remark-github-blockquote-alert';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeSlug from 'rehype-slug';
+import rehypePicture from 'rehype-picture';
+import rehypeImgSize from 'rehype-img-size';
+import rehypeFigure from 'rehype-figure';
 
 // https://astro.build/config
 export default defineConfig({
@@ -26,6 +31,18 @@ export default defineConfig({
       excludeLangs: ['mermaid'],
     },
     rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: 'prepend',
+          properties: {
+            class: 'anchor-link',
+            ariaHidden: true,
+            tabIndex: -1
+          }
+        }
+      ],
       [
         rehypeMermaid,
         {
@@ -33,7 +50,10 @@ export default defineConfig({
           dark: true, // 启用暗黑模式支持
           colorScheme: "forest", // 使用 forest 配色方案，可根据需要调整
         }
-      ]
+      ],
+      rehypePicture,
+      rehypeImgSize,
+      rehypeFigure
     ]
   },
 });
