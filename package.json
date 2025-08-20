@@ -16,7 +16,7 @@
     "@fontsource/lxgw-wenkai": "^5.2.5",
     "astro": "^5.12.8",
     "markdown-it": "^14.1.0",
-    "mermaid": "^11.6.0",
+    "mermaid": "^11.10.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-figure": "^1.0.1",
     "rehype-img-size": "^1.0.1",
