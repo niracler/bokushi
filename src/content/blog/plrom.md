@@ -1,9 +1,9 @@
 ---
-title: 人 X 社区 X 物 - 2025-05-30
+title: 人 X 社区 X 物 - 2025-09-22
 tags: [ "life", "software", "hardware", "community", "people", "tools", "xlog" ]
 socialImage: https://image.niracler.com/2025/03/2e3bf667bb2c02aa253c16a0aae5b762.png
 pubDate: "Sep 26, 2024"
-updatedDate: "May 30, 2025"
+updatedDate: "Sep 22, 2025"
 ---
 
 关于我关注的人和物。这个主题很个人化，我喜欢的内容，别人或许会觉得不适合。毕竟这与我的阅历和经验密切相关。不过，我希望能列出一些我认为不错的东西，给你一些启发。
