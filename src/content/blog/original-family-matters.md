@@ -43,5 +43,4 @@ socialImage: https://image.niracler.com/2024/07/dec773a38fdb545315d8f450f800ec95
 
 话题源于 [这里](https://t.me/polebugisabug/36)
 
-（最后，非常感谢这位痛斥我一顿的朋友）  
-![2024-07-16 08.26.51.png](https://image.niracler.com/2024/07/4bed4dcd9a92eae93886e888f517700a.png)
+![最后，非常感谢这位痛斥我一顿的朋友](https://image.niracler.com/2024/07/4bed4dcd9a92eae93886e888f517700a.png)

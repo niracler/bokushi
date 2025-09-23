@@ -210,8 +210,7 @@ updatedDate: "Sep 22, 2025"
   - [西部数据(WD) 2TB 移动硬盘 USB 3.0](https://www.wd.com/products/portable-storage/my-passport.html) - 中间有段时间用于备份我的 MacBook Air 的数据，但是经常会因为太慢甚至将我电脑卡死，所以就更换用途了。现在是用来作为 AutoBangumi 的动画存储。
 - [Logitech MX Keys](https://www.logitech.com/zh-cn/products/keyboards/mx-keys-mac-wireless-keyboard.920-009559.html) - 拿去公司上班用了
 
-(远远称不上整洁的桌面😂)
-![28D407F9-1DD6-48B1-8F06-B58A44EF392A_1_105_c.jpeg](https://image.niracler.com/2025/09/ae548461d451ed36ab16001c1832028c.jpeg)
+![远远称不上整洁的桌面😂](https://image.niracler.com/2025/09/ae548461d451ed36ab16001c1832028c.jpeg)
 
 ### 🏷️ 随身设备
 
@@ -526,8 +525,7 @@ updatedDate: "Sep 22, 2025"
 - [Home Assistant Companion](https://companion.home-assistant.io) - 最近日常手机上都是开 tailscale 来让 HA 识别我是否到家了，到家之前自动开空调电脑之类的。
 - [Apple Home](https://www.apple.com/cn/apple-home/) - 设备价格偏高,目前只有少量设备。不过配合 Home Assistant 后应该会有更多可能性。
 
-(最近摸鱼时调的一个 HA 面板)
-![CleanShot 2025-05-23 at 15.08.17@2x.png](https://image.niracler.com/2025/05/8770f3aca85cdd8a358bf0e17426c353.png)
+![最近摸鱼时调的一个 HA 面板](https://image.niracler.com/2025/05/8770f3aca85cdd8a358bf0e17426c353.png)
 
 ### 🛒 购物
 
