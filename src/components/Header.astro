@@ -3,10 +3,12 @@ import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
 ---
 
-<header>
-	<nav>
-		<h2><a href="/">{SITE_TITLE}</a></h2>
-		<div class="internal-links">
+<header class="bg-[var(--color-bg-page)] shadow-sm">
+	<nav class="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-3">
+		<h2 class="text-sm font-semibold text-[var(--color-text-secondary)]">
+			<a href="/" class="transition-colors hover:text-[var(--color-accent)]">{SITE_TITLE}</a>
+		</h2>
+		<div class="flex gap-1 sm:gap-2">
 			<HeaderLink href="/">首页</HeaderLink>
 			<HeaderLink href="/blog">文章</HeaderLink>
 			<HeaderLink href="/tags">标签</HeaderLink>
@@ -19,35 +21,3 @@ import { SITE_TITLE } from '../consts';
 		href={new URL('rss.xml', Astro.site)}
 	/>
 </header>
-<style>
-	header {
-		margin: 0;
-		padding: 0 1em;
-		background: var(--background);
-		box-shadow: 0 2px 8px rgba(139, 111, 71, 5%);
-	}
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
-
-	h2 a,
-	h2 a.active {
-		text-decoration: none;
-	}
-	nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	nav a {
-		padding: 1em 0.5em;
-		color: var(--black);
-		border-bottom: 4px solid transparent;
-		text-decoration: none;
-	}
-	nav a.active {
-		text-decoration: none;
-		border-bottom-color: var(--accent);
-	}
-</style>

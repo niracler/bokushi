@@ -2,11 +2,16 @@
 const today = new Date();
 import { SOCIAL_LINKS } from '../consts';
 ---
-
-<footer>
+<footer class="bg-[var(--color-bg-page)] px-4 py-12 text-center text-sm text-[var(--color-text-secondary)]">
 	&copy; {today.getFullYear()} Niracler. All rights reserved.
-	<div class="social-links">
-		<a href={SOCIAL_LINKS.telegram} target="_blank" data-tooltip={SOCIAL_LINKS.telegram}>
+	<div class="mt-4 flex justify-center gap-4">
+		<a
+			href={SOCIAL_LINKS.telegram}
+			target="_blank"
+			rel="noreferrer"
+			title={SOCIAL_LINKS.telegram}
+			class="transition-colors hover:text-[var(--color-accent)]"
+		>
 			<span class="sr-only">Join Niracler on Telegram</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/telegram">
 				<path
@@ -15,7 +20,13 @@ import { SOCIAL_LINKS } from '../consts';
 				></path>
 			</svg>
 		</a>
-		<a href={SOCIAL_LINKS.github} target="_blank" data-tooltip={SOCIAL_LINKS.github}>
+		<a
+			href={SOCIAL_LINKS.github}
+			target="_blank"
+			rel="noreferrer"
+			title={SOCIAL_LINKS.github}
+			class="transition-colors hover:text-[var(--color-accent)]"
+		>
 			<span class="sr-only">Go to Niracler's GitHub</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/github"
 				><path
@@ -24,7 +35,11 @@ import { SOCIAL_LINKS } from '../consts';
 				></path></svg
 			>
 		</a>
-		<a href={SOCIAL_LINKS.email} data-tooltip={SOCIAL_LINKS.email.replace('mailto:', '')}>
+		<a
+			href={SOCIAL_LINKS.email}
+			title={SOCIAL_LINKS.email.replace('mailto:', '')}
+			class="transition-colors hover:text-[var(--color-accent)]"
+		>
 			<span class="sr-only">Send email to Niracler</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/email">
 				<path
@@ -33,7 +48,13 @@ import { SOCIAL_LINKS } from '../consts';
 				></path>
 			</svg>
 		</a>
-		<a href={SOCIAL_LINKS.twitter} target="_blank" data-tooltip={SOCIAL_LINKS.twitter}>
+		<a
+			href={SOCIAL_LINKS.twitter}
+			target="_blank"
+			rel="noreferrer"
+			title={SOCIAL_LINKS.twitter}
+			class="transition-colors hover:text-[var(--color-accent)]"
+		>
 			<span class="sr-only">Follow Niracler on X</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/x"
 				><path
@@ -42,7 +63,11 @@ import { SOCIAL_LINKS } from '../consts';
 				></path></svg
 			>
 		</a>
-		<a href={SOCIAL_LINKS.rss} data-tooltip="RSS Feed">
+		<a
+			href={SOCIAL_LINKS.rss}
+			title="RSS Feed"
+			class="transition-colors hover:text-[var(--color-accent)]"
+		>
 			<span class="sr-only">Subscribe to RSS Feed</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32" astro-icon="social/rss">
 				<path
@@ -53,75 +78,3 @@ import { SOCIAL_LINKS } from '../consts';
 		</a>
 	</div>
 </footer>
-<style>
-	footer {
-		padding: 2em 1em 6em 1em;
-		background: var(--background);
-		color: rgb(var(--gray));
-		text-align: center;
-	}
-	.social-links {
-		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
-	}
-	.social-links a {
-		text-decoration: none;
-		color: rgb(var(--gray));
-		position: relative;
-	}
-	.social-links a:hover {
-		color: rgb(var(--gray-dark));
-	}
-	
-	/* 自定义 tooltip 样式 - 日式优雅风格 */
-	.social-links a[data-tooltip] {
-		position: relative;
-	}
-	
-	.social-links a[data-tooltip]::before,
-	.social-links a[data-tooltip]::after {
-		position: absolute;
-		visibility: hidden;
-		opacity: 0;
-		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-		pointer-events: none;
-		z-index: 10;
-	}
-	
-	.social-links a[data-tooltip]::before {
-		content: attr(data-tooltip);
-		bottom: 150%;
-		left: 50%;
-		transform: translateX(-50%) translateY(10px);
-		padding: 0.75em 1.25em;
-		background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 248, 248, 0.9));
-		backdrop-filter: blur(10px);
-		color: #2d2d2d;
-		font-size: 0.8rem;
-		border-radius: 8px;
-		white-space: nowrap;
-		font-weight: 500;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.06);
-		border: 1px solid rgba(0, 0, 0, 0.05);
-		letter-spacing: 0.3px;
-	}
-	
-	.social-links a[data-tooltip]::after {
-		content: '';
-		bottom: 140%;
-		left: 50%;
-		transform: translateX(-50%) translateY(10px);
-		border: 6px solid transparent;
-		border-top-color: rgba(248, 248, 248, 0.95);
-		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
-	}
-	
-	.social-links a[data-tooltip]:hover::before,
-	.social-links a[data-tooltip]:hover::after {
-		visibility: visible;
-		opacity: 1;
-		transform: translateX(-50%) translateY(0);
-	}
-</style>

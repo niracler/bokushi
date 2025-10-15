@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Remark42Comments from '../components/Remark42Comments.astro';
 import { extractDescription } from '../utils/extractDescription';
+import Prose from '../components/Prose.astro';
 
 type Props = CollectionEntry<'blog'>['data'] & {
 	body?: string;
@@ -13,113 +14,51 @@ type Props = CollectionEntry<'blog'>['data'] & {
 
 const { title, description: providedDescription, pubDate, updatedDate, socialImage, body, tags } = Astro.props;
 
-// 如果没有提供 description，从文章内容中提取
 const description = providedDescription || (body ? extractDescription(body) : '暂无描述');
 ---
 
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} image={socialImage} />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 60%;
-				height: 300px;
-				margin: 0 auto;
-				overflow: hidden;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 960px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
-			}
-			.tags {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.5rem;
-				justify-content: center;
-				margin-top: 1rem;
-			}
-			.tag {
-				display: inline-block;
-				padding: 0.25rem 0.75rem;
-				background-color: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
-				border-radius: 1rem;
-				font-size: 0.85rem;
-				text-decoration: none;
-				transition: all 0.2s ease;
-			}
-			.tag:hover {
-				background-color: rgba(var(--accent), 0.1);
-				color: rgb(var(--accent));
-			}
-		</style>
 	</head>
 
 	<body>
 		<Header />
-		<main>
-			<article>
-				<!-- <div class="hero-image">
-					{heroImage && <img width={1020} height={510} src={heroImage} alt="" />}
-				</div> -->
-				<div class="prose">
-					<div class="title">
-						<h1>{title}</h1>
-						<div class="date">
+		<main class="px-4">
+			<article class="mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]">
+				<div class="space-y-4 border-b border-border-subtle pb-6 text-center">
+					<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">{title}</h1>
+					<div class="space-y-2 text-sm text-[var(--color-text-muted)]">
+						<p>
 							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						{tags && tags.length > 0 && (
-							<div class="tags">
-								{tags.map((tag: string) => (
-									<a href={`/tags/${tag}`} class="tag">{tag}</a>
-								))}
-							</div>
-						)}
-						<hr />
+						</p>
+						{
+							updatedDate && (
+								<p>
+									Last updated on <FormattedDate date={updatedDate} />
+								</p>
+							)
+						}
 					</div>
-					<slot />
-					<Remark42Comments />
+					{tags && tags.length > 0 && (
+						<div class="flex flex-wrap justify-center gap-2">
+							{tags.map((tag: string) => (
+								<a
+									href={`/tags/${tag}`}
+									class="inline-flex items-center rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(var(--color-accent-rgb),0.15)] hover:text-[var(--color-accent)]"
+								>
+									{tag}
+								</a>
+							))}
+						</div>
+					)}
 				</div>
+
+				<Prose>
+					<slot />
+				</Prose>
+
+				<Remark42Comments />
 			</article>
 		</main>
 		<Footer />

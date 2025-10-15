@@ -11,12 +11,15 @@ import rehypePicture from 'rehype-picture';
 import rehypeImgSize from 'rehype-img-size';
 import rehypeFigure from 'rehype-figure';
 
+import tailwindcss from '@tailwindcss/vite';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://niracler.com',
   trailingSlash: 'never',
   integrations: [mdx(), sitemap()],
   adapter: cloudflare(),
+
   markdown: {
     remarkPlugins: [remarkAlert],
     shikiConfig: {
@@ -55,5 +58,9 @@ export default defineConfig({
       rehypeImgSize,
       rehypeFigure
     ]
+  },
+
+  vite: {
+    plugins: [tailwindcss()],
   },
 });

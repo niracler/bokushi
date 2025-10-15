@@ -533,8 +533,8 @@ updatedDate: "Sep 22, 2025"
 - [京东](https://www.jd.com/)(小程序) - 会员价值感逐渐降低。
 - [拼多多](https://www.pinduoduo.com/)(小程序) - 主要用于购买 Switch 游戏卡带、乐高、模型等娱乐用品。
 - [淘宝](https://www.taobao.com/) - 适合购买特殊商品,如台版书籍、外区充值卡等。
-- [闲鱼](https://www.goofish.com) - 因不愿花时间讨价还价,很少用于卖物。每年购买几件二手商品,在消费降级趋势下可能会增加使用频率。
-- [朴朴超市](http://www.pupumall.com) - 买菜以及生活用品之类的。
+- [闲鱼](https://www.goofish.com)(小程序) - 因不愿花时间讨价还价,很少用于卖物。每年购买几件二手商品,在消费降级趋势下可能会增加使用频率。
+- [朴朴超市](http://www.pupumall.com)(小程序) - 买菜以及生活用品之类的。
 
 <details>
 <summary>过期列表</summary>

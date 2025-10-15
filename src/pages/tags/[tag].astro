@@ -11,9 +11,7 @@ export async function getStaticPaths() {
 	const uniqueTags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
 
 	return uniqueTags.map((tag) => {
-		const filteredPosts = allPosts.filter((post) =>
-			post.data.tags.includes(tag)
-		);
+		const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag));
 		return {
 			params: { tag },
 			props: { posts: filteredPosts },
@@ -24,7 +22,6 @@ export async function getStaticPaths() {
 const { tag } = Astro.params;
 const { posts } = Astro.props;
 
-// 按日期排序
 const sortedPosts = posts.sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
@@ -34,96 +31,24 @@ const sortedPosts = posts.sort(
 <html lang="en">
 	<head>
 		<BaseHead title={`标签: ${tag} | ${SITE_TITLE}`} description={`所有标记为 "${tag}" 的文章`} />
-		<style>
-			main {
-				width: 960px;
-			}
-			h1 {
-				font-size: 2.5rem;
-				font-weight: 700;
-				line-height: 1;
-				text-align: center;
-				margin-bottom: 1em;
-			}
-			.tag-name {
-				color: rgb(var(--accent));
-			}
-			.back-link {
-				display: inline-block;
-				margin-bottom: 2rem;
-				color: rgb(var(--gray-dark));
-				text-decoration: none;
-				transition: color 0.2s ease;
-			}
-			.back-link:hover {
-				color: rgb(var(--accent));
-			}
-			ul {
-				display: flex;
-				flex-direction: column;
-				gap: 1rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: 100%;
-				position: relative;
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li a {
-				display: flex;
-				align-items: baseline;
-				padding: 0.5rem 0;
-				gap: 0.5rem;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1.2;
-				font-size: 1.5rem;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-				font-size: 0.9rem;
-				white-space: nowrap;
-			}
-			ul li a:hover .title,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			@media (max-width: 960px) {
-				ul li a {
-					flex-direction: column;
-					align-items: flex-start;
-					gap: 0.3rem;
-				}
-				.title {
-					font-size: 1rem;
-				}
-				.date {
-					font-size: 0.85rem;
-				}
-			}
-		</style>
 	</head>
 	<body>
 		<Header />
-		<main>
-			<a href="/tags" class="back-link">← 返回标签索引</a>
-			<h1>标签: <span class="tag-name">{tag}</span></h1>
+		<main class="space-y-8">
+			<a href="/tags" class="inline-flex items-center text-sm text-[var(--color-text-secondary)] transition hover:text-[var(--color-accent)]">← 返回标签索引</a>
+			<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">
+				标签: <span class="text-[var(--color-accent)]">{tag}</span>
+			</h1>
 			<section>
-				<ul>
+				<ul class="m-0 flex list-none flex-col gap-4 p-0">
 					{
 						sortedPosts.map((post) => (
-							<li>
-								<a href={`/${post.id}`}>
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
+							<li class="border-b border-border-soft pb-2">
+								<a href={`/${post.id}`} class="group flex flex-wrap items-baseline gap-3 no-underline">
+									<h4 class="text-lg font-semibold text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)] sm:text-xl">
+										{post.data.title}
+									</h4>
+									<p class="text-sm text-[var(--color-text-secondary)] transition-colors group-hover:text-[var(--color-accent)]">
 										<FormattedDate date={post.data.pubDate} />
 									</p>
 								</a>
@@ -135,4 +60,4 @@ const sortedPosts = posts.sort(
 		</main>
 		<Footer />
 	</body>
-</html> 
+</html>

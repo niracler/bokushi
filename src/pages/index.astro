@@ -13,63 +13,90 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 	</head>
 	<body>
 		<Header />
-		<main>
-			<section class="hero">
-				<div class="migration-notice">
-					<p>🚀 正在迁移啦，老朋友请看 <a href="https://niracler.xlog.app" target="_blank">niracler.xlog.app</a></p>
+		<main class="mx-auto max-w-3xl space-y-12 px-4">
+			<section class="space-y-6 text-center">
+				<div
+					class="mx-auto max-w-xl rounded-md border border-border-subtle border-l-4 border-l-accent bg-[var(--color-bg-surface)] px-6 py-3 text-sm text-[var(--color-text-muted)] shadow-sm"
+				>
+					<p>
+						🚀 正在迁移啦，老朋友请看
+						<a
+							href="https://niracler.xlog.app"
+							target="_blank"
+							class="font-semibold text-[var(--color-accent)] underline-offset-4 hover:underline"
+						>
+							niracler.xlog.app
+						</a>
+					</p>
 				</div>
-				<h1>Hi, 我是 Niracler 👋</h1>
-				<p class="subtitle">去各样的地方，遇见各样的人</p>
-				<p class="intro">
+				<h1 class="text-4xl font-bold text-[var(--color-accent)] sm:text-5xl">Hi, 我是 Niracler 👋</h1>
+				<p class="text-lg italic text-[var(--color-text-secondary)] sm:text-xl">去各样的地方，遇见各样的人</p>
+				<p class="mx-auto max-w-2xl text-base leading-relaxed text-[var(--color-text-muted)] sm:text-lg">
 					一个喜欢记录生活、思考人生的赛博电子人。在这里，你会看到我的生活片段、技术思考、游戏体验，
 					以及一些关于人生和世界的胡思乱想。
 				</p>
 			</section>
 
-			<section class="navigation">
-				<h2>这里可能会有</h2>
-				<div class="nav-grid">
-					<div class="nav-item">
-						<h3>📝 <a href="/blog">博客文章</a></h3>
-						<p>技术分享、生活感悟和各种思考</p>
+			<section class="space-y-6">
+				<h2 class="text-2xl font-semibold text-[var(--color-text-primary)]">这里可能会有</h2>
+				<div class="grid gap-4 sm:grid-cols-2">
+						<div
+							class="rounded-lg border border-border-subtle bg-[var(--color-bg-surface)] p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+						>
+						<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">
+							📝 <a href="/blog" class="hover:text-[var(--color-accent)]">博客文章</a>
+						</h3>
+						<p class="mt-2 text-sm text-[var(--color-text-muted)]">技术分享、生活感悟和各种思考</p>
 					</div>
-					<div class="nav-item">
-						<h3>🗓️ 周记月记</h3>
-						<p>记录生活的点点滴滴，分享日常的思考</p>
+						<div
+							class="rounded-lg border border-border-subtle bg-[var(--color-bg-surface)] p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+						>
+						<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">🗓️ 周记月记</h3>
+						<p class="mt-2 text-sm text-[var(--color-text-muted)]">记录生活的点点滴滴，分享日常的思考</p>
 					</div>
-					<div class="nav-item">
-						<h3>🎮 游戏体验</h3>
-						<p>分享游戏经历和感受</p>
+						<div
+							class="rounded-lg border border-border-subtle bg-[var(--color-bg-surface)] p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+						>
+						<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">🎮 游戏体验</h3>
+						<p class="mt-2 text-sm text-[var(--color-text-muted)]">分享游戏经历和感受</p>
 					</div>
-					<div class="nav-item">
-						<h3>🤔 哲学思考</h3>
-						<p>对生活、工作和人生的思考</p>
+						<div
+							class="rounded-lg border border-border-subtle bg-[var(--color-bg-surface)] p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+						>
+						<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">🤔 哲学思考</h3>
+						<p class="mt-2 text-sm text-[var(--color-text-muted)]">对生活、工作和人生的思考</p>
 					</div>
 				</div>
 			</section>
 
-			<section class="recent-updates">
-				<h2>最近在做什么</h2>
-				<div class="status-grid">
-					<div class="status-item">
+			<section class="space-y-4">
+				<h2 class="text-2xl font-semibold text-[var(--color-text-primary)]">最近在做什么</h2>
+				<div class="grid gap-4 sm:grid-cols-2">
+						<div
+							class="rounded-md border border-border-subtle border-l-4 border-l-accent bg-[var(--color-bg-muted)] px-4 py-3 text-[var(--color-text-secondary)]"
+						>
 						<strong>📍 当前状态：</strong> 在深圳工作中
 					</div>
-					<div class="status-item">
+						<div
+							class="rounded-md border border-border-subtle border-l-4 border-l-accent bg-[var(--color-bg-muted)] px-4 py-3 text-[var(--color-text-secondary)]"
+						>
 						<strong>🎯 最近关注：</strong> 技术学习、生活记录
 					</div>
-					<div class="status-item">
+						<div
+							class="rounded-md border border-border-subtle border-l-4 border-l-accent bg-[var(--color-bg-muted)] px-4 py-3 text-[var(--color-text-secondary)]"
+						>
 						<strong>📚 正在读：</strong> 各种技术文档和人生思考
 					</div>
 				</div>
 			</section>
 
-			<section class="quote-section">
-				<blockquote>
+			<section class="space-y-3 border-t border-border-soft pt-6">
+				<blockquote class="text-center text-base leading-relaxed text-[var(--color-text-secondary)]">
 					或许每个人都只是想证明自己的确存在着，希望他人也能认知到自己确实存在于这个世上。也许大家都是基于这个单纯的行动理念进行一切行为。所盼望的只有一个，那就是
 					<br/><strong>「不要忘了我」</strong><br/>
 					这个简洁却悲痛的讯息。
 				</blockquote>
-				<p class="quote-source">
+				<p class="text-right text-sm text-[var(--color-text-secondary)]">
 					—— 《<a href="https://t.me/tomoko_channel/7">凉宫春日的忧郁</a>》
 				</p>
 			</section>
@@ -77,152 +104,5 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 			<Remark42Comments postId="homepage" />
 		</main>
 		<Footer />
-
-		<style>
-			.migration-notice {
-				background: #f9f9f9;
-				color: #555;
-				padding: 0.8rem 1.5rem;
-				border-radius: 8px;
-				margin-bottom: 2rem;
-				text-align: center;
-				border: 1px solid #e1e1e1;
-				border-left: 4px solid var(--accent);
-			}
-
-			.migration-notice p {
-				margin: 0;
-				font-size: 1rem;
-				font-weight: 500;
-			}
-
-			.migration-notice a {
-				color: var(--accent);
-				text-decoration: none;
-				font-weight: bold;
-			}
-
-			.migration-notice a:hover {
-				text-decoration: underline;
-			}
-
-			.hero {
-				text-align: center;
-				padding: 2rem 0;
-				margin-bottom: 3rem;
-			}
-
-			.hero h1 {
-				font-size: 2.5rem;
-				margin-bottom: 0.5rem;
-				color: var(--accent);
-			}
-
-			.subtitle {
-				font-style: italic;
-				font-size: 1.2rem;
-				color: #666;
-				margin-bottom: 1rem;
-			}
-
-			.intro {
-				font-size: 1.1rem;
-				line-height: 1.6;
-				max-width: 600px;
-				margin: 0 auto;
-				color: #555;
-			}
-
-			.navigation {
-				margin-bottom: 3rem;
-			}
-
-			.navigation h2 {
-				margin-bottom: 1.5rem;
-				color: var(--accent);
-			}
-
-			.nav-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-				gap: 1.5rem;
-			}
-
-			.nav-item {
-				padding: 1.5rem;
-				border: 1px solid #e1e1e1;
-				border-radius: 8px;
-				transition: box-shadow 0.3s ease;
-			}
-
-			.nav-item:hover {
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-			}
-
-			.nav-item h3 {
-				margin-bottom: 0.5rem;
-			}
-
-			.nav-item a {
-				text-decoration: none;
-				color: inherit;
-			}
-
-			.nav-item a:hover {
-				color: var(--accent);
-			}
-
-			.recent-updates {
-				margin-bottom: 3rem;
-			}
-
-			.recent-updates h2 {
-				margin-bottom: 1.5rem;
-				color: var(--accent);
-			}
-
-			.status-grid {
-				display: grid;
-				gap: 1rem;
-			}
-
-			.status-item {
-				padding: 1rem;
-				background: #f9f9f9;
-				border-radius: 6px;
-				border-left: 4px solid var(--accent);
-			}
-
-			.quote-section {
-				margin-top: 4rem;
-				padding-top: 2rem;
-				border-top: 1px solid #e1e1e1;
-			}
-
-			.quote-section blockquote {
-				margin: 0 0 1rem 0;
-				padding: 0;
-				border: none;
-				text-align: center;
-				font-size: 1.1rem;
-				line-height: 1.6;
-			}
-
-			.quote-source {
-				text-align: right;
-				margin: 0;
-				color: #666;
-			}
-
-			@media (max-width: 768px) {
-				.hero h1 {
-					font-size: 2rem;
-				}
-				
-				.nav-grid {
-					grid-template-columns: 1fr;
-				}
-			}
-		</style>
 	</body>
 </html>

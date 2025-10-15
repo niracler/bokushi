@@ -15,8 +15,8 @@ const pageUrl = Astro.url.href;
 const pageId = postId || Astro.url.pathname;
 ---
 
-<div class="remark42-wrapper">
-  <h2>评论</h2>
+<div class="mt-12 border-t border-border-subtle pt-6">
+  <h2 class="mb-4 text-xl font-semibold text-[var(--color-accent)]">评论</h2>
   <div id="remark42"></div>
 </div>
 
@@ -60,38 +60,3 @@ const pageId = postId || Astro.url.pathname;
     document.head.appendChild(script);
   })();
 </script>
-
-<style>
-  .remark42-wrapper {
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid #e1e1e1;
-  }
-
-  .remark42-wrapper h2 {
-    margin-bottom: 1.5rem;
-    color: var(--accent);
-    font-size: 1.5rem;
-  }
-
-  #remark42 {
-    min-height: 100px;
-  }
-
-  /* 自定义 Remark42 样式 */
-  :global(.remark42__root) {
-    font-family: inherit !important;
-  }
-
-  :global(.remark42__root-theme-light) {
-    --remark42-color-primary: var(--accent) !important;
-  }
-
-  /* 响应式设计 */
-  @media (max-width: 768px) {
-    .remark42-wrapper {
-      margin-top: 3rem;
-      padding-top: 1.5rem;
-    }
-  }
-</style>
