@@ -1,6 +1,6 @@
 ---
 pubDate: "Jun 4, 2025"
-tags: [ "健康" ]
+tags: [ "健康", "生活" ]
 title: 赛博电子人尝试找回现实感 - 如何恢复并保持身心健康 - v1.0
 socialImage: https://image.niracler.com/2025/06/132cff41094121435193dcddc2f27168.jpg
 ---

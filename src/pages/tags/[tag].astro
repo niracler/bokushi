@@ -7,7 +7,10 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-	const allPosts = await getCollection('blog');
+	const blogPosts = await getCollection('blog');
+	const monthlyPosts = await getCollection('monthly');
+	const tilPosts = await getCollection('til');
+	const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts];
 	const uniqueTags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
 
 	return uniqueTags.map((tag) => {
@@ -28,36 +31,45 @@ const sortedPosts = posts.sort(
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<BaseHead title={`标签: ${tag} | ${SITE_TITLE}`} description={`所有标记为 "${tag}" 的文章`} />
 	</head>
-	<body>
-		<Header />
-		<main class="space-y-8">
-			<a href="/tags" class="inline-flex items-center text-sm text-[var(--color-text-secondary)] transition hover:text-[var(--color-accent)]">← 返回标签索引</a>
-			<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">
-				标签: <span class="text-[var(--color-accent)]">{tag}</span>
+<body>
+	<Header />
+	<main class="mx-auto max-w-4xl space-y-10 px-4">
+		<nav class="text-sm text-[var(--color-text-secondary)]">
+			<a href="/tags" class="inline-flex items-center gap-2 transition hover:text-[var(--color-accent)]">
+				<span aria-hidden="true">←</span> 返回标签索引
+			</a>
+		</nav>
+		<header class="space-y-2">
+			<p class="text-xs uppercase tracking-[0.28em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">Tag</p>
+			<h1 class="text-3xl font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
+				<span class="text-[var(--color-accent)]">{tag}</span>
 			</h1>
-			<section>
-				<ul class="m-0 flex list-none flex-col gap-4 p-0">
-					{
-						sortedPosts.map((post) => (
-							<li class="border-b border-border-soft pb-2">
-								<a href={`/${post.id}`} class="group flex flex-wrap items-baseline gap-3 no-underline">
-									<h4 class="text-lg font-semibold text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)] sm:text-xl">
-										{post.data.title}
-									</h4>
-									<p class="text-sm text-[var(--color-text-secondary)] transition-colors group-hover:text-[var(--color-accent)]">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-	</body>
+		</header>
+		<section>
+			<ul class="m-0 flex list-none flex-col gap-3.5 p-0 sm:gap-4">
+				{sortedPosts.map((post) => (
+					<li>
+						<a
+							href={`/${post.id}`}
+							class="group flex items-baseline gap-4 px-3 py-2 no-underline transition duration-150 ease-out hover:text-[var(--color-accent)] focus-visible:outline-none focus-visible:text-[var(--color-accent)] focus-visible:underline sm:px-4 sm:py-2.5"
+						>
+							<h4 class="flex-1 text-base font-semibold tracking-tight text-[var(--color-text-primary)] transition duration-150 group-hover:text-[var(--color-accent)] sm:text-lg">
+								{post.data.title}
+							</h4>
+							<p class="ml-auto flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.14em] text-[color-mix(in srgb, var(--color-text-muted) 75%, transparent)] transition-colors group-hover:text-[var(--color-accent)] sm:text-xs">
+								<span aria-hidden="true" class="hidden h-px w-6 bg-[color-mix(in srgb, var(--color-text-muted) 50%, transparent)] sm:inline-block"></span>
+								<FormattedDate date={post.data.pubDate} />
+							</p>
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+	</main>
+	<Footer />
+</body>
 </html>

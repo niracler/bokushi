@@ -1,7 +1,7 @@
 ---
 pubDate: "Nov 2, 2022"
 description: 这是我人生当中的至黑至暗时刻。那半年里面我失去的实在是太多了
-tags: [ "黑历史", "Game" ]
+tags: [ "游戏", "评测", "随笔" ]
 title: 少女回战 - 二次元类传奇游戏堕落史
 socialImage: https://image.niracler.com/2025/06/ffac8e2c3f860c469417a7c36a428e72.png
 ---

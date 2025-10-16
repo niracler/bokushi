@@ -2,7 +2,7 @@
 title: 我为什么会喜欢一首歌
 pubDate: 'Apr 21 2025'
 updatedDate: 'May 30 2025'
-tags: [ "music" ]
+tags: [ "音乐", "随笔" ]
 socialImage: https://image.niracler.com/2025/05/ae39ee1e90c47cab490990fa54a01537.png
 ---
 

@@ -8,7 +8,12 @@ import Remark42Comments from '../components/Remark42Comments.astro';
 import { extractDescription } from '../utils/extractDescription';
 import Prose from '../components/Prose.astro';
 
-type Props = CollectionEntry<'blog'>['data'] & {
+type EntryData =
+	| CollectionEntry<'blog'>['data']
+	| CollectionEntry<'monthly'>['data']
+	| CollectionEntry<'til'>['data'];
+
+type Props = EntryData & {
 	body?: string;
 };
 

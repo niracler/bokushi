@@ -5,11 +5,26 @@ import Footer from '../../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 import { getCollection } from 'astro:content';
 import FormattedDate from '../../components/FormattedDate.astro';
-import { extractDescription } from '../../utils/extractDescription';
 
-const posts = (await getCollection('blog')).sort(
+
+const blogPosts = await getCollection('blog');
+const monthlyPosts = await getCollection('monthly');
+const tilPosts = await getCollection('til');
+
+const posts = [...blogPosts, ...monthlyPosts, ...tilPosts].sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+const postsByYear = posts.reduce((acc, post) => {
+	const year = String(post.data.pubDate.getFullYear());
+	if (!acc.has(year)) {
+		acc.set(year, []);
+	}
+	acc.get(year)?.push(post);
+	return acc;
+}, new Map<string, typeof posts>());
+
+const groupedPosts = Array.from(postsByYear.entries());
 ---
 
 <!doctype html>
@@ -19,154 +34,96 @@ const posts = (await getCollection('blog')).sort(
 	</head>
 	<body>
 		<Header />
-		<main class="mx-auto max-w-3xl space-y-8 px-4">
-			<section>
-				<ul class="m-0 flex list-none flex-col gap-4 p-0">
-					{
-						posts.map((post) => {
-							const description = post.data.description || extractDescription(post.body || '');
-							return (
-								<li class="border-b border-border-subtle pb-2">
-									<a
-										href={`/${post.id}`}
-										class="post-link group flex flex-wrap items-baseline gap-3 no-underline"
-										data-title={post.data.title}
-										data-description={description}
-										data-image={post.data.socialImage || ''}
-									>
-										<h4 class="title text-lg font-semibold text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)] sm:text-xl">
-											{post.data.title}
-										</h4>
-										<p class="date text-sm text-[var(--color-text-secondary)] transition-colors group-hover:text-[var(--color-accent)]">
-											<FormattedDate date={post.data.pubDate} />
-										</p>
-									</a>
-								</li>
-							);
-						})
-					}
-				</ul>
-
-				<div
-					id="preview-card"
-					class="preview-card fixed w-72 overflow-hidden rounded-xl border border-border-subtle bg-[var(--color-bg-surface)] shadow-lg opacity-0 transition-opacity duration-200 ease-out"
-				>
-					<div id="preview-image-container" class="h-40 w-full bg-[var(--color-bg-muted)]">
-						<img id="preview-image" class="preview-image h-full w-full object-cover" alt="" style="display: none;" />
-						<div id="preview-no-image" class="preview-no-image flex h-full items-center justify-center text-xs text-[var(--color-text-muted)]" style="display: none;">
-							暂无预览图
-						</div>
-					</div>
-					<div class="preview-content space-y-2 p-4 text-sm">
-						<h5 id="preview-title" class="preview-title font-semibold text-[var(--color-text-primary)]"></h5>
-						<p id="preview-description" class="preview-description text-[var(--color-text-secondary)]"></p>
-					</div>
+		<main class="mx-auto max-w-4xl space-y-12 px-4 sm:space-y-16">
+			<section class="space-y-12 sm:space-y-16">
+				<div class="flex items-center justify-end">
+					<label class="inline-flex select-none items-center gap-2 text-sm text-[color-mix(in srgb, var(--color-text-secondary) 80%, transparent)]">
+						<input
+							id="filter-deepsearch"
+							type="checkbox"
+							class="h-4 w-4 accent-[var(--color-accent)]"
+							checked
+						/>
+						<span>隐藏 DeepSearch 文章</span>
+					</label>
 				</div>
+				{
+					groupedPosts.map(([year, yearPosts]) => (
+						<div class="space-y-5 sm:space-y-6" data-year-group>
+							<h3 class="text-[2.25rem] font-semibold tracking-tight text-[color-mix(in srgb, var(--color-text-muted) 28%, transparent)] sm:text-[3rem]">
+								{year}
+							</h3>
+							<ul class="m-0 flex list-none flex-col gap-3.5 p-0 sm:gap-4">
+								{
+									yearPosts.map((post) => {
+										const isDeepSearch = post.data.tags?.includes('DeepSearch') ?? false;
+										return (
+											<li data-deepsearch={isDeepSearch ? 'true' : 'false'}>
+												<a
+													href={`/${post.id}`}
+													class="post-link group relative flex items-baseline gap-4 px-3 py-2 no-underline transition duration-150 ease-out hover:text-[var(--color-accent)] focus-visible:outline-none focus-visible:text-[var(--color-accent)] focus-visible:underline sm:px-4 sm:py-2.5"
+													data-post-id={post.id}
+												>
+													<h4 class="title flex-1 text-base font-semibold tracking-tight text-[var(--color-text-primary)] transition duration-150 group-hover:text-[var(--color-accent)] sm:text-lg">
+														{post.data.title}
+													</h4>
+													<p class="date ml-auto flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.14em] text-[color-mix(in srgb, var(--color-text-muted) 75%, transparent)] transition-colors group-hover:text-[var(--color-accent)] sm:text-xs">
+														<span aria-hidden="true" class="hidden h-px w-6 bg-[color-mix(in srgb, var(--color-text-muted) 50%, transparent)] sm:inline-block"></span>
+														<FormattedDate date={post.data.pubDate} />
+													</p>
+												</a>
+											</li>
+										);
+									})
+								}
+							</ul>
+						</div>
+					))
+				}
 			</section>
 		</main>
 		<Footer />
 
 		<script is:inline>
 			document.addEventListener('DOMContentLoaded', function() {
-				const previewCard = document.getElementById('preview-card');
-				const previewImage = document.getElementById('preview-image');
-				const previewNoImage = document.getElementById('preview-no-image');
-				const previewTitle = document.getElementById('preview-title');
-				const previewDescription = document.getElementById('preview-description');
-				const postTitles = document.querySelectorAll('.title');
+				const yearGroups = document.querySelectorAll('[data-year-group]');
+				const filterCheckbox = document.getElementById('filter-deepsearch');
 
-				if (!previewCard) return;
+				if (!filterCheckbox) return;
 
-				let isPreviewVisible = false;
-				let showTimeout = null;
-
-				const showPreview = (event) => {
-					previewCard.style.opacity = '1';
-					previewCard.style.visibility = 'visible';
-					previewCard.style.pointerEvents = 'auto';
-					isPreviewVisible = true;
-					updatePreviewPosition(event);
-				};
-
-				const hidePreview = () => {
-					previewCard.style.opacity = '0';
-					previewCard.style.visibility = 'hidden';
-					previewCard.style.pointerEvents = 'none';
-					isPreviewVisible = false;
-				};
-
-				postTitles.forEach(function(titleElement) {
-					const link = titleElement.closest('.post-link');
-					if (!link) return;
-
-					titleElement.addEventListener('mouseenter', function(e) {
-						if (showTimeout) {
-							clearTimeout(showTimeout);
-						}
-
-						showTimeout = window.setTimeout(function() {
-							const title = link.getAttribute('data-title');
-							const description = link.getAttribute('data-description');
-							const image = link.getAttribute('data-image');
-
-							if (previewTitle) previewTitle.textContent = title || '';
-							if (previewDescription) previewDescription.textContent = description || '';
-
-							if (image && previewImage && previewNoImage) {
-								previewImage.setAttribute('src', image);
-								previewImage.setAttribute('alt', 'Preview of ' + (title || ''));
-								previewImage.style.display = 'block';
-								previewNoImage.style.display = 'none';
-							} else if (previewImage && previewNoImage) {
-								previewImage.style.display = 'none';
-								previewNoImage.style.display = 'flex';
-							}
-
-							showPreview(e);
-						}, 800);
-					});
-
-					titleElement.addEventListener('mouseleave', function() {
-						if (showTimeout) {
-							clearTimeout(showTimeout);
-							showTimeout = null;
-						}
-
-						hidePreview();
-					});
-
-					titleElement.addEventListener('mousemove', function(e) {
-						if (isPreviewVisible) {
-							updatePreviewPosition(e);
-						}
-					});
-				});
-
-				function updatePreviewPosition(e) {
-					if (!previewCard) return;
-
-					const cardWidth = 300;
-					const cardHeight = previewCard.offsetHeight || 250;
-					const offset = 20;
-
-					let x = e.clientX + offset;
-					let y = e.clientY - cardHeight / 2;
-
-					if (x + cardWidth > window.innerWidth) {
-						x = e.clientX - cardWidth - offset;
-					}
-
-					if (y < 0) {
-						y = 10;
-					}
-
-					if (y + cardHeight > window.innerHeight) {
-						y = window.innerHeight - cardHeight - 10;
-					}
-
-					previewCard.style.left = x + 'px';
-					previewCard.style.top = y + 'px';
+				const FILTER_KEY = 'hide-deepsearch-posts';
+				const savedPreference = window.localStorage.getItem(FILTER_KEY);
+				if (savedPreference !== null) {
+					filterCheckbox.checked = savedPreference === 'true';
 				}
+
+				const applyFilter = () => {
+					const hideDeepSearch = filterCheckbox.checked;
+					window.localStorage.setItem(FILTER_KEY, String(hideDeepSearch));
+
+					yearGroups.forEach((group) => {
+						let visibleCount = 0;
+						group.querySelectorAll('li[data-deepsearch]').forEach((item) => {
+							const isDeepSearch = item.getAttribute('data-deepsearch') === 'true';
+							const shouldHide = hideDeepSearch && isDeepSearch;
+							item.style.display = shouldHide ? 'none' : '';
+							if (!shouldHide) visibleCount += 1;
+						});
+
+						const noDataIndicator = group.querySelector('.no-posts');
+						if (noDataIndicator) {
+							noDataIndicator.style.display = visibleCount === 0 ? 'block' : 'none';
+						} else if (visibleCount === 0) {
+							const emptyState = document.createElement('p');
+							emptyState.className = 'no-posts text-sm text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)] italic';
+							emptyState.textContent = '（暂无符合条件的文章）';
+							group.querySelector('ul')?.appendChild(emptyState);
+						}
+					});
+				};
+
+				filterCheckbox.addEventListener('change', applyFilter);
+				applyFilter();
 			});
 		</script>
 	</body>

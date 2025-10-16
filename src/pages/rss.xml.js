@@ -7,7 +7,10 @@ import MarkdownIt from 'markdown-it';
 const parser = new MarkdownIt();
 
 export async function GET(context) {
-	const posts = (await getCollection('blog')).sort(
+	const blogPosts = await getCollection('blog');
+	const monthlyPosts = await getCollection('monthly');
+	const tilPosts = await getCollection('til');
+	const posts = [...blogPosts, ...monthlyPosts, ...tilPosts].sort(
 		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 	);
 	const rssContent = await rss({

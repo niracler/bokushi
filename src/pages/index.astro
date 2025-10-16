@@ -14,80 +14,128 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 	<body>
 		<Header />
 		<main class="mx-auto max-w-3xl space-y-12 px-4">
-			<section class="space-y-6 text-center">
-				<div
-					class="mx-auto max-w-xl rounded-md border border-border-subtle border-l-4 border-l-accent bg-[var(--color-bg-surface)] px-6 py-3 text-sm text-[var(--color-text-muted)] shadow-sm"
-				>
-					<p>
-						🚀 正在迁移啦，老朋友请看
-						<a
-							href="https://niracler.xlog.app"
-							target="_blank"
-							class="font-semibold text-[var(--color-accent)] underline-offset-4 hover:underline"
-						>
-							niracler.xlog.app
-						</a>
+			<section class="space-y-5 text-left">
+				<p class="text-xs font-medium uppercase tracking-[0.3em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
+					正在迁移中 ·
+					<a
+						href="https://niracler.xlog.app"
+						target="_blank"
+						class="inline-flex items-center gap-1 font-semibold text-[var(--color-accent)] underline-offset-4 hover:underline"
+					>
+						niracler.xlog.app
+					</a>
+				</p>
+				<div class="space-y-2">
+					<h1 class="text-[2.75rem] font-semibold leading-tight tracking-tight text-[var(--color-text-primary)] sm:text-[3.25rem]">
+						Hi, 我是 Niracler 👋
+					</h1>
+					<p class="text-base font-medium text-[color-mix(in srgb, var(--color-text-secondary) 80%, transparent)] sm:text-lg">
+						去各样的地方，遇见各样的人
 					</p>
 				</div>
-				<h1 class="text-4xl font-bold text-[var(--color-accent)] sm:text-5xl">Hi, 我是 Niracler 👋</h1>
-				<p class="text-lg italic text-[var(--color-text-secondary)] sm:text-xl">去各样的地方，遇见各样的人</p>
-				<p class="mx-auto max-w-2xl text-base leading-relaxed text-[var(--color-text-muted)] sm:text-lg">
-					一个喜欢记录生活、思考人生的赛博电子人。在这里，你会看到我的生活片段、技术思考、游戏体验，
-					以及一些关于人生和世界的胡思乱想。
+				<p class="max-w-2xl text-base leading-relaxed text-[color-mix(in srgb, var(--color-text-muted) 80%, transparent)] sm:text-[1.05rem]">
+					一个喜欢记录生活、思考人生的赛博电子人。在这里，你会看到我的生活片段、技术思考、游戏体验，以及一些关于人生和世界的胡思乱想。
 				</p>
 			</section>
 
 			<section class="space-y-6">
 				<h2 class="text-2xl font-semibold text-[var(--color-text-primary)]">这里可能会有</h2>
-				<div class="grid gap-4 sm:grid-cols-2">
-						<div
-							class="rounded-lg border border-border-subtle bg-[var(--color-bg-surface)] p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+				<ul class="grid gap-4 sm:grid-cols-2 sm:gap-5">
+					<li>
+						<a
+							href={`/tags/${encodeURIComponent('月记')}`}
+							class="group flex gap-3 rounded-md bg-transparent px-3 py-3 transition-colors hover:bg-[color-mix(in srgb, var(--color-accent) 6%, transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
 						>
-						<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">
-							📝 <a href="/blog" class="hover:text-[var(--color-accent)]">博客文章</a>
-						</h3>
-						<p class="mt-2 text-sm text-[var(--color-text-muted)]">技术分享、生活感悟和各种思考</p>
-					</div>
-						<div
-							class="rounded-lg border border-border-subtle bg-[var(--color-bg-surface)] p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+							<span class="text-xl leading-none">🗓️</span>
+							<div class="space-y-1">
+								<h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
+									月记
+								</h3>
+								<p class="text-base font-medium text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
+									记录一个月的节奏、心境与成长
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a
+							href={`/tags/${encodeURIComponent('TIL')}`}
+							class="group flex gap-3 rounded-md bg-transparent px-3 py-3 transition-colors hover:bg-[color-mix(in srgb, var(--color-accent) 6%, transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
 						>
-						<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">🗓️ 周记月记</h3>
-						<p class="mt-2 text-sm text-[var(--color-text-muted)]">记录生活的点点滴滴，分享日常的思考</p>
-					</div>
-						<div
-							class="rounded-lg border border-border-subtle bg-[var(--color-bg-surface)] p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+							<span class="text-xl leading-none">💡</span>
+							<div class="space-y-1">
+								<h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
+									每日一学
+								</h3>
+								<p class="text-base font-medium text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
+									每天学到的技巧、流程与灵感速记
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a
+							href={`/tags/${encodeURIComponent('游戏')}`}
+							class="group flex gap-3 rounded-md bg-transparent px-3 py-3 transition-colors hover:bg-[color-mix(in srgb, var(--color-accent) 6%, transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
 						>
-						<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">🎮 游戏体验</h3>
-						<p class="mt-2 text-sm text-[var(--color-text-muted)]">分享游戏经历和感受</p>
-					</div>
-						<div
-							class="rounded-lg border border-border-subtle bg-[var(--color-bg-surface)] p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+							<span class="text-xl leading-none">🎮</span>
+							<div class="space-y-1">
+								<h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
+									游戏体验
+								</h3>
+								<p class="text-base font-medium text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
+									分享游戏经历和感受
+								</p>
+							</div>
+						</a>
+					</li>
+					<li>
+						<a
+							href={`/tags/${encodeURIComponent('思考')}`}
+							class="group flex gap-3 rounded-md bg-transparent px-3 py-3 transition-colors hover:bg-[color-mix(in srgb, var(--color-accent) 6%, transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
 						>
-						<h3 class="text-lg font-semibold text-[var(--color-text-primary)]">🤔 哲学思考</h3>
-						<p class="mt-2 text-sm text-[var(--color-text-muted)]">对生活、工作和人生的思考</p>
-					</div>
-				</div>
+							<span class="text-xl leading-none">🤔</span>
+							<div class="space-y-1">
+								<h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
+									深度思考
+								</h3>
+								<p class="text-base font-medium text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
+									对工作、人生与世界的思辨
+								</p>
+							</div>
+						</a>
+					</li>
+				</ul>
 			</section>
 
 			<section class="space-y-4">
 				<h2 class="text-2xl font-semibold text-[var(--color-text-primary)]">最近在做什么</h2>
-				<div class="grid gap-4 sm:grid-cols-2">
-						<div
-							class="rounded-md border border-border-subtle border-l-4 border-l-accent bg-[var(--color-bg-muted)] px-4 py-3 text-[var(--color-text-secondary)]"
-						>
-						<strong>📍 当前状态：</strong> 在深圳工作中
-					</div>
-						<div
-							class="rounded-md border border-border-subtle border-l-4 border-l-accent bg-[var(--color-bg-muted)] px-4 py-3 text-[var(--color-text-secondary)]"
-						>
-						<strong>🎯 最近关注：</strong> 技术学习、生活记录
-					</div>
-						<div
-							class="rounded-md border border-border-subtle border-l-4 border-l-accent bg-[var(--color-bg-muted)] px-4 py-3 text-[var(--color-text-secondary)]"
-						>
-						<strong>📚 正在读：</strong> 各种技术文档和人生思考
-					</div>
-				</div>
+				<ul class="space-y-2 sm:grid sm:grid-cols-2 sm:gap-3 sm:space-y-0">
+					<li class="flex items-baseline gap-3 text-sm text-[var(--color-text-secondary)] sm:text-base">
+						<span class="h-[6px] w-[6px] rounded-full bg-[var(--color-accent)]"></span>
+						<div>
+							<span class="font-semibold text-[var(--color-text-primary)]">当前状态</span>
+							<span class="mx-2 text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">/</span>
+							<span>在深圳工作中</span>
+						</div>
+					</li>
+					<li class="flex items-baseline gap-3 text-sm text-[var(--color-text-secondary)] sm:text-base">
+						<span class="h-[6px] w-[6px] rounded-full bg-[var(--color-accent)]"></span>
+						<div>
+							<span class="font-semibold text-[var(--color-text-primary)]">最近关注</span>
+							<span class="mx-2 text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">/</span>
+							<span>技术学习、生活记录</span>
+						</div>
+					</li>
+					<li class="flex items-baseline gap-3 text-sm text-[var(--color-text-secondary)] sm:text-base">
+						<span class="h-[6px] w-[6px] rounded-full bg-[var(--color-accent)]"></span>
+						<div>
+							<span class="font-semibold text-[var(--color-text-primary)]">正在读</span>
+							<span class="mx-2 text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">/</span>
+							<span>各种技术文档和人生思考</span>
+						</div>
+					</li>
+				</ul>
 			</section>
 
 			<section class="space-y-3 border-t border-border-soft pt-6">

@@ -1,6 +1,6 @@
 ---
 title: 人 X 社区 X 物 - 2025-09-22
-tags: [ "life", "software", "hardware", "community", "people", "tools", "xlog" ]
+tags: [ "社区", "工具" ]
 socialImage: https://image.niracler.com/2025/03/2e3bf667bb2c02aa253c16a0aae5b762.png
 pubDate: "Sep 26, 2024"
 updatedDate: "Sep 22, 2025"

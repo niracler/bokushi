@@ -1,5 +1,5 @@
 ---
-tags: [ "life", "family" ]
+tags: [ "生活", "家庭" ]
 pubDate: "Jun 22, 2024"
 updatedDate: "Apr 11, 2025"
 title: 原生家庭那些事
