@@ -71,5 +71,83 @@ const description = providedDescription || (body ? extractDescription(body) : 'æ
 	<script>
 		import mermaid from 'mermaid';
 		mermaid.initialize({ startOnLoad: true });
+
+		if (typeof window !== 'undefined') {
+			const unwrapCardCells = (table) => {
+				const cardCells = table.querySelectorAll('[data-cardified]');
+
+				cardCells.forEach((cell) => {
+					const wrapper = cell.querySelector('.table-card-value');
+					if (wrapper) {
+						while (wrapper.firstChild) {
+							cell.insertBefore(wrapper.firstChild, wrapper);
+						}
+						wrapper.remove();
+					}
+					cell.removeAttribute('data-cardified');
+					cell.removeAttribute('data-label');
+				});
+			};
+
+			const applyResponsiveTables = () => {
+				const tables = document.querySelectorAll('.prose table');
+
+				tables.forEach((table) => {
+					const headers = Array.from(table.querySelectorAll('thead th')).map((th) => {
+						return (th.textContent || '').trim();
+					});
+
+					const rows = Array.from(table.querySelectorAll('tbody tr'));
+					const hasBodyRows = rows.length > 0;
+					const columnThreshold = 3;
+					const hasWideHeader = headers.length > columnThreshold;
+					const hasWideRow = rows.some((row) => {
+						return row.querySelectorAll('td, th').length > columnThreshold;
+					});
+					const shouldCardify =
+						headers.length > 0 && hasBodyRows && (hasWideHeader || hasWideRow);
+
+					table.setAttribute('data-card-mode', shouldCardify ? 'cards' : 'table');
+
+					if (!shouldCardify) {
+						unwrapCardCells(table);
+						return;
+					}
+
+					rows.forEach((row) => {
+						const cells = Array.from(row.querySelectorAll('td, th'));
+
+						cells.forEach((cell, index) => {
+							const label = headers[index] || '';
+							if (label.length === 0) {
+								cell.removeAttribute('data-label');
+								return;
+							}
+							cell.setAttribute('data-label', label);
+							if (!cell.hasAttribute('data-cardified')) {
+								const valueWrapper = document.createElement('div');
+								valueWrapper.classList.add('table-card-value');
+								while (cell.firstChild) {
+									valueWrapper.appendChild(cell.firstChild);
+								}
+								cell.appendChild(valueWrapper);
+								cell.setAttribute('data-cardified', 'true');
+							}
+						});
+					});
+				});
+			};
+
+			const ensureResponsiveTables = () =>
+				window.requestAnimationFrame(applyResponsiveTables);
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', ensureResponsiveTables, { once: true });
+			} else {
+				ensureResponsiveTables();
+			}
+
+			window.addEventListener('astro:after-swap', ensureResponsiveTables);
+		}
 	</script>
 </html>

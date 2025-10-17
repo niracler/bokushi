@@ -225,11 +225,11 @@
 	}
 
 	.prose table tbody tr:nth-child(even) {
-		background: rgba(var(--color-text-primary-rgb), 0.03);
+		background: color-mix(in srgb, var(--color-bg-surface) 82%, var(--color-bg-muted) 18%);
 	}
 
 	.prose table tbody tr:hover {
-		background: rgba(var(--color-accent-rgb), 0.08);
+		background: color-mix(in srgb, var(--color-bg-surface) 75%, var(--color-accent-soft) 25%);
 	}
 
 	.prose thead {
@@ -256,32 +256,79 @@
 	}
 
 	@media (max-width: 48rem) {
-		.prose table {
+		.prose table[data-card-mode='cards'] {
 			display: block;
-			width: 100%;
-			overflow-x: auto;
-			border-radius: var(--radius-md);
-			border: 1px solid var(--color-border-subtle);
+			border: none;
+			background: transparent;
 			box-shadow: none;
-			-webkit-overflow-scrolling: touch;
 		}
 
-		.prose table thead {
-			position: static;
+		.prose table[data-card-mode='cards'] thead {
+			display: none;
 		}
 
-		.prose table::-webkit-scrollbar {
-			height: 8px;
+		.prose table[data-card-mode='cards'] tbody {
+			display: grid;
+			gap: var(--space-3);
 		}
 
-		.prose table::-webkit-scrollbar-thumb {
-			background: rgba(var(--color-text-primary-rgb), 0.2);
-			border-radius: 999px;
+		.prose table[data-card-mode='cards'] tbody tr {
+			display: grid;
+			gap: var(--space-3);
+			padding: var(--space-3);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			background: color-mix(in srgb, var(--color-bg-surface) 90%, white 10%);
+			box-shadow: var(--shadow-soft);
 		}
 
-		.prose table {
-			scrollbar-color: rgba(var(--color-text-primary-rgb), 0.25) transparent;
-			scrollbar-width: thin;
+		.prose table[data-card-mode='cards'] tbody tr:nth-child(even) {
+			background: color-mix(in srgb, var(--color-bg-surface) 82%, var(--color-bg-muted) 18%);
+		}
+
+		.prose table[data-card-mode='cards'] tbody tr:hover {
+			background: color-mix(in srgb, var(--color-bg-surface) 72%, var(--color-accent-soft) 28%);
+		}
+
+		.prose table[data-card-mode='cards'] :where(th, td) {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-2);
+			padding: 0;
+			border: none;
+			background: transparent;
+		}
+
+		.prose table[data-card-mode='cards'] :where(td, th) + :where(td, th) {
+			margin-top: var(--space-2);
+		}
+
+		.prose table[data-card-mode='cards'] :where(td, th)::before {
+			content: attr(data-label);
+			flex: 0 0 3rem;
+			max-width: 20%;
+			font-weight: 600;
+			color: var(--color-text-muted);
+			font-size: var(--font-size-xs);
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			line-height: 1.4;
+		}
+
+		.prose table[data-card-mode='cards'] :where(td, th)[data-label='']::before {
+			content: none;
+			flex: 0;
+		}
+
+		.prose table[data-card-mode='cards'] .table-card-value {
+			flex: 1 1 0%;
+			min-width: 0;
+			color: var(--color-text-secondary);
+			line-height: var(--line-height-base);
+		}
+
+		.prose table[data-card-mode='cards'] .table-card-value > :where(p, div, span, strong, em, a, ul, ol, code, pre, blockquote) {
+			margin: 0;
 		}
 	}
 

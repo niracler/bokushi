@@ -7,7 +7,6 @@ tags: [ "TIL", "工具", "邮箱", "自动化" ]
 ---
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
-
 ## 1 要干什么
 
 我想把任何邮件都转发到 Fastmail 邮箱，然后 Fastmail 转发到 Apple Mail。
