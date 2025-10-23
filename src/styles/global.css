@@ -194,12 +194,16 @@
 		border: 1px solid var(--color-border-subtle);
 		overflow-x: auto;
 		font-size: 0.95em;
+		max-width: 100%;
 	}
 
 	.prose pre code {
 		background: transparent;
 		padding: 0;
 		color: inherit;
+		white-space: pre;
+		word-wrap: normal;
+		overflow-wrap: normal;
 	}
 
 	.prose hr {
