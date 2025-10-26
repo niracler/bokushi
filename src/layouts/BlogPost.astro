@@ -149,5 +149,35 @@ const description = providedDescription || (body ? extractDescription(body) : 'æ
 
 			window.addEventListener('astro:after-swap', ensureResponsiveTables);
 		}
+
+		// Hide iframes that fail to load
+		const hideFailedIframes = () => {
+			const iframes = document.querySelectorAll('iframe[data-testid="embed-iframe"]');
+			iframes.forEach((iframe) => {
+				const iframeElement = iframe as HTMLIFrameElement;
+				let loaded = false;
+
+				iframeElement.addEventListener('load', () => {
+					loaded = true;
+				});
+
+				// Check after 3 seconds
+				setTimeout(() => {
+					if (!loaded) {
+						iframeElement.style.height = '0';
+						iframeElement.style.overflow = 'hidden';
+						iframeElement.style.marginBottom = '0';
+					}
+				}, 3000);
+			});
+		};
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', hideFailedIframes, { once: true });
+		} else {
+			hideFailedIframes();
+		}
+
+		window.addEventListener('astro:after-swap', hideFailedIframes);
 	</script>
 </html>
