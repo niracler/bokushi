@@ -150,34 +150,65 @@ const description = providedDescription || (body ? extractDescription(body) : 'æ
 			window.addEventListener('astro:after-swap', ensureResponsiveTables);
 		}
 
-		// Hide iframes that fail to load
-		const hideFailedIframes = () => {
+		// Gracefully handle embed iframes that fail to load
+		const handleEmbedIframes = () => {
 			const iframes = document.querySelectorAll('iframe[data-testid="embed-iframe"]');
+
 			iframes.forEach((iframe) => {
 				const iframeElement = iframe as HTMLIFrameElement;
-				let loaded = false;
 
-				iframeElement.addEventListener('load', () => {
-					loaded = true;
-				});
+				// Skip if already processed
+				if (iframeElement.dataset.embedProcessed === 'true') return;
+				iframeElement.dataset.embedProcessed = 'true';
 
-				// Check after 3 seconds
-				setTimeout(() => {
-					if (!loaded) {
-						iframeElement.style.height = '0';
-						iframeElement.style.overflow = 'hidden';
-						iframeElement.style.marginBottom = '0';
+				let hasLoaded = false;
+				let timeoutId: number;
+
+				// Wrap in container for smooth transitions
+				if (!iframeElement.parentElement?.classList.contains('embed-wrapper')) {
+					const wrapper = document.createElement('div');
+					wrapper.className = 'embed-wrapper';
+					wrapper.style.cssText = 'transition: max-height 0.4s ease, opacity 0.4s ease; overflow: hidden;';
+					iframeElement.parentNode?.insertBefore(wrapper, iframeElement);
+					wrapper.appendChild(iframeElement);
+				}
+
+				const wrapper = iframeElement.parentElement as HTMLElement;
+
+				// Handle successful load
+				const handleLoad = () => {
+					hasLoaded = true;
+					clearTimeout(timeoutId);
+					// Ensure wrapper is visible
+					wrapper.style.maxHeight = '';
+					wrapper.style.opacity = '1';
+				};
+
+				iframeElement.addEventListener('load', handleLoad, { once: true });
+
+				// Timeout: collapse if not loaded within 5 seconds
+				timeoutId = window.setTimeout(() => {
+					if (!hasLoaded) {
+						wrapper.style.maxHeight = '0';
+						wrapper.style.opacity = '0';
+						wrapper.style.marginBottom = '0';
+						// Fully hide after animation
+						setTimeout(() => {
+							wrapper.style.display = 'none';
+						}, 400);
 					}
-				}, 3000);
+				}, 5000);
 			});
 		};
 
+		// Run on page load
 		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', hideFailedIframes, { once: true });
+			document.addEventListener('DOMContentLoaded', handleEmbedIframes, { once: true });
 		} else {
-			hideFailedIframes();
+			handleEmbedIframes();
 		}
 
-		window.addEventListener('astro:after-swap', hideFailedIframes);
+		// Re-run on Astro page transitions
+		window.addEventListener('astro:after-swap', handleEmbedIframes);
 	</script>
 </html>
