@@ -29,7 +29,7 @@ function ensurePreviewCard(): HTMLElement {
 	card.innerHTML = `
 		<div class="h-40 w-full bg-[var(--color-bg-muted)]">
 			<img id="${CARD_ID}-image" class="h-full w-full object-cover hidden" alt="" />
-			<div id="${CARD_ID}-no-image" class="hidden h-full items-center justify-center text-xs text-[var(--color-text-muted)]">
+			<div id="${CARD_ID}-no-image" class="hidden h-full flex items-center justify-center text-xs text-[var(--color-text-muted)]">
 				暂无预览图
 			</div>
 		</div>
@@ -43,6 +43,25 @@ function ensurePreviewCard(): HTMLElement {
 	return card;
 }
 
+const imageCache = new Map<string, HTMLImageElement>();
+
+function preloadImage(src: string): Promise<HTMLImageElement> {
+	const cached = imageCache.get(src);
+	if (cached) {
+		return Promise.resolve(cached);
+	}
+
+	return new Promise((resolve, reject) => {
+		const img = new Image();
+		img.onload = () => {
+			imageCache.set(src, img);
+			resolve(img);
+		};
+		img.onerror = reject;
+		img.src = src;
+	});
+}
+
 function updatePreviewContent(card: HTMLElement, meta: PostMeta) {
 	const imageEl = card.querySelector<HTMLImageElement>(`#${CARD_ID}-image`);
 	const noImageEl = card.querySelector<HTMLDivElement>(`#${CARD_ID}-no-image`);
@@ -53,13 +72,32 @@ function updatePreviewContent(card: HTMLElement, meta: PostMeta) {
 	if (descriptionEl) descriptionEl.textContent = meta.description ?? '';
 
 	if (meta.image && imageEl && noImageEl) {
-		imageEl.src = meta.image;
-		imageEl.alt = `Preview of ${meta.title ?? ''}`;
-		imageEl.classList.remove('hidden');
-		noImageEl.classList.add('hidden');
+		const imageSrc = meta.image;
+		// Check if image is already cached/loaded
+		if (imageCache.has(imageSrc)) {
+			imageEl.src = imageSrc;
+			imageEl.alt = `Preview of ${meta.title ?? ''}`;
+			imageEl.classList.remove('hidden');
+			noImageEl.classList.add('hidden');
+		} else {
+			// Show loading state while image loads
+			imageEl.classList.add('hidden');
+			noImageEl.classList.remove('hidden');
+			noImageEl.textContent = '加载中...';
+
+			preloadImage(imageSrc).then(() => {
+				imageEl.src = imageSrc;
+				imageEl.alt = `Preview of ${meta.title ?? ''}`;
+				imageEl.classList.remove('hidden');
+				noImageEl.classList.add('hidden');
+			}).catch(() => {
+				noImageEl.textContent = '暂无预览图';
+			});
+		}
 	} else if (imageEl && noImageEl) {
 		imageEl.classList.add('hidden');
 		noImageEl.classList.remove('hidden');
+		noImageEl.textContent = '暂无预览图';
 	}
 }
 
@@ -111,14 +149,35 @@ export function initPostPreview(root: ParentNode = document) {
 		return;
 	}
 
-	const links = Array.from(root.querySelectorAll<HTMLAnchorElement>('a'))
-		.filter((link) => {
-			if (!link.href) return false;
-			const id = link.dataset.postId || parsePostIdFromHref(link.href);
-			return !!(id && metaMap[id]);
-		});
+	const links = Array.from(root.querySelectorAll<HTMLAnchorElement>('a')).filter((link) => {
+		if (!link.href) return false;
+		const id = link.dataset.postId || parsePostIdFromHref(link.href);
+		return !!(id && metaMap[id]);
+	});
 
 	if (links.length === 0) return;
+
+	// Preload images for all posts to improve hover performance
+	links.forEach((link) => {
+		const id = link.dataset.postId || parsePostIdFromHref(link.href);
+		if (id && metaMap[id]?.image) {
+			// Use requestIdleCallback to preload images when browser is idle
+			if ('requestIdleCallback' in window) {
+				window.requestIdleCallback(() => {
+					preloadImage(metaMap[id].image as string).catch(() => {
+						// Silently fail for preload errors
+					});
+				});
+			} else {
+				// Fallback for browsers without requestIdleCallback
+				setTimeout(() => {
+					preloadImage(metaMap[id].image as string).catch(() => {
+						// Silently fail for preload errors
+					});
+				}, 100);
+			}
+		}
+	});
 
 	const previewCard = ensurePreviewCard();
 	let hoverTimeout: number | null = null;
