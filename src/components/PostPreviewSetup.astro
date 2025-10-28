@@ -1,6 +1,5 @@
 ---
 import { getCollection } from 'astro:content';
-import previewScriptUrl from '../scripts/postPreview.client.ts?url';
 import { extractDescription } from '../utils/extractDescription';
 
 interface PostMeta {
@@ -40,4 +39,7 @@ if (!postMetaMap) {
 const serializedMeta = JSON.stringify(postMetaMap).replace(/</g, '\\u003c');
 ---
 <script id="all-posts-meta" type="application/json" set:html={serializedMeta}></script>
-<script type="module" src={previewScriptUrl}></script>
+<script>
+	import { initPostPreview } from '../scripts/postPreview.ts';
+	initPostPreview(document);
+</script>

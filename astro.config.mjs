@@ -18,7 +18,9 @@ export default defineConfig({
   site: 'https://niracler.com',
   trailingSlash: 'never',
   integrations: [mdx(), sitemap()],
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    imageService: 'compile'
+  }),
 
   markdown: {
     remarkPlugins: [remarkAlert],
