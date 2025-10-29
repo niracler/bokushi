@@ -140,14 +140,10 @@ function updatePosition(card: HTMLElement, event: MouseEvent | FocusEvent) {
 
 export function initPostPreview(root: ParentNode = document) {
 	// 跳过移动端/触摸环境，避免在小屏设备显示预览卡片
-	try {
-		// Coarse pointer 通常表示触摸设备；同时也屏蔽较小视口
-		const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-		const isSmallViewport = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 1024px)').matches;
-		if (isCoarse || isSmallViewport) return;
-	} catch {
-		// no-op
-	}
+	// Coarse pointer 通常表示触摸设备；同时也屏蔽较小视口
+	const isCoarse = window.matchMedia?.('(pointer: coarse)').matches ?? false;
+	const isSmallViewport = window.matchMedia?.('(max-width: 1024px)').matches ?? false;
+	if (isCoarse || isSmallViewport) return;
 	const metaScript = document.getElementById('all-posts-meta');
 	if (!metaScript || !metaScript.textContent) return;
 

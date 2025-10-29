@@ -23,6 +23,18 @@
 		accent-color: var(--color-accent);
 	}
 
+	/* 平滑滚动 */
+	html {
+		scroll-behavior: smooth;
+	}
+
+	/* 为了更好的动画效果，当用户喜欢减少动画时禁用 */
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+	}
+
 	*,
 	*::before,
 	*::after {
@@ -156,6 +168,7 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
+		-webkit-user-select: none;
 		user-select: none;
 		padding: var(--space-1) 0;
 		transition: color 0.2s ease;
@@ -187,12 +200,10 @@
 		transform: rotate(-45deg);
 		transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 		flex-shrink: 0;
-		margin-top: -0.1em;
 	}
 
 	.prose details[open] > summary::before {
 		transform: rotate(45deg);
-		margin-top: 0.1em;
 	}
 
 	/* details 内容区域 */

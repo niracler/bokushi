@@ -36,8 +36,17 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 	<body>
 		<Header />
 		<main class="px-4">
-				<div data-toc-container class={showToc ? "relative mx-auto max-w-[90rem]" : ""}>
-				<article class={showToc ? "mx-auto w-full max-w-3xl space-y-10 text-[var(--color-text-secondary)]" : "mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]"}>
+			<div
+				data-toc-container
+				class:list={[
+					showToc && "relative mx-auto max-w-[90rem]"
+				]}
+			>
+				<article
+					class:list={[
+						"mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]"
+					]}
+				>
 						<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
 						<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">{title}</h1>
 						<div class="space-y-2 text-sm text-[var(--color-text-muted)]">
@@ -67,20 +76,58 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 					</div>
 
 					{showToc && (
-						<!-- 移动端：折叠的目录，放在正文最前面 -->
-						<details data-toc-mobile class="xl:hidden mt-2 rounded-md border border-border-subtle bg-[var(--color-bg-muted)]/40 open:shadow-sm">
-							<summary class="flex cursor-pointer select-none items-center justify-between gap-2 px-3 py-2">
-								<span class="text-sm font-medium text-[var(--color-text-primary)]">目录</span>
-								<svg class="toc-mobile-chevron h-4 w-4 text-[var(--color-text-muted)] transition-transform duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-									<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-								</svg>
-							</summary>
-							<div class="px-3 pb-3">
-								<div class="toc-mobile">
-									<TableOfContents headings={headings} />
+						<!-- 移动端：浮动按钮 -->
+						<button
+							data-toc-mobile-toggle
+							class="xl:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-white shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
+							aria-label="打开目录"
+						>
+							<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+								<path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</button>
+
+						<!-- 移动端：抽屉式目录 -->
+						<div
+							data-toc-mobile-drawer
+							class="xl:hidden fixed inset-0 z-50 pointer-events-none"
+							aria-hidden="true"
+						>
+							<!-- 遮罩层 -->
+							<div
+								data-toc-mobile-overlay
+								class="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 pointer-events-none"
+							></div>
+
+							<!-- 抽屉内容 -->
+							<div
+								data-toc-mobile-content
+								class="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-[var(--color-bg-surface)] shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto"
+							>
+								<div class="flex h-full flex-col">
+									<!-- 头部 -->
+									<div class="flex items-center justify-between border-b border-border-subtle px-6 py-4">
+										<h2 class="text-lg font-semibold text-[var(--color-text-primary)]">目录</h2>
+										<button
+											data-toc-mobile-close
+											class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--color-bg-muted)] transition-colors"
+											aria-label="关闭目录"
+										>
+											<svg class="h-5 w-5 text-[var(--color-text-muted)]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+											</svg>
+										</button>
+									</div>
+
+									<!-- 目录内容 -->
+									<div class="flex-1 overflow-y-auto px-6 py-4">
+										<div class="toc-mobile">
+											<TableOfContents headings={headings} />
+										</div>
+									</div>
 								</div>
 							</div>
-						</details>
+						</div>
 					)}
 
 					<Prose>
@@ -90,40 +137,38 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 					<Remark42Comments />
 				</article>
 
-					{showToc && (
-						<aside data-toc-sidebar class="hidden xl:block absolute top-0 z-10 w-[280px] left-[calc(50%+24rem+3rem)]">
-							<TableOfContents headings={headings} />
-						</aside>
-					)}
+				{showToc && (
+					<!-- 侧边栏使用 absolute 定位,不影响文章居中布局 -->
+					<!-- 高度由 JavaScript 动态设置,匹配文章高度让 sticky 生效 -->
+					<aside data-toc-sidebar class="hidden xl:block absolute left-[calc(50%+24rem+3rem)] w-[280px]" style="top: 0;">
+						<TableOfContents headings={headings} />
+					</aside>
+				)}
 			</div>
 		</main>
 		<Footer />
 	</body>
 	<style>
-		/* 移动端目录外观：覆盖桌面 TOC 的粘性与尺寸 */
+		/* 移动端抽屉目录样式 */
 		.toc-mobile :global(.toc) {
 			position: static;
 			max-height: none;
 			overflow: visible;
+			padding: 0;
 		}
-		/* 移动端已由 summary 显示标题，隐藏内部标题 */
+
 		.toc-mobile :global(.toc-title) {
 			display: none;
 		}
-		/* 让链接字号在移动端稍大一点便于点按 */
+
+		/* 移动端目录链接更大更易点击 */
 		.toc-mobile :global(.toc-link) {
-			font-size: 0.9rem;
+			font-size: 0.9375rem;
+			padding: 0.375rem 0;
 		}
-		/* 打开时旋转折叠图标 */
-		details[open] .toc-mobile-chevron {
-			transform: rotate(180deg);
-		}
-		/* 移动端不需要左侧高亮条外溢，收窄或对齐 */
-		.toc-mobile :global(.toc-link.active::before) {
-			left: 0;
-		}
-		.toc-mobile :global(.toc-link-child.active::before) {
-			left: 0;
+
+		.toc-mobile :global(.toc-number) {
+			font-size: 0.75rem;
 		}
 	</style>
 	<script>
@@ -131,10 +176,10 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 		mermaid.initialize({ startOnLoad: true });
 
 		if (typeof window !== 'undefined') {
-			const unwrapCardCells = (table) => {
+			const unwrapCardCells = (table: HTMLTableElement) => {
 				const cardCells = table.querySelectorAll('[data-cardified]');
 
-				cardCells.forEach((cell) => {
+				cardCells.forEach((cell: Element) => {
 					const wrapper = cell.querySelector('.table-card-value');
 					if (wrapper) {
 						while (wrapper.firstChild) {
@@ -148,7 +193,7 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 			};
 
 			const applyResponsiveTables = () => {
-				const tables = document.querySelectorAll('.prose table');
+				const tables = document.querySelectorAll<HTMLTableElement>('.prose table');
 
 				tables.forEach((table) => {
 					const headers = Array.from(table.querySelectorAll('thead th')).map((th) => {
@@ -270,7 +315,15 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 		window.addEventListener('astro:after-swap', handleEmbedIframes);
 
 		// Table of Contents - Intersection Observer for active heading
+		let currentTocCleanup: (() => void) | null = null;
+
 		const initTocObserver = () => {
+			// 清理之前的 observer
+			if (currentTocCleanup) {
+				currentTocCleanup();
+				currentTocCleanup = null;
+			}
+
 			const tocLinks = document.querySelectorAll('[data-toc-link]');
 			if (tocLinks.length === 0) return;
 
@@ -333,20 +386,29 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 
 			headingElements.forEach((heading) => observer.observe(heading));
 
+			// 点击处理器映射，用于清理
+			const clickHandlers = new Map<Element, () => void>();
+
 			// 添加点击事件处理
 			tocLinks.forEach((link) => {
-				link.addEventListener('click', () => {
+				const handler = () => {
 					const id = link.getAttribute('data-heading-id');
 					if (id) {
 						// 立即更新高亮
 						setActiveLink(id);
 					}
-				});
+				};
+				clickHandlers.set(link, handler);
+				link.addEventListener('click', handler);
 			});
 
 			// Cleanup function
-			return () => {
-				headingElements.forEach((heading) => observer.unobserve(heading));
+			currentTocCleanup = () => {
+				observer.disconnect();
+				clickHandlers.forEach((handler, link) => {
+					link.removeEventListener('click', handler);
+				});
+				clickHandlers.clear();
 			};
 		};
 
@@ -360,58 +422,90 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 		// Re-initialize on Astro page transitions
 		window.addEventListener('astro:after-swap', initTocObserver);
 
-		// 移动端：点击目录链接后自动收起
-		const initMobileTocAutoClose = () => {
-			const detailsEl = document.querySelector('details[data-toc-mobile]');
-			if (!detailsEl) return;
-			const links = detailsEl.querySelectorAll('[data-toc-link]');
-			links.forEach((link) => {
-				link.addEventListener('click', () => {
-					(detailsEl as HTMLDetailsElement).open = false;
-				});
+		// 移动端：抽屉式目录的打开/关闭
+		const initMobileTocDrawer = () => {
+			const toggleBtn = document.querySelector('[data-toc-mobile-toggle]');
+			const drawer = document.querySelector('[data-toc-mobile-drawer]');
+			const overlay = document.querySelector('[data-toc-mobile-overlay]');
+			const content = document.querySelector('[data-toc-mobile-content]');
+			const closeBtn = document.querySelector('[data-toc-mobile-close]');
+			const tocLinks = drawer?.querySelectorAll('[data-toc-link]');
+
+			if (!toggleBtn || !drawer || !overlay || !content || !closeBtn) return;
+
+			let isOpen = false;
+
+			const openDrawer = () => {
+				isOpen = true;
+				drawer.classList.remove('pointer-events-none');
+				drawer.setAttribute('aria-hidden', 'false');
+				overlay.classList.remove('opacity-0', 'pointer-events-none');
+				content.classList.remove('translate-x-full');
+				document.body.style.overflow = 'hidden';
+			};
+
+			const closeDrawer = () => {
+				isOpen = false;
+				overlay.classList.add('opacity-0', 'pointer-events-none');
+				content.classList.add('translate-x-full');
+				document.body.style.overflow = '';
+				// 等待动画结束后再隐藏
+				setTimeout(() => {
+					if (!isOpen) {
+						drawer.classList.add('pointer-events-none');
+						drawer.setAttribute('aria-hidden', 'true');
+					}
+				}, 300);
+			};
+
+			toggleBtn.addEventListener('click', openDrawer);
+			closeBtn.addEventListener('click', closeDrawer);
+			overlay.addEventListener('click', closeDrawer);
+
+			// 点击目录链接后自动关闭
+			tocLinks?.forEach((link) => {
+				link.addEventListener('click', closeDrawer);
+			});
+
+			// ESC 键关闭
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' && isOpen) {
+					closeDrawer();
+				}
 			});
 		};
 
 		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', initMobileTocAutoClose, { once: true });
+			document.addEventListener('DOMContentLoaded', initMobileTocDrawer, { once: true });
 		} else {
-			initMobileTocAutoClose();
+			initMobileTocDrawer();
 		}
-		window.addEventListener('astro:after-swap', initMobileTocAutoClose);
+		window.addEventListener('astro:after-swap', initMobileTocDrawer);
 
-		// 右侧目录定位：保持 sticky 行为并与正文分割线对齐
-		const adjustTocSidebar = () => {
+		// 侧边栏定位：让目录从分割线位置开始sticky，并匹配文章高度
+		const adjustTocPosition = () => {
 			const aside = document.querySelector<HTMLElement>('aside[data-toc-sidebar]');
-			const toc = aside?.querySelector<HTMLElement>('.toc');
 			const header = document.querySelector<HTMLElement>('[data-article-header]');
-			if (!aside || !toc || !header) return;
+			const container = document.querySelector<HTMLElement>('[data-toc-container]');
+			if (!aside || !header || !container) return;
 
-			// 计算顶部偏移（正文标题块的底部）
-			const headerBottom = header.getBoundingClientRect().bottom + window.scrollY;
-			const containerTop = (aside.offsetParent as HTMLElement)?.getBoundingClientRect().top ?? 0;
-			const offset = Math.max(0, Math.round(headerBottom - containerTop - window.scrollY));
-			aside.style.top = `${offset}px`;
+			// 获取 header 底部相对于其 offsetParent 的位置
+			const headerBottom = header.offsetTop + header.offsetHeight;
+			aside.style.top = `${headerBottom}px`;
 
-			// 限制最大高度让 sticky 生效（viewport 高度扣除间距）
-			const viewportHeight = window.innerHeight;
-			const margin = 40; // 与顶部/底部保持一定距离，避免紧贴
-			toc.style.maxHeight = `${Math.max(200, viewportHeight - margin * 2)}px`;
-			// 重新触发 sticky
-			toc.style.position = 'sticky';
-			toc.style.top = `${margin}px`;
-		};
-
-		const initTocSidebar = () => {
-			adjustTocSidebar();
-			requestAnimationFrame(adjustTocSidebar);
+			// 让 aside 的高度匹配容器的高度减去 top 偏移
+			// 这样即使滚动到最底部，sticky 也能一直生效
+			const containerHeight = container.offsetHeight;
+			const asideHeight = containerHeight - headerBottom;
+			aside.style.height = `${asideHeight}px`;
 		};
 
 		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', initTocSidebar, { once: true });
+			document.addEventListener('DOMContentLoaded', adjustTocPosition, { once: true });
 		} else {
-			initTocSidebar();
+			adjustTocPosition();
 		}
-		window.addEventListener('resize', adjustTocSidebar);
-		window.addEventListener('astro:after-swap', initTocSidebar);
+		window.addEventListener('resize', adjustTocPosition);
+		window.addEventListener('astro:after-swap', adjustTocPosition);
 	</script>
 </html>
