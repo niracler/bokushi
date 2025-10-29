@@ -139,6 +139,15 @@ function updatePosition(card: HTMLElement, event: MouseEvent | FocusEvent) {
 }
 
 export function initPostPreview(root: ParentNode = document) {
+	// 跳过移动端/触摸环境，避免在小屏设备显示预览卡片
+	try {
+		// Coarse pointer 通常表示触摸设备；同时也屏蔽较小视口
+		const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+		const isSmallViewport = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 1024px)').matches;
+		if (isCoarse || isSmallViewport) return;
+	} catch {
+		// no-op
+	}
 	const metaScript = document.getElementById('all-posts-meta');
 	if (!metaScript || !metaScript.textContent) return;
 
@@ -151,6 +160,13 @@ export function initPostPreview(root: ParentNode = document) {
 
 	const links = Array.from(root.querySelectorAll<HTMLAnchorElement>('a')).filter((link) => {
 		if (!link.href) return false;
+		// 排除目录与标记禁止预览的区域/链接
+		if (link.closest('[data-no-preview]')) return false;
+		if (link.closest('.toc')) return false;
+		if (link.dataset.preview === 'off') return false;
+		// 排除站内锚点（如 TOC 链接）
+		const rawHref = link.getAttribute('href') || '';
+		if (rawHref.startsWith('#')) return false;
 		const id = link.dataset.postId || parsePostIdFromHref(link.href);
 		return !!(id && metaMap[id]);
 	});

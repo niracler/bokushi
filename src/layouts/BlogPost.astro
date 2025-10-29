@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -7,6 +8,7 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Remark42Comments from '../components/Remark42Comments.astro';
 import { extractDescription } from '../utils/extractDescription';
 import Prose from '../components/Prose.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 
 type EntryData =
 	| CollectionEntry<'blog'>['data']
@@ -15,11 +17,15 @@ type EntryData =
 
 type Props = EntryData & {
 	body?: string;
+	headings?: MarkdownHeading[];
 };
 
-const { title, description: providedDescription, pubDate, updatedDate, socialImage, body, tags } = Astro.props;
+const { title, description: providedDescription, pubDate, updatedDate, socialImage, body, tags, headings = [] } = Astro.props;
 
 const description = providedDescription || (body ? extractDescription(body) : '暂无描述');
+
+// 只有当文章有足够的标题时才显示目录（至少 2 个 h2/h3）
+const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 ---
 
 <html lang="en">
@@ -30,44 +36,96 @@ const description = providedDescription || (body ? extractDescription(body) : '�
 	<body>
 		<Header />
 		<main class="px-4">
-			<article class="mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]">
-				<div class="space-y-4 border-b border-border-subtle pb-6 text-center">
-					<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">{title}</h1>
-					<div class="space-y-2 text-sm text-[var(--color-text-muted)]">
-						<p>
-							<FormattedDate date={pubDate} />
-						</p>
-						{
-							updatedDate && (
-								<p>
-									Last updated on <FormattedDate date={updatedDate} />
-								</p>
-							)
-						}
-					</div>
-					{tags && tags.length > 0 && (
-						<div class="flex flex-wrap justify-center gap-2">
-							{tags.map((tag: string) => (
-								<a
-									href={`/tags/${tag}`}
-									class="inline-flex items-center rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(var(--color-accent-rgb),0.15)] hover:text-[var(--color-accent)]"
-								>
-									{tag}
-								</a>
-							))}
+				<div data-toc-container class={showToc ? "relative mx-auto max-w-[90rem]" : ""}>
+				<article class={showToc ? "mx-auto w-full max-w-3xl space-y-10 text-[var(--color-text-secondary)]" : "mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]"}>
+						<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
+						<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">{title}</h1>
+						<div class="space-y-2 text-sm text-[var(--color-text-muted)]">
+							<p>
+								<FormattedDate date={pubDate} />
+							</p>
+							{
+								updatedDate && (
+									<p>
+										Last updated on <FormattedDate date={updatedDate} />
+									</p>
+								)
+							}
 						</div>
+						{tags && tags.length > 0 && (
+							<div class="flex flex-wrap justify-center gap-2">
+								{tags.map((tag: string) => (
+									<a
+										href={`/tags/${tag}`}
+										class="inline-flex items-center rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(var(--color-accent-rgb),0.15)] hover:text-[var(--color-accent)]"
+									>
+										{tag}
+									</a>
+								))}
+							</div>
+						)}
+					</div>
+
+					{showToc && (
+						<!-- 移动端：折叠的目录，放在正文最前面 -->
+						<details data-toc-mobile class="xl:hidden mt-2 rounded-md border border-border-subtle bg-[var(--color-bg-muted)]/40 open:shadow-sm">
+							<summary class="flex cursor-pointer select-none items-center justify-between gap-2 px-3 py-2">
+								<span class="text-sm font-medium text-[var(--color-text-primary)]">目录</span>
+								<svg class="toc-mobile-chevron h-4 w-4 text-[var(--color-text-muted)] transition-transform duration-200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+									<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</summary>
+							<div class="px-3 pb-3">
+								<div class="toc-mobile">
+									<TableOfContents headings={headings} />
+								</div>
+							</div>
+						</details>
 					)}
-				</div>
 
-				<Prose>
-					<slot />
-				</Prose>
+					<Prose>
+						<slot />
+					</Prose>
 
-				<Remark42Comments />
-			</article>
+					<Remark42Comments />
+				</article>
+
+					{showToc && (
+						<aside data-toc-sidebar class="hidden xl:block absolute top-0 z-10 w-[280px] left-[calc(50%+24rem+3rem)]">
+							<TableOfContents headings={headings} />
+						</aside>
+					)}
+			</div>
 		</main>
 		<Footer />
 	</body>
+	<style>
+		/* 移动端目录外观：覆盖桌面 TOC 的粘性与尺寸 */
+		.toc-mobile :global(.toc) {
+			position: static;
+			max-height: none;
+			overflow: visible;
+		}
+		/* 移动端已由 summary 显示标题，隐藏内部标题 */
+		.toc-mobile :global(.toc-title) {
+			display: none;
+		}
+		/* 让链接字号在移动端稍大一点便于点按 */
+		.toc-mobile :global(.toc-link) {
+			font-size: 0.9rem;
+		}
+		/* 打开时旋转折叠图标 */
+		details[open] .toc-mobile-chevron {
+			transform: rotate(180deg);
+		}
+		/* 移动端不需要左侧高亮条外溢，收窄或对齐 */
+		.toc-mobile :global(.toc-link.active::before) {
+			left: 0;
+		}
+		.toc-mobile :global(.toc-link-child.active::before) {
+			left: 0;
+		}
+	</style>
 	<script>
 		import mermaid from 'mermaid';
 		mermaid.initialize({ startOnLoad: true });
@@ -210,5 +268,150 @@ const description = providedDescription || (body ? extractDescription(body) : '�
 
 		// Re-run on Astro page transitions
 		window.addEventListener('astro:after-swap', handleEmbedIframes);
+
+		// Table of Contents - Intersection Observer for active heading
+		const initTocObserver = () => {
+			const tocLinks = document.querySelectorAll('[data-toc-link]');
+			if (tocLinks.length === 0) return;
+
+			const headingElements = Array.from(tocLinks)
+				.map((link) => {
+					const id = link.getAttribute('data-heading-id');
+					return id ? document.getElementById(id) : null;
+				})
+				.filter((el): el is HTMLElement => el !== null);
+
+			if (headingElements.length === 0) return;
+
+			// 追踪所有当前可见的标题
+			const visibleHeadings = new Set<string>();
+
+			const observerOptions = {
+				rootMargin: '-100px 0px -66% 0px',
+				threshold: [0, 1],
+			};
+
+			const setActiveLink = (id: string) => {
+				// 移除所有 active 类（包含桌面与移动端两个 TOC）
+				tocLinks.forEach((link) => link.classList.remove('active'));
+
+				// 针对同一 heading，给所有匹配链接添加 active
+				const matches = document.querySelectorAll(`[data-heading-id="${id}"]`);
+				matches.forEach((el) => el.classList.add('active'));
+			};
+
+			const updateActiveHeading = () => {
+				// 如果没有可见的标题，不做任何事
+				if (visibleHeadings.size === 0) return;
+
+				// 找到第一个可见的标题（从上到下）
+				let firstVisibleId: string | null = null;
+				for (const heading of headingElements) {
+					if (visibleHeadings.has(heading.id)) {
+						firstVisibleId = heading.id;
+						break;
+					}
+				}
+
+				if (firstVisibleId) {
+					setActiveLink(firstVisibleId);
+				}
+			};
+
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					const id = entry.target.id;
+					if (entry.isIntersecting) {
+						visibleHeadings.add(id);
+					} else {
+						visibleHeadings.delete(id);
+					}
+				});
+
+				updateActiveHeading();
+			}, observerOptions);
+
+			headingElements.forEach((heading) => observer.observe(heading));
+
+			// 添加点击事件处理
+			tocLinks.forEach((link) => {
+				link.addEventListener('click', () => {
+					const id = link.getAttribute('data-heading-id');
+					if (id) {
+						// 立即更新高亮
+						setActiveLink(id);
+					}
+				});
+			});
+
+			// Cleanup function
+			return () => {
+				headingElements.forEach((heading) => observer.unobserve(heading));
+			};
+		};
+
+		// Initialize on load
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initTocObserver, { once: true });
+		} else {
+			initTocObserver();
+		}
+
+		// Re-initialize on Astro page transitions
+		window.addEventListener('astro:after-swap', initTocObserver);
+
+		// 移动端：点击目录链接后自动收起
+		const initMobileTocAutoClose = () => {
+			const detailsEl = document.querySelector('details[data-toc-mobile]');
+			if (!detailsEl) return;
+			const links = detailsEl.querySelectorAll('[data-toc-link]');
+			links.forEach((link) => {
+				link.addEventListener('click', () => {
+					(detailsEl as HTMLDetailsElement).open = false;
+				});
+			});
+		};
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initMobileTocAutoClose, { once: true });
+		} else {
+			initMobileTocAutoClose();
+		}
+		window.addEventListener('astro:after-swap', initMobileTocAutoClose);
+
+		// 右侧目录定位：保持 sticky 行为并与正文分割线对齐
+		const adjustTocSidebar = () => {
+			const aside = document.querySelector<HTMLElement>('aside[data-toc-sidebar]');
+			const toc = aside?.querySelector<HTMLElement>('.toc');
+			const header = document.querySelector<HTMLElement>('[data-article-header]');
+			if (!aside || !toc || !header) return;
+
+			// 计算顶部偏移（正文标题块的底部）
+			const headerBottom = header.getBoundingClientRect().bottom + window.scrollY;
+			const containerTop = (aside.offsetParent as HTMLElement)?.getBoundingClientRect().top ?? 0;
+			const offset = Math.max(0, Math.round(headerBottom - containerTop - window.scrollY));
+			aside.style.top = `${offset}px`;
+
+			// 限制最大高度让 sticky 生效（viewport 高度扣除间距）
+			const viewportHeight = window.innerHeight;
+			const margin = 40; // 与顶部/底部保持一定距离，避免紧贴
+			toc.style.maxHeight = `${Math.max(200, viewportHeight - margin * 2)}px`;
+			// 重新触发 sticky
+			toc.style.position = 'sticky';
+			toc.style.top = `${margin}px`;
+		};
+
+		const initTocSidebar = () => {
+			adjustTocSidebar();
+			requestAnimationFrame(adjustTocSidebar);
+		};
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initTocSidebar, { once: true });
+		} else {
+			initTocSidebar();
+		}
+		window.addEventListener('resize', adjustTocSidebar);
+		window.addEventListener('astro:after-swap', initTocSidebar);
 	</script>
 </html>

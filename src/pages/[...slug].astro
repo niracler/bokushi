@@ -17,9 +17,9 @@ type BlogEntry = CollectionEntry<'blog'> | CollectionEntry<'monthly'> | Collecti
 type Props = BlogEntry;
 
 const post = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 ---
 
-<BlogPost {...post.data} body={post.body}>
+<BlogPost {...post.data} body={post.body} headings={headings}>
 	<Content />
 </BlogPost>

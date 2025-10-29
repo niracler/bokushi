@@ -129,6 +129,90 @@
 	.prose details {
 		inline-size: 100%;
 		width: 100%;
+		margin: var(--space-4) 0;
+		padding: var(--space-4);
+		background: color-mix(in srgb, var(--color-bg-surface) 95%, var(--color-accent-soft) 5%);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		box-shadow: var(--shadow-soft);
+		transition: all 0.2s ease;
+	}
+
+	.prose details:hover {
+		border-color: color-mix(in srgb, var(--color-border) 70%, var(--color-accent) 30%);
+		box-shadow: 0 8px 24px rgba(47, 37, 25, 0.12);
+	}
+
+	.prose details[open] {
+		background: color-mix(in srgb, var(--color-bg-surface) 90%, var(--color-accent-soft) 10%);
+		border-color: color-mix(in srgb, var(--color-border) 60%, var(--color-accent) 40%);
+	}
+
+	.prose summary {
+		cursor: pointer;
+		font-weight: 600;
+		color: var(--color-text-primary);
+		list-style: none;
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		user-select: none;
+		padding: var(--space-1) 0;
+		transition: color 0.2s ease;
+	}
+
+	.prose summary:hover {
+		color: var(--color-accent);
+	}
+
+	.prose summary:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 4px;
+		border-radius: var(--radius-sm);
+	}
+
+	/* 隐藏默认的三角形标记 */
+	.prose summary::-webkit-details-marker,
+	.prose summary::marker {
+		display: none;
+	}
+
+	/* 自定义箭头图标 */
+	.prose summary::before {
+		content: '';
+		width: 0.6em;
+		height: 0.6em;
+		border-right: 2px solid currentColor;
+		border-bottom: 2px solid currentColor;
+		transform: rotate(-45deg);
+		transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+		flex-shrink: 0;
+		margin-top: -0.1em;
+	}
+
+	.prose details[open] > summary::before {
+		transform: rotate(45deg);
+		margin-top: 0.1em;
+	}
+
+	/* details 内容区域 */
+	.prose details > *:not(summary) {
+		margin-top: var(--space-4);
+		padding-top: var(--space-3);
+		border-top: 1px solid var(--color-border-soft);
+		animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	/* 展开动画 */
+	@keyframes slideDown {
+		from {
+			opacity: 0;
+			transform: translateY(-8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.prose p + p {
