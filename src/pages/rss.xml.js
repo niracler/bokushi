@@ -10,7 +10,9 @@ export async function GET(context) {
     const blogPosts = await getCollection("blog");
     const monthlyPosts = await getCollection("monthly");
     const tilPosts = await getCollection("til");
-    const posts = [...blogPosts, ...monthlyPosts, ...tilPosts].sort(
+    const posts = [...blogPosts, ...monthlyPosts, ...tilPosts]
+        .filter((post) => !post.data.hidden)
+        .sort(
         (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
     );
     const rssContent = await rss({

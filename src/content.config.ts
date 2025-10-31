@@ -10,6 +10,7 @@ const sharedSchema = z.object({
     heroImage: z.string().optional(),
     socialImage: z.string().optional(),
     tags: z.array(z.string()).optional().default([]),
+    hidden: z.boolean().optional().default(false),
 });
 
 const blog = defineCollection({

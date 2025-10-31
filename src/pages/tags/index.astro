@@ -8,7 +8,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 const blogPosts = await getCollection("blog");
 const monthlyPosts = await getCollection("monthly");
 const tilPosts = await getCollection("til");
-const posts = [...blogPosts, ...monthlyPosts, ...tilPosts];
+const posts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter((post) => !post.data.hidden);
 const tagCountMap = new Map<string, number>();
 
 posts.forEach((post) => {

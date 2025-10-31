@@ -3,16 +3,12 @@ import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import Prose from "../components/Prose.astro";
+import Remark42Comments from "../components/Remark42Comments.astro";
 import { SITE_TITLE } from "../consts";
 
-interface Props {
-	title?: string;
-	description?: string;
-	eyebrow?: string;
-}
-
-const { title, description, eyebrow }: Props = Astro.props;
-const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const { frontmatter = {} } = Astro.props as { frontmatter?: Record<string, unknown> };
+const { commentsId } = frontmatter as { commentsId?: string };
+const pageTitle = `${SITE_TITLE}`;
 ---
 
 <!doctype html>
@@ -23,27 +19,11 @@ const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 	<body>
 		<Header />
 		<main class="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:space-y-12 sm:py-14">
-			{title && (
-				<header class="space-y-3 text-left">
-					{eyebrow && (
-						<p class="text-xs font-medium uppercase tracking-[0.3em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
-							{eyebrow}
-						</p>
-					)}
-					<h1 class="text-[1.875rem] font-semibold leading-tight tracking-tight text-[var(--color-text-primary)] sm:text-[2.25rem]">
-						{title}
-					</h1>
-					{description && (
-						<p class="text-base leading-relaxed text-[color-mix(in srgb, var(--color-text-secondary) 80%, transparent)] sm:text-lg">
-							{description}
-						</p>
-					)}
-				</header>
-			)}
-
 			<Prose class="max-w-none text-[var(--color-text-secondary)]">
 				<slot />
 			</Prose>
+
+			{commentsId && <Remark42Comments postId={commentsId} />}
 		</main>
 		<Footer />
 	</body>
