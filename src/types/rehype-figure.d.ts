@@ -1,1 +1,1 @@
-declare module 'rehype-figure'; 
+declare module "rehype-figure";

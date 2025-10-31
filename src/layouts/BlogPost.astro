@@ -1,31 +1,40 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import type { MarkdownHeading } from 'astro';
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import FormattedDate from '../components/FormattedDate.astro';
-import Remark42Comments from '../components/Remark42Comments.astro';
-import { extractDescription } from '../utils/extractDescription';
-import Prose from '../components/Prose.astro';
-import TableOfContents from '../components/TableOfContents.astro';
+import type { CollectionEntry } from "astro:content";
+import type { MarkdownHeading } from "astro";
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import Header from "../components/Header.astro";
+import Prose from "../components/Prose.astro";
+import Remark42Comments from "../components/Remark42Comments.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import { extractDescription } from "../utils/extractDescription";
 
 type EntryData =
-	| CollectionEntry<'blog'>['data']
-	| CollectionEntry<'monthly'>['data']
-	| CollectionEntry<'til'>['data'];
+    | CollectionEntry<"blog">["data"]
+    | CollectionEntry<"monthly">["data"]
+    | CollectionEntry<"til">["data"];
 
 type Props = EntryData & {
-	body?: string;
-	headings?: MarkdownHeading[];
+    body?: string;
+    headings?: MarkdownHeading[];
 };
 
-const { title, description: providedDescription, pubDate, updatedDate, socialImage, body, tags, headings = [] } = Astro.props;
+const {
+    title,
+    description: providedDescription,
+    pubDate,
+    updatedDate,
+    socialImage,
+    body,
+    tags,
+    headings = [],
+} = Astro.props;
 
-const description = providedDescription || (body ? extractDescription(body) : '暂无描述');
+const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
 
 // 只有当文章有足够的标题时才显示目录（至少 2 个 h2/h3）
-const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
+const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;
 ---
 
 <html lang="en">
@@ -39,12 +48,12 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 			<div
 				data-toc-container
 				class:list={[
-					showToc && "relative mx-auto max-w-[90rem]"
+					showToc && 'relative mx-auto max-w-[90rem]',
 				]}
 			>
 				<article
 					class:list={[
-						"mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]"
+						'mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]',
 					]}
 				>
 						<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
@@ -148,29 +157,6 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 		</main>
 		<Footer />
 	</body>
-	<style>
-		/* 移动端抽屉目录样式 */
-		.toc-mobile :global(.toc) {
-			position: static;
-			max-height: none;
-			overflow: visible;
-			padding: 0;
-		}
-
-		.toc-mobile :global(.toc-title) {
-			display: none;
-		}
-
-		/* 移动端目录链接更大更易点击 */
-		.toc-mobile :global(.toc-link) {
-			font-size: 0.9375rem;
-			padding: 0.375rem 0;
-		}
-
-		.toc-mobile :global(.toc-number) {
-			font-size: 0.75rem;
-		}
-	</style>
 	<script>
 		import mermaid from 'mermaid';
 		mermaid.initialize({ startOnLoad: true });

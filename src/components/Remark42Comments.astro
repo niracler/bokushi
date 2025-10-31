@@ -1,13 +1,12 @@
 ---
 export interface Props {
-  postId?: string;
+    postId?: string;
 }
 
 const { postId } = Astro.props;
 
 // 这里需要配置你的 Remark42 服务器地址
-const REMARK_URL =
-  import.meta.env.PUBLIC_REMARK_URL || "https://remark42.niracler.com";
+const REMARK_URL = import.meta.env.PUBLIC_REMARK_URL || "https://remark42.niracler.com";
 const SITE_ID = import.meta.env.PUBLIC_REMARK_SITE_ID || "niracler";
 
 // 获取当前页面的 URL 作为评论的唯一标识
