@@ -1,31 +1,40 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import type { MarkdownHeading } from 'astro';
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import FormattedDate from '../components/FormattedDate.astro';
-import Remark42Comments from '../components/Remark42Comments.astro';
-import { extractDescription } from '../utils/extractDescription';
-import Prose from '../components/Prose.astro';
-import TableOfContents from '../components/TableOfContents.astro';
+import type { CollectionEntry } from "astro:content";
+import type { MarkdownHeading } from "astro";
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import Header from "../components/Header.astro";
+import Prose from "../components/Prose.astro";
+import Remark42Comments from "../components/Remark42Comments.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import { extractDescription } from "../utils/extractDescription";
 
 type EntryData =
-	| CollectionEntry<'blog'>['data']
-	| CollectionEntry<'monthly'>['data']
-	| CollectionEntry<'til'>['data'];
+    | CollectionEntry<"blog">["data"]
+    | CollectionEntry<"monthly">["data"]
+    | CollectionEntry<"til">["data"];
 
 type Props = EntryData & {
-	body?: string;
-	headings?: MarkdownHeading[];
+    body?: string;
+    headings?: MarkdownHeading[];
 };
 
-const { title, description: providedDescription, pubDate, updatedDate, socialImage, body, tags, headings = [] } = Astro.props;
+const {
+    title,
+    description: providedDescription,
+    pubDate,
+    updatedDate,
+    socialImage,
+    body,
+    tags,
+    headings = [],
+} = Astro.props;
 
-const description = providedDescription || (body ? extractDescription(body) : '暂无描述');
+const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
 
 // 只有当文章有足够的标题时才显示目录（至少 2 个 h2/h3）
-const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
+const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;
 ---
 
 <html lang="en">
@@ -39,12 +48,12 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 			<div
 				data-toc-container
 				class:list={[
-					showToc && "relative mx-auto max-w-[90rem]"
+					showToc && 'relative mx-auto max-w-[90rem]',
 				]}
 			>
 				<article
 					class:list={[
-						"mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]"
+						'mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]',
 					]}
 				>
 						<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
@@ -76,58 +85,60 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 					</div>
 
 					{showToc && (
-						<!-- 移动端：浮动按钮 -->
-						<button
-							data-toc-mobile-toggle
-							class="xl:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-white shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
-							aria-label="打开目录"
-						>
-							<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-								<path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
-						</button>
-
-						<!-- 移动端：抽屉式目录 -->
-						<div
-							data-toc-mobile-drawer
-							class="xl:hidden fixed inset-0 z-50 pointer-events-none"
-							aria-hidden="true"
-						>
-							<!-- 遮罩层 -->
-							<div
-								data-toc-mobile-overlay
-								class="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 pointer-events-none"
-							></div>
-
-							<!-- 抽屉内容 -->
-							<div
-								data-toc-mobile-content
-								class="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-[var(--color-bg-surface)] shadow-2xl translate-x-full transition-transform duration-300 pointer-events-auto"
+						<>
+							{/* 移动端：浮动按钮 */}
+							<button
+								data-toc-mobile-toggle
+								class="xl:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-md bg-[rgba(251,143,104,0.85)] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_8px_32px_rgba(251,143,104,0.35)] transition-all duration-300 hover:scale-105 hover:bg-[rgba(251,143,104,0.95)] hover:shadow-[0_12px_40px_rgba(251,143,104,0.45)] active:scale-95"
+								aria-label="打开目录"
 							>
-								<div class="flex h-full flex-col">
-									<!-- 头部 -->
-									<div class="flex items-center justify-between border-b border-border-subtle px-6 py-4">
-										<h2 class="text-lg font-semibold text-[var(--color-text-primary)]">目录</h2>
-										<button
-											data-toc-mobile-close
-											class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--color-bg-muted)] transition-colors"
-											aria-label="关闭目录"
-										>
-											<svg class="h-5 w-5 text-[var(--color-text-muted)]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-												<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-											</svg>
-										</button>
-									</div>
+								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+									<path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</button>
 
-									<!-- 目录内容 -->
-									<div class="flex-1 overflow-y-auto px-6 py-4">
-										<div class="toc-mobile">
-											<TableOfContents headings={headings} />
+							{/* 移动端：抽屉式目录 */}
+							<div
+								data-toc-mobile-drawer
+								class="xl:hidden fixed inset-0 z-50 pointer-events-none"
+								aria-hidden="true"
+							>
+								{/* 遮罩层 */}
+								<div
+									data-toc-mobile-overlay
+									class="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 pointer-events-none"
+								></div>
+
+								{/* 抽屉内容 */}
+								<div
+									data-toc-mobile-content
+									class="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-[var(--color-bg-surface)] shadow-2xl translate-x-full transition-transform duration-300 pointer-events-auto"
+								>
+									<div class="flex h-full flex-col">
+										{/* 头部 */}
+										<div class="flex items-center justify-between border-b border-border-subtle px-6 py-4">
+											<h2 class="text-lg font-semibold text-[var(--color-text-primary)]">目录</h2>
+											<button
+												data-toc-mobile-close
+												class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--color-bg-muted)] transition-colors"
+												aria-label="关闭目录"
+											>
+												<svg class="h-5 w-5 text-[var(--color-text-muted)]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+												</svg>
+											</button>
+										</div>
+
+										{/* 目录内容 */}
+										<div class="flex-1 overflow-y-auto px-6 pt-4 pb-8">
+											<div class="toc-mobile">
+												<TableOfContents headings={headings} />
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						</div>
+						</>
 					)}
 
 					<Prose>
@@ -138,39 +149,18 @@ const showToc = headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 2;
 				</article>
 
 				{showToc && (
-					<!-- 侧边栏使用 absolute 定位,不影响文章居中布局 -->
-					<!-- 高度由 JavaScript 动态设置,匹配文章高度让 sticky 生效 -->
-					<aside data-toc-sidebar class="hidden xl:block absolute left-[calc(50%+24rem+3rem)] w-[280px]" style="top: 0;">
-						<TableOfContents headings={headings} />
-					</aside>
+					<>
+						{/* 侧边栏使用 absolute 定位,不影响文章居中布局 */}
+						{/* 高度由 JavaScript 动态设置,匹配文章高度让 sticky 生效 */}
+						<aside data-toc-sidebar class="hidden xl:block absolute left-[calc(50%+24rem+3rem)] w-[280px]" style="top: 0;">
+							<TableOfContents headings={headings} />
+						</aside>
+					</>
 				)}
 			</div>
 		</main>
 		<Footer />
 	</body>
-	<style>
-		/* 移动端抽屉目录样式 */
-		.toc-mobile :global(.toc) {
-			position: static;
-			max-height: none;
-			overflow: visible;
-			padding: 0;
-		}
-
-		.toc-mobile :global(.toc-title) {
-			display: none;
-		}
-
-		/* 移动端目录链接更大更易点击 */
-		.toc-mobile :global(.toc-link) {
-			font-size: 0.9375rem;
-			padding: 0.375rem 0;
-		}
-
-		.toc-mobile :global(.toc-number) {
-			font-size: 0.75rem;
-		}
-	</style>
 	<script>
 		import mermaid from 'mermaid';
 		mermaid.initialize({ startOnLoad: true });

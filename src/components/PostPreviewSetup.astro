@@ -1,15 +1,15 @@
 ---
-import { getCollection } from 'astro:content';
-import { extractDescription } from '../utils/extractDescription';
+import { getCollection } from "astro:content";
+import { extractDescription } from "../utils/extractDescription";
 
 interface PostMeta {
-	title: string;
-	description: string;
-	image?: string;
+    title: string;
+    description: string;
+    image?: string;
 }
 
 interface Props {
-	meta?: Record<string, PostMeta>;
+    meta?: Record<string, PostMeta>;
 }
 
 const { meta } = Astro.props as Props;
@@ -17,26 +17,26 @@ const { meta } = Astro.props as Props;
 let postMetaMap: Record<string, PostMeta> | undefined = meta;
 
 if (!postMetaMap) {
-	const [blogPosts, monthlyPosts, tilPosts] = await Promise.all([
-		getCollection('blog'),
-		getCollection('monthly'),
-		getCollection('til'),
-	]);
+    const [blogPosts, monthlyPosts, tilPosts] = await Promise.all([
+        getCollection("blog"),
+        getCollection("monthly"),
+        getCollection("til"),
+    ]);
 
-	const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts];
+    const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts];
 
-	postMetaMap = allPosts.reduce<Record<string, PostMeta>>((acc, post) => {
-		const description = post.data.description || extractDescription(post.body || '');
-		acc[post.id] = {
-			title: post.data.title,
-			description,
-			image: post.data.socialImage || undefined,
-		};
-		return acc;
-	}, {});
+    postMetaMap = allPosts.reduce<Record<string, PostMeta>>((acc, post) => {
+        const description = post.data.description || extractDescription(post.body || "");
+        acc[post.id] = {
+            title: post.data.title,
+            description,
+            image: post.data.socialImage || undefined,
+        };
+        return acc;
+    }, {});
 }
 
-const serializedMeta = JSON.stringify(postMetaMap).replace(/</g, '\\u003c');
+const serializedMeta = JSON.stringify(postMetaMap).replace(/</g, "\\u003c");
 ---
 <script id="all-posts-meta" type="application/json" set:html={serializedMeta}></script>
 <script>

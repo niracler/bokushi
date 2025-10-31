@@ -1,33 +1,31 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
-import { getCollection } from 'astro:content';
+import { getCollection } from "astro:content";
+import BaseHead from "../../components/BaseHead.astro";
+import Footer from "../../components/Footer.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import Header from "../../components/Header.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 
 export async function getStaticPaths() {
-	const blogPosts = await getCollection('blog');
-	const monthlyPosts = await getCollection('monthly');
-	const tilPosts = await getCollection('til');
-	const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts];
-	const uniqueTags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
+    const blogPosts = await getCollection("blog");
+    const monthlyPosts = await getCollection("monthly");
+    const tilPosts = await getCollection("til");
+    const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts];
+    const uniqueTags = [...new Set(allPosts.flatMap((post) => post.data.tags))];
 
-	return uniqueTags.map((tag) => {
-		const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag));
-		return {
-			params: { tag },
-			props: { posts: filteredPosts },
-		};
-	});
+    return uniqueTags.map((tag) => {
+        const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag));
+        return {
+            params: { tag },
+            props: { posts: filteredPosts },
+        };
+    });
 }
 
 const { tag } = Astro.params;
 const { posts } = Astro.props;
 
-const sortedPosts = posts.sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>

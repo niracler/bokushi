@@ -1,11 +1,11 @@
 ---
+import { SOCIAL_LINKS } from "../consts";
+import PostPreviewSetup from "./PostPreviewSetup.astro";
+
 const today = new Date();
-import { SOCIAL_LINKS } from '../consts';
-import PostPreviewSetup from './PostPreviewSetup.astro';
 ---
 <footer class="bg-[var(--color-bg-page)] px-4 py-12 text-center text-sm text-[var(--color-text-secondary)]">
-	&copy; {today.getFullYear()} Niracler. All rights reserved.
-	<div class="mt-4 flex justify-center gap-4">
+	<div class="mb-4 flex justify-center gap-4">
 		<a
 			href={SOCIAL_LINKS.telegram}
 			target="_blank"
@@ -75,6 +75,22 @@ import PostPreviewSetup from './PostPreviewSetup.astro';
 					fill="currentColor"
 					d="M2.002 2.725a.764.764 0 0 1 .767-.764c5.154 0 9.335 4.181 9.335 9.335a.764.764 0 0 1-.764.767H9.579a.764.764 0 0 1-.767-.767c0-3.73-3.03-6.76-6.76-6.76a.764.764 0 0 1-.767-.764V2.725zm0 3.334a.764.764 0 0 1 .767-.767c3.066 0 5.555 2.49 5.555 5.556a.764.764 0 0 1-.767.767H5.796a.764.764 0 0 1-.767-.767c0-1.402-1.137-2.54-2.54-2.54a.764.764 0 0 1-.767-.767V6.059zm0 3.333a.764.764 0 0 1 .767-.767c.422 0 .767.345.767.767s-.345.767-.767.767a.764.764 0 0 1-.767-.767v-.767z"
 				></path>
+			</svg>
+		</a>
+	</div>
+	<div class="mt-4">
+		&copy; {today.getFullYear()} Niracler.
+		<a
+			href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+			target="_blank"
+			rel="license noopener noreferrer"
+			class="inline-flex items-center gap-1 transition-colors hover:text-[var(--color-accent)]"
+			title="本站内容采用 CC BY-NC-SA 4.0 国际许可协议"
+		>
+			<span>CC BY-NC-SA 4.0</span>
+			<svg class="inline-block" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+				<path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14.5c-3.59 0-6.5-2.91-6.5-6.5S4.41 1.5 8 1.5s6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"/>
+				<path d="M8 4c-1.66 0-3 1.34-3 3h1.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 .5-.25.94-.63 1.21-.58.41-.87.98-.87 1.79h1.5c0-.31.08-.5.37-.71C10.26 8.84 11 8.03 11 7c0-1.66-1.34-3-3-3zm-.75 7h1.5v1.5h-1.5V11z"/>
 			</svg>
 		</a>
 	</div>
