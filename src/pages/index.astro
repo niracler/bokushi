@@ -10,146 +10,96 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(30px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes breathe {
+				0%, 100% {
+					opacity: 0.95;
+				}
+				50% {
+					opacity: 1;
+				}
+			}
+
+			.quote-container {
+				animation: fadeIn 1.5s ease-out;
+			}
+
+			.quote-text {
+				color: var(--color-text-secondary);
+				line-height: 1.8;
+			}
+
+			.quote-emphasis {
+				display: inline-block;
+				font-size: 2rem;
+				font-weight: 700;
+				letter-spacing: 0.1em;
+				color: var(--color-accent);
+				margin: 1rem 0;
+				animation: breathe 4s ease-in-out infinite;
+			}
+
+			.quote-source {
+				animation: fadeIn 2s ease-out;
+				transition: all 0.3s ease;
+			}
+
+			.quote-source:hover {
+				transform: translateX(-8px);
+			}
+
+			.quote-source a {
+				position: relative;
+				text-decoration: none;
+				transition: color 0.3s ease;
+			}
+
+			.quote-source a::after {
+				content: '';
+				position: absolute;
+				bottom: -2px;
+				left: 0;
+				width: 0;
+				height: 2px;
+				background: var(--color-accent);
+				transition: width 0.3s ease;
+			}
+
+			.quote-source a:hover::after {
+				width: 100%;
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
-		<main class="mx-auto max-w-2xl space-y-12 px-4">
-			<section class="space-y-5 text-left">
-				<p class="text-xs font-medium uppercase tracking-[0.3em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
-					正在迁移中 ·
-					<a
-						href="https://niracler.xlog.app"
-						target="_blank"
-						class="inline-flex items-center gap-1 font-semibold text-[var(--color-accent)] underline-offset-4 hover:underline"
-					>
-						niracler.xlog.app
-					</a>
-				</p>
-				<div class="space-y-2">
-					<h1 class="text-[2.75rem] font-semibold leading-tight tracking-tight text-[var(--color-text-primary)] sm:text-[3.25rem]">
-						Hi, 我是 Niracler 👋
-					</h1>
-					<p class="text-base font-medium text-[color-mix(in srgb, var(--color-text-secondary) 80%, transparent)] sm:text-lg">
-						去各样的地方，遇见各样的人
+		<main class="flex min-h-[calc(100vh-200px)] items-center justify-center px-4">
+			<section class="quote-container mx-auto max-w-3xl space-y-8 text-center">
+				<blockquote class="quote-text space-y-6 text-xl leading-relaxed sm:text-2xl sm:leading-relaxed">
+					<p>
+						或许每个人都只是想证明自己的确存在着，希望他人也能认知到自己确实存在于这个世上。基于这个单纯的行动理念，我们进行着一切行为。而所盼望的只有一个，那就是
 					</p>
-				</div>
-				<p class="max-w-2xl text-base leading-relaxed text-[color-mix(in srgb, var(--color-text-muted) 80%, transparent)] sm:text-[1.05rem]">
-					一个喜欢记录生活、思考人生的赛博电子人。在这里，你会看到我的生活片段、技术思考、游戏体验，以及一些关于人生和世界的胡思乱想。
-				</p>
-			</section>
-
-			<section class="space-y-6">
-				<h2 class="text-2xl font-semibold text-[var(--color-text-primary)]">这里可能会有</h2>
-				<ul class="grid gap-4 sm:grid-cols-2 sm:gap-5">
-					<li>
-						<a
-							href={`/tags/${encodeURIComponent('月记')}`}
-							class="group flex gap-3 rounded-lg bg-transparent px-4 py-4 border border-[var(--color-border-soft)] transition-all duration-300 hover:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)] hover:border-[var(--color-accent)] hover:shadow-[0_4px_20px_rgba(251,143,104,0.15)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-						>
-							<span class="text-xl leading-none">🗓️</span>
-							<div class="space-y-1">
-								<h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
-									月记
-								</h3>
-								<p class="text-base font-medium text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
-									记录一个月的节奏、心境与成长
-								</p>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a
-							href={`/tags/${encodeURIComponent('TIL')}`}
-							class="group flex gap-3 rounded-lg bg-transparent px-4 py-4 border border-[var(--color-border-soft)] transition-all duration-300 hover:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)] hover:border-[var(--color-accent)] hover:shadow-[0_4px_20px_rgba(251,143,104,0.15)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-						>
-							<span class="text-xl leading-none">💡</span>
-							<div class="space-y-1">
-								<h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
-									每日一学
-								</h3>
-								<p class="text-base font-medium text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
-									每天学到的技巧、流程与灵感速记
-								</p>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a
-							href={`/tags/${encodeURIComponent('游戏')}`}
-							class="group flex gap-3 rounded-lg bg-transparent px-4 py-4 border border-[var(--color-border-soft)] transition-all duration-300 hover:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)] hover:border-[var(--color-accent)] hover:shadow-[0_4px_20px_rgba(251,143,104,0.15)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-						>
-							<span class="text-xl leading-none">🎮</span>
-							<div class="space-y-1">
-								<h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
-									游戏体验
-								</h3>
-								<p class="text-base font-medium text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
-									分享游戏经历和感受
-								</p>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a
-							href={`/tags/${encodeURIComponent('思考')}`}
-							class="group flex gap-3 rounded-lg bg-transparent px-4 py-4 border border-[var(--color-border-soft)] transition-all duration-300 hover:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)] hover:border-[var(--color-accent)] hover:shadow-[0_4px_20px_rgba(251,143,104,0.15)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-						>
-							<span class="text-xl leading-none">🤔</span>
-							<div class="space-y-1">
-								<h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
-									深度思考
-								</h3>
-								<p class="text-base font-medium text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-accent)]">
-									对工作、人生与世界的思辨
-								</p>
-							</div>
-						</a>
-					</li>
-				</ul>
-			</section>
-
-			<section class="space-y-4">
-				<h2 class="text-2xl font-semibold text-[var(--color-text-primary)]">最近在做什么</h2>
-				<ul class="space-y-2 sm:grid sm:grid-cols-2 sm:gap-3 sm:space-y-0">
-					<li class="flex items-baseline gap-3 text-sm text-[var(--color-text-secondary)] sm:text-base">
-						<span class="h-[6px] w-[6px] rounded-full bg-[var(--color-accent)]"></span>
-						<div>
-							<span class="font-semibold text-[var(--color-text-primary)]">当前状态</span>
-							<span class="mx-2 text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">/</span>
-							<span>在深圳工作中</span>
-						</div>
-					</li>
-					<li class="flex items-baseline gap-3 text-sm text-[var(--color-text-secondary)] sm:text-base">
-						<span class="h-[6px] w-[6px] rounded-full bg-[var(--color-accent)]"></span>
-						<div>
-							<span class="font-semibold text-[var(--color-text-primary)]">最近关注</span>
-							<span class="mx-2 text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">/</span>
-							<span>技术学习、生活记录</span>
-						</div>
-					</li>
-					<li class="flex items-baseline gap-3 text-sm text-[var(--color-text-secondary)] sm:text-base">
-						<span class="h-[6px] w-[6px] rounded-full bg-[var(--color-accent)]"></span>
-						<div>
-							<span class="font-semibold text-[var(--color-text-primary)]">正在读</span>
-							<span class="mx-2 text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">/</span>
-							<span>各种技术文档和人生思考</span>
-						</div>
-					</li>
-				</ul>
-			</section>
-
-			<section class="space-y-3 border-t border-border-soft pt-6">
-				<blockquote class="text-center text-base leading-relaxed text-[var(--color-text-secondary)]">
-					或许每个人都只是想证明自己的确存在着，希望他人也能认知到自己确实存在于这个世上。也许大家都是基于这个单纯的行动理念进行一切行为。所盼望的只有一个，那就是
-					<br/><strong>「不要忘了我」</strong><br/>
-					这个简洁却悲痛的讯息。
+					<p class="quote-emphasis">
+						「不要忘了我」
+					</p>
+					<p>
+						这个简洁却悲痛的讯息。
+					</p>
 				</blockquote>
-				<p class="text-right text-sm text-[var(--color-text-secondary)]">
-					—— 《<a href="https://t.me/tomoko_channel/7">凉宫春日的忧郁</a>》
+				<p class="quote-source text-right text-base text-[var(--color-text-muted)]">
+					—— 《<a href="https://t.me/tomoko_channel/7" class="text-[var(--color-text-secondary)] hover:text-[var(--color-accent)]">凉宫春日的忧郁</a>》
 				</p>
 			</section>
-
-			<Remark42Comments postId="homepage" />
 		</main>
 		<Footer />
 	</body>

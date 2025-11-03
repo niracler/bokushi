@@ -11,6 +11,7 @@ const sharedSchema = z.object({
     socialImage: z.string().optional(),
     tags: z.array(z.string()).optional().default([]),
     hidden: z.boolean().optional().default(false),
+    commentId: z.string().optional(),
 });
 
 const blog = defineCollection({
