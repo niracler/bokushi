@@ -18,6 +18,7 @@ type EntryData =
 type Props = EntryData & {
     body?: string;
     headings?: MarkdownHeading[];
+    commentId?: string;
 };
 
 const {
@@ -29,6 +30,7 @@ const {
     body,
     tags,
     headings = [],
+    commentId,
 } = Astro.props;
 
 const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
@@ -145,7 +147,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						<slot />
 					</Prose>
 
-					<Remark42Comments />
+					<Remark42Comments postId={commentId} />
 				</article>
 
 				{showToc && (
@@ -163,7 +165,42 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 	</body>
 	<script>
 		import mermaid from 'mermaid';
-		mermaid.initialize({ startOnLoad: true });
+
+		// 初始化 Mermaid 配置
+		const initMermaid = () => {
+			mermaid.initialize({
+				startOnLoad: false, // 手动控制渲染时机
+				theme: 'default',
+				securityLevel: 'loose',
+			});
+
+			// 查找所有未渲染的 mermaid 代码块
+			const mermaidBlocks = document.querySelectorAll('pre.mermaid:not([data-processed])');
+
+			if (mermaidBlocks.length > 0) {
+				// 标记为已处理,避免重复渲染
+				mermaidBlocks.forEach((block) => {
+					block.setAttribute('data-processed', 'true');
+				});
+
+				// 执行渲染
+				mermaid.run({
+					nodes: Array.from(mermaidBlocks),
+				}).catch((error) => {
+					console.error('Mermaid rendering error:', error);
+				});
+			}
+		};
+
+		// 初始化执行
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', initMermaid, { once: true });
+		} else {
+			initMermaid();
+		}
+
+		// Astro 页面切换时重新初始化
+		window.addEventListener('astro:after-swap', initMermaid);
 
 		if (typeof window !== 'undefined') {
 			const unwrapCardCells = (table: HTMLTableElement) => {

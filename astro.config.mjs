@@ -51,9 +51,7 @@ export default defineConfig({
             [
                 rehypeMermaid,
                 {
-                    strategy: "pre-mermaid", // 生成静态 HTML，客户端渲染
-                    dark: true, // 启用暗黑模式支持
-                    colorScheme: "forest", // 使用 forest 配色方案，可根据需要调整
+                    strategy: "pre-mermaid", // 客户端渲染，无需 Playwright
                 },
             ],
             rehypePicture,
