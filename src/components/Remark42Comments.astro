@@ -1,17 +1,10 @@
 ---
-export interface Props {
-    postId?: string;
-}
-
-const { postId } = Astro.props;
-
 // 这里需要配置你的 Remark42 服务器地址
 const REMARK_URL = import.meta.env.PUBLIC_REMARK_URL || "https://remark42.niracler.com";
 const SITE_ID = import.meta.env.PUBLIC_REMARK_SITE_ID || "niracler";
 
 // 获取当前页面的 URL 作为评论的唯一标识
 const pageUrl = Astro.url.href;
-const pageId = postId || Astro.url.pathname;
 ---
 
 <div class="mt-12 border-t border-border-subtle pt-6">
@@ -19,7 +12,7 @@ const pageId = postId || Astro.url.pathname;
   <div id="remark42"></div>
 </div>
 
-<script define:vars={{ REMARK_URL, SITE_ID, pageUrl, pageId }}>
+<script define:vars={{ REMARK_URL, SITE_ID, pageUrl }}>
   // Remark42 配置
   var remark_config = {
     host: REMARK_URL,

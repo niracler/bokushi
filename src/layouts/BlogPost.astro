@@ -18,7 +18,6 @@ type EntryData =
 type Props = EntryData & {
     body?: string;
     headings?: MarkdownHeading[];
-    commentId?: string;
 };
 
 const {
@@ -30,7 +29,6 @@ const {
     body,
     tags,
     headings = [],
-    commentId,
 } = Astro.props;
 
 const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
@@ -147,7 +145,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						<slot />
 					</Prose>
 
-					<Remark42Comments postId={commentId} />
+					<Remark42Comments />
 				</article>
 
 				{showToc && (
