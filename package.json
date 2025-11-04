@@ -8,8 +8,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "format": "biome format --write .",
-    "lint": "biome check .",
-    "postinstall": "playwright install --with-deps chromium"
+    "lint": "biome check ."
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.6",
