@@ -162,43 +162,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 		<Footer />
 	</body>
 	<script>
-		import mermaid from 'mermaid';
-
-		// 初始化 Mermaid 配置
-		const initMermaid = () => {
-			mermaid.initialize({
-				startOnLoad: false, // 手动控制渲染时机
-				theme: 'default',
-				securityLevel: 'loose',
-			});
-
-			// 查找所有未渲染的 mermaid 代码块
-			const mermaidBlocks = document.querySelectorAll('pre.mermaid:not([data-processed])');
-
-			if (mermaidBlocks.length > 0) {
-				// 标记为已处理,避免重复渲染
-				mermaidBlocks.forEach((block) => {
-					block.setAttribute('data-processed', 'true');
-				});
-
-				// 执行渲染
-				mermaid.run({
-					nodes: Array.from(mermaidBlocks),
-				}).catch((error) => {
-					console.error('Mermaid rendering error:', error);
-				});
-			}
-		};
-
-		// 初始化执行
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', initMermaid, { once: true });
-		} else {
-			initMermaid();
-		}
-
-		// Astro 页面切换时重新初始化
-		window.addEventListener('astro:after-swap', initMermaid);
+		// Mermaid 图表现在在构建时渲染为内联 SVG，无需客户端初始化
 
 		if (typeof window !== 'undefined') {
 			const unwrapCardCells = (table: HTMLTableElement) => {

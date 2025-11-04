@@ -15,52 +15,52 @@ import { remarkAlert } from "remark-github-blockquote-alert";
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://niracler.com",
-    trailingSlash: "never",
-    integrations: [mdx(), sitemap()],
-    adapter: cloudflare({
-        imageService: "compile",
-    }),
+  site: "https://niracler.com",
+  trailingSlash: "never",
+  integrations: [mdx(), sitemap()],
+  adapter: cloudflare({
+    imageService: "compile",
+  }),
 
-    markdown: {
-        remarkPlugins: [remarkAlert],
-        shikiConfig: {
-            theme: "dracula",
-            // 如果想要支持浅色/深色模式切换，可以这样配置：
-            // themes: {
-            //   light: 'github-light',
-            //   dark: 'dracula',
-            // },
-        },
-        syntaxHighlight: {
-            excludeLangs: ["mermaid"],
-        },
-        rehypePlugins: [
-            rehypeSlug,
-            [
-                rehypeAutolinkHeadings,
-                {
-                    behavior: "prepend",
-                    properties: {
-                        class: "anchor-link",
-                        ariaHidden: true,
-                        tabIndex: -1,
-                    },
-                },
-            ],
-            [
-                rehypeMermaid,
-                {
-                    strategy: "pre-mermaid", // 客户端渲染，无需 Playwright
-                },
-            ],
-            rehypePicture,
-            rehypeImgSize,
-            rehypeFigure,
-        ],
+  markdown: {
+    remarkPlugins: [remarkAlert],
+    shikiConfig: {
+      theme: "dracula",
+      // 如果想要支持浅色/深色模式切换，可以这样配置：
+      // themes: {
+      //   light: 'github-light',
+      //   dark: 'dracula',
+      // },
     },
+    syntaxHighlight: {
+      excludeLangs: ["mermaid"],
+    },
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: "prepend",
+          properties: {
+            class: "anchor-link",
+            ariaHidden: true,
+            tabIndex: -1,
+          },
+        },
+      ],
+      [
+        rehypeMermaid,
+        {
+          strategy: "inline-svg", // 服务端渲染为内联 SVG
+        },
+      ],
+      rehypePicture,
+      rehypeImgSize,
+      rehypeFigure,
+    ],
+  },
 
-    vite: {
-        plugins: [tailwindcss()],
-    },
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });
