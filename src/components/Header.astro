@@ -4,188 +4,220 @@ import HeaderLink from "./HeaderLink.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 
 const navLinks = [
-	{ href: "/", label: "首页" },
-	{ href: "/blog", label: "文章" },
-	{ href: "/tags", label: "标签" },
-	{ href: "/friends", label: "友链" },
+    { href: "/", label: "首页" },
+    { href: "/blog", label: "文章" },
+    { href: "/tags", label: "标签" },
+    { href: "/friends", label: "友链" },
+    { href: "/plrom", label: "心头好" },
 ];
 
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, "");
 const subpath = pathname.match(/[^/]+/g);
-const isActive = (href: string) => href === pathname || href === `/${subpath?.[0] || ""}`;
+const isActive = (href: string) =>
+    href === pathname || href === `/${subpath?.[0] || ""}`;
 ---
 
-<header class="bg-[var(--color-bg-surface)] border-b border-[var(--color-border)]">
-	<nav class="mx-auto flex w-full max-w-4xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6">
-		<h2 class="text-[1.05rem] font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-[1.1rem]">
-			<a href="/" class="transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]">
-				{SITE_TITLE}
-			</a>
-		</h2>
-		<ThemeToggle variant="header" class="hidden md:inline-flex" />
-		<div class="ml-auto flex items-center gap-2 sm:gap-3">
-			<button
-				type="button"
-				class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--color-border-soft)] bg-transparent text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)] md:hidden"
-				aria-label="打开导航菜单"
-				aria-expanded="false"
-				data-nav-toggle
-			>
-				<span aria-hidden="true" class="flex h-4 w-5 flex-col justify-between">
-					<span class="h-0.5 w-full rounded-full bg-current transition-transform duration-300" data-bar-top></span>
-					<span class="h-0.5 w-full rounded-full bg-current transition-opacity duration-300" data-bar-middle></span>
-					<span class="h-0.5 w-full rounded-full bg-current transition-transform duration-300" data-bar-bottom></span>
-				</span>
-			</button>
-			<div class="hidden items-center gap-2 sm:gap-3 md:flex">
-				{navLinks.map((link) => (
-					<HeaderLink href={link.href}>{link.label}</HeaderLink>
-				))}
-			</div>
-		</div>
-	</nav>
-	<div
-		data-nav-overlay
-		class="fixed inset-0 z-40 flex items-start justify-end bg-black/30 opacity-0 transition-opacity duration-200 pointer-events-none md:hidden"
-		data-nav-state="closed"
-	>
-		<button
-			type="button"
-			class="absolute inset-0 h-full w-full cursor-default"
-			data-nav-close
-			aria-label="关闭导航菜单"
-		></button>
-		<div
-			data-nav-drawer
-			class="relative z-10 flex h-full w-72 max-w-[80vw] translate-x-6 flex-col gap-6 border-l border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 text-[var(--color-text-primary)] shadow-xl transition-transform duration-200"
-		>
-			<div class="flex items-center justify-between">
-				<span class="text-sm font-semibold uppercase tracking-[0.25em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
-					Menu
-				</span>
-				<button
-					type="button"
-					class="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]"
-					data-nav-close
-					aria-label="关闭导航菜单"
-				>
-					<span aria-hidden="true" class="text-xl leading-none">×</span>
-				</button>
-			</div>
-			<nav class="flex flex-col gap-2 text-base">
-				{navLinks.map((link) => (
-					<a
-						href={link.href}
-						class:list={[
-							"inline-flex items-center rounded-md px-3 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]",
-							isActive(link.href)
-								? "bg-[color-mix(in srgb,var(--color-accent)12%,transparent)] text-[var(--color-accent)] font-semibold"
-								: "text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] hover:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)]",
-						]}
-						data-nav-link
-					>
-						{link.label}
-					</a>
-				))}
-			</nav>
-			<div class="mt-auto border-t border-[var(--color-border-subtle)] pt-4">
-				<ThemeToggle variant="mobile" />
-			</div>
-		</div>
-	</div>
-	<link
-    rel="alternate"
-    type="application/rss+xml"
-		title="Niracler's 博物志"
-		href={new URL('rss.xml', Astro.site)}
-	/>
+<header
+    class="bg-[var(--color-bg-surface)] border-b border-[var(--color-border)]"
+>
+    <nav
+        class="mx-auto flex w-full max-w-4xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6"
+    >
+        <h2
+            class="text-[1.05rem] font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-[1.1rem]"
+        >
+            <a
+                href="/"
+                class="transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]"
+            >
+                {SITE_TITLE}
+            </a>
+        </h2>
+        <ThemeToggle variant="header" class="hidden md:inline-flex" />
+        <div class="ml-auto flex items-center gap-2 sm:gap-3">
+            <button
+                type="button"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--color-border-soft)] bg-transparent text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)] md:hidden"
+                aria-label="打开导航菜单"
+                aria-expanded="false"
+                data-nav-toggle
+            >
+                <span
+                    aria-hidden="true"
+                    class="flex h-4 w-5 flex-col justify-between"
+                >
+                    <span
+                        class="h-0.5 w-full rounded-full bg-current transition-transform duration-300"
+                        data-bar-top></span>
+                    <span
+                        class="h-0.5 w-full rounded-full bg-current transition-opacity duration-300"
+                        data-bar-middle></span>
+                    <span
+                        class="h-0.5 w-full rounded-full bg-current transition-transform duration-300"
+                        data-bar-bottom></span>
+                </span>
+            </button>
+            <div class="hidden items-center gap-2 sm:gap-3 md:flex">
+                {
+                    navLinks.map((link) => (
+                        <HeaderLink href={link.href}>{link.label}</HeaderLink>
+                    ))
+                }
+            </div>
+        </div>
+    </nav>
+    <div
+        data-nav-overlay
+        class="fixed inset-0 z-40 flex items-start justify-end bg-black/30 opacity-0 transition-opacity duration-200 pointer-events-none md:hidden"
+        data-nav-state="closed"
+    >
+        <button
+            type="button"
+            class="absolute inset-0 h-full w-full cursor-default"
+            data-nav-close
+            aria-label="关闭导航菜单"></button>
+        <div
+            data-nav-drawer
+            class="relative z-10 flex h-full w-72 max-w-[80vw] translate-x-6 flex-col gap-6 border-l border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 text-[var(--color-text-primary)] shadow-xl transition-transform duration-200"
+        >
+            <div class="flex items-center justify-between">
+                <span
+                    class="text-sm font-semibold uppercase tracking-[0.25em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]"
+                >
+                    Menu
+                </span>
+                <button
+                    type="button"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]"
+                    data-nav-close
+                    aria-label="关闭导航菜单"
+                >
+                    <span aria-hidden="true" class="text-xl leading-none"
+                        >×</span
+                    >
+                </button>
+            </div>
+            <nav class="flex flex-col gap-2 text-base">
+                {
+                    navLinks.map((link) => (
+                        <a
+                            href={link.href}
+                            class:list={[
+                                "inline-flex items-center rounded-md px-3 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]",
+                                isActive(link.href)
+                                    ? "bg-[color-mix(in srgb,var(--color-accent)12%,transparent)] text-[var(--color-accent)] font-semibold"
+                                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] hover:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)]",
+                            ]}
+                            data-nav-link
+                        >
+                            {link.label}
+                        </a>
+                    ))
+                }
+            </nav>
+            <div
+                class="mt-auto border-t border-[var(--color-border-subtle)] pt-4"
+            >
+                <ThemeToggle variant="mobile" />
+            </div>
+        </div>
+    </div>
+    <link
+        rel="alternate"
+        type="application/rss+xml"
+        title="Niracler's 博物志"
+        href={new URL("rss.xml", Astro.site)}
+    />
 </header>
 
 <script is:inline>
-	const toggleButton = document.querySelector('[data-nav-toggle]');
-	const overlay = document.querySelector('[data-nav-overlay]');
-	const drawer = document.querySelector('[data-nav-drawer]');
-	const closeButtons = document.querySelectorAll('[data-nav-close]');
-	const navLinks = document.querySelectorAll('[data-nav-link]');
-	const barTop = toggleButton?.querySelector('[data-bar-top]');
-	const barMiddle = toggleButton?.querySelector('[data-bar-middle]');
-	const barBottom = toggleButton?.querySelector('[data-bar-bottom]');
-	let lastFocusedElement = null;
+    const toggleButton = document.querySelector("[data-nav-toggle]");
+    const overlay = document.querySelector("[data-nav-overlay]");
+    const drawer = document.querySelector("[data-nav-drawer]");
+    const closeButtons = document.querySelectorAll("[data-nav-close]");
+    const navLinks = document.querySelectorAll("[data-nav-link]");
+    const barTop = toggleButton?.querySelector("[data-bar-top]");
+    const barMiddle = toggleButton?.querySelector("[data-bar-middle]");
+    const barBottom = toggleButton?.querySelector("[data-bar-bottom]");
+    let lastFocusedElement = null;
 
-	const setOpen = (open) => {
-		if (!overlay || !drawer) return;
+    const setOpen = (open) => {
+        if (!overlay || !drawer) return;
 
-		overlay.dataset.navState = open ? 'open' : 'closed';
-		toggleButton?.setAttribute('aria-expanded', open ? 'true' : 'false');
-		toggleButton?.setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+        overlay.dataset.navState = open ? "open" : "closed";
+        toggleButton?.setAttribute("aria-expanded", open ? "true" : "false");
+        toggleButton?.setAttribute(
+            "aria-label",
+            open ? "关闭导航菜单" : "打开导航菜单",
+        );
 
-		if (open) {
-			lastFocusedElement = document.activeElement;
-			overlay.classList.remove('pointer-events-none', 'opacity-0');
-			overlay.classList.add('opacity-100');
-			drawer.classList.remove('translate-x-6');
-			drawer.classList.add('translate-x-0');
-			document.body.classList.add('overflow-hidden');
-			barTop?.classList.add('translate-y-1.5', 'rotate-45');
-			barBottom?.classList.add('-translate-y-1.5', '-rotate-45');
-			barMiddle?.classList.add('opacity-0');
-			requestAnimationFrame(() => {
-				if (navLinks[0]) {
-					navLinks[0].focus({ preventScroll: true });
-				}
-			});
-		} else {
-			overlay.classList.remove('opacity-100');
-			overlay.classList.add('opacity-0', 'pointer-events-none');
-			drawer.classList.add('translate-x-6');
-			drawer.classList.remove('translate-x-0');
-			document.body.classList.remove('overflow-hidden');
-			barTop?.classList.remove('translate-y-1.5', 'rotate-45');
-			barBottom?.classList.remove('-translate-y-1.5', '-rotate-45');
-			barMiddle?.classList.remove('opacity-0');
-			if (lastFocusedElement && 'focus' in lastFocusedElement) {
-				lastFocusedElement.focus({ preventScroll: true });
-			}
-		}
-	};
+        if (open) {
+            lastFocusedElement = document.activeElement;
+            overlay.classList.remove("pointer-events-none", "opacity-0");
+            overlay.classList.add("opacity-100");
+            drawer.classList.remove("translate-x-6");
+            drawer.classList.add("translate-x-0");
+            document.body.classList.add("overflow-hidden");
+            barTop?.classList.add("translate-y-1.5", "rotate-45");
+            barBottom?.classList.add("-translate-y-1.5", "-rotate-45");
+            barMiddle?.classList.add("opacity-0");
+            requestAnimationFrame(() => {
+                if (navLinks[0]) {
+                    navLinks[0].focus({ preventScroll: true });
+                }
+            });
+        } else {
+            overlay.classList.remove("opacity-100");
+            overlay.classList.add("opacity-0", "pointer-events-none");
+            drawer.classList.add("translate-x-6");
+            drawer.classList.remove("translate-x-0");
+            document.body.classList.remove("overflow-hidden");
+            barTop?.classList.remove("translate-y-1.5", "rotate-45");
+            barBottom?.classList.remove("-translate-y-1.5", "-rotate-45");
+            barMiddle?.classList.remove("opacity-0");
+            if (lastFocusedElement && "focus" in lastFocusedElement) {
+                lastFocusedElement.focus({ preventScroll: true });
+            }
+        }
+    };
 
-	toggleButton?.addEventListener('click', () => {
-		const isOpen = overlay?.dataset.navState === 'open';
-		setOpen(!isOpen);
-	});
+    toggleButton?.addEventListener("click", () => {
+        const isOpen = overlay?.dataset.navState === "open";
+        setOpen(!isOpen);
+    });
 
-	closeButtons.forEach((button) => {
-		button.addEventListener('click', () => setOpen(false));
-	});
+    closeButtons.forEach((button) => {
+        button.addEventListener("click", () => setOpen(false));
+    });
 
-	overlay?.addEventListener('click', (event) => {
-		if (event.target === overlay) {
-			setOpen(false);
-		}
-	});
+    overlay?.addEventListener("click", (event) => {
+        if (event.target === overlay) {
+            setOpen(false);
+        }
+    });
 
-	document.addEventListener('keydown', (event) => {
-		if (event.key === 'Escape') {
-			setOpen(false);
-		}
-	});
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            setOpen(false);
+        }
+    });
 
-	navLinks.forEach((link) => {
-		link.addEventListener('click', () => setOpen(false));
-	});
+    navLinks.forEach((link) => {
+        link.addEventListener("click", () => setOpen(false));
+    });
 
-	const mdQuery = window.matchMedia('(min-width: 768px)');
-	const handleMediaChange = (event) => {
-		if (event.matches) {
-			setOpen(false);
-		}
-	};
-	if (typeof mdQuery.addEventListener === 'function') {
-		mdQuery.addEventListener('change', handleMediaChange);
-	} else {
-		const legacyAddListener = Reflect.get(mdQuery, 'addListener');
-		if (typeof legacyAddListener === 'function') {
-			legacyAddListener.call(mdQuery, handleMediaChange);
-		}
-	}
+    const mdQuery = window.matchMedia("(min-width: 768px)");
+    const handleMediaChange = (event) => {
+        if (event.matches) {
+            setOpen(false);
+        }
+    };
+    if (typeof mdQuery.addEventListener === "function") {
+        mdQuery.addEventListener("change", handleMediaChange);
+    } else {
+        const legacyAddListener = Reflect.get(mdQuery, "addListener");
+        if (typeof legacyAddListener === "function") {
+            legacyAddListener.call(mdQuery, handleMediaChange);
+        }
+    }
 </script>
