@@ -177,7 +177,10 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
 	};
 	if (typeof mdQuery.addEventListener === 'function') {
 		mdQuery.addEventListener('change', handleMediaChange);
-	} else if (typeof mdQuery.addListener === 'function') {
-		mdQuery.addListener(handleMediaChange);
+	} else {
+		const legacyAddListener = Reflect.get(mdQuery, 'addListener');
+		if (typeof legacyAddListener === 'function') {
+			legacyAddListener.call(mdQuery, handleMediaChange);
+		}
 	}
 </script>

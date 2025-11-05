@@ -4,11 +4,16 @@ import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import Prose from "../components/Prose.astro";
 import Remark42Comments from "../components/Remark42Comments.astro";
-import { SITE_TITLE } from "../consts";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
 const { frontmatter = {} } = Astro.props as { frontmatter?: Record<string, unknown> };
-const { comments: commentsEnabled } = frontmatter as { comments?: boolean };
-const pageTitle = `${SITE_TITLE}`;
+const { comments: commentsEnabled, description: pageDescription, title } = frontmatter as {
+	comments?: boolean;
+	description?: string;
+	title?: string;
+};
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const description = pageDescription || SITE_DESCRIPTION;
 ---
 
 <!doctype html>

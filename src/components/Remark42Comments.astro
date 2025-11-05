@@ -1,4 +1,6 @@
 ---
+import remark42ScriptUrl from "../scripts/remark42.ts?url";
+
 // 这里需要配置你的 Remark42 服务器地址
 const REMARK_URL = import.meta.env.PUBLIC_REMARK_URL || "https://remark42.niracler.com";
 const SITE_ID = import.meta.env.PUBLIC_REMARK_SITE_ID || "niracler";
@@ -7,48 +9,14 @@ const SITE_ID = import.meta.env.PUBLIC_REMARK_SITE_ID || "niracler";
 const pageUrl = Astro.url.href;
 ---
 
-<div class="mt-12 border-t border-border-subtle pt-6">
+<div class="mt-12 border-t border-[var(--color-border-subtle)] pt-6">
   <h2 class="mb-4 text-xl font-semibold text-[var(--color-text-primary)]">评论</h2>
-  <div id="remark42"></div>
+  <div
+    id="remark42"
+    data-remark-host={REMARK_URL}
+    data-remark-site-id={SITE_ID}
+    data-remark-url={pageUrl}
+  ></div>
 </div>
 
-<script define:vars={{ REMARK_URL, SITE_ID, pageUrl }}>
-  // Remark42 配置
-  var remark_config = {
-    host: REMARK_URL,
-    site_id: SITE_ID,
-    url: pageUrl,
-    components: ["embed"],
-    theme: "light", // 可以设置为 'dark' 或 'light'
-    locale: "zh", // 设置为中文
-    show_email_subscription: true,
-    simple_view: false,
-    no_footer: false,
-  };
-
-  // 动态加载 Remark42 脚本
-  (function () {
-    // 检查是否已经加载
-    if (window.REMARK42) {
-      window.REMARK42.createInstance(remark_config);
-      return;
-    }
-
-    // 创建脚本标签
-    const script = document.createElement("script");
-    script.src = remark_config.host + "/web/embed.js";
-    script.defer = true;
-
-    // 添加配置到 window
-    window.remark_config = remark_config;
-    window.REMARK42 = window.REMARK42 || {};
-    window.REMARK42.createInstance =
-      window.REMARK42.createInstance ||
-      function (config) {
-        window.remark_config = config;
-      };
-
-    // 加载脚本
-    document.head.appendChild(script);
-  })();
-</script>
+<Fragment set:html={`<script type="module" src="${remark42ScriptUrl}" defer></script>`} />

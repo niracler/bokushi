@@ -38,7 +38,7 @@ if (!postMetaMap) {
 
 const serializedMeta = JSON.stringify(postMetaMap).replace(/</g, "\\u003c");
 ---
-<script id="all-posts-meta" type="application/json" set:html={serializedMeta}></script>
+<script id="all-posts-meta" type="application/json" set:html={serializedMeta} is:inline></script>
 <script>
 	import { initPostPreview } from '../scripts/postPreview.ts';
 	initPostPreview(document);

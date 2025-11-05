@@ -18,6 +18,36 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<script is:inline>
+	(() => {
+		const storageKey = "theme-preference";
+		const root = document.documentElement;
+		const isPreference = (value) =>
+			value === "light" || value === "dark" || value === "system";
+
+		let preference = "system";
+
+		try {
+			const stored = window.localStorage.getItem(storageKey);
+			if (isPreference(stored)) {
+				preference = stored;
+			}
+		} catch {
+			/* noop */
+		}
+
+		const getSystemTheme = () => {
+			if (!window.matchMedia) return "light";
+			return window.matchMedia("(prefers-color-scheme: dark)").matches
+				? "dark"
+				: "light";
+		};
+
+		const theme = preference === "system" ? getSystemTheme() : preference;
+		root.dataset.themeMode = preference;
+		root.dataset.theme = theme;
+	})();
+</script>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

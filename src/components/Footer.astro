@@ -1,11 +1,12 @@
 ---
 import { SOCIAL_LINKS } from "../consts";
 import PostPreviewSetup from "./PostPreviewSetup.astro";
+import ThemeToggle from "./ThemeToggle.astro";
 
 const today = new Date();
 ---
 <footer class="bg-[var(--color-bg-page)] px-4 py-12 text-center text-sm text-[var(--color-text-secondary)]">
-	<div class="mb-4 flex justify-center gap-4">
+	<div class="mb-6 flex flex-wrap items-center justify-center gap-4">
 		<a
 			href={SOCIAL_LINKS.telegram}
 			target="_blank"
@@ -77,6 +78,7 @@ const today = new Date();
 				></path>
 			</svg>
 		</a>
+		<ThemeToggle label="切换主题模式" variant="footer" />
 	</div>
 	<div class="mt-4">
 		&copy; {today.getFullYear()} Niracler.

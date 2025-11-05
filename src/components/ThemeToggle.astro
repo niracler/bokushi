@@ -1,0 +1,144 @@
+---
+interface Props {
+	label?: string;
+	class?: string;
+	variant?: "default" | "footer";
+}
+
+const {
+	label = "切换主题模式",
+	class: className = "",
+	variant = "default",
+} = (Astro.props as Props) ?? {};
+---
+
+<div
+	class={`theme-toggle ${className}`}
+	data-theme-toggle-root
+	data-variant={variant}
+>
+	<button
+		type="button"
+		class="inline-flex h-10 w-11 items-center justify-center rounded-md border border-[var(--color-border-soft)] bg-transparent text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]"
+		data-theme-toggle
+		data-theme-preference="system"
+		aria-label={label}
+		title={label}
+	>
+		<span class="sr-only" data-theme-toggle-label>{label}</span>
+		<span aria-hidden="true" class="flex items-center justify-center">
+			<svg
+				data-icon="system"
+				class="h-5 w-5 transition-opacity duration-150"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.5"
+			>
+				<rect x="3" y="5" width="18" height="12" rx="1.5" />
+				<path d="M8 18h8" stroke-linecap="round" />
+				<path d="M10 21h4" stroke-linecap="round" />
+			</svg>
+			<svg
+				data-icon="light"
+				class="h-5 w-5 transition-opacity duration-150"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.5"
+			>
+				<circle cx="12" cy="12" r="4" />
+				<path d="M12 3v2" stroke-linecap="round" />
+				<path d="M12 19v2" stroke-linecap="round" />
+				<path d="M5.64 5.64l1.42 1.42" stroke-linecap="round" />
+				<path d="M16.94 16.94l1.42 1.42" stroke-linecap="round" />
+				<path d="M3 12h2" stroke-linecap="round" />
+				<path d="M19 12h2" stroke-linecap="round" />
+				<path d="M5.64 18.36l1.42-1.42" stroke-linecap="round" />
+				<path d="M16.94 7.06l1.42-1.42" stroke-linecap="round" />
+			</svg>
+			<svg
+				data-icon="dark"
+				class="h-5 w-5 transition-opacity duration-150"
+				viewBox="0 0 24 24"
+				fill="currentColor"
+			>
+				<path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79Z" />
+			</svg>
+		</span>
+	</button>
+</div>
+
+<script>
+	import { bindThemeToggles } from "../scripts/theme.ts";
+
+	const container =
+		document.currentScript?.previousElementSibling?.closest(
+			"[data-theme-toggle-root]",
+		) ?? document;
+
+	bindThemeToggles(container);
+</script>
+
+<style>
+	.theme-toggle {
+		display: inline-flex;
+	}
+
+	.theme-toggle [data-theme-toggle] {
+		inline-size: 2.75rem;
+	}
+
+	.theme-toggle [data-theme-toggle][data-theme-preference="system"] [data-icon="system"],
+	.theme-toggle [data-theme-toggle][data-theme-preference="light"] [data-icon="light"],
+	.theme-toggle [data-theme-toggle][data-theme-preference="dark"] [data-icon="dark"] {
+		display: block;
+	}
+
+	.theme-toggle [data-theme-toggle][data-theme-preference="system"] [data-icon="light"],
+	.theme-toggle [data-theme-toggle][data-theme-preference="system"] [data-icon="dark"],
+	.theme-toggle [data-theme-toggle][data-theme-preference="light"] [data-icon="system"],
+	.theme-toggle [data-theme-toggle][data-theme-preference="light"] [data-icon="dark"],
+	.theme-toggle [data-theme-toggle][data-theme-preference="dark"] [data-icon="system"],
+	.theme-toggle [data-theme-toggle][data-theme-preference="dark"] [data-icon="light"] {
+		display: none;
+	}
+
+	:global(html[data-theme="dark"]) .theme-toggle [data-theme-toggle] {
+		color: var(--color-text-muted);
+	}
+
+	:global(html[data-theme="dark"]) .theme-toggle [data-theme-toggle]:hover {
+		color: var(--color-link-hover);
+	}
+
+	.theme-toggle[data-variant="footer"] [data-theme-toggle] {
+		height: 2.5rem;
+		inline-size: 2.5rem;
+		border-radius: 999px;
+		border-color: color-mix(in srgb, var(--color-text-muted) 30%, transparent);
+		background: color-mix(in srgb, var(--color-bg-surface) 92%, transparent);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+		color: var(--color-text-secondary);
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+	}
+
+	.theme-toggle[data-variant="footer"] [data-theme-toggle]:hover {
+		background: color-mix(in srgb, var(--color-bg-muted) 86%, transparent);
+		border-color: color-mix(in srgb, var(--color-accent) 18%, var(--color-border));
+		color: var(--color-accent);
+	}
+
+	:global(html[data-theme="dark"]) .theme-toggle[data-variant="footer"] [data-theme-toggle] {
+		border-color: color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+		background: color-mix(in srgb, var(--color-bg-surface) 35%, transparent);
+		color: var(--color-text-muted);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+	}
+
+	:global(html[data-theme="dark"]) .theme-toggle[data-variant="footer"] [data-theme-toggle]:hover {
+		background: color-mix(in srgb, var(--color-bg-surface) 55%, transparent);
+		color: var(--color-link-hover);
+		border-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
+	}
+</style>
