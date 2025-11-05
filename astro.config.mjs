@@ -25,12 +25,11 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [remarkAlert],
     shikiConfig: {
-      theme: "dracula",
       // 如果想要支持浅色/深色模式切换，可以这样配置：
-      // themes: {
-      //   light: 'github-light',
-      //   dark: 'dracula',
-      // },
+      themes: {
+        light: "github-light",
+        dark: "dracula",
+      },
     },
     syntaxHighlight: {
       excludeLangs: ["mermaid"],
