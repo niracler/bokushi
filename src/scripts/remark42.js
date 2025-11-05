@@ -1,34 +1,34 @@
-import {
-  getThemeState,
-  initTheme,
-  onThemeChange,
-  type ThemeName,
-  type ThemeState,
-} from "./theme";
+import { getThemeState, initTheme, onThemeChange } from "./theme";
 
-type Remark42Config = {
-  host: string;
-  site_id: string;
-  url: string;
-  components: string[];
-  theme: ThemeName;
-  locale: string;
-  show_email_subscription: boolean;
-  simple_view: boolean;
-  no_footer: boolean;
-};
+/**
+ * @typedef {import("./theme").ThemeState} ThemeState
+ */
 
-type Remark42Global = {
-  createInstance?: (config: Remark42Config) => void;
-  changeTheme?: (theme: ThemeName) => void;
-};
+/**
+ * @typedef {import("./theme").ThemeName} ThemeName
+ */
 
-declare global {
-  interface Window {
-    REMARK42?: Remark42Global;
-    remark_config?: Remark42Config;
-  }
-}
+/**
+ * @typedef {Object} Remark42Config
+ * @property {string} host
+ * @property {string} site_id
+ * @property {string} url
+ * @property {string[]} components
+ * @property {ThemeName} theme
+ * @property {string} locale
+ * @property {boolean} show_email_subscription
+ * @property {boolean} simple_view
+ * @property {boolean} no_footer
+ */
+
+/**
+ * @typedef {Object} Remark42Global
+ * @property {(config: Remark42Config) => void} [createInstance]
+ * @property {(theme: ThemeName) => void} [changeTheme]
+ */
+
+/** @type {Window & { REMARK42?: Remark42Global; remark_config?: Remark42Config }} */
+const win = window;
 
 const SCRIPT_ATTR = "data-remark42";
 const CONTAINER_SELECTOR = "[data-remark-host]";
@@ -107,21 +107,7 @@ const initRemark42 = (container: HTMLElement) => {
   // Astro generally renders once per navigation; cleanup if needed.
 };
 
-const initAllContainers = () => {
-  const containers = Array.from(
-    document.querySelectorAll<HTMLElement>(CONTAINER_SELECTOR),
-  );
-  containers.forEach((container) => initRemark42(container));
-};
-
-// 初始化
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initAllContainers, {
-    once: true,
-  });
-} else {
-  initAllContainers();
-}
-
-// 处理 Astro 页面切换
-window.addEventListener("astro:after-swap", initAllContainers);
+const containers = Array.from(
+  document.querySelectorAll<HTMLElement>(CONTAINER_SELECTOR),
+);
+containers.forEach((container) => initRemark42(container));

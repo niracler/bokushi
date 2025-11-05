@@ -1,6 +1,4 @@
 ---
-import remark42ScriptUrl from "../scripts/remark42.ts?url";
-
 // 这里需要配置你的 Remark42 服务器地址
 const REMARK_URL = import.meta.env.PUBLIC_REMARK_URL || "https://remark42.niracler.com";
 const SITE_ID = import.meta.env.PUBLIC_REMARK_SITE_ID || "niracler";
@@ -19,4 +17,6 @@ const pageUrl = Astro.url.href;
   ></div>
 </div>
 
-<Fragment set:html={`<script type="module" src="${remark42ScriptUrl}" defer></script>`} />
+<script>
+  import "../scripts/remark42.ts";
+</script>

@@ -1,6 +1,7 @@
 ---
 import { SITE_TITLE } from "../consts";
 import HeaderLink from "./HeaderLink.astro";
+import ThemeToggle from "./ThemeToggle.astro";
 
 const navLinks = [
 	{ href: "/", label: "首页" },
@@ -15,13 +16,14 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
 ---
 
 <header class="bg-[var(--color-bg-surface)] border-b border-[var(--color-border)]">
-	<nav class="mx-auto flex w-full max-w-4xl items-center justify-between gap-3 px-4 py-3 sm:gap-6 sm:px-6">
+	<nav class="mx-auto flex w-full max-w-4xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6">
 		<h2 class="text-[1.05rem] font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-[1.1rem]">
 			<a href="/" class="transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]">
 				{SITE_TITLE}
 			</a>
 		</h2>
-		<div class="flex items-center gap-2 sm:gap-3">
+		<ThemeToggle variant="header" class="hidden md:inline-flex" />
+		<div class="ml-auto flex items-center gap-2 sm:gap-3">
 			<button
 				type="button"
 				class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--color-border-soft)] bg-transparent text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)] md:hidden"
@@ -86,6 +88,9 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
 					</a>
 				))}
 			</nav>
+			<div class="mt-auto border-t border-[var(--color-border-subtle)] pt-4">
+				<ThemeToggle variant="mobile" />
+			</div>
 		</div>
 	</div>
 	<link
