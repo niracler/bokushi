@@ -4,6 +4,7 @@ import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
+import icon from "astro-icon";
 import { defineConfig } from "astro/config";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeFigure from "rehype-figure";
@@ -17,7 +18,7 @@ import { remarkAlert } from "remark-github-blockquote-alert";
 export default defineConfig({
   site: "https://niracler.com",
   trailingSlash: "never",
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap(), icon()],
   adapter: cloudflare({
     imageService: "compile",
   }),

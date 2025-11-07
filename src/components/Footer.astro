@@ -1,17 +1,18 @@
 ---
+import { Icon } from "astro-icon/components";
 import { SOCIAL_LINKS } from "../consts";
 import PostPreviewSetup from "./PostPreviewSetup.astro";
 
 const today = new Date();
 const iconButtonClass =
     "inline-flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]";
-const iconClass = "h-6 w-6";
+const iconClass = "h-7 w-7";
 ---
 
 <footer
     class="bg-[var(--color-bg-page)] px-4 py-12 text-center text-sm text-[var(--color-text-secondary)]"
->
-    <div class="mb-6 flex flex-wrap items-center justify-center gap-2">
+    >
+    <div class="mb-6 flex flex-wrap items-center justify-center gap-3">
         <a
             href={SOCIAL_LINKS.telegram}
             target="_blank"
@@ -20,17 +21,11 @@ const iconClass = "h-6 w-6";
             class={iconButtonClass}
         >
             <span class="sr-only">Join Niracler on Telegram</span>
-            <svg
-                viewBox="0 0 16 16"
-                aria-hidden="true"
+            <Icon
+                name="ri:telegram-fill"
                 class={iconClass}
-                astro-icon="social/telegram"
-            >
-                <path
-                    fill="currentColor"
-                    d="M8 0C3.581 0 0 3.581 0 8s3.581 8 8 8 8-3.581 8-8-3.581-8-8-8zm3.292 5.014l-1.321 6.226c-.099.439-.358.546-.725.34l-2.01-1.482-1.104 1.062c-.122.122-.225.225-.462.225l.165-2.363 4.298-3.883c.187-.165-.041-.257-.29-.092L5.34 8.085 3.35 7.468c-.434-.135-.442-.434.09-.643l7.783-3c.363-.132.68.089.568.639z"
-                ></path>
-            </svg>
+                aria-hidden="true"
+            />
         </a>
         <a
             href={SOCIAL_LINKS.github}
@@ -40,16 +35,7 @@ const iconClass = "h-6 w-6";
             class={iconButtonClass}
         >
             <span class="sr-only">Go to Niracler's GitHub</span>
-            <svg
-                viewBox="0 0 16 16"
-                aria-hidden="true"
-                class={iconClass}
-                astro-icon="social/github"
-                ><path
-                    fill="currentColor"
-                    d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-                ></path></svg
-            >
+            <Icon name="ri:github-fill" class={iconClass} aria-hidden="true" />
         </a>
         <a
             href={SOCIAL_LINKS.steam}
@@ -59,18 +45,7 @@ const iconClass = "h-6 w-6";
             class={iconButtonClass}
         >
             <span class="sr-only">Visit Niracler on Steam</span>
-            <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                class={iconClass}
-                role="img"
-            >
-                <title>Steam</title>
-                <path
-                    fill="currentColor"
-                    d="M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"
-                ></path>
-            </svg>
+            <Icon name="ri:steam-fill" class={iconClass} aria-hidden="true" />
         </a>
         <a
             href={SOCIAL_LINKS.douban}
@@ -80,18 +55,7 @@ const iconClass = "h-6 w-6";
             class={iconButtonClass}
         >
             <span class="sr-only">Visit Niracler on Douban</span>
-            <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                class={iconClass}
-                role="img"
-            >
-                <title>Douban</title>
-                <path
-                    fill="currentColor"
-                    d="M.51 3.06h22.98V.755H.51V3.06Zm20.976 2.537v9.608h-2.137l-1.669 5.76H24v2.28H0v-2.28h6.32l-1.67-5.76H2.515V5.597h18.972Zm-5.066 9.608H7.58l1.67 5.76h5.501l1.67-5.76ZM18.367 7.9H5.634v5.025h12.733V7.9Z"
-                ></path>
-            </svg>
+            <Icon name="ri:douban-fill" class={iconClass} aria-hidden="true" />
         </a>
         <a
             href={SOCIAL_LINKS.email}
@@ -99,17 +63,7 @@ const iconClass = "h-6 w-6";
             class={iconButtonClass}
         >
             <span class="sr-only">Send email to Niracler</span>
-            <svg
-                viewBox="0 0 16 16"
-                aria-hidden="true"
-                class={iconClass}
-                astro-icon="social/email"
-            >
-                <path
-                    fill="currentColor"
-                    d="M1.922 4.731v-.65c0-.478.394-.872.872-.872h10.412c.478 0 .872.394.872.872v.65l-6.078 4.04-6.078-4.04zm0 1.296l5.628 3.739a.872.872 0 0 0 .9 0l5.628-3.739v5.479c0 .478-.394.872-.872.872H2.794a.872.872 0 0 1-.872-.872v-5.479z"
-                ></path>
-            </svg>
+            <Icon name="ri:mail-fill" class={iconClass} aria-hidden="true" />
         </a>
         <a
             href={SOCIAL_LINKS.twitter}
@@ -119,30 +73,11 @@ const iconClass = "h-6 w-6";
             class={iconButtonClass}
         >
             <span class="sr-only">Follow Niracler on X</span>
-            <svg
-                viewBox="0 0 16 16"
-                aria-hidden="true"
-                class={iconClass}
-                astro-icon="social/x"
-                ><path
-                    fill="currentColor"
-                    d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"
-                ></path></svg
-            >
+            <Icon name="ri:twitter-fill" class={iconClass} aria-hidden="true" />
         </a>
         <a href={SOCIAL_LINKS.rss} title="RSS Feed" class={iconButtonClass}>
             <span class="sr-only">Subscribe to RSS Feed</span>
-            <svg
-                viewBox="0 0 16 16"
-                aria-hidden="true"
-                class={iconClass}
-                astro-icon="social/rss"
-            >
-                <path
-                    fill="currentColor"
-                    d="M2.002 2.725a.764.764 0 0 1 .767-.764c5.154 0 9.335 4.181 9.335 9.335a.764.764 0 0 1-.764.767H9.579a.764.764 0 0 1-.767-.767c0-3.73-3.03-6.76-6.76-6.76a.764.764 0 0 1-.767-.764V2.725zm0 3.334a.764.764 0 0 1 .767-.767c3.066 0 5.555 2.49 5.555 5.556a.764.764 0 0 1-.767.767H5.796a.764.764 0 0 1-.767-.767c0-1.402-1.137-2.54-2.54-2.54a.764.764 0 0 1-.767-.767V6.059zm0 3.333a.764.764 0 0 1 .767-.767c.422 0 .767.345.767.767s-.345.767-.767.767a.764.764 0 0 1-.767-.767v-.767z"
-                ></path>
-            </svg>
+            <Icon name="ri:rss-fill" class={iconClass} aria-hidden="true" />
         </a>
     </div>
     <div class="mt-4">
@@ -151,25 +86,32 @@ const iconClass = "h-6 w-6";
             href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
             target="_blank"
             rel="license noopener noreferrer"
-            class="inline-flex items-center gap-1 transition-colors hover:text-[var(--color-accent)]"
+            class="inline-flex items-center gap-2 transition-colors hover:text-[var(--color-accent)]"
             title="本站内容采用 CC BY-NC-SA 4.0 国际许可协议"
         >
             <span>CC BY-NC-SA 4.0</span>
-            <svg
-                class="inline-block"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                aria-hidden="true"
-            >
-                <path
-                    d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14.5c-3.59 0-6.5-2.91-6.5-6.5S4.41 1.5 8 1.5s6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5z"
-                ></path>
-                <path
-                    d="M8 4c-1.66 0-3 1.34-3 3h1.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 .5-.25.94-.63 1.21-.58.41-.87.98-.87 1.79h1.5c0-.31.08-.5.37-.71C10.26 8.84 11 8.03 11 7c0-1.66-1.34-3-3-3zm-.75 7h1.5v1.5h-1.5V11z"
-                ></path>
-            </svg>
+            <span class="inline-flex items-center gap-1 text-base text-[var(--color-text-secondary)]">
+                <Icon
+                    name="ri:creative-commons-fill"
+                    class="h-4 w-4"
+                    aria-hidden="true"
+                />
+                <Icon
+                    name="ri:creative-commons-by-fill"
+                    class="h-4 w-4"
+                    aria-hidden="true"
+                />
+                <Icon
+                    name="ri:creative-commons-nc-fill"
+                    class="h-4 w-4"
+                    aria-hidden="true"
+                />
+                <Icon
+                    name="ri:creative-commons-sa-fill"
+                    class="h-4 w-4"
+                    aria-hidden="true"
+                />
+            </span>
         </a>
     </div>
 </footer>
