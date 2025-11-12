@@ -1,14 +1,14 @@
 ---
 interface Props {
-	label?: string;
-	class?: string;
-	variant?: "default" | "header" | "mobile" | "footer";
+    label?: string;
+    class?: string;
+    variant?: "default" | "header" | "mobile" | "footer";
 }
 
 const {
-	label = "切换主题模式",
-	class: className = "",
-	variant = "default",
+    label = "切换主题模式",
+    class: className = "",
+    variant = "default",
 } = (Astro.props as Props) ?? {};
 ---
 

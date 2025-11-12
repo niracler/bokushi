@@ -13,8 +13,7 @@ const navLinks = [
 
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, "");
 const subpath = pathname.match(/[^/]+/g);
-const isActive = (href: string) =>
-    href === pathname || href === `/${subpath?.[0] || ""}`;
+const isActive = (href: string) => href === pathname || href === `/${subpath?.[0] || ""}`;
 ---
 
 <header

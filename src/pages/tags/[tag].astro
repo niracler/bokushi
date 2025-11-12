@@ -10,7 +10,9 @@ export async function getStaticPaths() {
     const blogPosts = await getCollection("blog");
     const monthlyPosts = await getCollection("monthly");
     const tilPosts = await getCollection("til");
-    const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter((post) => !post.data.hidden);
+    const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter(
+        (post) => !post.data.hidden,
+    );
     const uniqueTags = [...new Set(allPosts.flatMap((post) => post.data.tags || []))];
 
     return uniqueTags.map((tag) => {

@@ -7,10 +7,14 @@ import Remark42Comments from "../components/Remark42Comments.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
 const { frontmatter = {} } = Astro.props as { frontmatter?: Record<string, unknown> };
-const { comments: commentsEnabled, description: pageDescription, title } = frontmatter as {
-	comments?: boolean;
-	description?: string;
-	title?: string;
+const {
+    comments: commentsEnabled,
+    description: pageDescription,
+    title,
+} = frontmatter as {
+    comments?: boolean;
+    description?: string;
+    title?: string;
 };
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 const description = pageDescription || SITE_DESCRIPTION;

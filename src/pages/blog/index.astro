@@ -1,31 +1,9 @@
 ---
-import { getCollection } from "astro:content";
 import BaseHead from "../../components/BaseHead.astro";
 import Footer from "../../components/Footer.astro";
-import FormattedDate from "../../components/FormattedDate.astro";
 import Header from "../../components/Header.astro";
+import PostList from "../../components/PostList.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
-
-const blogPosts = await getCollection("blog");
-const monthlyPosts = await getCollection("monthly");
-const tilPosts = await getCollection("til");
-
-const posts = [...blogPosts, ...monthlyPosts, ...tilPosts]
-    .filter((post) => !post.data.hidden)
-    .sort(
-    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
-
-const postsByYear = posts.reduce((acc, post) => {
-    const year = String(post.data.pubDate.getFullYear());
-    if (!acc.has(year)) {
-        acc.set(year, []);
-    }
-    acc.get(year)?.push(post);
-    return acc;
-}, new Map<string, typeof posts>());
-
-const groupedPosts = Array.from(postsByYear.entries());
 ---
 
 <!doctype html>
@@ -36,101 +14,8 @@ const groupedPosts = Array.from(postsByYear.entries());
 	<body>
 		<Header />
 		<main class="mx-auto max-w-4xl space-y-12 px-4 sm:space-y-16">
-			<section class="space-y-12 sm:space-y-16">
-				<div class="flex items-center justify-end">
-					<label class="inline-flex select-none items-center gap-2 text-sm text-[color-mix(in srgb, var(--color-text-secondary) 80%, transparent)]">
-						<input
-							id="filter-deepsearch"
-							type="checkbox"
-							class="h-4 w-4 accent-[var(--color-accent)]"
-							checked
-						/>
-						<span>隐藏 DeepSearch 文章</span>
-					</label>
-				</div>
-				{
-					groupedPosts.map(([year, yearPosts]) => (
-						<div class="space-y-4" data-year-group>
-							{/* 年份标题 - 使用分隔线而非巨大数字 */}
-							<div class="flex items-center gap-4">
-								<h3 class="text-xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-2xl">
-									{year}
-								</h3>
-								<div class="h-px flex-1 bg-[var(--color-border-soft)]"></div>
-							</div>
-
-							<ul class="m-0 flex list-none flex-col gap-0 p-0">
-								{
-									yearPosts.map((post) => {
-										const isDeepSearch = post.data.tags?.includes('DeepSearch') ?? false;
-										return (
-											<li data-deepsearch={isDeepSearch ? 'true' : 'false'}>
-												<a
-													href={`/${post.id}`}
-													class="post-link group relative flex items-baseline gap-4 rounded-md px-4 py-2.5 no-underline transition-all duration-200 hover:bg-[color-mix(in srgb,var(--color-accent)6%,transparent)] focus-visible:outline-none focus-visible:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)]"
-													data-post-id={post.id}
-												>
-													<h4 class="title flex-1 text-base font-medium tracking-tight text-[var(--color-text-primary)] transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-lg">
-														{post.data.title}
-													</h4>
-
-													<p class="date ml-auto shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-[color-mix(in srgb,var(--color-text-muted)70%,transparent)] transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-xs">
-														<FormattedDate date={post.data.pubDate} />
-													</p>
-												</a>
-											</li>
-										);
-									})
-								}
-							</ul>
-						</div>
-					))
-				}
-			</section>
+			<PostList />
 		</main>
 		<Footer />
-
-		<script is:inline>
-			document.addEventListener('DOMContentLoaded', function() {
-				const yearGroups = document.querySelectorAll('[data-year-group]');
-				const filterCheckbox = document.getElementById('filter-deepsearch');
-
-				if (!filterCheckbox) return;
-
-				const FILTER_KEY = 'hide-deepsearch-posts';
-				const savedPreference = window.localStorage.getItem(FILTER_KEY);
-				if (savedPreference !== null) {
-					filterCheckbox.checked = savedPreference === 'true';
-				}
-
-				const applyFilter = () => {
-					const hideDeepSearch = filterCheckbox.checked;
-					window.localStorage.setItem(FILTER_KEY, String(hideDeepSearch));
-
-					yearGroups.forEach((group) => {
-						let visibleCount = 0;
-						group.querySelectorAll('li[data-deepsearch]').forEach((item) => {
-							const isDeepSearch = item.getAttribute('data-deepsearch') === 'true';
-							const shouldHide = hideDeepSearch && isDeepSearch;
-							item.style.display = shouldHide ? 'none' : '';
-							if (!shouldHide) visibleCount += 1;
-						});
-
-						const noDataIndicator = group.querySelector('.no-posts');
-						if (noDataIndicator) {
-							noDataIndicator.style.display = visibleCount === 0 ? 'block' : 'none';
-						} else if (visibleCount === 0) {
-							const emptyState = document.createElement('p');
-							emptyState.className = 'no-posts text-sm text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)] italic';
-							emptyState.textContent = '（暂无符合条件的文章）';
-							group.querySelector('ul')?.appendChild(emptyState);
-						}
-					});
-				};
-
-				filterCheckbox.addEventListener('change', applyFilter);
-				applyFilter();
-			});
-		</script>
 	</body>
 </html>
