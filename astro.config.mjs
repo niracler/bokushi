@@ -13,6 +13,7 @@ import rehypeMermaid from "rehype-mermaid";
 import rehypePicture from "rehype-picture";
 import rehypeSlug from "rehype-slug";
 import { remarkAlert } from "remark-github-blockquote-alert";
+import { remarkModifiedTime } from "./remark-modified-time.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -24,7 +25,7 @@ export default defineConfig({
   }),
 
   markdown: {
-    remarkPlugins: [remarkAlert],
+    remarkPlugins: [remarkAlert, remarkModifiedTime],
     shikiConfig: {
       // 如果想要支持浅色/深色模式切换，可以这样配置：
       themes: {

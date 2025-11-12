@@ -16,9 +16,15 @@ type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | Collecti
 type Props = BlogEntry;
 
 const post = Astro.props;
-const { Content, headings } = await render(post);
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
 ---
 
-<BlogPost {...post.data} body={post.body} headings={headings}>
+<BlogPost
+	{...post.data}
+	body={post.body}
+	headings={headings}
+	lastModified={remarkPluginFrontmatter?.lastModified}
+	lastModifiedCommitUrl={remarkPluginFrontmatter?.lastModifiedCommitUrl}
+>
 	<Content />
 </BlogPost>
