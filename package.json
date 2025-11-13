@@ -19,6 +19,7 @@
         "@tailwindcss/vite": "^4.1.14",
         "astro": "^5.15.5",
         "astro-icon": "^1.1.5",
+        "cheerio": "^1.1.2",
         "markdown-it": "^14.1.0",
         "mermaid": "^11.10.0",
         "rehype-autolink-headings": "^7.1.0",

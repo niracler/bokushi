@@ -1,0 +1,155 @@
+import * as cheerio from 'cheerio';
+
+interface TelegramPost {
+  id: string;
+  datetime: string;
+  title: string;
+  content: string;
+  text: string;
+  forwardedFrom?: string;
+}
+
+interface TelegramChannel {
+  title: string;
+  description: string;
+  avatar: string;
+  posts: TelegramPost[];
+}
+
+/**
+ * Fetch and parse Telegram channel information from public web page
+ * @param channelUsername - Telegram channel username (without @)
+ * @returns Channel information including posts
+ */
+export async function fetchTelegramChannel(
+  channelUsername: string
+): Promise<TelegramChannel> {
+  const url = `https://t.me/s/${channelUsername}`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch channel: ${response.statusText}`);
+    }
+
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    // Extract channel info
+    const title = $('.tgme_channel_info_header_title').text().trim();
+    // Get description HTML to preserve line breaks
+    const $description = $('.tgme_channel_info_description');
+    $description.find('br').replaceWith('\n');
+
+    // Convert numbered lists in description
+    let description = $description.text().trim();
+    // Replace numbered lists with HTML
+    description = description.replace(
+      /(?:^|\n)(\d+)\.\s+(.+?)(?=\n\d+\.\s+|\n\n|$)/gs,
+      (_match, num, text) => {
+        if (num === '1') {
+          return `<ol><li>${text.trim()}</li>`;
+        }
+        return `<li>${text.trim()}</li>`;
+      }
+    );
+    // Close the last <ol> tag if there was a list
+    if (description.includes('<ol>')) {
+      description = description.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, '$1</ol>');
+    }
+
+    const avatar = $('.tgme_page_photo_image img').attr('src') || '';
+
+    // Extract posts
+    const posts: TelegramPost[] = [];
+    $('.tgme_widget_message_wrap').each((_index, element) => {
+      const $message = $(element).find('.tgme_widget_message');
+      const id = $message.attr('data-post')?.replace(`${channelUsername}/`, '') || '';
+
+      // Skip if no valid ID
+      if (!id) return;
+
+      // Get datetime
+      const datetime = $message.find('.tgme_widget_message_date time').attr('datetime') || '';
+
+      // Check if message is forwarded
+      const forwardedFrom = $message.find('.tgme_widget_message_forwarded_from_name').text().trim();
+
+      // Get text content
+      const $text = $message.find('.tgme_widget_message_text');
+      const text = $text.text().trim();
+
+      // Generate title from first sentence or first line
+      const title = text.match(/^.*?(?=[。\n]|$)/)?.[0] || text.substring(0, 100);
+
+      // Process content HTML
+      const $content = $text.clone();
+
+      // Convert <br> to newlines for better text formatting
+      $content.find('br').replaceWith('\n');
+
+      // Remove inline styles from emojis
+      $content.find('.emoji').removeAttr('style');
+
+      // Add target and rel to links
+      $content.find('a').each((_, link) => {
+        $(link).attr('target', '_blank').attr('rel', 'noopener noreferrer');
+      });
+
+      // Get images
+      const images: string[] = [];
+      $message.find('.tgme_widget_message_photo_wrap').each((_, photo) => {
+        const style = $(photo).attr('style') || '';
+        const match = style.match(/url\(['"](.+?)['"]\)/);
+        if (match?.[1]) {
+          images.push(match[1]);
+        }
+      });
+
+      // Build content HTML and convert numbered lists
+      let contentHtml = $content.html() || '';
+
+      // Convert numbered lists (1. 2. 3.) to proper HTML lists
+      contentHtml = contentHtml.replace(
+        /(?:^|\n)(\d+)\.\s+(.+?)(?=\n\d+\.\s+|\n\n|$)/gs,
+        (_match, num, text) => {
+          if (num === '1') {
+            return `<ol><li>${text.trim()}</li>`;
+          }
+          return `<li>${text.trim()}</li>`;
+        }
+      );
+      // Close the last <ol> tag if there was a list
+      if (contentHtml.includes('<ol>')) {
+        contentHtml = contentHtml.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, '$1</ol>');
+      }
+
+      // Add images if any
+      if (images.length > 0) {
+        const imagesHtml = images
+          .map(img => `<img src="${img}" alt="${title}" loading="lazy" class="telegram-post-image" />`)
+          .join('');
+        contentHtml = `<div class="telegram-images">${imagesHtml}</div>${contentHtml}`;
+      }
+
+      posts.push({
+        id,
+        datetime,
+        title,
+        content: contentHtml,
+        text,
+        ...(forwardedFrom && { forwardedFrom }),
+      });
+    });
+
+    return {
+      title,
+      description,
+      avatar,
+      posts: posts.reverse(), // Reverse to show newest first
+    };
+  } catch (error) {
+    console.error('Error fetching Telegram channel:', error);
+    throw error;
+  }
+}
