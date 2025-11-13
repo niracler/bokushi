@@ -1,30 +1,43 @@
 import * as cheerio from 'cheerio';
 
-interface TelegramPost {
+export interface TelegramPost {
   id: string;
   datetime: string;
   title: string;
   content: string;
   text: string;
   forwardedFrom?: string;
+  forwardedFromLink?: string;
 }
 
-interface TelegramChannel {
+export interface TelegramChannel {
   title: string;
   description: string;
   avatar: string;
   posts: TelegramPost[];
 }
 
+export interface FetchOptions {
+  before?: string;
+  after?: string;
+}
+
 /**
  * Fetch and parse Telegram channel information from public web page
  * @param channelUsername - Telegram channel username (without @)
+ * @param options - Pagination options (before/after message ID)
  * @returns Channel information including posts
  */
 export async function fetchTelegramChannel(
-  channelUsername: string
+  channelUsername: string,
+  options: FetchOptions = {}
 ): Promise<TelegramChannel> {
-  const url = `https://t.me/s/${channelUsername}`;
+  const params = new URLSearchParams();
+  if (options.before) params.append('before', options.before);
+  if (options.after) params.append('after', options.after);
+
+  const queryString = params.toString();
+  const url = `https://t.me/s/${channelUsername}${queryString ? `?${queryString}` : ''}`;
 
   try {
     const response = await fetch(url);
@@ -73,7 +86,9 @@ export async function fetchTelegramChannel(
       const datetime = $message.find('.tgme_widget_message_date time').attr('datetime') || '';
 
       // Check if message is forwarded
-      const forwardedFrom = $message.find('.tgme_widget_message_forwarded_from_name').text().trim();
+      const $forwardedFromElem = $message.find('.tgme_widget_message_forwarded_from_name');
+      const forwardedFrom = $forwardedFromElem.text().trim();
+      const forwardedFromLink = $forwardedFromElem.attr('href') || undefined;
 
       // Get text content
       const $text = $message.find('.tgme_widget_message_text');
@@ -139,6 +154,7 @@ export async function fetchTelegramChannel(
         content: contentHtml,
         text,
         ...(forwardedFrom && { forwardedFrom }),
+        ...(forwardedFromLink && { forwardedFromLink }),
       });
     });
 
