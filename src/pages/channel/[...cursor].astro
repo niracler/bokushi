@@ -61,6 +61,7 @@ const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.le
     <BaseHead
       title={channelData?.title ? `${channelData.title} - 动态` : '动态'}
       description={channelData?.description || '我的最新动态和分享'}
+      image={channelData?.avatar}
     />
   </head>
   <body>
