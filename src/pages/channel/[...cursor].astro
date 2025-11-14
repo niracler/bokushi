@@ -186,14 +186,17 @@ const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.le
   // 图片点击放大功能
   document.addEventListener('DOMContentLoaded', () => {
     const lightbox = document.getElementById('image-lightbox');
-    const lightboxImage = document.getElementById('lightbox-image');
+    const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement | null;
     const closeButton = document.querySelector('.lightbox-close');
 
     // 为所有 telegram 图片添加点击事件
     document.querySelectorAll('.telegram-post-image').forEach(img => {
       img.addEventListener('click', () => {
-        lightboxImage.src = img.src;
-        lightboxImage.alt = img.alt;
+        const imgElement = img as HTMLImageElement;
+        if (lightboxImage) {
+          lightboxImage.src = imgElement.src;
+          lightboxImage.alt = imgElement.alt;
+        }
         lightbox?.classList.add('active');
         document.body.style.overflow = 'hidden';
       });

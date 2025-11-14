@@ -181,6 +181,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 	<script>
 		// 使用外部脚本优化加载性能
 		import { initBlogInteractive } from '../scripts/blog-interactive';
+		import '../scripts/code-blocks';
 
 		if (document.readyState === 'loading') {
 			document.addEventListener('DOMContentLoaded', initBlogInteractive, { once: true });
