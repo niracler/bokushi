@@ -24,7 +24,8 @@ function ensurePreviewCard(): HTMLElement {
     card = document.createElement("div");
     card.id = CARD_ID;
     card.className =
-        "fixed z-[60] w-72 overflow-hidden rounded-xl border border-border-subtle bg-[var(--color-bg-surface)] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 ease-out";
+        "fixed z-[60] w-72 overflow-hidden rounded-xl border border-border-subtle bg-[var(--color-bg-surface)] shadow-lg opacity-0 pointer-events-none transition-all duration-300 ease-out";
+    card.style.transform = "translateY(-8px) scale(0.96)";
 
     card.innerHTML = `
 		<div class="h-40 w-full bg-[var(--color-bg-muted)]">
@@ -107,6 +108,7 @@ function showCard(card: HTMLElement, event: MouseEvent | FocusEvent) {
     card.style.opacity = "1";
     card.style.visibility = "visible";
     card.style.pointerEvents = "auto";
+    card.style.transform = "translateY(0) scale(1)";
     updatePosition(card, event);
 }
 
@@ -114,6 +116,7 @@ function hideCard(card: HTMLElement) {
     card.style.opacity = "0";
     card.style.visibility = "hidden";
     card.style.pointerEvents = "none";
+    card.style.transform = "translateY(-8px) scale(0.96)";
 }
 
 function updatePosition(card: HTMLElement, event: MouseEvent | FocusEvent) {
@@ -206,7 +209,7 @@ export function initPostPreview(root: ParentNode = document) {
         updatePreviewContent(previewCard, metaMap[id]);
         hoverTimeout = window.setTimeout(() => {
             showCard(previewCard, event as MouseEvent);
-        }, 300);
+        }, 500);
     };
 
     const handleLeave = () => {

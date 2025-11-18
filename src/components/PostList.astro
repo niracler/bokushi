@@ -53,19 +53,21 @@ const groupedPosts = Array.from(postsByYear.entries());
 						const isDeepSearch = post.data.tags?.includes('DeepSearch') ?? false;
 						return (
 							<li data-deepsearch={isDeepSearch ? 'true' : 'false'}>
-								<a
-									href={`/${post.id}`}
-									class="post-link group relative flex items-baseline gap-4 rounded-md px-4 py-2.5 no-underline transition-all duration-200 hover:bg-[color-mix(in srgb,var(--color-accent)6%,transparent)] focus-visible:outline-none focus-visible:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)]"
-									data-post-id={post.id}
-								>
+								<div class="post-link group relative flex items-baseline gap-4 rounded-md px-4 py-2.5 transition-all duration-200 hover:bg-[color-mix(in srgb,var(--color-accent)6%,transparent)]">
 									<h4 class="title flex-1 text-base font-medium tracking-tight text-[var(--color-text-primary)] transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-lg">
-										{post.data.title}
+										<a
+											href={`/${post.id}`}
+											class="no-underline text-[var(--color-text-primary)] hover:text-[var(--color-accent)] focus-visible:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]"
+											data-post-id={post.id}
+										>
+											{post.data.title}
+										</a>
 									</h4>
 
-									<p class="date ml-auto shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-[color-mix(in srgb,var(--color-text-muted)70%,transparent)] transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-xs">
+									<p class="date ml-auto shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-[color-mix(in srgb,var(--color-text-muted)70%,transparent)] transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-xs" data-no-preview>
 										<FormattedDate date={post.data.pubDate} />
 									</p>
-								</a>
+								</div>
 							</li>
 						);
 					})}

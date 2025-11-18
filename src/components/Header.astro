@@ -57,7 +57,7 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
                         data-bar-bottom></span>
                 </span>
             </button>
-            <div class="hidden items-center gap-2 sm:gap-3 md:flex">
+            <div class="hidden items-center gap-2 sm:gap-3 md:flex" data-no-preview>
                 {
                     navLinks.map((link) => (
                         <HeaderLink href={link.href}>{link.label}</HeaderLink>
@@ -97,7 +97,7 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
                     >
                 </button>
             </div>
-            <nav class="flex flex-col gap-2 text-base">
+            <nav class="flex flex-col gap-2 text-base" data-no-preview>
                 {
                     navLinks.map((link) => (
                         <a

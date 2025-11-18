@@ -55,18 +55,21 @@ const sortedPosts = posts
 			<ul class="m-0 flex list-none flex-col gap-3.5 p-0 sm:gap-4">
 				{sortedPosts.map((post) => (
 					<li>
-						<a
-							href={`/${post.id}`}
-							class="group flex items-baseline gap-4 px-3 py-2 no-underline transition duration-150 ease-out hover:text-[var(--color-accent)] focus-visible:outline-none focus-visible:text-[var(--color-accent)] focus-visible:underline sm:px-4 sm:py-2.5"
-						>
+						<div class="group flex items-baseline gap-4 px-3 py-2 transition duration-150 sm:px-4 sm:py-2.5">
 							<h4 class="flex-1 text-base font-semibold tracking-tight text-[var(--color-text-primary)] transition duration-150 group-hover:text-[var(--color-accent)] sm:text-lg">
-								{post.data.title}
+								<a
+									href={`/${post.id}`}
+									class="no-underline text-[var(--color-text-primary)] transition hover:text-[var(--color-accent)] focus-visible:outline-none focus-visible:text-[var(--color-accent)] focus-visible:underline"
+									data-post-id={post.id}
+								>
+									{post.data.title}
+								</a>
 							</h4>
-							<p class="ml-auto flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.14em] text-[color-mix(in srgb, var(--color-text-muted) 75%, transparent)] transition-colors group-hover:text-[var(--color-accent)] sm:text-xs">
+							<p class="ml-auto flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.14em] text-[color-mix(in srgb, var(--color-text-muted) 75%, transparent)] transition-colors group-hover:text-[var(--color-accent)] sm:text-xs" data-no-preview>
 								<span aria-hidden="true" class="hidden h-px w-6 bg-[color-mix(in srgb, var(--color-text-muted) 50%, transparent)] sm:inline-block"></span>
 								<FormattedDate date={post.data.pubDate} />
 							</p>
-						</a>
+						</div>
 					</li>
 				))}
 			</ul>
