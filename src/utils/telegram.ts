@@ -23,6 +23,15 @@ export interface FetchOptions {
 }
 
 /**
+ * Proxy external image URLs through our image proxy API
+ * This ensures images are accessible in regions where direct access may be blocked
+ */
+function getProxiedImageUrl(imageUrl: string): string {
+  if (!imageUrl) return '';
+  return `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
+}
+
+/**
  * Fetch and parse Telegram channel information from public web page
  * @param channelUsername - Telegram channel username (without @)
  * @param options - Pagination options (before/after message ID)
@@ -71,7 +80,8 @@ export async function fetchTelegramChannel(
       description = description.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, '$1</ol>');
     }
 
-    const avatar = $('.tgme_page_photo_image img').attr('src') || '';
+    const avatarSrc = $('.tgme_page_photo_image img').attr('src') || '';
+    const avatar = getProxiedImageUrl(avatarSrc);
 
     // Extract posts
     const posts: TelegramPost[] = [];
@@ -117,7 +127,7 @@ export async function fetchTelegramChannel(
         const style = $(photo).attr('style') || '';
         const match = style.match(/url\(['"](.+?)['"]\)/);
         if (match?.[1]) {
-          images.push(match[1]);
+          images.push(getProxiedImageUrl(match[1]));
         }
       });
 
