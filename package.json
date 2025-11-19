@@ -17,7 +17,7 @@
         "@astrojs/sitemap": "^3.6.0",
         "@iconify-json/ri": "^1.2.6",
         "@tailwindcss/vite": "^4.1.14",
-        "astro": "^5.15.6",
+        "astro": "^5.15.9",
         "astro-icon": "^1.1.5",
         "cheerio": "^1.1.2",
         "markdown-it": "^14.1.0",
