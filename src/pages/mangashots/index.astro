@@ -1,0 +1,1215 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+// 这个页面不使用 Content Collections，改为客户端动态加载
+// 设置为服务端渲染，这样可以实时获取数据
+export const prerender = false;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead
+			title="漫画表情包 | Manga Shots"
+			description="我收集的漫画表情包 - My collection of manga meme screenshots"
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="manga-shots-main">
+			<div class="manga-container">
+				<!-- Sidebar -->
+				<aside class="manga-sidebar">
+					<div class="manga-sidebar-header">
+						<h1 class="manga-sidebar-title">漫画表情包</h1>
+						<p class="manga-sidebar-desc">
+							收集的漫画截图，可以用作表情包
+						</p>
+						<div class="manga-count-display">
+							共 <span id="manga-count" class="manga-count-num"
+								>0</span
+							> 张
+						</div>
+					</div>
+
+					<!-- Filter Section -->
+					<div class="manga-filter-section">
+						<h2 class="manga-filter-title">筛选漫画</h2>
+						<div id="manga-filter-list" class="manga-filter-list">
+							<button
+								class="manga-filter-item active"
+								data-manga="all"
+							>
+								<span class="manga-filter-dot"></span>
+								<span class="manga-filter-name">全部</span>
+								<span class="manga-filter-count">0</span>
+							</button>
+							<!-- 动态加载的漫画列表 -->
+						</div>
+					</div>
+				</aside>
+
+				<!-- Main Content -->
+				<div class="manga-content">
+					<!-- Loading State -->
+					<div id="loading-state" class="text-center py-12">
+						<div
+							class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-solid border-current border-r-transparent"
+						>
+						</div>
+						<p class="mt-4 opacity-70">加载中...</p>
+					</div>
+
+					<!-- Error State -->
+					<div id="error-state" class="hidden text-center py-12">
+						<p class="text-red-500">加载失败，请刷新页面重试</p>
+					</div>
+
+					<!-- Masonry Grid Container -->
+					<div id="manga-grid" class="hidden"></div>
+
+					<!-- Load More Trigger (always in DOM for IntersectionObserver) -->
+					<div id="load-more-trigger" class="h-1"></div>
+
+					<!-- Load More Indicator -->
+					<div
+						id="load-more-indicator"
+						class="hidden text-center py-8"
+					>
+						<div
+							class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-solid border-current border-r-transparent"
+						>
+						</div>
+						<p class="mt-2 opacity-70">加载更多...</p>
+					</div>
+
+					<!-- End of List Indicator -->
+					<div
+						id="end-of-list"
+						class="hidden text-center py-8 opacity-50"
+					>
+						<p>已经到底了~</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Lightbox Dialog -->
+			<dialog id="manga-lightbox" class="manga-lightbox">
+				<div class="manga-lightbox-content">
+					<button
+						class="manga-lightbox-close"
+						aria-label="Close lightbox"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="32"
+							height="32"
+							viewBox="0 0 32 32"
+						>
+							<path
+								fill="currentColor"
+								d="M16 2C8.2 2 2 8.2 2 16s6.2 14 14 14s14-6.2 14-14S23.8 2 16 2m5.4 21L16 17.6L10.6 23L9 21.4l5.4-5.4L9 10.6L10.6 9l5.4 5.4L21.4 9l1.6 1.6l-5.4 5.4l5.4 5.4z"
+							></path>
+						</svg>
+					</button>
+
+					<button
+						class="manga-lightbox-prev"
+						aria-label="Previous image"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="32"
+							height="32"
+							viewBox="0 0 32 32"
+						>
+							<path
+								fill="currentColor"
+								d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2m8 15H11.85l5.58 5.573L16 24l-8-8l8-8l1.43 1.393L11.85 15H24Z"
+							></path>
+						</svg>
+					</button>
+
+					<button class="manga-lightbox-next" aria-label="Next image">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="32"
+							height="32"
+							viewBox="0 0 32 32"
+						>
+							<path
+								fill="currentColor"
+								d="M2 16A14 14 0 1 0 16 2A14 14 0 0 0 2 16m6-1h12.15l-5.58-5.607L16 8l8 8l-8 8l-1.43-1.427L20.15 17H8Z"
+							></path>
+						</svg>
+					</button>
+
+					<div class="manga-lightbox-image-container">
+						<img
+							id="manga-lightbox-img"
+							src=""
+							alt=""
+							class="manga-lightbox-img"
+						/>
+					</div>
+
+					<div class="manga-lightbox-caption">
+						<p
+							id="manga-lightbox-manga-name"
+							class="text-sm opacity-70 mb-1"
+						>
+						</p>
+						<h2 id="manga-lightbox-title"></h2>
+						<p id="manga-lightbox-caption-text"></p>
+					</div>
+				</div>
+			</dialog>
+		</main>
+		<Footer />
+
+		<style>
+			/* Main Layout */
+			.manga-shots-main {
+				max-width: 72rem; /* max-w-4xl = 64rem, 用 72rem 让侧边栏有空间 */
+				margin: 0 auto;
+				padding: 2rem 1rem;
+				background: var(--color-bg-page);
+			}
+
+			.manga-container {
+				display: grid;
+				grid-template-columns: 1fr 320px;
+				gap: 2.5rem;
+				align-items: start;
+			}
+
+			/* Sidebar Styles */
+			.manga-sidebar {
+				position: sticky;
+				top: 2rem;
+				background: var(--color-bg-surface);
+				border: 1px solid var(--color-border-soft);
+				border-radius: var(--radius-lg);
+				padding: 1.75rem;
+				box-shadow:
+					0 8px 24px rgba(251, 143, 104, 0.08),
+					0 2px 8px rgba(42, 28, 23, 0.06);
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.manga-sidebar::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 3px;
+				background: linear-gradient(
+					90deg,
+					var(--color-accent),
+					var(--color-accent-dark)
+				);
+				opacity: 0.8;
+			}
+
+			.manga-sidebar-header {
+				padding-bottom: 1.5rem;
+				border-bottom: 1px solid var(--color-border-soft);
+				margin-bottom: 1.5rem;
+			}
+
+			.manga-sidebar-title {
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: var(--color-text-primary);
+				margin: 0 0 0.75rem 0;
+			}
+
+			.manga-sidebar-desc {
+				font-size: 0.875rem;
+				color: var(--color-text-muted);
+				line-height: 1.5;
+				margin: 0 0 1rem 0;
+			}
+
+			.manga-count-display {
+				font-size: 0.875rem;
+				color: var(--color-text-secondary);
+			}
+
+			.manga-count-num {
+				font-weight: 700;
+				color: var(--color-accent);
+				font-size: 1.1em;
+			}
+
+			/* Filter Section */
+			.manga-filter-section {
+				margin-top: 1.5rem;
+			}
+
+			.manga-filter-title {
+				font-size: 0.75rem;
+				font-weight: 700;
+				color: var(--color-text-muted);
+				text-transform: uppercase;
+				letter-spacing: 0.1em;
+				margin: 0 0 1rem 0;
+			}
+
+			.manga-filter-list {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+
+			.manga-filter-item {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				padding: 0.875rem 1rem;
+				background: transparent;
+				border: 1px solid transparent;
+				border-radius: var(--radius-md);
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				text-align: left;
+				font-size: 0.875rem;
+				color: var(--color-text-secondary);
+				width: 100%;
+				position: relative;
+			}
+
+			.manga-filter-item:hover {
+				background: var(--color-bg-muted);
+				border-color: var(--color-border-soft);
+				transform: translateX(-2px);
+				box-shadow: 0 2px 8px rgba(251, 143, 104, 0.12);
+			}
+
+			.manga-filter-item.active {
+				background: linear-gradient(
+					135deg,
+					color-mix(
+						in srgb,
+						var(--color-accent-soft) 70%,
+						transparent
+					),
+					color-mix(
+						in srgb,
+						var(--color-accent-soft) 50%,
+						transparent
+					)
+				);
+				border-color: var(--color-accent);
+				color: var(--color-text-primary);
+				font-weight: 600;
+				transform: translateX(-4px);
+				box-shadow:
+					0 4px 12px rgba(251, 143, 104, 0.2),
+					inset 0 1px 0 rgba(255, 255, 255, 0.1);
+			}
+
+			.manga-filter-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background: var(--color-border);
+				flex-shrink: 0;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.manga-filter-item:hover .manga-filter-dot {
+				background: var(--color-accent);
+				transform: scale(1.2);
+				box-shadow: 0 0 0 2px rgba(251, 143, 104, 0.2);
+			}
+
+			.manga-filter-item.active .manga-filter-dot {
+				background: var(--color-accent);
+				transform: scale(1.3);
+				box-shadow:
+					0 0 0 4px var(--color-accent-soft),
+					0 0 8px rgba(251, 143, 104, 0.4);
+			}
+
+			.manga-filter-name {
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.manga-filter-count {
+				font-size: 0.75rem;
+				color: var(--color-text-muted);
+				font-weight: 600;
+				padding: 0.125rem 0.5rem;
+				background: var(--color-bg-muted);
+				border-radius: 10px;
+				flex-shrink: 0;
+			}
+
+			.manga-filter-item.active .manga-filter-count {
+				background: var(--color-accent-soft);
+				color: var(--color-accent-dark);
+			}
+
+			/* Content Area */
+			.manga-content {
+				min-width: 0;
+			}
+
+			/* Masonry Grid */
+			.manga-masonry-grid {
+				display: flex;
+				gap: 1rem;
+				width: 100%;
+			}
+
+			.manga-masonry-grid_column {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			/* Manga Shot Item - Clean Card Style */
+			.manga-shot-item {
+				position: relative;
+				overflow: hidden;
+				border-radius: var(--radius-lg);
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				animation: itemFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1)
+					backwards;
+				animation-delay: calc(var(--item-index, 0) * 0.04s);
+			}
+
+			@keyframes itemFadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(20px) scale(0.95);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0) scale(1);
+				}
+			}
+
+			.manga-shot-item:hover {
+				transform: translateY(-6px) scale(1.02);
+				z-index: 10;
+			}
+
+			.manga-shot-button {
+				position: relative;
+				width: 100%;
+				border: none;
+				padding: 0;
+				background: none;
+				cursor: zoom-in;
+				display: block;
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+				box-shadow:
+					0 4px 12px rgba(42, 28, 23, 0.1),
+					0 1px 3px rgba(42, 28, 23, 0.08);
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.manga-shot-button::before {
+				content: "";
+				position: absolute;
+				inset: 0;
+				border-radius: var(--radius-lg);
+				padding: 2px;
+				background: linear-gradient(
+					135deg,
+					transparent,
+					rgba(251, 143, 104, 0.3)
+				);
+				-webkit-mask:
+					linear-gradient(#fff 0 0) content-box,
+					linear-gradient(#fff 0 0);
+				-webkit-mask-composite: xor;
+				mask-composite: exclude;
+				opacity: 0;
+				transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.manga-shot-item:hover .manga-shot-button {
+				box-shadow:
+					0 12px 32px rgba(251, 143, 104, 0.25),
+					0 4px 12px rgba(251, 143, 104, 0.15),
+					0 0 0 1px var(--color-accent-soft);
+			}
+
+			.manga-shot-item:hover .manga-shot-button::before {
+				opacity: 1;
+			}
+
+			.manga-shot-img {
+				width: 100%;
+				height: auto;
+				display: block;
+				object-fit: cover;
+				transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.manga-shot-button:hover .manga-shot-img {
+				transform: scale(1.05);
+			}
+
+			/* 隐藏 overlay - 不在卡片上显示文字 */
+			.manga-shot-overlay,
+			.manga-shot-manga-name,
+			.manga-shot-title,
+			.manga-shot-caption {
+				display: none;
+			}
+
+			/* Lightbox Styles */
+			.manga-lightbox {
+				position: fixed;
+				inset: 0;
+				max-width: 100vw;
+				max-height: 100vh;
+				width: 100vw;
+				height: 100vh;
+				border: none;
+				padding: 0;
+				background: transparent;
+				opacity: 0;
+				transition:
+					opacity 0.3s ease,
+					display 0.3s ease allow-discrete;
+			}
+
+			.manga-lightbox::backdrop {
+				background: rgba(20, 14, 11, 0.95);
+				backdrop-filter: blur(12px);
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+
+			.manga-lightbox[open] {
+				opacity: 1;
+			}
+
+			.manga-lightbox[open]::backdrop {
+				opacity: 1;
+			}
+
+			@starting-style {
+				.manga-lightbox[open] {
+					opacity: 0;
+				}
+				.manga-lightbox[open]::backdrop {
+					opacity: 0;
+				}
+			}
+
+			.manga-lightbox-content {
+				position: relative;
+				width: 100%;
+				height: 100%;
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-template-rows: 1fr auto;
+				gap: 1.5rem;
+				padding: 2rem;
+			}
+
+			.manga-lightbox-image-container {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+			}
+
+			.manga-lightbox-img {
+				max-width: 100%;
+				max-height: calc(100vh - 200px);
+				object-fit: contain;
+				border-radius: var(--radius-md);
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+			}
+
+			.manga-lightbox-caption {
+				text-align: center;
+				color: white;
+				padding: 1rem;
+			}
+
+			.manga-lightbox-caption h2 {
+				margin: 0 0 0.5rem 0;
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: var(--color-accent);
+			}
+
+			.manga-lightbox-caption p {
+				margin: 0.25rem 0;
+				opacity: 0.9;
+				line-height: 1.6;
+			}
+
+			/* Navigation Buttons */
+			.manga-lightbox-close,
+			.manga-lightbox-prev,
+			.manga-lightbox-next {
+				position: absolute;
+				background: rgba(255, 255, 255, 0.12);
+				border: 1.5px solid rgba(255, 255, 255, 0.25);
+				border-radius: 50%;
+				padding: 0.75rem;
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				z-index: 10;
+				backdrop-filter: blur(12px);
+			}
+
+			.manga-lightbox-close:hover,
+			.manga-lightbox-prev:hover,
+			.manga-lightbox-next:hover {
+				background: rgba(251, 143, 104, 0.4);
+				border-color: var(--color-accent);
+				transform: scale(1.1);
+				box-shadow: 0 4px 16px rgba(251, 143, 104, 0.3);
+			}
+
+			.manga-lightbox-close svg,
+			.manga-lightbox-prev svg,
+			.manga-lightbox-next svg {
+				display: block;
+				color: white;
+				filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+			}
+
+			.manga-lightbox-close {
+				top: 1.5rem;
+				right: 1.5rem;
+			}
+
+			.manga-lightbox-prev {
+				top: 50%;
+				left: 1.5rem;
+				transform: translateY(-50%);
+			}
+
+			.manga-lightbox-prev:hover {
+				transform: translateY(-50%) scale(1.1);
+			}
+
+			.manga-lightbox-next {
+				top: 50%;
+				right: 1.5rem;
+				transform: translateY(-50%);
+			}
+
+			.manga-lightbox-next:hover {
+				transform: translateY(-50%) scale(1.1);
+			}
+
+			/* Prevent body scroll when lightbox is open */
+			html:has(dialog[open]) {
+				overflow: hidden;
+			}
+
+			/* Loading & Error States */
+			#loading-state .inline-block {
+				border-color: var(--color-accent);
+				border-right-color: transparent;
+			}
+
+			#end-of-list {
+				color: var(--color-text-muted);
+				padding: 2rem;
+				text-align: center;
+				font-size: 0.875rem;
+			}
+
+			/* Mobile Responsive */
+			@media (max-width: 1024px) {
+				.manga-container {
+					grid-template-columns: 1fr;
+					gap: 2rem;
+				}
+
+				.manga-sidebar {
+					position: static;
+					max-width: 100%;
+					order: -1;
+				}
+
+				.manga-filter-list {
+					display: grid;
+					grid-template-columns: repeat(
+						auto-fill,
+						minmax(140px, 1fr)
+					);
+					gap: 0.75rem;
+				}
+
+				.manga-filter-item {
+					padding: 0.75rem 0.875rem;
+				}
+
+				.manga-filter-item:hover,
+				.manga-filter-item.active {
+					transform: none !important;
+				}
+			}
+
+			@media (max-width: 640px) {
+				.manga-shots-main {
+					padding: 1.5rem 0.75rem;
+				}
+
+				.manga-sidebar {
+					padding: 1.25rem;
+				}
+
+				.manga-filter-list {
+					grid-template-columns: repeat(
+						auto-fill,
+						minmax(120px, 1fr)
+					);
+				}
+
+				.manga-masonry-grid {
+					gap: 0.75rem;
+				}
+
+				.manga-masonry-grid_column {
+					gap: 0.75rem;
+				}
+
+				.manga-lightbox-content {
+					padding: 1rem;
+				}
+
+				.manga-lightbox-img {
+					max-height: calc(100vh - 150px);
+				}
+
+				.manga-lightbox-caption h2 {
+					font-size: 1.25rem;
+				}
+
+				.manga-lightbox-prev,
+				.manga-lightbox-next {
+					padding: 0.5rem;
+				}
+			}
+		</style>
+
+		<script>
+			// 数据加载和瀑布流渲染
+			interface MangaShot {
+				id: string;
+				title: string;
+				manga_name: string;
+				photo_url: string;
+				thumbnail_url: string;
+				caption: string | null;
+				created_at: string;
+			}
+
+			interface PaginationInfo {
+				page: number;
+				pageSize: number;
+				total: number;
+				totalPages: number;
+			}
+
+			interface MangashotsResponse {
+				data: MangaShot[];
+				pagination: PaginationInfo;
+			}
+
+			// 全局状态
+			let allShots: MangaShot[] = [];
+			let currentPage = 1;
+			let totalPages = 1;
+			let isLoading = false;
+			let columnContainers: HTMLDivElement[] = [];
+			let currentFilter = "all"; // 当前筛选的漫画名
+
+			// 加载漫画列表
+			async function loadMangaList() {
+				try {
+					const response = await fetch("/api/mangas");
+					if (!response.ok) throw new Error("Failed to fetch mangas");
+
+					const data = await response.json();
+					const mangaList = data.data || [];
+
+					// 更新侧边栏
+					const filterList =
+						document.getElementById("manga-filter-list");
+					if (!filterList) return;
+
+					// 清空现有列表（保留"全部"按钮）
+					const allButton =
+						filterList.querySelector('[data-manga="all"]');
+					filterList.innerHTML = "";
+					if (allButton) {
+						filterList.appendChild(allButton);
+					}
+
+					// 添加每个漫画的筛选按钮
+					mangaList.forEach(
+						(manga: { manga_name: string; count: number }) => {
+							const button = document.createElement("button");
+							button.className = "manga-filter-item";
+							button.dataset.manga = manga.manga_name;
+
+							button.innerHTML = `
+							<span class="manga-filter-dot"></span>
+							<span class="manga-filter-name">${manga.manga_name}</span>
+							<span class="manga-filter-count">${manga.count}</span>
+						`;
+
+							filterList.appendChild(button);
+						},
+					);
+
+					// 更新"全部"的数量
+					const total = mangaList.reduce(
+						(sum: number, m: { count: number }) => sum + m.count,
+						0,
+					);
+					const allCountSpan = allButton?.querySelector(
+						".manga-filter-count",
+					);
+					if (allCountSpan) {
+						allCountSpan.textContent = String(total);
+					}
+
+					// 绑定点击事件
+					setupFilterListeners();
+				} catch (error) {
+					console.error("Error loading manga list:", error);
+				}
+			}
+
+			// 设置筛选按钮的点击事件
+			function setupFilterListeners() {
+				const filterList = document.getElementById("manga-filter-list");
+				if (!filterList) return;
+
+				filterList.addEventListener("click", (e) => {
+					const button = (e.target as HTMLElement).closest(
+						".manga-filter-item",
+					) as HTMLButtonElement;
+					if (!button) return;
+
+					const mangaName = button.dataset.manga || "all";
+
+					// 更新活动状态
+					filterList
+						.querySelectorAll(".manga-filter-item")
+						.forEach((btn) => {
+							btn.classList.remove("active");
+						});
+					button.classList.add("active");
+
+					// 更新筛选并重新加载
+					currentFilter = mangaName;
+					allShots = [];
+					currentPage = 1;
+					totalPages = 1;
+					loadMangashots(1);
+				});
+			}
+
+			async function loadMangashots(page: number = 1) {
+				if (isLoading) return;
+				isLoading = true;
+
+				const loadingState = document.getElementById("loading-state");
+				const loadMoreIndicator = document.getElementById(
+					"load-more-indicator",
+				);
+				const errorState = document.getElementById("error-state");
+				const endOfList = document.getElementById("end-of-list");
+				const mangaGrid = document.getElementById("manga-grid");
+				const mangaCount = document.getElementById("manga-count");
+
+				// 显示加载指示器
+				if (page === 1) {
+					loadingState?.classList.remove("hidden");
+				} else {
+					loadMoreIndicator?.classList.remove("hidden");
+				}
+
+				try {
+					// 从 API endpoint 获取数据，添加筛选参数
+					let url = `/api/mangashots.json?page=${page}`;
+					if (currentFilter !== "all") {
+						url += `&manga_name=${encodeURIComponent(currentFilter)}`;
+					}
+					const response = await fetch(url);
+					if (!response.ok) throw new Error("Failed to fetch");
+
+					const responseData: MangashotsResponse =
+						await response.json();
+					const { data, pagination } = responseData;
+
+					// 按创建时间倒序排序新数据
+					const sortedNewShots = data.sort(
+						(a, b) =>
+							new Date(b.created_at).getTime() -
+							new Date(a.created_at).getTime(),
+					);
+
+					// 添加到全局数组
+					allShots = [...allShots, ...sortedNewShots];
+					currentPage = pagination.page;
+					totalPages = pagination.totalPages;
+
+					// 更新计数
+					if (mangaCount) {
+						mangaCount.textContent = `(${pagination.total} 张)`;
+					}
+
+					// 创建或更新瀑布流布局
+					if (mangaGrid) {
+						if (page === 1) {
+							// 首次加载，创建列容器
+							initMasonry();
+						}
+
+						// 添加新图片到列
+						addItemsToMasonry(
+							sortedNewShots,
+							allShots.length - sortedNewShots.length,
+						);
+
+						// 显示网格，隐藏初始加载状态
+						mangaGrid.classList.remove("hidden");
+						loadingState?.classList.add("hidden");
+
+						// 首次加载时设置 lightbox
+						if (page === 1) {
+							setupLightbox();
+							setupInfiniteScroll();
+						}
+					}
+
+					// 隐藏加载更多指示器
+					loadMoreIndicator?.classList.add("hidden");
+
+					// 显示是否到底
+					if (currentPage >= totalPages) {
+						endOfList?.classList.remove("hidden");
+					}
+				} catch (error) {
+					console.error("Error loading mangashots:", error);
+					loadingState?.classList.add("hidden");
+					loadMoreIndicator?.classList.add("hidden");
+					if (page === 1) {
+						errorState?.classList.remove("hidden");
+					}
+				} finally {
+					isLoading = false;
+				}
+			}
+
+			function getColumns() {
+				const width = window.innerWidth;
+				if (width <= 500) return 1;
+				if (width <= 700) return 2;
+				if (width <= 1100) return 3;
+				return 4;
+			}
+
+			function initMasonry() {
+				const mangaGrid = document.getElementById("manga-grid");
+				if (!mangaGrid) return;
+
+				const columns = getColumns();
+				mangaGrid.innerHTML = "";
+				mangaGrid.className = "manga-masonry-grid grid gap-4";
+				mangaGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+				// 创建列容器
+				columnContainers = [];
+				for (let i = 0; i < columns; i++) {
+					const col = document.createElement("div");
+					col.className = "manga-masonry-column flex flex-col gap-4";
+					columnContainers.push(col);
+					mangaGrid.appendChild(col);
+				}
+			}
+
+			function addItemsToMasonry(shots: MangaShot[], startIndex: number) {
+				shots.forEach((shot, index) => {
+					const globalIndex = startIndex + index;
+					const columnIndex = globalIndex % columnContainers.length;
+					const item = createMangaItem(shot, globalIndex);
+					columnContainers[columnIndex].appendChild(item);
+				});
+			}
+
+			function createMangaItem(shot: MangaShot, index: number) {
+				const div = document.createElement("div");
+				div.className = "manga-shot-item group";
+				div.dataset.index = String(index);
+				div.style.setProperty("--item-index", String(index));
+
+				const button = document.createElement("button");
+				button.className = "manga-shot-button";
+				button.dataset.photoUrl = shot.photo_url;
+				button.dataset.thumbnailUrl = shot.thumbnail_url;
+				button.dataset.mangaName = shot.manga_name;
+				button.dataset.title = shot.title;
+				button.dataset.caption = shot.caption || "";
+				button.setAttribute("aria-label", `View ${shot.title}`);
+
+				const img = document.createElement("img");
+				img.src = shot.thumbnail_url;
+				img.alt = shot.title;
+				img.loading = "lazy";
+				img.className = "manga-shot-img";
+
+				const overlay = document.createElement("div");
+				overlay.className = "manga-shot-overlay";
+
+				const mangaNameP = document.createElement("p");
+				mangaNameP.className = "manga-shot-manga-name";
+				mangaNameP.textContent = shot.manga_name;
+				overlay.appendChild(mangaNameP);
+
+				const titleP = document.createElement("p");
+				titleP.className = "manga-shot-title";
+				titleP.textContent = shot.title;
+				overlay.appendChild(titleP);
+
+				if (shot.caption) {
+					const captionP = document.createElement("p");
+					captionP.className = "manga-shot-caption";
+					captionP.textContent = shot.caption;
+					overlay.appendChild(captionP);
+				}
+
+				button.appendChild(img);
+				button.appendChild(overlay);
+				div.appendChild(button);
+
+				return div;
+			}
+
+			function renderMasonry() {
+				initMasonry();
+				addItemsToMasonry(allShots, 0);
+			}
+
+			function setupInfiniteScroll() {
+				const observer = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((entry) => {
+							console.log("Intersection observed:", {
+								isIntersecting: entry.isIntersecting,
+								isLoading,
+								currentPage,
+								totalPages,
+							});
+							if (
+								entry.isIntersecting &&
+								!isLoading &&
+								currentPage < totalPages
+							) {
+								console.log(
+									"Loading next page:",
+									currentPage + 1,
+								);
+								loadMangashots(currentPage + 1);
+							}
+						});
+					},
+					{
+						rootMargin: "200px", // 提前 200px 开始加载
+					},
+				);
+
+				const loadMoreTrigger =
+					document.getElementById("load-more-trigger");
+				if (loadMoreTrigger) {
+					console.log(
+						"Setting up IntersectionObserver on load-more-trigger",
+					);
+					observer.observe(loadMoreTrigger);
+				} else {
+					console.error("load-more-trigger element not found");
+				}
+			}
+
+			// 响应式处理
+			let resizeTimeout: number;
+			window.addEventListener("resize", () => {
+				clearTimeout(resizeTimeout);
+				resizeTimeout = window.setTimeout(renderMasonry, 300);
+			});
+
+			// Lightbox 功能
+			function setupLightbox() {
+				const lightbox = document.getElementById(
+					"manga-lightbox",
+				) as HTMLDialogElement;
+				const lightboxImg = document.getElementById(
+					"manga-lightbox-img",
+				) as HTMLImageElement;
+				const lightboxMangaName = document.getElementById(
+					"manga-lightbox-manga-name",
+				);
+				const lightboxTitle = document.getElementById(
+					"manga-lightbox-title",
+				);
+				const lightboxCaption = document.getElementById(
+					"manga-lightbox-caption-text",
+				);
+				const closeBtn = document.querySelector(
+					".manga-lightbox-close",
+				);
+				const prevBtn = document.querySelector(".manga-lightbox-prev");
+				const nextBtn = document.querySelector(".manga-lightbox-next");
+
+				let currentIndex = 0;
+
+				function getButtons() {
+					return Array.from(
+						document.querySelectorAll(".manga-shot-button"),
+					) as HTMLButtonElement[];
+				}
+
+				function showImage(index: number) {
+					const buttons = getButtons();
+					if (index < 0 || index >= buttons.length) return;
+
+					const button = buttons[index];
+					const photoUrl = button.dataset.photoUrl || "";
+					const mangaName = button.dataset.mangaName || "";
+					const title = button.dataset.title || "";
+					const caption = button.dataset.caption || "";
+
+					lightboxImg.src = photoUrl;
+					lightboxImg.alt = title;
+					if (lightboxMangaName)
+						lightboxMangaName.textContent = mangaName;
+					if (lightboxTitle) lightboxTitle.textContent = title;
+					if (lightboxCaption) lightboxCaption.textContent = caption;
+
+					currentIndex = index;
+				}
+
+				function openLightbox(index: number) {
+					showImage(index);
+					lightbox?.showModal();
+				}
+
+				function closeLightbox() {
+					lightbox?.close();
+				}
+
+				function showPrev() {
+					const buttons = getButtons();
+					const prevIndex =
+						currentIndex > 0
+							? currentIndex - 1
+							: buttons.length - 1;
+					showImage(prevIndex);
+				}
+
+				function showNext() {
+					const buttons = getButtons();
+					const nextIndex =
+						currentIndex < buttons.length - 1
+							? currentIndex + 1
+							: 0;
+					showImage(nextIndex);
+				}
+
+				// 使用事件委托处理动态添加的按钮
+				document
+					.getElementById("manga-grid")
+					?.addEventListener("click", (e) => {
+						const button = (e.target as HTMLElement).closest(
+							".manga-shot-button",
+						) as HTMLButtonElement;
+						if (button) {
+							const buttons = getButtons();
+							const index = buttons.indexOf(button);
+							if (index !== -1) {
+								openLightbox(index);
+							}
+						}
+					});
+
+				closeBtn?.addEventListener("click", closeLightbox);
+				prevBtn?.addEventListener("click", showPrev);
+				nextBtn?.addEventListener("click", showNext);
+
+				// Keyboard navigation
+				document.addEventListener("keydown", (e) => {
+					if (!lightbox?.open) return;
+
+					switch (e.key) {
+						case "Escape":
+							closeLightbox();
+							break;
+						case "ArrowLeft":
+							showPrev();
+							break;
+						case "ArrowRight":
+							showNext();
+							break;
+					}
+				});
+
+				// Touch swipe support
+				let touchStartX = 0;
+				let touchEndX = 0;
+
+				lightbox?.addEventListener("touchstart", (e) => {
+					touchStartX = e.changedTouches[0].screenX;
+				});
+
+				lightbox?.addEventListener("touchend", (e) => {
+					touchEndX = e.changedTouches[0].screenX;
+					handleSwipe();
+				});
+
+				function handleSwipe() {
+					const swipeThreshold = 50;
+					if (touchEndX < touchStartX - swipeThreshold) {
+						showNext();
+					}
+					if (touchEndX > touchStartX + swipeThreshold) {
+						showPrev();
+					}
+				}
+			}
+
+			// 页面初始化
+			async function initPage() {
+				// 先加载漫画列表（侧边栏）
+				await loadMangaList();
+				// 再加载漫画截图
+				loadMangashots(1);
+			}
+
+			// 立即执行
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", () => initPage());
+			} else {
+				initPage();
+			}
+		</script>
+	</body>
+</html>

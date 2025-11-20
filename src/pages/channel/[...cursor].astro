@@ -105,9 +105,11 @@ const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.le
                         原创
                       </div>
                     )}
+                    {post.datetime && (
                     <time datetime={post.datetime}>
                       <FormattedDate date={new Date(post.datetime)} />
                     </time>
+                  )}
                   </header>
                   <div class="post-content" set:html={post.content} />
                 </article>
