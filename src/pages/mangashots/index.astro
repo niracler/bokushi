@@ -20,37 +20,6 @@ export const prerender = false;
 		<Header />
 		<main class="manga-shots-main">
 			<div class="manga-container">
-				<!-- Sidebar -->
-				<aside class="manga-sidebar">
-					<div class="manga-sidebar-header">
-						<h1 class="manga-sidebar-title">漫画表情包</h1>
-						<p class="manga-sidebar-desc">
-							收集的漫画截图，可以用作表情包
-						</p>
-						<div class="manga-count-display">
-							共 <span id="manga-count" class="manga-count-num"
-								>0</span
-							> 张
-						</div>
-					</div>
-
-					<!-- Filter Section -->
-					<div class="manga-filter-section">
-						<h2 class="manga-filter-title">筛选漫画</h2>
-						<div id="manga-filter-list" class="manga-filter-list">
-							<button
-								class="manga-filter-item active"
-								data-manga="all"
-							>
-								<span class="manga-filter-dot"></span>
-								<span class="manga-filter-name">全部</span>
-								<span class="manga-filter-count">0</span>
-							</button>
-							<!-- 动态加载的漫画列表 -->
-						</div>
-					</div>
-				</aside>
-
 				<!-- Main Content -->
 				<div class="manga-content">
 					<!-- Loading State -->
@@ -93,6 +62,37 @@ export const prerender = false;
 						<p>已经到底了~</p>
 					</div>
 				</div>
+
+				<!-- Sidebar -->
+				<aside class="manga-sidebar">
+					<div class="manga-sidebar-header">
+						<h1 class="manga-sidebar-title">漫画表情包</h1>
+						<p class="manga-sidebar-desc">
+							收集的漫画截图，可以用作表情包
+						</p>
+						<div class="manga-count-display">
+							共 <span id="manga-count" class="manga-count-num"
+								>0</span
+							> 张
+						</div>
+					</div>
+
+					<!-- Filter Section -->
+					<div class="manga-filter-section">
+						<h2 class="manga-filter-title">筛选漫画</h2>
+						<div id="manga-filter-list" class="manga-filter-list">
+							<button
+								class="manga-filter-item active"
+								data-manga="all"
+							>
+								<span class="manga-filter-dot"></span>
+								<span class="manga-filter-name">全部</span>
+								<span class="manga-filter-count">0</span>
+							</button>
+							<!-- 动态加载的漫画列表 -->
+						</div>
+					</div>
+				</aside>
 			</div>
 
 			<!-- Lightbox Dialog -->
@@ -172,7 +172,7 @@ export const prerender = false;
 		<style>
 			/* Main Layout */
 			.manga-shots-main {
-				max-width: 72rem; /* max-w-4xl = 64rem, 用 72rem 让侧边栏有空间 */
+				max-width: 80rem;
 				margin: 0 auto;
 				padding: 2rem 1rem;
 				background: var(--color-bg-page);
@@ -189,13 +189,18 @@ export const prerender = false;
 			.manga-sidebar {
 				position: sticky;
 				top: 2rem;
-				background: var(--color-bg-surface);
+				background: linear-gradient(
+					135deg,
+					var(--color-bg-surface) 0%,
+					color-mix(in srgb, var(--color-bg-surface) 95%, var(--color-accent)) 100%
+				);
 				border: 1px solid var(--color-border-soft);
 				border-radius: var(--radius-lg);
 				padding: 1.75rem;
 				box-shadow:
-					0 8px 24px rgba(251, 143, 104, 0.08),
-					0 2px 8px rgba(42, 28, 23, 0.06);
+					0 12px 32px rgba(251, 143, 104, 0.1),
+					0 4px 12px rgba(42, 28, 23, 0.08),
+					inset 0 1px 0 rgba(255, 255, 255, 0.1);
 				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 				position: relative;
 				overflow: hidden;
@@ -207,13 +212,20 @@ export const prerender = false;
 				top: 0;
 				left: 0;
 				right: 0;
-				height: 3px;
+				height: 4px;
 				background: linear-gradient(
 					90deg,
 					var(--color-accent),
-					var(--color-accent-dark)
+					var(--color-accent-dark),
+					var(--color-accent)
 				);
-				opacity: 0.8;
+				background-size: 200% 100%;
+				animation: shimmer 3s ease-in-out infinite;
+			}
+
+			@keyframes shimmer {
+				0%, 100% { background-position: 0% 50%; }
+				50% { background-position: 100% 50%; }
 			}
 
 			.manga-sidebar-header {
@@ -225,7 +237,14 @@ export const prerender = false;
 			.manga-sidebar-title {
 				font-size: 1.5rem;
 				font-weight: 700;
-				color: var(--color-text-primary);
+				background: linear-gradient(
+					135deg,
+					var(--color-text-primary),
+					var(--color-accent)
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
 				margin: 0 0 0.75rem 0;
 			}
 
@@ -272,7 +291,7 @@ export const prerender = false;
 				align-items: center;
 				gap: 0.75rem;
 				padding: 0.875rem 1rem;
-				background: transparent;
+				background: rgba(255, 255, 255, 0.02);
 				border: 1px solid transparent;
 				border-radius: var(--radius-md);
 				cursor: pointer;
@@ -287,31 +306,38 @@ export const prerender = false;
 			.manga-filter-item:hover {
 				background: var(--color-bg-muted);
 				border-color: var(--color-border-soft);
-				transform: translateX(-2px);
-				box-shadow: 0 2px 8px rgba(251, 143, 104, 0.12);
+				transform: translateX(-3px);
+				box-shadow:
+					0 4px 12px rgba(251, 143, 104, 0.15),
+					inset 0 1px 0 rgba(255, 255, 255, 0.05);
 			}
 
 			.manga-filter-item.active {
 				background: linear-gradient(
 					135deg,
-					color-mix(
-						in srgb,
-						var(--color-accent-soft) 70%,
-						transparent
-					),
-					color-mix(
-						in srgb,
-						var(--color-accent-soft) 50%,
-						transparent
-					)
+					color-mix(in srgb, var(--color-accent) 20%, transparent),
+					color-mix(in srgb, var(--color-accent) 10%, transparent)
 				);
 				border-color: var(--color-accent);
 				color: var(--color-text-primary);
 				font-weight: 600;
-				transform: translateX(-4px);
+				transform: translateX(-5px);
 				box-shadow:
-					0 4px 12px rgba(251, 143, 104, 0.2),
-					inset 0 1px 0 rgba(255, 255, 255, 0.1);
+					0 6px 16px rgba(251, 143, 104, 0.25),
+					0 2px 8px rgba(251, 143, 104, 0.15),
+					inset 0 1px 0 rgba(255, 255, 255, 0.15);
+			}
+
+			.manga-filter-item.active::before {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 3px;
+				height: 60%;
+				background: var(--color-accent);
+				border-radius: 0 2px 2px 0;
 			}
 
 			.manga-filter-dot {
@@ -401,7 +427,7 @@ export const prerender = false;
 			}
 
 			.manga-shot-item:hover {
-				transform: translateY(-6px) scale(1.02);
+				transform: translateY(-8px) scale(1.03);
 				z-index: 10;
 			}
 
@@ -416,8 +442,9 @@ export const prerender = false;
 				border-radius: var(--radius-lg);
 				overflow: hidden;
 				box-shadow:
-					0 4px 12px rgba(42, 28, 23, 0.1),
-					0 1px 3px rgba(42, 28, 23, 0.08);
+					0 4px 16px rgba(42, 28, 23, 0.12),
+					0 2px 6px rgba(42, 28, 23, 0.08),
+					0 0 0 1px rgba(251, 143, 104, 0.1);
 				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 
@@ -429,8 +456,9 @@ export const prerender = false;
 				padding: 2px;
 				background: linear-gradient(
 					135deg,
-					transparent,
-					rgba(251, 143, 104, 0.3)
+					rgba(251, 143, 104, 0.4),
+					rgba(251, 143, 104, 0.2),
+					transparent
 				);
 				-webkit-mask:
 					linear-gradient(#fff 0 0) content-box,
@@ -441,14 +469,31 @@ export const prerender = false;
 				transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 			}
 
+			.manga-shot-button::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				background: radial-gradient(
+					circle at center,
+					transparent 0%,
+					rgba(251, 143, 104, 0.05) 100%
+				);
+				opacity: 0;
+				transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
 			.manga-shot-item:hover .manga-shot-button {
 				box-shadow:
-					0 12px 32px rgba(251, 143, 104, 0.25),
-					0 4px 12px rgba(251, 143, 104, 0.15),
-					0 0 0 1px var(--color-accent-soft);
+					0 16px 48px rgba(251, 143, 104, 0.3),
+					0 8px 20px rgba(251, 143, 104, 0.2),
+					0 0 0 2px var(--color-accent-soft);
 			}
 
 			.manga-shot-item:hover .manga-shot-button::before {
+				opacity: 1;
+			}
+
+			.manga-shot-item:hover .manga-shot-button::after {
 				opacity: 1;
 			}
 
@@ -462,14 +507,6 @@ export const prerender = false;
 
 			.manga-shot-button:hover .manga-shot-img {
 				transform: scale(1.05);
-			}
-
-			/* 隐藏 overlay - 不在卡片上显示文字 */
-			.manga-shot-overlay,
-			.manga-shot-manga-name,
-			.manga-shot-title,
-			.manga-shot-caption {
-				display: none;
 			}
 
 			/* Lightbox Styles */
@@ -978,28 +1015,7 @@ export const prerender = false;
 				img.loading = "lazy";
 				img.className = "manga-shot-img";
 
-				const overlay = document.createElement("div");
-				overlay.className = "manga-shot-overlay";
-
-				const mangaNameP = document.createElement("p");
-				mangaNameP.className = "manga-shot-manga-name";
-				mangaNameP.textContent = shot.manga_name;
-				overlay.appendChild(mangaNameP);
-
-				const titleP = document.createElement("p");
-				titleP.className = "manga-shot-title";
-				titleP.textContent = shot.title;
-				overlay.appendChild(titleP);
-
-				if (shot.caption) {
-					const captionP = document.createElement("p");
-					captionP.className = "manga-shot-caption";
-					captionP.textContent = shot.caption;
-					overlay.appendChild(captionP);
-				}
-
 				button.appendChild(img);
-				button.appendChild(overlay);
 				div.appendChild(button);
 
 				return div;
