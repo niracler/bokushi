@@ -8,16 +8,16 @@ tags: [ "TIL", "博客", "RSS", "优化", "DeepSearch" ]
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
 
-## 1 要干什么
+## 要干什么
 
 我想为博客增强元数据功能，主要包括两方面：
 
 1. 添加媒体预览功能，使文章在社交平台（如Telegram）上分享时能显示精美的预览图；
 2. 实现RSS订阅功能，方便读者及时获取博客更新。这些改进将提升博客的专业性和用户体验。
 
-## 2 开始我们的美化工作吧
+## 开始我们的美化工作吧
 
-### 2.1 设置预览图和摘要
+### 设置预览图和摘要
 
 ```yaml
 ---
@@ -38,7 +38,7 @@ cover:
 
 ![](https://image.niracler.com/2025/03/5a3cc265aed801fdeffba4966c889e89.png)
 
-### 2.2 添加网站图标（Favicon）
+### 添加网站图标（Favicon）
 
 为博客添加一个网站图标可以提升专业性，并在浏览器标签页中显示您的品牌标识。以下是添加 favicon 的步骤：
 
@@ -60,7 +60,7 @@ cover:
 (效果图)
 ![](https://image.niracler.com/2025/03/cbd003b59f85210c39ecd48a558ad65b.png)
 
-### 2.2 添加 RSS 支持
+### 添加 RSS 支持
 
 **全文 RSS 设置**  : Hugo 默认生成包含摘要的 RSS 提要，但您可以启用全文。在 PaperMod 主题中，可以在 hugo.toml 中添加：
 
@@ -79,7 +79,7 @@ cover:
 
 然后顺手做个 Follow 认证吧。
 
-### 2.3 添加 RSS feed 描述以验证所有权
+### 添加 RSS feed 描述以验证所有权
 
 要在 RSS feed 中添加特定的描述文本以便在 RSS 阅读器中声明所有权，需要创建自定义的 RSS 模板：
 
@@ -141,3 +141,4 @@ cover:
 ### 关键引文
 
 - [折腾 Hugo & PaperMod 主题](https://dvel.me/posts/hugo-papermod-config/)
+

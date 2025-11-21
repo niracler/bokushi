@@ -111,6 +111,7 @@
         color: var(--color-text-primary);
         font-size: clamp(1rem, 0.4vw + 0.95rem, 1.1rem);
         line-height: var(--line-height-base);
+        counter-reset: h2;
     }
 
     .prose > * {
@@ -145,6 +146,7 @@
         font-size: clamp(1.5rem, 2.4vw, 2rem);
         font-weight: 800;
         letter-spacing: -0.02em;
+        counter-reset: h3;
     }
 
     .prose h3 {
@@ -153,11 +155,53 @@
         font-size: clamp(1.3rem, 1.9vw, 1.6rem);
         font-weight: 700;
         letter-spacing: -0.01em;
+        counter-reset: h4;
     }
 
     .prose h4 {
         margin-top: var(--space-5);
         font-size: 1.125rem;
+    }
+
+    .prose :where(h2, h3, h4) {
+        position: relative;
+        display: flex;
+        align-items: baseline;
+        gap: 0.25rem;
+    }
+
+    .prose :where(h2, h3, h4) > .anchor-link {
+        display: inline-flex;
+        align-items: baseline;
+        flex-shrink: 0;
+        min-width: 1.2ch;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        font-size: 1em;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .prose h2 > .anchor-link::before {
+        counter-increment: h2;
+        content: counter(h2);
+    }
+
+    .prose h3 > .anchor-link::before {
+        counter-increment: h3;
+        content: counter(h2) "." counter(h3);
+    }
+
+    .prose h4 > .anchor-link::before {
+        counter-increment: h4;
+        content: counter(h2) "." counter(h3) "." counter(h4);
+    }
+
+    .prose :where(h2, h3, h4) > .anchor-link:focus-visible {
+        outline: 2px solid var(--color-border-subtle);
+        outline-offset: 2px;
+        border-radius: var(--radius-sm);
     }
 
     .prose p {
@@ -232,10 +276,15 @@
     .prose code {
         padding: 0.1em 0.4em;
         border-radius: var(--radius-sm);
-        background: var(--color-accent-soft);
-        color: var(--color-accent-dark);
+        background: color-mix(in srgb, var(--color-text-muted) 15%, var(--color-bg-page));
+        color: var(--color-text-primary);
         font-family: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
         font-size: 0.95em;
+    }
+
+    .prose :not(pre) code {
+        white-space: pre-wrap;
+        word-break: break-word;
     }
 
     .prose pre {
@@ -261,6 +310,15 @@
         white-space: pre;
         word-wrap: normal;
         overflow-wrap: normal;
+    }
+
+    /* Prevent accent color on strong/b tags inside code blocks */
+    .prose pre strong,
+    .prose pre b,
+    .prose code strong,
+    .prose code b {
+        color: inherit;
+        font-weight: inherit;
     }
 
     /* Shiki syntax highlighting - Light theme (default) */

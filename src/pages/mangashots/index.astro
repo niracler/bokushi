@@ -1055,26 +1055,33 @@ export const prerender = false;
 				img.decoding = "async";
 				img.className = "manga-shot-img";
 
-				let settled = false;
+				let isPlaced = false;
 				const place = () => {
-					if (settled) return;
-					settled = true;
+					if (isPlaced || !column) return;
+					isPlaced = true;
 					if (!column.contains(div)) column.appendChild(div);
 				};
 
 				const readyPromise = new Promise<void>((resolve) => {
-					const done = () => {
-						place();
+					let settled = false;
+					const settle = () => {
+						if (settled) return;
+						settled = true;
 						resolve();
 					};
 
-					img.addEventListener(
-						"load",
-						() => {
-							done();
-						},
-						{ once: true }
-					);
+					const done = () => {
+						place();
+						settle();
+					};
+
+					const fallback = window.setTimeout(done, 4000);
+					const clearAndDone = () => {
+						window.clearTimeout(fallback);
+						done();
+					};
+
+					img.addEventListener("load", clearAndDone, { once: true });
 					img.addEventListener(
 						"error",
 						() => {
@@ -1082,13 +1089,13 @@ export const prerender = false;
 								img.removeAttribute("data-full-src");
 								img.src = shot.photo_url;
 							}
-							done();
+							clearAndDone();
 						},
 						{ once: true }
 					);
 
 					if (img.complete && img.naturalWidth) {
-						done();
+						clearAndDone();
 					}
 				});
 
@@ -1098,6 +1105,9 @@ export const prerender = false;
 
 				button.appendChild(img);
 				div.appendChild(button);
+				// 提前插入 DOM，避免 lazy image 在未挂载时不加载导致首屏空白
+				place();
+
 				return { item: div, readyPromise };
 			}
 

@@ -7,13 +7,13 @@ tags: [ "TIL", "工具", "邮箱", "自动化" ]
 ---
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
-## 1 要干什么
+## 要干什么
 
 我想把任何邮件都转发到 Fastmail 邮箱，然后 Fastmail 转发到 Apple Mail。
 
-## 2 从其他邮箱到 fastmail 邮箱
+## 从其他邮箱到 fastmail 邮箱
 
-### 2.1 QQ 邮箱邮件迁移并同步到 Fastmail
+### QQ 邮箱邮件迁移并同步到 Fastmail
 
 在 QQ 邮箱中启用IMAP服务是同步的前提条件。操作步骤如下：
 
@@ -48,7 +48,7 @@ tags: [ "TIL", "工具", "邮箱", "自动化" ]
 
 ![](https://image.niracler.com/2025/03/2d30cccefd14e62c7fd6be42c91c8df5.png)
 
-### 3 Apple Mail 的 Fastmail 配置
+### Apple Mail 的 Fastmail 配置
 
 在 Apple Mail 中，添加账户，然后选择其他账户，然后选择 Fastmail。
 
@@ -66,8 +66,9 @@ tags: [ "TIL", "工具", "邮箱", "自动化" ]
 
 ![](https://image.niracler.com/2025/03/90816d70068cb7048e9077a4fbadce21.png)
 
-## 4 总结
+## 总结
 
 大功告成！
 
 ![](https://image.niracler.com/2025/03/40cc47308bdf5fa56bfc6d033aac0d5d.png)
+
