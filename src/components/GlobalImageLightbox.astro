@@ -1,0 +1,287 @@
+---
+// Lightweight global lightbox used by article/page images.
+// It binds to images inside `.prose` and provides next/prev navigation plus alt caption display.
+---
+
+<dialog data-global-lightbox class="global-lightbox" aria-label="查看大图">
+	<div class="global-lightbox__backdrop" data-lightbox-close></div>
+	<div class="global-lightbox__content">
+		<button class="global-lightbox__close" type="button" aria-label="关闭" data-lightbox-close>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+			</svg>
+		</button>
+
+		<button class="global-lightbox__nav global-lightbox__nav--prev" type="button" aria-label="上一张" data-lightbox-prev>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
+		</button>
+
+		<div class="global-lightbox__image-frame">
+			<img data-lightbox-img alt="" />
+		</div>
+
+		<button class="global-lightbox__nav global-lightbox__nav--next" type="button" aria-label="下一张" data-lightbox-next>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
+		</button>
+
+		<div class="global-lightbox__meta">
+			<p class="global-lightbox__alt" data-lightbox-alt></p>
+			<p class="global-lightbox__counter" data-lightbox-counter></p>
+		</div>
+	</div>
+</dialog>
+
+<script is:inline>
+	(() => {
+		const dialog = document.querySelector("[data-global-lightbox]");
+		if (!dialog) return;
+
+		const imgEl = dialog.querySelector("[data-lightbox-img]");
+		const altEl = dialog.querySelector("[data-lightbox-alt]");
+		const counterEl = dialog.querySelector("[data-lightbox-counter]");
+		const closeButtons = dialog.querySelectorAll("[data-lightbox-close]");
+		const prevBtn = dialog.querySelector("[data-lightbox-prev]");
+		const nextBtn = dialog.querySelector("[data-lightbox-next]");
+
+		let shots = [];
+		let current = 0;
+
+		const collect = () => {
+			const images = Array.from(
+				document.querySelectorAll(
+					".prose img:not([data-lightbox-skip]), .telegram-post .telegram-post-image"
+				)
+			);
+			shots = images.map((img, index) => {
+				img.style.cursor = "pointer";
+				img.dataset.lightboxIndex = String(index);
+				const alt =
+					img.getAttribute("alt") ||
+					img.dataset.caption ||
+					img.dataset.title ||
+					"未提供描述";
+				return {
+					src: img.currentSrc || img.src,
+					alt,
+				};
+			});
+
+			images.forEach((img) => {
+				img.addEventListener("click", (event) => {
+					event.preventDefault();
+					const index = Number(img.dataset.lightboxIndex || 0);
+					open(index);
+				});
+			});
+		};
+
+		const updateView = () => {
+			const shot = shots[current];
+			if (!shot) return;
+			if (imgEl) {
+				imgEl.src = shot.src;
+				imgEl.alt = shot.alt;
+			}
+			if (altEl) altEl.textContent = shot.alt || "未提供描述";
+			if (counterEl) counterEl.textContent = `${current + 1} / ${shots.length}`;
+		};
+
+		const open = (index) => {
+			if (!shots.length) return;
+			current = ((index % shots.length) + shots.length) % shots.length;
+			updateView();
+			dialog.showModal();
+			dialog.classList.add("is-open");
+			document.documentElement.classList.add("lightbox-open");
+		};
+
+		const close = () => {
+			dialog.close();
+			dialog.classList.remove("is-open");
+			document.documentElement.classList.remove("lightbox-open");
+		};
+
+		const step = (delta) => {
+			if (!shots.length) return;
+			current = (current + delta + shots.length) % shots.length;
+			updateView();
+		};
+
+		closeButtons.forEach((btn) => btn.addEventListener("click", close));
+		prevBtn?.addEventListener("click", () => step(-1));
+		nextBtn?.addEventListener("click", () => step(1));
+
+		dialog.addEventListener("click", (event) => {
+			if (event.target === dialog) close();
+		});
+
+		document.addEventListener("keydown", (event) => {
+			if (!dialog.open) return;
+			if (event.key === "Escape") close();
+			if (event.key === "ArrowLeft") step(-1);
+			if (event.key === "ArrowRight") step(1);
+		});
+
+		collect();
+	})();
+</script>
+
+<style>
+	:global(.lightbox-open) {
+		overflow: hidden;
+	}
+
+	.global-lightbox {
+		margin: 0;
+		padding: 0;
+		border: none;
+		background: transparent;
+		width: 100vw;
+		height: 100vh;
+		max-width: none;
+		max-height: none;
+	}
+
+	.global-lightbox::backdrop {
+		background: rgba(0, 0, 0, 0.65);
+		backdrop-filter: blur(6px);
+	}
+
+	.global-lightbox__backdrop {
+		position: absolute;
+		inset: 0;
+	}
+
+	.global-lightbox__content {
+		position: fixed;
+		inset: 0;
+		display: grid;
+		grid-template-rows: 1fr auto;
+		align-items: center;
+		justify-items: center;
+		padding: clamp(1rem, 4vw, 2rem);
+		gap: 1rem;
+		pointer-events: none;
+	}
+
+	.global-lightbox__image-frame {
+		position: relative;
+		max-width: min(92vw, 1200px);
+		max-height: 80vh;
+		width: auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		border-radius: 0;
+		box-shadow: none;
+		border: none;
+		pointer-events: auto;
+		overflow: visible;
+	}
+
+	.global-lightbox__image-frame img {
+		max-height: 80vh;
+		max-width: 100%;
+		width: auto;
+		height: auto;
+		display: block;
+		object-fit: contain;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+		border-radius: var(--radius-lg);
+	}
+
+	.global-lightbox__close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, 0.35);
+		color: white;
+		background: rgba(0, 0, 0, 0.4);
+		display: grid;
+		place-items: center;
+		cursor: pointer;
+		pointer-events: auto;
+		transition: transform 0.2s ease, background 0.2s ease;
+	}
+
+	.global-lightbox__close:hover {
+		transform: scale(1.05);
+		background: rgba(0, 0, 0, 0.55);
+	}
+
+	.global-lightbox__nav {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, 0.35);
+		color: white;
+		background: rgba(0, 0, 0, 0.35);
+		display: grid;
+		place-items: center;
+		cursor: pointer;
+		pointer-events: auto;
+		transition: transform 0.2s ease, background 0.2s ease;
+	}
+
+	.global-lightbox__nav:hover {
+		transform: translateY(-50%) scale(1.05);
+		background: rgba(0, 0, 0, 0.55);
+	}
+
+	.global-lightbox__nav--prev {
+		left: clamp(0.5rem, 4vw, 1.5rem);
+	}
+
+	.global-lightbox__nav--next {
+		right: clamp(0.5rem, 4vw, 1.5rem);
+	}
+
+	.global-lightbox__nav svg,
+	.global-lightbox__close svg {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+
+	.global-lightbox__meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		align-items: center;
+		text-align: center;
+		pointer-events: auto;
+		color: var(--color-text-inverse);
+	}
+
+	.global-lightbox__alt {
+		margin: 0;
+		font-weight: 600;
+	}
+
+	.global-lightbox__counter {
+		margin: 0;
+		font-size: var(--font-size-sm);
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	@media (max-width: 640px) {
+		.global-lightbox__image-frame {
+			max-height: 60vh;
+		}
+
+		.global-lightbox__meta {
+			align-items: stretch;
+			text-align: left;
+		}
+	}
+</style>

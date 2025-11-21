@@ -1,0 +1,2 @@
+pnpm astro check
+pnpm lint-staged

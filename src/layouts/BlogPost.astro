@@ -5,6 +5,7 @@ import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import Header from "../components/Header.astro";
+import GlobalImageLightbox from "../components/GlobalImageLightbox.astro";
 import Prose from "../components/Prose.astro";
 import Remark42Comments from "../components/Remark42Comments.astro";
 import TableOfContents from "../components/TableOfContents.astro";
@@ -41,14 +42,14 @@ const description = providedDescription || (body ? extractDescription(body) : "æ
 const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;
 ---
 
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<BaseHead title={title} description={description} image={socialImage} />
 	</head>
 
 	<body>
 		<Header />
-		<main class="px-4">
+		<main class="page-shell max-w-none">
 			<div
 				data-toc-container
 				class:list={[
@@ -57,12 +58,12 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 			>
 				<article
 					class:list={[
-						'mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]',
+						'mx-auto max-w-3xl space-y-10 text-secondary',
 					]}
 				>
 						<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
 						<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">{title}</h1>
-						<div class="space-y-2 text-sm text-[var(--color-text-muted)]">
+						<div class="space-y-2 text-sm text-muted">
 							<p>
 								<FormattedDate date={pubDate} />
 							</p>
@@ -92,7 +93,8 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 								{tags.map((tag: string) => (
 									<a
 										href={`/tags/${tag}`}
-										class="inline-flex items-center rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(var(--color-accent-rgb),0.15)] hover:text-[var(--color-accent)]"
+										class="pill"
+										data-tone="accent"
 									>
 										{tag}
 									</a>
@@ -158,11 +160,12 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						</>
 					)}
 
-					<Prose>
+					<Prose class="text-secondary">
 						<slot />
 					</Prose>
 
 					<Remark42Comments />
+					<GlobalImageLightbox />
 				</article>
 
 				{showToc && (

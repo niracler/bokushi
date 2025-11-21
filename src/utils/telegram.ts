@@ -94,6 +94,9 @@ export async function fetchTelegramChannel(
 
       // Get datetime
       const datetime = $message.find('.tgme_widget_message_date time').attr('datetime') || '';
+      if (!datetime) {
+        console.warn(`Missing datetime for message ${id}`);
+      }
 
       // Check if message is forwarded
       const $forwardedFromElem = $message.find('.tgme_widget_message_forwarded_from_name');

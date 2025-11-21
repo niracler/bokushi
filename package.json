@@ -8,7 +8,8 @@
         "preview": "astro preview",
         "astro": "astro",
         "format": "biome format --write .",
-        "lint": "biome check ."
+        "lint": "biome check .",
+        "prepare": "husky"
     },
     "dependencies": {
         "@astrojs/cloudflare": "^12.6.10",
@@ -19,6 +20,7 @@
         "@tailwindcss/vite": "^4.1.14",
         "astro": "^5.15.6",
         "astro-icon": "^1.1.5",
+        "astro-masonry": "^1.2.2",
         "cheerio": "^1.1.2",
         "markdown-it": "^14.1.0",
         "mermaid": "^11.10.0",
@@ -35,6 +37,8 @@
     "devDependencies": {
         "@astrojs/check": "^0.9.5",
         "@biomejs/biome": "^2.3.2",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.2.7",
         "playwright": "^1.55.1",
         "wrangler": "^4.18.0"
     }
