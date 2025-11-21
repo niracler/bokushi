@@ -23,11 +23,12 @@ export const prerender = false;
 			</header>
 
 			<div class="manga-search-wrapper">
-				<svg class="manga-search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<label for="manga-search" class="sr-only">搜索漫画表情包</label>
+				<svg class="manga-search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 					<circle cx="11" cy="11" r="8"></circle>
 					<path d="m21 21-4.35-4.35"></path>
 				</svg>
-				<input type="text" id="manga-search" class="manga-search" placeholder="搜索标题（跨页，可配合漫画名）..." aria-label="搜索标题" />
+				<input type="text" id="manga-search" class="manga-search" placeholder="搜索标题（跨页，可配合漫画名）..." aria-label="搜索漫画表情包" />
 			</div>
 
 			<div class="filter-section">
@@ -39,12 +40,12 @@ export const prerender = false;
 				</div>
 			</div>
 
-			<div id="loading-state" class="loading-state">
-				<div class="loading-spinner"></div>
+			<div id="loading-state" class="loading-state" role="status" aria-live="polite">
+				<div class="loading-spinner" aria-hidden="true"></div>
 				<p class="loading-text">加载中...</p>
 			</div>
 
-			<div id="error-state" class="manga-hidden error-state">
+			<div id="error-state" class="manga-hidden error-state" role="alert" aria-live="assertive">
 				<p>加载失败，请刷新页面重试</p>
 			</div>
 
@@ -52,12 +53,12 @@ export const prerender = false;
 
 			<div id="load-more-trigger" class="h-1"></div>
 
-			<div id="load-more-indicator" class="manga-hidden loading-more">
-				<div class="loading-spinner small"></div>
+			<div id="load-more-indicator" class="manga-hidden loading-more" role="status" aria-live="polite">
+				<div class="loading-spinner small" aria-hidden="true"></div>
 				<p>加载更多...</p>
 			</div>
 
-			<div id="end-of-list" class="manga-hidden end-of-list">
+			<div id="end-of-list" class="manga-hidden end-of-list" role="status" aria-live="polite">
 				<p>没有更多了~</p>
 			</div>
 
@@ -136,6 +137,19 @@ export const prerender = false;
 		<Footer />
 
 		<style is:global>
+			/* Accessibility */
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border-width: 0;
+			}
+
 			/* Main Layout */
 			.manga-shots-main {
 				max-width: 56rem; /* 与 Header max-w-4xl 接近（4xl=56rem） */
@@ -288,6 +302,13 @@ export const prerender = false;
 				opacity: 0.95;
 			}
 
+			.filter-error {
+				color: var(--color-accent-dark);
+				font-size: var(--font-size-sm);
+				padding: 0.5rem 0;
+				margin: 0;
+			}
+
 			/* Masonry Grid */
 			.manga-masonry-grid {
 				display: flex;
@@ -316,8 +337,29 @@ export const prerender = false;
 				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 				animation: itemFadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1)
 					backwards;
-				animation-delay: calc(var(--item-index, 0) * 0.05s);
 			}
+
+			/* Staggered animation based on data attribute */
+			.manga-shot-item[data-item-index="0"] { animation-delay: 0s; }
+			.manga-shot-item[data-item-index="1"] { animation-delay: 0.05s; }
+			.manga-shot-item[data-item-index="2"] { animation-delay: 0.1s; }
+			.manga-shot-item[data-item-index="3"] { animation-delay: 0.15s; }
+			.manga-shot-item[data-item-index="4"] { animation-delay: 0.2s; }
+			.manga-shot-item[data-item-index="5"] { animation-delay: 0.25s; }
+			.manga-shot-item[data-item-index="6"] { animation-delay: 0.3s; }
+			.manga-shot-item[data-item-index="7"] { animation-delay: 0.35s; }
+			.manga-shot-item[data-item-index="8"] { animation-delay: 0.4s; }
+			.manga-shot-item[data-item-index="9"] { animation-delay: 0.45s; }
+			.manga-shot-item[data-item-index="10"] { animation-delay: 0.5s; }
+			.manga-shot-item[data-item-index="11"] { animation-delay: 0.55s; }
+			.manga-shot-item[data-item-index="12"] { animation-delay: 0.6s; }
+			.manga-shot-item[data-item-index="13"] { animation-delay: 0.65s; }
+			.manga-shot-item[data-item-index="14"] { animation-delay: 0.7s; }
+			.manga-shot-item[data-item-index="15"] { animation-delay: 0.75s; }
+			.manga-shot-item[data-item-index="16"] { animation-delay: 0.8s; }
+			.manga-shot-item[data-item-index="17"] { animation-delay: 0.85s; }
+			.manga-shot-item[data-item-index="18"] { animation-delay: 0.9s; }
+			.manga-shot-item[data-item-index="19"] { animation-delay: 0.95s; }
 
 			@keyframes itemFadeIn {
 				from {
@@ -693,6 +735,14 @@ export const prerender = false;
 		</style>
 
 		<script>
+			// Constants
+			const SEARCH_DEBOUNCE_MS = 250;
+			const IMAGE_PRELOAD_MARGIN = "320px";
+			const IMAGE_LOAD_TIMEOUT_MS = 4000;
+			const LOAD_MORE_ROOT_MARGIN = "200px";
+			const RESIZE_DEBOUNCE_MS = 300;
+			const VIEWPORT_FILL_BUFFER = 120;
+
 			interface MangaShot {
 				id: string;
 				title: string;
@@ -746,6 +796,11 @@ export const prerender = false;
 					renderFilterChips(allMangaList);
 				} catch (error) {
 					console.error("Error loading manga list:", error);
+					// Show error state for filters
+					const filterChips = document.getElementById("filter-chips");
+					if (filterChips) {
+						filterChips.innerHTML = '<p class="filter-error">筛选器加载失败</p>';
+					}
 				}
 			}
 
@@ -812,7 +867,7 @@ export const prerender = false;
 						searchQuery = query;
 						resetPaginationState();
 						loadMangashots(1);
-					}, 250);
+					}, SEARCH_DEBOUNCE_MS);
 				});
 			}
 
@@ -940,7 +995,7 @@ export const prerender = false;
 						while (!isLoading && currentPage < totalPages) {
 							const docHeight = document.documentElement.scrollHeight;
 							const viewport = window.innerHeight;
-							if (docHeight - viewport > 120) break;
+							if (docHeight - viewport > VIEWPORT_FILL_BUFFER) break;
 							await loadMangashots(currentPage + 1);
 						}
 					} finally {
@@ -1008,7 +1063,7 @@ export const prerender = false;
 							loader.src = fullSrc;
 						});
 					},
-					{ rootMargin: "320px 0px" }
+					{ rootMargin: `${IMAGE_PRELOAD_MARGIN} 0px` }
 				);
 
 				return imageObserver;
@@ -1032,7 +1087,7 @@ export const prerender = false;
 				const div = document.createElement("div");
 				div.className = "manga-shot-item";
 				div.dataset.index = String(index);
-				div.style.setProperty("--item-index", String(index));
+				div.dataset.itemIndex = String(index);
 
 				const button = document.createElement("button");
 				button.className = "manga-shot-button";
@@ -1075,7 +1130,7 @@ export const prerender = false;
 						settle();
 					};
 
-					const fallback = window.setTimeout(done, 4000);
+					const fallback = window.setTimeout(done, IMAGE_LOAD_TIMEOUT_MS);
 					const clearAndDone = () => {
 						window.clearTimeout(fallback);
 						done();
@@ -1123,7 +1178,7 @@ export const prerender = false;
 							loadMangashots(currentPage + 1);
 						}
 					},
-					{ rootMargin: "200px" }
+					{ rootMargin: LOAD_MORE_ROOT_MARGIN }
 				);
 
 				loadMoreObserver.observe(loadMoreTrigger);
@@ -1137,7 +1192,7 @@ export const prerender = false;
 					if (rebuilt) {
 						addItemsToMasonry(allShots, 0);
 					}
-				}, 300);
+				}, RESIZE_DEBOUNCE_MS);
 			});
 
 			function setupLightbox() {
