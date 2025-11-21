@@ -36,7 +36,7 @@ sudo nano /etc/caddy/Caddyfile
 
 添加以下配置内容：
 
-```caddy
+```nginx
 example.com {
     reverse_proxy localhost:<PORT>
 }

@@ -19,7 +19,7 @@ import { remarkModifiedTime } from "./remark-modified-time.mjs";
 export default defineConfig({
     site: "https://niracler.com",
     trailingSlash: "never",
-    output: "server", // SSR 模式，支持动态页面
+    output: "static", // 静态模式：全部预渲染（动态页面需要单独配置 prerender: false）
     integrations: [mdx(), sitemap(), icon()],
     adapter: cloudflare({
         imageService: "compile",

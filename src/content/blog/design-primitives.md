@@ -32,11 +32,15 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 选择 [Astro](https://astro.build) 作为框架，主要基于以下考虑：
 
 **静态优先 + 按需动态**
-Astro 5 使用 `output: "server"` 模式配合 `@astrojs/cloudflare` 适配器，这意味着：
+Astro 5 使用 `output: "static"` 模式配合 `@astrojs/cloudflare` 适配器，这意味着：
 
-- 大部分内容静态渲染（博客文章、策展页）
-- 动态内容（Telegram 频道、漫画表情包）通过 SSR 实时生成
+- **默认静态生成**：博客文章、策展页、主页等在构建时预渲染为 HTML
+- **按需 SSR**：需要动态内容的页面（如 Telegram 频道、漫画表情包）通过 `export const prerender = false` 单独开启服务端渲染
 - **零/少 JavaScript 基线**：只有必要的交互才加载 JS（导航抽屉、主题切换、目录、灯箱、评论）
+
+> **架构演进记录**：最初采用 `output: "server"` 全站 SSR 模式，但这是一个过度设计的决策——它会强制所有页面都走服务端渲染，即使是不需要动态内容的静态文章页。这不仅增加了托管成本和复杂度，还破坏了现有的静态部署工作流。
+>
+> **正确做法**：保持 `output: "static"` 为全局默认，仅在需要 SSR 的页面顶部添加 `export const prerender = false`。这样既保留了静态优先的性能优势，又能灵活支持动态内容。
 
 **Content Collections**
 Astro 的内容集合系统让我可以用统一的方式管理不同类型的内容：
