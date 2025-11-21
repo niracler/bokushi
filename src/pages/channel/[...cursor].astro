@@ -11,6 +11,7 @@
 
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
+import GlobalImageLightbox from '../../components/GlobalImageLightbox.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
 import type { TelegramChannel } from '../../utils/telegram';
@@ -21,6 +22,7 @@ export const prerender = false;
 
 const { cursor } = Astro.params;
 const CHANNEL_USERNAME = 'tomoko_channel';
+const CACHE_SECONDS = 300;
 
 // 解析游标参数
 const cursorType = cursor?.startsWith('before-') ? 'before' : cursor?.startsWith('after-') ? 'after' : null;
@@ -53,6 +55,12 @@ const lastPostId = channelData?.posts?.[channelData.posts.length - 1]?.id;
 // - 如果使用了 before 参数且返回了数据，说明还有更早的内容
 const hasNewerPosts = cursorType === 'before' || cursorType === 'after';
 const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.length > 0);
+
+// 为频道页设置短缓存，避免每次刷新都重新抓取
+Astro.response.headers.set(
+  'Cache-Control',
+  `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=30`,
+);
 ---
 
 <!doctype html>
@@ -171,57 +179,16 @@ const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.le
       ) : null}
     </main>
     <Footer />
-
-    <!-- 图片灯箱 -->
-    <div id="image-lightbox" class="lightbox">
-      <button class="lightbox-close" aria-label="关闭">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <img id="lightbox-image" src="" alt="" />
-    </div>
+    <GlobalImageLightbox />
   </body>
 </html>
 
 <script>
-  // 图片点击放大功能
+  // 统一标记频道图片以供全局灯箱使用（并懒加载）
   document.addEventListener('DOMContentLoaded', () => {
-    const lightbox = document.getElementById('image-lightbox');
-    const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement | null;
-    const closeButton = document.querySelector('.lightbox-close');
-
-    // 为所有 telegram 图片添加点击事件
-    document.querySelectorAll('.telegram-post-image').forEach(img => {
-      img.addEventListener('click', () => {
-        const imgElement = img as HTMLImageElement;
-        if (lightboxImage) {
-          lightboxImage.src = imgElement.src;
-          lightboxImage.alt = imgElement.alt;
-        }
-        lightbox?.classList.add('active');
-        document.body.style.overflow = 'hidden';
-      });
-    });
-
-    // 关闭灯箱
-    const closeLightbox = () => {
-      lightbox?.classList.remove('active');
-      document.body.style.overflow = '';
-    };
-
-    closeButton?.addEventListener('click', closeLightbox);
-    lightbox?.addEventListener('click', (e) => {
-      if (e.target === lightbox) {
-        closeLightbox();
-      }
-    });
-
-    // ESC 键关闭
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox?.classList.contains('active')) {
-        closeLightbox();
-      }
+    document.querySelectorAll('.telegram-post .post-content img').forEach((img) => {
+      img.classList.add('telegram-post-image');
+      img.loading = img.loading || 'lazy';
     });
   });
 </script>
@@ -574,13 +541,14 @@ const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.le
     object-fit: contain;
     background: var(--color-bg-muted);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
     cursor: pointer;
+    transform: translateY(0) scale(1);
   }
 
   .post-content :global(.telegram-post-image:hover) {
-    transform: scale(1.02);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.2);
   }
 
   .post-content :global(pre) {

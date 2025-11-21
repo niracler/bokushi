@@ -57,7 +57,7 @@ export default defineConfig({
                 },
             ],
             rehypePicture,
-            rehypeImgSize,
+            [rehypeImgSize, { dir: "./public" }],
             rehypeFigure,
         ],
     },

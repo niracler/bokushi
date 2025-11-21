@@ -25,9 +25,9 @@ const postsByYear = posts.reduce((acc, post) => {
 const groupedPosts = Array.from(postsByYear.entries());
 ---
 
-<section class="space-y-12 sm:space-y-16">
+<section class="section-stack">
 	<div class="flex items-center justify-end">
-		<label class="inline-flex select-none items-center gap-2 text-sm text-[color-mix(in srgb, var(--color-text-secondary) 80%, transparent)]">
+		<label class="inline-flex select-none items-center gap-2 text-sm text-muted">
 			<input
 				id="filter-deepsearch"
 				type="checkbox"
@@ -64,7 +64,7 @@ const groupedPosts = Array.from(postsByYear.entries());
 										</a>
 									</h4>
 
-									<p class="date ml-auto shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-[color-mix(in srgb,var(--color-text-muted)70%,transparent)] transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-xs" data-no-preview>
+									<p class="date ml-auto shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-xs" data-no-preview>
 										<FormattedDate date={post.data.pubDate} />
 									</p>
 								</div>

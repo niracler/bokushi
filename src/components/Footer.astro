@@ -9,110 +9,110 @@ const iconButtonClass =
 const iconClass = "h-7 w-7";
 ---
 
-<footer
-    class="bg-[var(--color-bg-page)] px-4 py-12 text-center text-sm text-[var(--color-text-secondary)]"
-    >
-    <div class="mb-6 flex flex-wrap items-center justify-center gap-3">
-        <a
-            href={SOCIAL_LINKS.telegram}
-            target="_blank"
-            rel="noreferrer"
-            title={SOCIAL_LINKS.telegram}
-            class={iconButtonClass}
-        >
-            <span class="sr-only">Join Niracler on Telegram</span>
-            <Icon
-                name="ri:telegram-fill"
-                class={iconClass}
-                aria-hidden="true"
-            />
-        </a>
-        <a
-            href={SOCIAL_LINKS.github}
-            target="_blank"
-            rel="noreferrer"
-            title={SOCIAL_LINKS.github}
-            class={iconButtonClass}
-        >
-            <span class="sr-only">Go to Niracler's GitHub</span>
-            <Icon name="ri:github-fill" class={iconClass} aria-hidden="true" />
-        </a>
-        <a
-            href={SOCIAL_LINKS.steam}
-            target="_blank"
-            rel="noreferrer"
-            title={SOCIAL_LINKS.steam}
-            class={iconButtonClass}
-        >
-            <span class="sr-only">Visit Niracler on Steam</span>
-            <Icon name="ri:steam-fill" class={iconClass} aria-hidden="true" />
-        </a>
-        <a
-            href={SOCIAL_LINKS.douban}
-            target="_blank"
-            rel="noreferrer"
-            title={SOCIAL_LINKS.douban}
-            class={iconButtonClass}
-        >
-            <span class="sr-only">Visit Niracler on Douban</span>
-            <Icon name="ri:douban-fill" class={iconClass} aria-hidden="true" />
-        </a>
-        <a
-            href={SOCIAL_LINKS.email}
-            title={SOCIAL_LINKS.email.replace("mailto:", "")}
-            class={iconButtonClass}
-        >
-            <span class="sr-only">Send email to Niracler</span>
-            <Icon name="ri:mail-fill" class={iconClass} aria-hidden="true" />
-        </a>
-        <a
-            href={SOCIAL_LINKS.twitter}
-            target="_blank"
-            rel="noreferrer"
-            title={SOCIAL_LINKS.twitter}
-            class={iconButtonClass}
-        >
-            <span class="sr-only">Follow Niracler on X</span>
-            <Icon name="ri:twitter-fill" class={iconClass} aria-hidden="true" />
-        </a>
-        <a href={SOCIAL_LINKS.rss} title="RSS Feed" class={iconButtonClass}>
-            <span class="sr-only">Subscribe to RSS Feed</span>
-            <Icon name="ri:rss-fill" class={iconClass} aria-hidden="true" />
-        </a>
-    </div>
-    <div class="mt-4">
-        &copy; {today.getFullYear()} Niracler.
-        <a
-            href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
-            target="_blank"
-            rel="license noopener noreferrer"
-            class="inline-flex items-center gap-2 transition-colors hover:text-[var(--color-accent)]"
-            title="本站内容采用 CC BY-NC-SA 4.0 国际许可协议"
-        >
-            <span>CC BY-NC-SA 4.0</span>
-            <span class="inline-flex items-center gap-1 text-base text-[var(--color-text-secondary)]">
+<footer class="bg-[var(--color-bg-page)] py-12 text-center text-sm text-secondary">
+    <div class="page-shell space-y-6">
+        <div class="flex flex-wrap items-center justify-center gap-3">
+            <a
+                href={SOCIAL_LINKS.telegram}
+                target="_blank"
+                rel="noreferrer"
+                title={SOCIAL_LINKS.telegram}
+                class={iconButtonClass}
+            >
+                <span class="sr-only">Join Niracler on Telegram</span>
                 <Icon
-                    name="ri:creative-commons-fill"
-                    class="h-4 w-4"
+                    name="ri:telegram-fill"
+                    class={iconClass}
                     aria-hidden="true"
                 />
-                <Icon
-                    name="ri:creative-commons-by-fill"
-                    class="h-4 w-4"
-                    aria-hidden="true"
-                />
-                <Icon
-                    name="ri:creative-commons-nc-fill"
-                    class="h-4 w-4"
-                    aria-hidden="true"
-                />
-                <Icon
-                    name="ri:creative-commons-sa-fill"
-                    class="h-4 w-4"
-                    aria-hidden="true"
-                />
-            </span>
-        </a>
+            </a>
+            <a
+                href={SOCIAL_LINKS.github}
+                target="_blank"
+                rel="noreferrer"
+                title={SOCIAL_LINKS.github}
+                class={iconButtonClass}
+            >
+                <span class="sr-only">Go to Niracler's GitHub</span>
+                <Icon name="ri:github-fill" class={iconClass} aria-hidden="true" />
+            </a>
+            <a
+                href={SOCIAL_LINKS.steam}
+                target="_blank"
+                rel="noreferrer"
+                title={SOCIAL_LINKS.steam}
+                class={iconButtonClass}
+            >
+                <span class="sr-only">Visit Niracler on Steam</span>
+                <Icon name="ri:steam-fill" class={iconClass} aria-hidden="true" />
+            </a>
+            <a
+                href={SOCIAL_LINKS.douban}
+                target="_blank"
+                rel="noreferrer"
+                title={SOCIAL_LINKS.douban}
+                class={iconButtonClass}
+            >
+                <span class="sr-only">Visit Niracler on Douban</span>
+                <Icon name="ri:douban-fill" class={iconClass} aria-hidden="true" />
+            </a>
+            <a
+                href={SOCIAL_LINKS.email}
+                title={SOCIAL_LINKS.email.replace("mailto:", "")}
+                class={iconButtonClass}
+            >
+                <span class="sr-only">Send email to Niracler</span>
+                <Icon name="ri:mail-fill" class={iconClass} aria-hidden="true" />
+            </a>
+            <a
+                href={SOCIAL_LINKS.twitter}
+                target="_blank"
+                rel="noreferrer"
+                title={SOCIAL_LINKS.twitter}
+                class={iconButtonClass}
+            >
+                <span class="sr-only">Follow Niracler on X</span>
+                <Icon name="ri:twitter-fill" class={iconClass} aria-hidden="true" />
+            </a>
+            <a href={SOCIAL_LINKS.rss} title="RSS Feed" class={iconButtonClass}>
+                <span class="sr-only">Subscribe to RSS Feed</span>
+                <Icon name="ri:rss-fill" class={iconClass} aria-hidden="true" />
+            </a>
+        </div>
+        <div class="text-muted">
+            &copy; {today.getFullYear()} Niracler.
+            <a
+                href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                target="_blank"
+                rel="license noopener noreferrer"
+                class="inline-flex items-center gap-2 transition-colors hover:text-[var(--color-accent)]"
+                title="本站内容采用 CC BY-NC-SA 4.0 国际许可协议"
+            >
+                <span>CC BY-NC-SA 4.0</span>
+                <span class="inline-flex items-center gap-1 text-base text-[var(--color-text-secondary)]">
+                    <Icon
+                        name="ri:creative-commons-fill"
+                        class="h-4 w-4"
+                        aria-hidden="true"
+                    />
+                    <Icon
+                        name="ri:creative-commons-by-fill"
+                        class="h-4 w-4"
+                        aria-hidden="true"
+                    />
+                    <Icon
+                        name="ri:creative-commons-nc-fill"
+                        class="h-4 w-4"
+                        aria-hidden="true"
+                    />
+                    <Icon
+                        name="ri:creative-commons-sa-fill"
+                        class="h-4 w-4"
+                        aria-hidden="true"
+                    />
+                </span>
+            </a>
+        </div>
     </div>
 </footer>
 <PostPreviewSetup />

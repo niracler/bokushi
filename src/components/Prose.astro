@@ -5,3 +5,56 @@ const { class: className = "" } = Astro.props;
 <div class:list={['prose', className]}>
 	<slot />
 </div>
+
+<style is:global>
+	.prose img,
+	.prose picture {
+		border-radius: var(--radius-lg);
+		box-shadow: 0 6px 14px rgba(var(--color-text-primary-rgb), 0.16) !important;
+		filter: drop-shadow(0 5px 12px rgba(var(--color-text-primary-rgb), 0.18)) !important;
+		transition:
+			transform 0.22s ease,
+			box-shadow 0.22s ease,
+			filter 0.22s ease;
+		transform: translateY(0) scale(1);
+	}
+
+	.prose figure {
+		box-shadow: 0 6px 14px rgba(var(--color-text-primary-rgb), 0.16) !important;
+		border-radius: var(--radius-lg);
+		transition:
+			transform 0.22s ease,
+			box-shadow 0.22s ease;
+		transform: translateY(0) scale(1);
+	}
+
+	.prose figure:hover,
+	.prose img:hover,
+	.prose picture:hover {
+		transform: translateY(-4px) scale(1.04);
+		box-shadow: 0 8px 20px rgba(var(--color-text-primary-rgb), 0.22) !important;
+		filter: drop-shadow(0 7px 20px rgba(var(--color-text-primary-rgb), 0.24)) !important;
+	}
+</style>
+
+<script is:global>
+    // 确保阴影样式生效（少数情况下全局样式被冲掉时补一手）
+    const applyImageEffects = () => {
+        document.querySelectorAll(".prose img, .prose picture").forEach((el) => {
+            const target = /** @type {HTMLElement} */ (el);
+            target.style.setProperty("box-shadow", "0 6px 14px rgba(0, 0, 0, 0.16)", "important");
+            target.style.setProperty("filter", "drop-shadow(0 5px 12px rgba(0, 0, 0, 0.18))", "important");
+            target.style.setProperty("border-radius", "var(--radius-lg)", "important");
+            target.style.setProperty(
+                "transition",
+                "transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease",
+            );
+        });
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", applyImageEffects, { once: true });
+    } else {
+        applyImageEffects();
+    }
+</script>
