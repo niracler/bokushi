@@ -9,40 +9,44 @@
  * @author Niracler
  */
 
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import GlobalImageLightbox from '../../components/GlobalImageLightbox.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
-import type { TelegramChannel } from '../../utils/telegram';
-import { fetchTelegramChannel } from '../../utils/telegram';
+import BaseHead from "../../components/BaseHead.astro";
+import Footer from "../../components/Footer.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import GlobalImageLightbox from "../../components/GlobalImageLightbox.astro";
+import Header from "../../components/Header.astro";
+import type { TelegramChannel } from "../../utils/telegram";
+import { fetchTelegramChannel } from "../../utils/telegram";
 
 // Enable server-side rendering for this dynamic route
 export const prerender = false;
 
 const { cursor } = Astro.params;
-const CHANNEL_USERNAME = 'tomoko_channel';
+const CHANNEL_USERNAME = "tomoko_channel";
 const CACHE_SECONDS = 300;
 
 // 解析游标参数
-const cursorType = cursor?.startsWith('before-') ? 'before' : cursor?.startsWith('after-') ? 'after' : null;
-const cursorValue = cursor ? cursor.replace(/^(before-|after-)/, '') : undefined;
+const cursorType = cursor?.startsWith("before-")
+    ? "before"
+    : cursor?.startsWith("after-")
+      ? "after"
+      : null;
+const cursorValue = cursor ? cursor.replace(/^(before-|after-)/, "") : undefined;
 
 let channelData: TelegramChannel | undefined;
 let error: string | null = null;
 
 try {
-  const options: { before?: string; after?: string } = {};
-  if (cursorType === 'before' && cursorValue) {
-    options.before = cursorValue;
-  } else if (cursorType === 'after' && cursorValue) {
-    options.after = cursorValue;
-  }
+    const options: { before?: string; after?: string } = {};
+    if (cursorType === "before" && cursorValue) {
+        options.before = cursorValue;
+    } else if (cursorType === "after" && cursorValue) {
+        options.after = cursorValue;
+    }
 
-  channelData = await fetchTelegramChannel(CHANNEL_USERNAME, options);
+    channelData = await fetchTelegramChannel(CHANNEL_USERNAME, options);
 } catch (e) {
-  error = e instanceof Error ? e.message : 'Failed to load channel';
-  console.error('Error loading Telegram channel:', e);
+    error = e instanceof Error ? e.message : "Failed to load channel";
+    console.error("Error loading Telegram channel:", e);
 }
 
 // 获取第一篇和最后一篇文章的 ID 用于分页
@@ -53,13 +57,13 @@ const lastPostId = channelData?.posts?.[channelData.posts.length - 1]?.id;
 // - 如果是首页（没有 cursor），总是显示"更早的动态"按钮（假设有历史内容）
 // - 如果使用了 after 参数，说明正在查看更新的内容，可以回到最新
 // - 如果使用了 before 参数且返回了数据，说明还有更早的内容
-const hasNewerPosts = cursorType === 'before' || cursorType === 'after';
+const hasNewerPosts = cursorType === "before" || cursorType === "after";
 const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.length > 0);
 
 // 为频道页设置短缓存，避免每次刷新都重新抓取
 Astro.response.headers.set(
-  'Cache-Control',
-  `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=30`,
+    "Cache-Control",
+    `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=30`,
 );
 ---
 
@@ -186,7 +190,8 @@ Astro.response.headers.set(
 <script>
   // 统一标记频道图片以供全局灯箱使用（并懒加载）
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.telegram-post .post-content img').forEach((img) => {
+    document.querySelectorAll('.telegram-post .post-content img').forEach((element) => {
+      const img = element as HTMLImageElement;
       img.classList.add('telegram-post-image');
       img.loading = img.loading || 'lazy';
     });

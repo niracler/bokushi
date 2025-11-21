@@ -1,11 +1,11 @@
 ---
-import { type CollectionEntry, getEntry } from "astro:content";
 import { Image } from "astro:assets";
+import { type CollectionEntry, getEntry } from "astro:content";
 
 interface Props {
-  galleryid: string;
-  gallery?: CollectionEntry<"galleries">;
-  transitionType?: string;
+    galleryid: string;
+    gallery?: CollectionEntry<"galleries">;
+    transitionType?: string;
 }
 
 const { galleryid, transitionType } = Astro.props;
@@ -439,20 +439,6 @@ const images = gallery?.data.images ?? [];
 <script>
   // Types for better type
   // This can me moved to an external .ts file.
-  interface LightboxElements {
-    thumbnailButtons: NodeListOf<HTMLButtonElement>;
-    lightboxDialog: HTMLDialogElement | null;
-    prevButton: HTMLButtonElement | null;
-    nextButton: HTMLButtonElement | null;
-    closeButton: HTMLButtonElement | null;
-  }
-
-  interface LightboxState {
-    currentIndex: number;
-    resizeTimeout?: number;
-    closeDuration: number;
-    debug: boolean;
-  }
 
   document.addEventListener("astro:page-load", () => {
     const thumbnailButtons = document.querySelectorAll<HTMLButtonElement>(

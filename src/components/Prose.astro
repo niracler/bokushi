@@ -37,7 +37,7 @@ const { class: className = "" } = Astro.props;
 	}
 </style>
 
-<script is:global>
+<script is:inline>
     // 确保阴影样式生效（少数情况下全局样式被冲掉时补一手）
     const applyImageEffects = () => {
         document.querySelectorAll(".prose img, .prose picture").forEach((el) => {
