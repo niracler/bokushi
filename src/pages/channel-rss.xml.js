@@ -8,35 +8,35 @@ import { fetchTelegramChannel } from "../utils/telegram";
  * Returns emoji prefix for the title
  */
 function detectMediaType(content) {
-    if (!content) return '';
+    if (!content) return "";
 
     // Check for different media types
-    if (content.includes('telegram-images')) {
+    if (content.includes("telegram-images")) {
         // Has images
         if (content.match(/<img[^>]*>/g)?.length > 1) {
-            return '🖼 '; // Multiple photos
+            return "🖼 "; // Multiple photos
         }
-        return '📷 '; // Single photo
+        return "📷 "; // Single photo
     }
 
     // Could add more types: video 🎬, document 📄, voice 🎙, etc.
-    return '';
+    return "";
 }
 
 /**
  * Extract plain text from HTML content
  */
 function htmlToText(html) {
-    if (!html) return '';
+    if (!html) return "";
     return html
-        .replace(/<div[^>]*class="telegram-images"[^>]*>[\s\S]*?<\/div>/g, '') // Remove image containers
-        .replace(/<br\s*\/?>/gi, '\n') // Convert br to newlines
-        .replace(/<\/p>/gi, '\n') // Convert closing p to newlines
-        .replace(/<[^>]+>/g, '') // Remove all HTML tags
-        .replace(/&nbsp;/g, ' ')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&')
+        .replace(/<div[^>]*class="telegram-images"[^>]*>[\s\S]*?<\/div>/g, "") // Remove image containers
+        .replace(/<br\s*\/?>/gi, "\n") // Convert br to newlines
+        .replace(/<\/p>/gi, "\n") // Convert closing p to newlines
+        .replace(/<[^>]+>/g, "") // Remove all HTML tags
+        .replace(/&nbsp;/g, " ")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&")
         .trim();
 }
 
@@ -58,23 +58,23 @@ function generateTitle(content, maxLength = 80) {
 
     // First, clean up text but KEEP newlines for splitting
     let title = text
-        .replace(/^[🔖🌟]\s*/u, '') // Remove bookmark emojis
-        .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Remove all other emojis
+        .replace(/^[🔖🌟]\s*/u, "") // Remove bookmark emojis
+        .replace(/[\u{1F300}-\u{1F9FF}]/gu, "") // Remove all other emojis
         .trim();
 
     // Extract first meaningful line(s)
-    let firstLine = title.split('\n')[0].trim();
+    let firstLine = title.split("\n")[0].trim();
 
     // If first line is just hashtag(s) or too short, take the next line too
     if (firstLine.length < 15 || /^[#@\s]+$/.test(firstLine)) {
-        const lines = title.split('\n').filter(l => l.trim().length > 0);
-        firstLine = lines.slice(0, 2).join(' ').trim();
+        const lines = title.split("\n").filter((l) => l.trim().length > 0);
+        firstLine = lines.slice(0, 2).join(" ").trim();
     }
 
     // Now remove hashtags/mentions and normalize whitespace
     firstLine = firstLine
-        .replace(/[#@]/g, '') // Remove hashtag and mention symbols
-        .replace(/\s+/g, ' ') // Normalize whitespace
+        .replace(/[#@]/g, "") // Remove hashtag and mention symbols
+        .replace(/\s+/g, " ") // Normalize whitespace
         .trim();
 
     // Try to extract a meaningful sentence
@@ -103,9 +103,8 @@ function generateTitle(content, maxLength = 80) {
     // Limit length and add ellipsis if needed
     if (title.length > maxLength) {
         // Try to cut at a natural boundary (space, comma, etc.)
-        const cutPoint = title.lastIndexOf(' ', maxLength) ||
-                        title.lastIndexOf('，', maxLength) ||
-                        maxLength;
+        const cutPoint =
+            title.lastIndexOf(" ", maxLength) || title.lastIndexOf("，", maxLength) || maxLength;
         title = `${title.substring(0, cutPoint).trim()}...`;
     }
 
@@ -123,9 +122,9 @@ function generateDescription(html, maxLength = 200) {
 
     // Strip HTML tags
     let text = html
-        .replace(/<[^>]*>/g, '') // Remove HTML tags
-        .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Remove emojis
-        .replace(/\s+/g, ' ') // Normalize whitespace
+        .replace(/<[^>]*>/g, "") // Remove HTML tags
+        .replace(/[\u{1F300}-\u{1F9FF}]/gu, "") // Remove emojis
+        .replace(/\s+/g, " ") // Normalize whitespace
         .trim();
 
     // Limit length
@@ -145,9 +144,9 @@ function fixHashtagLinks(html, channelUsername) {
     return html.replace(
         /<a href="\?q=([^"]+)" target="_blank">(#[^<]+)<\/a>/g,
         (_match, _query, hashtag) => {
-            const tag = hashtag.replace('#', '');
+            const tag = hashtag.replace("#", "");
             return `<a href="https://t.me/s/${channelUsername}?q=%23${encodeURIComponent(tag)}" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
-        }
+        },
     );
 }
 
@@ -174,9 +173,7 @@ export async function GET(context) {
                     pubDate: new Date(post.datetime),
                     link: `https://t.me/${CHANNEL_USERNAME}/${post.id}`,
                     content: sanitizeHtml(fixedContent, {
-                        allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-                            "img",
-                        ]),
+                        allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
                         allowedAttributes: {
                             ...sanitizeHtml.defaults.allowedAttributes,
                             img: ["src", "alt", "loading", "class"],

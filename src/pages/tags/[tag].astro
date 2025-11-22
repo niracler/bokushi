@@ -9,33 +9,29 @@ import { SITE_TITLE } from "../../consts";
 export const prerender = true;
 
 export async function getStaticPaths() {
-	const blogPosts = await getCollection("blog");
-	const monthlyPosts = await getCollection("monthly");
-	const tilPosts = await getCollection("til");
-	const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter(
-		(post) => !post.data.hidden,
-	);
-	const uniqueTags = [
-		...new Set(allPosts.flatMap((post) => post.data.tags || [])),
-	];
+    const blogPosts = await getCollection("blog");
+    const monthlyPosts = await getCollection("monthly");
+    const tilPosts = await getCollection("til");
+    const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter(
+        (post) => !post.data.hidden,
+    );
+    const uniqueTags = [...new Set(allPosts.flatMap((post) => post.data.tags || []))];
 
-	return uniqueTags.map((tag) => {
-		const filteredPosts = allPosts.filter((post) =>
-			(post.data.tags || []).includes(tag),
-		);
-		return {
-			params: { tag },
-			props: { posts: filteredPosts },
-		};
-	});
+    return uniqueTags.map((tag) => {
+        const filteredPosts = allPosts.filter((post) => (post.data.tags || []).includes(tag));
+        return {
+            params: { tag },
+            props: { posts: filteredPosts },
+        };
+    });
 }
 
 const { tag } = Astro.params;
 const { posts } = Astro.props;
 
 const sortedPosts = posts
-	.filter((post) => !post.data.hidden)
-	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    .filter((post) => !post.data.hidden)
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>

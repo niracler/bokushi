@@ -14,10 +14,7 @@ export async function getStaticPaths() {
         props: post,
     }));
 }
-type BlogEntry =
-    | CollectionEntry<"blog">
-    | CollectionEntry<"monthly">
-    | CollectionEntry<"til">;
+type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
 type Props = BlogEntry;
 
 const post = Astro.props;

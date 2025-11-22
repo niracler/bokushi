@@ -298,7 +298,7 @@
         overflow-x: auto;
     }
 
-    html[data-theme='dark'] .prose pre {
+    html[data-theme="dark"] .prose pre {
         background: #282a36 !important;
         border-color: rgba(255, 255, 255, 0.1);
     }
@@ -330,7 +330,7 @@
     }
 
     /* Shiki syntax highlighting - Dark theme */
-    html[data-theme='dark'] .prose pre code span {
+    html[data-theme="dark"] .prose pre code span {
         color: var(--shiki-dark) !important;
         font-style: var(--shiki-dark-font-style) !important;
         font-weight: var(--shiki-dark-font-weight) !important;
@@ -400,7 +400,7 @@
         background: #f6f8fa !important;
     }
 
-    html[data-theme='dark'] .code-block-wrapper pre {
+    html[data-theme="dark"] .code-block-wrapper pre {
         background: #282a36 !important;
     }
 
@@ -892,7 +892,10 @@
         font-weight: 600;
         letter-spacing: 0.04em;
         text-transform: none;
-        transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        transition:
+            color 0.2s ease,
+            border-color 0.2s ease,
+            background 0.2s ease;
     }
 
     .pill[data-tone="accent"] {
@@ -929,7 +932,9 @@
         border-bottom: 1px solid color-mix(in srgb, var(--color-link) 70%, transparent);
         transform-origin: left;
         transform: scaleX(0.6);
-        transition: transform 0.25s ease, border-color 0.25s ease;
+        transition:
+            transform 0.25s ease,
+            border-color 0.25s ease;
     }
 
     .underline-link:hover::after {
