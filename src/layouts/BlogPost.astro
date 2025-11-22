@@ -9,6 +9,7 @@ import GlobalImageLightbox from "../components/GlobalImageLightbox.astro";
 import Prose from "../components/Prose.astro";
 import Remark42Comments from "../components/Remark42Comments.astro";
 import TableOfContents from "../components/TableOfContents.astro";
+import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
 import { extractDescription } from "../utils/extractDescription";
 
 type EntryData =
@@ -38,10 +39,7 @@ const {
 
 const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
 
-// 文章默认题图（当文章未设置 socialImage 时使用）
-const ARTICLE_DEFAULT_IMAGE =
-    "https://image.niracler.com/2025/03/2e3bf667bb2c02aa253c16a0aae5b762.png";
-const imageSrc = socialImage || ARTICLE_DEFAULT_IMAGE;
+const imageSrc = socialImage || DEFAULT_POST_SOCIAL_IMAGE;
 
 // 只有当文章有足够的标题时才显示目录（至少 2 个 h2/h3）
 const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;

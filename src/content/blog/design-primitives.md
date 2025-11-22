@@ -597,6 +597,16 @@ Telegram 图片直接引用可能在某些地区无法访问，所以走本域�
 - 导航/目录脚本可按需加载（目前是全局加载）
 - Pandabox 可抽离为共享灯箱（目前与 GlobalImageLightbox 功能重复）
 
+### PageSpeed 实战记录（2025-11-22）
+
+- 字体优化：用 `pyftsubset` 生成 `jf-openhuninn-2.1.subset.woff2`（≈385 KB，覆盖当前内容字符集），`font-display: optional`，移除 TTF 回退，减轻 LCP 链。
+- 缓存策略：`public/_headers` 为 `/fonts/*`、`/_astro/*`、`/images/*` 设置一年 immutable，默认 10 分钟；RSS/Sitemap 1 天。
+- 阻塞脚本：在 Cloudflare 关闭 Email Obfuscation（去掉 `email-decode.min.js`）、可选关闭 Pages Analytics（去掉 `beacon.min.js`），避免 render-blocking / 短 TTL 提示。
+- robots 修复：新增 `public/robots.txt` 指向 `sitemap-index.xml`，通过 Lighthouse SEO 检查。
+- 当前 Mobile 报告（慢 4G 模拟，Moto G Power）：FCP 11.6s、LCP 12.2s、TBT 0、CLS 0，Performance 56。主要瓶颈为网络带宽 + 首屏文字/字体加载。
+
+![PageSpeed Insights mobile report (2025-11-22)](/images/psi-mobile-2025-11-22.png)
+
 ---
 
 ## 待重构的部分

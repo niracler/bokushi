@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
 import { extractDescription } from "../utils/extractDescription";
 
 interface PostMeta {
@@ -14,9 +15,20 @@ interface Props {
 
 const { meta } = Astro.props as Props;
 
-let postMetaMap: Record<string, PostMeta> | undefined = meta;
+const normalizeMetaMap = (map: Record<string, PostMeta>): Record<string, PostMeta> =>
+    Object.entries(map).reduce<Record<string, PostMeta>>((acc, [id, value]) => {
+        acc[id] = {
+            ...value,
+            image: value.image || DEFAULT_POST_SOCIAL_IMAGE,
+        };
+        return acc;
+    }, {});
 
-if (!postMetaMap) {
+let postMetaMap: Record<string, PostMeta>;
+
+if (meta) {
+    postMetaMap = meta;
+} else {
     const [blogPosts, monthlyPosts, tilPosts] = await Promise.all([
         getCollection("blog"),
         getCollection("monthly"),
@@ -35,6 +47,8 @@ if (!postMetaMap) {
         return acc;
     }, {});
 }
+
+postMetaMap = normalizeMetaMap(postMetaMap);
 
 const serializedMeta = JSON.stringify(postMetaMap).replace(/</g, "\\u003c");
 ---
