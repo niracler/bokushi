@@ -8,13 +8,13 @@ tags: [ "TIL", "照明", "色温", "调光", "DeepSearch" ]
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
 
-## 1 要点总结
+## 要点总结
 
 Mired 和 Kelvin 是色温控制中常用的两种单位。Kelvin (K) 直接测量光源的色温，是色温的标准单位。然而，人类对色温变化的感知并非线性，例如 3000K 到 4000K 的变化比 5000K 到 6000K 的变化在视觉上更为显著。Mired（微互成度）是 Kelvin 的倒数乘以一百万（$M = \frac{1,000,000}{T}$），它提供了一个更符合人类感知的线性尺度。色温概念起源于17世纪牛顿的光学实验，Kelvin 温标在19世纪由开尔文勋爵提出。1932年，Irwin G. Priest 提出了 Mired 的概念，以解决 Kelvin 尺度在感知上的非线性问题。色温广泛应用于摄影（白平衡）、照明设计（营造氛围）和显示技术（颜色校准）等领域。
 
-## 2 Mired 和 Kelvin 的定义与区别
+## Mired 和 Kelvin 的定义与区别
 
-### 2.1 Kelvin (K)
+### Kelvin (K)
 
 Kelvin 是国际单位制中温度的基本单位，也用于衡量光源的颜色温度。色温描述的是一个理想黑体辐射器加热到特定温度时所发出的光的颜色。例如：
 
@@ -25,7 +25,7 @@ Kelvin 是国际单位制中温度的基本单位，也用于衡量光源的颜�
 
 Kelvin 值直接反映了光源的物理特性。然而，正如前面提到的，Kelvin 尺度在描述人类对色温变化的感知时存在非线性问题。
 
-### 2.2 Mired (Micro Reciprocal Degree)
+### Mired (Micro Reciprocal Degree)
 
 Mired，即微倒数度或微互成度，是为了弥补 Kelvin 在感知线性度上的不足而引入的单位。其计算公式为：
 
@@ -40,7 +40,7 @@ $$ M = \frac{1,000,000}{T_K} $$
 
 这更准确地反映了人眼对前者色温变化更为敏感的事实。
 
-### 2.3 主要区别
+### 主要区别
 
 | 特性         | Kelvin (K)                             | Mired                                      |
 |--------------|----------------------------------------|--------------------------------------------|
@@ -51,7 +51,7 @@ $$ M = \frac{1,000,000}{T_K} $$
 
 在实际应用中，Kelvin 通常用于标识光源本身固有的色温类型，而 Mired 则更多地应用于需要调整或校正色温的场景，尤其是在摄影和专业照明领域，它可以帮助精确计算所需的滤镜强度。
 
-## 3 Mired 和 Kelvin 的前世今生
+## Mired 和 Kelvin 的前世今生
 
 色温概念的发展历程漫长而有趣：
 
@@ -62,7 +62,7 @@ $$ M = \frac{1,000,000}{T_K} $$
 
 苹果的 HomeKit 平台也采用 Mired 来指定灯光的色温，进一步证明了其在现代智能家居技术中的实用性。
 
-## 4 关于色温的那些事
+## 关于色温的那些事
 
 色温不仅仅是一个物理参数，它深刻影响着我们的视觉体验和心理感受。
 
@@ -83,7 +83,7 @@ $$ M = \frac{1,000,000}{T_K} $$
 * **显示技术与色彩校准**：
     显示器、电视和投影仪等设备的色彩表现也与色温密切相关。D65 (对应约 6504K) 是一个常见的行业标准白点，用于确保在不同设备上观看内容时颜色的一致性。
 
-### 4.1 常见光源色温及对应 Mired 值
+### 常见光源色温及对应 Mired 值
 
 | 光源类型           | 色温 (K)       | Mired 值 |
 |--------------------|----------------|----------|
@@ -102,13 +102,13 @@ $$ M = \frac{1,000,000}{T_K} $$
 
 *数据来源: 综合 Wikipedia 及行业常见数值。*
 
-## 5 总结与展望
+## 总结与展望
 
 Kelvin 和 Mired 都是描述色温的重要单位，但它们各有侧重。Kelvin 直接定义了光源的物理色温，而 Mired 则提供了一个更符合人类视觉感知的尺度，尤其在需要精确调整色温的摄影和照明领域中至关重要。从牛顿的光学启蒙到现代复杂的照明系统，对色温的理解和应用不断深化。随着 LED 技术和智能控制系统的发展，未来我们可以期待更加个性化、更利于健康的动态色温照明方案，Mired 和 Kelvin 的概念将继续在其中扮演核心角色。
 
 ---
 
-## 6 参考资料与拓展阅读
+## 参考资料与拓展阅读
 
 * [Mired - Wikipedia](https://en.wikipedia.org/wiki/Mired)
 * [Color temperature - Wikipedia](https://en.wikipedia.org/wiki/Color_temperature)
@@ -119,3 +119,4 @@ Kelvin 和 Mired 都是描述色温的重要单位，但它们各有侧重。Kel
 * [Color Temperature - Evident Scientific](https://evidentscientific.com/en/microscope-resource/knowledge-hub/lightandcolor/colortemp)
 * [Mired/Filter Calculator - Points in Focus Photography](https://www.pointsinfocus.com/tools/mired-calculator/)
 * [WHAT COLOUR IS THAT TEMPERATURE? - Video & Filmmaker magazine](https://videoandfilmmaker.com/wp/tutorials/colour-temperature/)
+

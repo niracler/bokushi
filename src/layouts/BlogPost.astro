@@ -5,9 +5,11 @@ import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import Header from "../components/Header.astro";
+import GlobalImageLightbox from "../components/GlobalImageLightbox.astro";
 import Prose from "../components/Prose.astro";
 import Remark42Comments from "../components/Remark42Comments.astro";
 import TableOfContents from "../components/TableOfContents.astro";
+import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
 import { extractDescription } from "../utils/extractDescription";
 
 type EntryData =
@@ -18,6 +20,8 @@ type EntryData =
 type Props = EntryData & {
     body?: string;
     headings?: MarkdownHeading[];
+    lastModified?: string;
+    lastModifiedCommitUrl?: string | null;
 };
 
 const {
@@ -29,22 +33,26 @@ const {
     body,
     tags,
     headings = [],
+    lastModified,
+    lastModifiedCommitUrl,
 } = Astro.props;
 
 const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
+
+const imageSrc = socialImage || DEFAULT_POST_SOCIAL_IMAGE;
 
 // 只有当文章有足够的标题时才显示目录（至少 2 个 h2/h3）
 const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;
 ---
 
-<html lang="en">
+<html lang="zh-CN">
 	<head>
-		<BaseHead title={title} description={description} image={socialImage} />
+		<BaseHead title={title} description={description} image={imageSrc} />
 	</head>
 
 	<body>
 		<Header />
-		<main class="px-4">
+		<main class="page-shell max-w-none">
 			<div
 				data-toc-container
 				class:list={[
@@ -53,19 +61,32 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 			>
 				<article
 					class:list={[
-						'mx-auto max-w-3xl space-y-10 text-[var(--color-text-secondary)]',
+						'mx-auto max-w-3xl space-y-10 text-secondary',
 					]}
 				>
 						<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
 						<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">{title}</h1>
-						<div class="space-y-2 text-sm text-[var(--color-text-muted)]">
+						<div class="space-y-2 text-sm text-muted">
 							<p>
 								<FormattedDate date={pubDate} />
 							</p>
 							{
-								updatedDate && (
+								(lastModified || updatedDate) && (
 									<p>
-										Last updated on <FormattedDate date={updatedDate} />
+										Last updated on {
+											lastModifiedCommitUrl ? (
+												<a
+													href={lastModifiedCommitUrl}
+													target="_blank"
+													rel="noopener noreferrer"
+													class="underline decoration-dotted underline-offset-4 hover:text-[var(--color-accent)] transition-colors"
+												>
+													<FormattedDate date={lastModified ? new Date(lastModified) : updatedDate!} />
+												</a>
+											) : (
+												<FormattedDate date={lastModified ? new Date(lastModified) : updatedDate!} />
+											)
+										}
 									</p>
 								)
 							}
@@ -75,7 +96,8 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 								{tags.map((tag: string) => (
 									<a
 										href={`/tags/${tag}`}
-										class="inline-flex items-center rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-medium text-[var(--color-text-primary)] transition-colors hover:bg-[rgba(var(--color-accent-rgb),0.15)] hover:text-[var(--color-accent)]"
+										class="pill"
+										data-tone="accent"
 									>
 										{tag}
 									</a>
@@ -141,11 +163,12 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						</>
 					)}
 
-					<Prose>
+					<Prose class="text-secondary">
 						<slot />
 					</Prose>
 
 					<Remark42Comments />
+					<GlobalImageLightbox />
 				</article>
 
 				{showToc && (
@@ -162,339 +185,14 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 		<Footer />
 	</body>
 	<script>
-		// Mermaid 图表现在在构建时渲染为内联 SVG，无需客户端初始化
-
-		if (typeof window !== 'undefined') {
-			const unwrapCardCells = (table: HTMLTableElement) => {
-				const cardCells = table.querySelectorAll('[data-cardified]');
-
-				cardCells.forEach((cell: Element) => {
-					const wrapper = cell.querySelector('.table-card-value');
-					if (wrapper) {
-						while (wrapper.firstChild) {
-							cell.insertBefore(wrapper.firstChild, wrapper);
-						}
-						wrapper.remove();
-					}
-					cell.removeAttribute('data-cardified');
-					cell.removeAttribute('data-label');
-				});
-			};
-
-			const applyResponsiveTables = () => {
-				const tables = document.querySelectorAll<HTMLTableElement>('.prose table');
-
-				tables.forEach((table) => {
-					const headers = Array.from(table.querySelectorAll('thead th')).map((th) => {
-						return (th.textContent || '').trim();
-					});
-
-					const rows = Array.from(table.querySelectorAll('tbody tr'));
-					const hasBodyRows = rows.length > 0;
-					const columnThreshold = 3;
-					const hasWideHeader = headers.length > columnThreshold;
-					const hasWideRow = rows.some((row) => {
-						return row.querySelectorAll('td, th').length > columnThreshold;
-					});
-					const shouldCardify =
-						headers.length > 0 && hasBodyRows && (hasWideHeader || hasWideRow);
-
-					table.setAttribute('data-card-mode', shouldCardify ? 'cards' : 'table');
-
-					if (!shouldCardify) {
-						unwrapCardCells(table);
-						return;
-					}
-
-					rows.forEach((row) => {
-						const cells = Array.from(row.querySelectorAll('td, th'));
-
-						cells.forEach((cell, index) => {
-							const label = headers[index] || '';
-							if (label.length === 0) {
-								cell.removeAttribute('data-label');
-								return;
-							}
-							cell.setAttribute('data-label', label);
-							if (!cell.hasAttribute('data-cardified')) {
-								const valueWrapper = document.createElement('div');
-								valueWrapper.classList.add('table-card-value');
-								while (cell.firstChild) {
-									valueWrapper.appendChild(cell.firstChild);
-								}
-								cell.appendChild(valueWrapper);
-								cell.setAttribute('data-cardified', 'true');
-							}
-						});
-					});
-				});
-			};
-
-			const ensureResponsiveTables = () =>
-				window.requestAnimationFrame(applyResponsiveTables);
-
-			if (document.readyState === 'loading') {
-				document.addEventListener('DOMContentLoaded', ensureResponsiveTables, { once: true });
-			} else {
-				ensureResponsiveTables();
-			}
-
-			window.addEventListener('astro:after-swap', ensureResponsiveTables);
-		}
-
-		// Gracefully handle embed iframes that fail to load
-		const handleEmbedIframes = () => {
-			const iframes = document.querySelectorAll('iframe[data-testid="embed-iframe"]');
-
-			iframes.forEach((iframe) => {
-				const iframeElement = iframe as HTMLIFrameElement;
-
-				// Skip if already processed
-				if (iframeElement.dataset.embedProcessed === 'true') return;
-				iframeElement.dataset.embedProcessed = 'true';
-
-				let hasLoaded = false;
-				let timeoutId: number;
-
-				// Wrap in container for smooth transitions
-				if (!iframeElement.parentElement?.classList.contains('embed-wrapper')) {
-					const wrapper = document.createElement('div');
-					wrapper.className = 'embed-wrapper';
-					wrapper.style.cssText = 'transition: max-height 0.4s ease, opacity 0.4s ease; overflow: hidden;';
-					iframeElement.parentNode?.insertBefore(wrapper, iframeElement);
-					wrapper.appendChild(iframeElement);
-				}
-
-				const wrapper = iframeElement.parentElement as HTMLElement;
-
-				// Handle successful load
-				const handleLoad = () => {
-					hasLoaded = true;
-					clearTimeout(timeoutId);
-					// Ensure wrapper is visible
-					wrapper.style.maxHeight = '';
-					wrapper.style.opacity = '1';
-				};
-
-				iframeElement.addEventListener('load', handleLoad, { once: true });
-
-				// Timeout: collapse if not loaded within 5 seconds
-				timeoutId = window.setTimeout(() => {
-					if (!hasLoaded) {
-						wrapper.style.maxHeight = '0';
-						wrapper.style.opacity = '0';
-						wrapper.style.marginBottom = '0';
-						// Fully hide after animation
-						setTimeout(() => {
-							wrapper.style.display = 'none';
-						}, 400);
-					}
-				}, 5000);
-			});
-		};
-
-		// Run on page load
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', handleEmbedIframes, { once: true });
-		} else {
-			handleEmbedIframes();
-		}
-
-		// Re-run on Astro page transitions
-		window.addEventListener('astro:after-swap', handleEmbedIframes);
-
-		// Table of Contents - Intersection Observer for active heading
-		let currentTocCleanup: (() => void) | null = null;
-
-		const initTocObserver = () => {
-			// 清理之前的 observer
-			if (currentTocCleanup) {
-				currentTocCleanup();
-				currentTocCleanup = null;
-			}
-
-			const tocLinks = document.querySelectorAll('[data-toc-link]');
-			if (tocLinks.length === 0) return;
-
-			const headingElements = Array.from(tocLinks)
-				.map((link) => {
-					const id = link.getAttribute('data-heading-id');
-					return id ? document.getElementById(id) : null;
-				})
-				.filter((el): el is HTMLElement => el !== null);
-
-			if (headingElements.length === 0) return;
-
-			// 追踪所有当前可见的标题
-			const visibleHeadings = new Set<string>();
-
-			const observerOptions = {
-				rootMargin: '-100px 0px -66% 0px',
-				threshold: [0, 1],
-			};
-
-			const setActiveLink = (id: string) => {
-				// 移除所有 active 类（包含桌面与移动端两个 TOC）
-				tocLinks.forEach((link) => link.classList.remove('active'));
-
-				// 针对同一 heading，给所有匹配链接添加 active
-				const matches = document.querySelectorAll(`[data-heading-id="${id}"]`);
-				matches.forEach((el) => el.classList.add('active'));
-			};
-
-			const updateActiveHeading = () => {
-				// 如果没有可见的标题，不做任何事
-				if (visibleHeadings.size === 0) return;
-
-				// 找到第一个可见的标题（从上到下）
-				let firstVisibleId: string | null = null;
-				for (const heading of headingElements) {
-					if (visibleHeadings.has(heading.id)) {
-						firstVisibleId = heading.id;
-						break;
-					}
-				}
-
-				if (firstVisibleId) {
-					setActiveLink(firstVisibleId);
-				}
-			};
-
-			const observer = new IntersectionObserver((entries) => {
-				entries.forEach((entry) => {
-					const id = entry.target.id;
-					if (entry.isIntersecting) {
-						visibleHeadings.add(id);
-					} else {
-						visibleHeadings.delete(id);
-					}
-				});
-
-				updateActiveHeading();
-			}, observerOptions);
-
-			headingElements.forEach((heading) => observer.observe(heading));
-
-			// 点击处理器映射，用于清理
-			const clickHandlers = new Map<Element, () => void>();
-
-			// 添加点击事件处理
-			tocLinks.forEach((link) => {
-				const handler = () => {
-					const id = link.getAttribute('data-heading-id');
-					if (id) {
-						// 立即更新高亮
-						setActiveLink(id);
-					}
-				};
-				clickHandlers.set(link, handler);
-				link.addEventListener('click', handler);
-			});
-
-			// Cleanup function
-			currentTocCleanup = () => {
-				observer.disconnect();
-				clickHandlers.forEach((handler, link) => {
-					link.removeEventListener('click', handler);
-				});
-				clickHandlers.clear();
-			};
-		};
-
-		// Initialize on load
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', initTocObserver, { once: true });
-		} else {
-			initTocObserver();
-		}
-
-		// Re-initialize on Astro page transitions
-		window.addEventListener('astro:after-swap', initTocObserver);
-
-		// 移动端：抽屉式目录的打开/关闭
-		const initMobileTocDrawer = () => {
-			const toggleBtn = document.querySelector('[data-toc-mobile-toggle]');
-			const drawer = document.querySelector('[data-toc-mobile-drawer]');
-			const overlay = document.querySelector('[data-toc-mobile-overlay]');
-			const content = document.querySelector('[data-toc-mobile-content]');
-			const closeBtn = document.querySelector('[data-toc-mobile-close]');
-			const tocLinks = drawer?.querySelectorAll('[data-toc-link]');
-
-			if (!toggleBtn || !drawer || !overlay || !content || !closeBtn) return;
-
-			let isOpen = false;
-
-			const openDrawer = () => {
-				isOpen = true;
-				drawer.classList.remove('pointer-events-none');
-				drawer.setAttribute('aria-hidden', 'false');
-				overlay.classList.remove('opacity-0', 'pointer-events-none');
-				content.classList.remove('translate-x-full');
-				document.body.style.overflow = 'hidden';
-			};
-
-			const closeDrawer = () => {
-				isOpen = false;
-				overlay.classList.add('opacity-0', 'pointer-events-none');
-				content.classList.add('translate-x-full');
-				document.body.style.overflow = '';
-				// 等待动画结束后再隐藏
-				setTimeout(() => {
-					if (!isOpen) {
-						drawer.classList.add('pointer-events-none');
-						drawer.setAttribute('aria-hidden', 'true');
-					}
-				}, 300);
-			};
-
-			toggleBtn.addEventListener('click', openDrawer);
-			closeBtn.addEventListener('click', closeDrawer);
-			overlay.addEventListener('click', closeDrawer);
-
-			// 点击目录链接后自动关闭
-			tocLinks?.forEach((link) => {
-				link.addEventListener('click', closeDrawer);
-			});
-
-			// ESC 键关闭
-			document.addEventListener('keydown', (e) => {
-				if (e.key === 'Escape' && isOpen) {
-					closeDrawer();
-				}
-			});
-		};
+		// 使用外部脚本优化加载性能
+		import { initBlogInteractive } from '../scripts/blog-interactive';
+		import '../scripts/code-blocks';
 
 		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', initMobileTocDrawer, { once: true });
+			document.addEventListener('DOMContentLoaded', initBlogInteractive, { once: true });
 		} else {
-			initMobileTocDrawer();
+			initBlogInteractive();
 		}
-		window.addEventListener('astro:after-swap', initMobileTocDrawer);
-
-		// 侧边栏定位：让目录从分割线位置开始sticky，并匹配文章高度
-		const adjustTocPosition = () => {
-			const aside = document.querySelector<HTMLElement>('aside[data-toc-sidebar]');
-			const header = document.querySelector<HTMLElement>('[data-article-header]');
-			const container = document.querySelector<HTMLElement>('[data-toc-container]');
-			if (!aside || !header || !container) return;
-
-			// 获取 header 底部相对于其 offsetParent 的位置
-			const headerBottom = header.offsetTop + header.offsetHeight;
-			aside.style.top = `${headerBottom}px`;
-
-			// 让 aside 的高度匹配容器的高度减去 top 偏移
-			// 这样即使滚动到最底部，sticky 也能一直生效
-			const containerHeight = container.offsetHeight;
-			const asideHeight = containerHeight - headerBottom;
-			aside.style.height = `${asideHeight}px`;
-		};
-
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', adjustTocPosition, { once: true });
-		} else {
-			adjustTocPosition();
-		}
-		window.addEventListener('resize', adjustTocPosition);
-		window.addEventListener('astro:after-swap', adjustTocPosition);
 	</script>
 </html>

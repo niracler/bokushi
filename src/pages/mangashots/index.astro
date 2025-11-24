@@ -1,0 +1,1309 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Footer from "../../components/Footer.astro";
+import Header from "../../components/Header.astro";
+
+export const prerender = false;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead
+			title="漫画表情包 | Manga Shots"
+			description="我收集的漫画表情包 - My collection of manga meme screenshots"
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="manga-shots-main">
+			<header class="manga-header">
+				<h1 class="manga-title">漫画表情包</h1>
+				<span class="manga-count" id="manga-count">共 0 张</span>
+			</header>
+
+			<div class="manga-search-wrapper">
+				<label for="manga-search" class="sr-only">搜索漫画表情包</label>
+				<svg class="manga-search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<circle cx="11" cy="11" r="8"></circle>
+					<path d="m21 21-4.35-4.35"></path>
+				</svg>
+				<input type="text" id="manga-search" class="manga-search" placeholder="搜索标题（跨页，可配合漫画名）..." aria-label="搜索漫画表情包" />
+			</div>
+
+			<div class="filter-section">
+				<div id="filter-chips" class="filter-chips">
+					<button class="filter-chip active" data-manga="all" aria-label="显示全部漫画">
+						<span class="filter-chip-name">全部</span>
+						<span class="filter-chip-count">0</span>
+					</button>
+				</div>
+			</div>
+
+			<div id="loading-state" class="loading-state" role="status" aria-live="polite">
+				<div class="loading-spinner" aria-hidden="true"></div>
+				<p class="loading-text">加载中...</p>
+			</div>
+
+			<div id="error-state" class="manga-hidden error-state" role="alert" aria-live="assertive">
+				<p>加载失败，请刷新页面重试</p>
+			</div>
+
+			<div id="manga-grid" class="manga-hidden"></div>
+
+			<div id="load-more-trigger" class="h-1"></div>
+
+			<div id="load-more-indicator" class="manga-hidden loading-more" role="status" aria-live="polite">
+				<div class="loading-spinner small" aria-hidden="true"></div>
+				<p>加载更多...</p>
+			</div>
+
+			<div id="end-of-list" class="manga-hidden end-of-list" role="status" aria-live="polite">
+				<p>没有更多了~</p>
+			</div>
+
+			<!-- Lightbox Dialog -->
+			<dialog id="manga-lightbox" class="manga-lightbox">
+				<div class="manga-lightbox-content">
+					<button
+						class="manga-lightbox-close"
+						aria-label="Close lightbox"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="32"
+							height="32"
+							viewBox="0 0 32 32"
+						>
+							<path
+								fill="currentColor"
+								d="M16 2C8.2 2 2 8.2 2 16s6.2 14 14 14s14-6.2 14-14S23.8 2 16 2m5.4 21L16 17.6L10.6 23L9 21.4l5.4-5.4L9 10.6L10.6 9l5.4 5.4L21.4 9l1.6 1.6l-5.4 5.4l5.4 5.4z"
+							></path>
+						</svg>
+					</button>
+
+					<button
+						class="manga-lightbox-prev"
+						aria-label="Previous image"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="32"
+							height="32"
+							viewBox="0 0 32 32"
+						>
+							<path
+								fill="currentColor"
+								d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2m8 15H11.85l5.58 5.573L16 24l-8-8l8-8l1.43 1.393L11.85 15H24Z"
+							></path>
+						</svg>
+					</button>
+
+					<button class="manga-lightbox-next" aria-label="Next image">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="32"
+							height="32"
+							viewBox="0 0 32 32"
+						>
+							<path
+								fill="currentColor"
+								d="M2 16A14 14 0 1 0 16 2A14 14 0 0 0 2 16m6-1h12.15l-5.58-5.607L16 8l8 8l-8 8l-1.43-1.427L20.15 17H8Z"
+							></path>
+						</svg>
+					</button>
+
+					<div class="manga-lightbox-image-container">
+						<img
+							id="manga-lightbox-img"
+							src=""
+							alt=""
+							class="manga-lightbox-img"
+						/>
+					</div>
+
+					<div class="manga-lightbox-caption">
+						<p
+							id="manga-lightbox-manga-name"
+							class="lightbox-manga-name"
+						>
+						</p>
+						<h2 id="manga-lightbox-title"></h2>
+						<p id="manga-lightbox-caption-text"></p>
+					</div>
+				</div>
+			</dialog>
+		</main>
+		<Footer />
+
+		<style is:global>
+			/* Accessibility */
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border-width: 0;
+			}
+
+			/* Main Layout */
+			.manga-shots-main {
+				max-width: 56rem; /* 与 Header max-w-4xl 接近（4xl=56rem） */
+				width: 100%;
+				margin: 0 auto;
+				padding: 2rem clamp(1rem, 2.5vw, 1.25rem); /* 与 Header px-4 / sm:px-6 呼应 */
+				background: var(--color-bg-page);
+				box-sizing: border-box;
+			}
+
+			/* Header Section */
+			.manga-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: baseline;
+				margin-bottom: 2rem;
+			}
+
+			.manga-title {
+				font-size: 2.5rem;
+				font-weight: 700;
+				color: var(--color-text-primary);
+				margin: 0;
+				letter-spacing: -0.02em;
+			}
+
+			.manga-count {
+				font-size: var(--font-size-sm);
+				color: var(--color-text-muted);
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Search Box */
+			.manga-search-wrapper {
+				position: relative;
+				margin-bottom: 1.5rem;
+			}
+
+			.manga-search-icon {
+				position: absolute;
+				left: 1.25rem;
+				top: 50%;
+				transform: translateY(-50%);
+				color: var(--color-text-muted);
+				pointer-events: none;
+				z-index: 1;
+			}
+
+			.manga-search {
+				width: 100%;
+				padding: 1rem 1.25rem 1rem 3.25rem;
+				border: 2px solid var(--color-border);
+				border-radius: 14px;
+				font-size: var(--font-size-base);
+				color: var(--color-text-primary);
+				background: var(--color-bg-surface);
+				transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+				font-family: inherit;
+				box-shadow: 0 2px 8px rgba(42, 28, 23, 0.06);
+			}
+
+			.manga-search::placeholder {
+				color: var(--color-text-muted);
+			}
+
+			.manga-search:focus {
+				outline: none;
+				border-color: var(--color-accent);
+				box-shadow:
+					0 0 0 4px var(--color-accent-soft),
+					0 4px 16px rgba(251, 143, 104, 0.15);
+				transform: translateY(-1px);
+			}
+
+			/* Filter Section - Horizontal Scroll */
+			.filter-section {
+				margin-bottom: 3rem;
+				position: relative;
+			}
+
+			.filter-chips {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: nowrap;
+				align-items: center;
+				gap: 0.75rem;
+				overflow-x: auto;
+				overflow-y: hidden;
+				scroll-behavior: smooth;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+				padding-bottom: 0.5rem;
+			}
+
+			.filter-chips::-webkit-scrollbar {
+				display: none;
+			}
+
+			button.filter-chip,
+			.filter-chips button.filter-chip {
+				display: flex !important;
+				flex-direction: row !important;
+				align-items: center !important;
+				gap: 0.625rem !important;
+				padding: 0.5rem 1.125rem !important;
+				border: 1.5px solid var(--color-border) !important;
+				border-radius: 8px !important;
+				background: var(--color-bg-surface) !important;
+				color: var(--color-text-primary) !important;
+				font-size: var(--font-size-sm) !important;
+				font-weight: 500 !important;
+				cursor: pointer !important;
+				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+				white-space: nowrap !important;
+				flex-shrink: 0 !important;
+				min-width: fit-content !important;
+				width: auto !important;
+				box-shadow: 0 1px 2px rgba(42, 28, 23, 0.05) !important;
+			}
+
+			.filter-chip:hover {
+				border-color: var(--color-accent);
+				background: var(--color-accent-soft);
+				transform: translateY(-1px);
+				box-shadow: 0 2px 8px rgba(251, 143, 104, 0.12);
+			}
+
+			.filter-chip.active {
+				background: var(--color-accent);
+				border-color: var(--color-accent);
+				color: white;
+				box-shadow: 0 2px 12px rgba(251, 143, 104, 0.3);
+				font-weight: 600;
+			}
+
+			.filter-chip-name {
+				display: inline !important;
+				line-height: 1 !important;
+			}
+
+			.filter-chip-count {
+				display: inline !important;
+				font-size: 0.6875rem !important;
+				font-variant-numeric: tabular-nums !important;
+				opacity: 0.7 !important;
+				font-weight: 600 !important;
+			}
+
+			.filter-chip.active .filter-chip-count {
+				opacity: 0.95;
+			}
+
+			.filter-error {
+				color: var(--color-accent-dark);
+				font-size: var(--font-size-sm);
+				padding: 0.5rem 0;
+				margin: 0;
+			}
+
+			/* Masonry Grid */
+			.manga-masonry-grid {
+				display: flex;
+				gap: 1.25rem;
+				width: 100%;
+				margin-top: 0;
+			}
+
+			.manga-masonry-grid.has-items {
+				margin-top: 1.25rem;
+			}
+
+			.manga-masonry-grid_column {
+				display: flex;
+				flex-direction: column;
+				gap: 1.25rem;
+				flex: 1;
+				min-width: 0;
+			}
+
+			/* Manga Shot Item - Editorial Style */
+			.manga-shot-item {
+				position: relative;
+				overflow: hidden;
+				border-radius: 12px 20px 12px 20px; /* 不对称圆角 */
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				animation: itemFadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1)
+					backwards;
+			}
+
+			/* Staggered animation based on data attribute */
+			.manga-shot-item[data-item-index="0"] { animation-delay: 0s; }
+			.manga-shot-item[data-item-index="1"] { animation-delay: 0.05s; }
+			.manga-shot-item[data-item-index="2"] { animation-delay: 0.1s; }
+			.manga-shot-item[data-item-index="3"] { animation-delay: 0.15s; }
+			.manga-shot-item[data-item-index="4"] { animation-delay: 0.2s; }
+			.manga-shot-item[data-item-index="5"] { animation-delay: 0.25s; }
+			.manga-shot-item[data-item-index="6"] { animation-delay: 0.3s; }
+			.manga-shot-item[data-item-index="7"] { animation-delay: 0.35s; }
+			.manga-shot-item[data-item-index="8"] { animation-delay: 0.4s; }
+			.manga-shot-item[data-item-index="9"] { animation-delay: 0.45s; }
+			.manga-shot-item[data-item-index="10"] { animation-delay: 0.5s; }
+			.manga-shot-item[data-item-index="11"] { animation-delay: 0.55s; }
+			.manga-shot-item[data-item-index="12"] { animation-delay: 0.6s; }
+			.manga-shot-item[data-item-index="13"] { animation-delay: 0.65s; }
+			.manga-shot-item[data-item-index="14"] { animation-delay: 0.7s; }
+			.manga-shot-item[data-item-index="15"] { animation-delay: 0.75s; }
+			.manga-shot-item[data-item-index="16"] { animation-delay: 0.8s; }
+			.manga-shot-item[data-item-index="17"] { animation-delay: 0.85s; }
+			.manga-shot-item[data-item-index="18"] { animation-delay: 0.9s; }
+			.manga-shot-item[data-item-index="19"] { animation-delay: 0.95s; }
+
+			@keyframes itemFadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(30px) scale(0.96);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0) scale(1);
+				}
+			}
+
+			.manga-shot-item:hover {
+				transform: translateY(-12px) scale(1.02);
+				z-index: 10;
+			}
+
+			.manga-shot-button {
+				position: relative;
+				width: 100%;
+				border: none;
+				padding: 0;
+				background: transparent;
+				cursor: zoom-in;
+				display: block;
+				border-radius: 12px 20px 12px 20px;
+				overflow: hidden;
+				box-shadow:
+					0 3px 12px rgba(42, 28, 23, 0.12),
+					0 1px 6px rgba(42, 28, 23, 0.08);
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.manga-shot-item:hover .manga-shot-button {
+				box-shadow:
+					0 12px 28px rgba(251, 143, 104, 0.25),
+					0 6px 18px rgba(251, 143, 104, 0.18),
+					0 0 0 3px var(--color-accent-soft),
+					inset 0 0 0 1.5px var(--color-accent);
+			}
+
+			.manga-shot-img {
+				width: 100%;
+				height: auto;
+				display: block;
+				object-fit: cover;
+				transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.manga-shot-button:hover .manga-shot-img {
+				transform: scale(1.08);
+			}
+
+			/* Lightbox Styles */
+			.manga-lightbox {
+				position: fixed;
+				inset: 0;
+				max-width: 100vw;
+				max-height: 100vh;
+				width: 100vw;
+				height: 100vh;
+				border: none;
+				padding: 0;
+				background: transparent;
+				opacity: 0;
+				transition:
+					opacity 0.3s ease,
+					display 0.3s ease allow-discrete;
+			}
+
+			.manga-lightbox::backdrop {
+				background: rgba(20, 14, 11, 0.95);
+				backdrop-filter: blur(12px);
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+
+			.manga-lightbox[open] {
+				opacity: 1;
+			}
+
+			.manga-lightbox[open]::backdrop {
+				opacity: 1;
+			}
+
+			@starting-style {
+				.manga-lightbox[open] {
+					opacity: 0;
+				}
+				.manga-lightbox[open]::backdrop {
+					opacity: 0;
+				}
+			}
+
+			.manga-lightbox-content {
+				position: relative;
+				width: 100%;
+				height: 100%;
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-template-rows: 1fr auto;
+				gap: 1.5rem;
+				padding: 2rem;
+			}
+
+			.manga-lightbox-image-container {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.manga-lightbox-img {
+				max-width: 100%;
+				max-height: calc(100vh - 200px);
+				object-fit: contain;
+				border-radius: 12px;
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+				transition: opacity 0.18s ease, filter 0.18s ease;
+			}
+
+			.manga-lightbox-image-container.is-loading .manga-lightbox-img {
+				opacity: 0.35;
+				filter: blur(1px);
+			}
+
+			.manga-lightbox-image-container::after {
+				content: "";
+				position: absolute;
+				inset: 50% auto auto 50%;
+				width: 2.5rem;
+				height: 2.5rem;
+				margin: -1.25rem 0 0 -1.25rem;
+				border-radius: 50%;
+				border: 3px solid rgba(255, 255, 255, 0.25);
+				border-top-color: rgba(255, 255, 255, 0.9);
+				opacity: 0;
+				transform: scale(0.9);
+				transition: opacity 0.15s ease, transform 0.15s ease;
+				pointer-events: none;
+			}
+
+			.manga-lightbox-image-container.is-loading::after {
+				opacity: 1;
+				transform: scale(1);
+				animation: spin 0.7s linear infinite;
+			}
+
+			.manga-lightbox-caption {
+				text-align: center;
+				color: white;
+				padding: 1rem;
+			}
+
+			.lightbox-manga-name {
+				font-size: var(--font-size-sm);
+				opacity: 0.7;
+				margin-bottom: 0.5rem;
+			}
+
+			.manga-lightbox-caption h2 {
+				margin: 0 0 0.5rem 0;
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: var(--color-accent);
+			}
+
+			.manga-lightbox-caption p {
+				margin: 0.25rem 0;
+				opacity: 0.9;
+				line-height: 1.6;
+			}
+
+			/* Navigation Buttons */
+			.manga-lightbox-close,
+			.manga-lightbox-prev,
+			.manga-lightbox-next {
+				position: absolute;
+				background: rgba(255, 255, 255, 0.15);
+				border: 2px solid rgba(255, 255, 255, 0.3);
+				border-radius: 50%;
+				padding: 0.875rem;
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				z-index: 10;
+				backdrop-filter: blur(12px);
+			}
+
+			.manga-lightbox-close:hover,
+			.manga-lightbox-prev:hover,
+			.manga-lightbox-next:hover {
+				background: rgba(251, 143, 104, 0.5);
+				border-color: var(--color-accent);
+				transform: scale(1.15);
+				box-shadow: 0 6px 20px rgba(251, 143, 104, 0.4);
+			}
+
+			.manga-lightbox-close svg,
+			.manga-lightbox-prev svg,
+			.manga-lightbox-next svg {
+				display: block;
+				color: white;
+				filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+			}
+
+			.manga-lightbox-close {
+				top: 1.5rem;
+				right: 1.5rem;
+			}
+
+			.manga-lightbox-prev {
+				top: 50%;
+				left: 1.5rem;
+				transform: translateY(-50%);
+			}
+
+			.manga-lightbox-prev:hover {
+				transform: translateY(-50%) scale(1.15);
+			}
+
+			.manga-lightbox-next {
+				top: 50%;
+				right: 1.5rem;
+				transform: translateY(-50%);
+			}
+
+			.manga-lightbox-next:hover {
+				transform: translateY(-50%) scale(1.15);
+			}
+
+			/* Prevent body scroll when lightbox is open */
+			html:has(dialog[open]) {
+				overflow: hidden;
+			}
+
+			/* Loading States */
+			.loading-state,
+			.loading-more,
+			.error-state,
+			.end-of-list {
+				text-align: center;
+				padding: 3rem 1rem;
+			}
+
+			.loading-spinner {
+				display: inline-block;
+				width: 48px;
+				height: 48px;
+				border: 4px solid var(--color-accent-soft);
+				border-top-color: var(--color-accent);
+				border-radius: 50%;
+				animation: spin 0.8s linear infinite;
+			}
+
+			.loading-spinner.small {
+				width: 32px;
+				height: 32px;
+				border-width: 3px;
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			.loading-text {
+				margin-top: 1rem;
+				color: var(--color-text-muted);
+				font-size: var(--font-size-sm);
+			}
+
+			.error-state p {
+				color: var(--color-accent-dark);
+				font-weight: 500;
+			}
+
+			.end-of-list {
+				color: var(--color-text-muted);
+				font-size: var(--font-size-sm);
+				padding: 2rem;
+			}
+
+			.manga-hidden {
+				display: none !important;
+			}
+
+			/* Mobile Responsive */
+			@media (max-width: 768px) {
+				.manga-shots-main {
+					padding: 1.5rem clamp(1rem, 4vw, 1.25rem);
+				}
+
+				.manga-header {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: 0.5rem;
+					margin-bottom: 1.5rem;
+				}
+
+				.manga-title {
+					font-size: 2rem;
+				}
+
+				.manga-search {
+					padding: 0.875rem 1rem 0.875rem 3rem;
+				}
+
+				.filter-chip {
+					padding: 0.75rem 1.25rem;
+				}
+
+				.manga-masonry-grid {
+					gap: 1rem;
+				}
+
+				.manga-masonry-grid_column {
+					gap: 1rem;
+				}
+
+				.manga-lightbox-content {
+					padding: 1rem;
+				}
+
+				.manga-lightbox-img {
+					max-height: calc(100vh - 150px);
+				}
+
+				.manga-lightbox-caption h2 {
+					font-size: 1.25rem;
+				}
+
+				.manga-lightbox-prev,
+				.manga-lightbox-next {
+					padding: 0.625rem;
+				}
+
+				.manga-shot-item,
+				.manga-shot-item:hover {
+					transform: none;
+				}
+
+				.manga-shot-item:hover .manga-shot-button {
+					box-shadow:
+						0 3px 12px rgba(42, 28, 23, 0.12),
+						0 1px 6px rgba(42, 28, 23, 0.08);
+				}
+
+				.manga-shot-button:hover .manga-shot-img {
+					transform: none;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.manga-shots-main {
+					padding-inline: clamp(0.75rem, 6vw, 1.1rem);
+				}
+
+				.manga-masonry-grid,
+				.manga-masonry-grid_column {
+					gap: 0.75rem;
+				}
+
+				.manga-title {
+					font-size: 1.75rem;
+				}
+
+				.manga-search {
+					font-size: var(--font-size-sm);
+				}
+			}
+		</style>
+
+		<script>
+			// Constants
+			const SEARCH_DEBOUNCE_MS = 250;
+			const IMAGE_PRELOAD_MARGIN = "320px";
+			const IMAGE_LOAD_TIMEOUT_MS = 4000;
+			const LOAD_MORE_ROOT_MARGIN = "200px";
+			const RESIZE_DEBOUNCE_MS = 300;
+			const VIEWPORT_FILL_BUFFER = 120;
+
+			interface MangaShot {
+				id: string;
+				title: string;
+				manga_name: string;
+				photo_url: string;
+				thumbnail_url: string;
+				caption: string | null;
+				created_at: string;
+			}
+
+			interface PaginationInfo {
+				page: number;
+				pageSize: number;
+				total: number;
+				totalPages: number;
+			}
+
+			interface MangashotsResponse {
+				data: MangaShot[];
+				pagination: PaginationInfo;
+			}
+
+			interface MangaInfo {
+				manga_name: string;
+				count: number;
+			}
+
+			let allShots: MangaShot[] = [];
+			let allMangaList: MangaInfo[] = [];
+			let currentPage = 1;
+			let totalPages = 1;
+			let isLoading = false;
+			let columnContainers: HTMLDivElement[] = [];
+			let currentColumnCount = 0;
+			let loadMoreObserver: IntersectionObserver | null = null;
+			const hiddenClass = "manga-hidden";
+			let currentFilter = "all";
+			let searchQuery = "";
+			let activeRequestToken = 0;
+			let searchTimeout: number;
+			let lightboxInitialized = false;
+			let imageObserver: IntersectionObserver | null = null;
+			let fillInProgress = false;
+
+			async function loadMangaList() {
+				try {
+					const response = await fetch("/api/mangas");
+					if (!response.ok) throw new Error("Failed to fetch mangas");
+					const data = await response.json();
+					allMangaList = data.data || [];
+					renderFilterChips(allMangaList);
+				} catch (error) {
+					console.error("Error loading manga list:", error);
+					// Show error state for filters
+					const filterChips = document.getElementById("filter-chips");
+					if (filterChips) {
+						filterChips.innerHTML = '<p class="filter-error">筛选器加载失败</p>';
+					}
+				}
+			}
+
+			function renderFilterChips(mangaList: MangaInfo[]) {
+				const filterChips = document.getElementById("filter-chips");
+				if (!filterChips) return;
+
+				const total = mangaList.reduce((sum, m) => sum + m.count, 0);
+
+				// 使用 DocumentFragment 来批量添加元素
+				const fragment = document.createDocumentFragment();
+
+				const allButton = createFilterChip("全部", total, "all", currentFilter === "all");
+				fragment.appendChild(allButton);
+
+				mangaList.forEach((manga) => {
+					const button = createFilterChip(manga.manga_name, manga.count, manga.manga_name, currentFilter === manga.manga_name);
+					fragment.appendChild(button);
+				});
+
+				// 一次性替换所有内容
+				filterChips.replaceChildren(fragment);
+			}
+
+			function createFilterChip(name: string, count: number, mangaName: string, isActive: boolean) {
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = isActive ? "filter-chip active" : "filter-chip";
+				button.dataset.manga = mangaName;
+				button.setAttribute("aria-label", mangaName === "all" ? "显示全部漫画" : `筛选 ${name}`);
+
+				const nameSpan = document.createElement("span");
+				nameSpan.className = "filter-chip-name";
+				nameSpan.textContent = name;
+
+				const countSpan = document.createElement("span");
+				countSpan.className = "filter-chip-count";
+				countSpan.textContent = String(count);
+
+				button.append(nameSpan, countSpan);
+
+				return button;
+			}
+
+			function resetPaginationState() {
+				allShots = [];
+				currentPage = 1;
+				totalPages = 1;
+				isLoading = false;
+				activeRequestToken += 1;
+				document.getElementById("end-of-list")?.classList.add(hiddenClass);
+				document.getElementById("error-state")?.classList.add(hiddenClass);
+				document.getElementById("load-more-indicator")?.classList.add(hiddenClass);
+			}
+
+			function setupSearch() {
+				const searchInput = document.getElementById("manga-search") as HTMLInputElement;
+				if (!searchInput) return;
+
+				searchInput.addEventListener("input", (e) => {
+					const query = (e.target as HTMLInputElement).value.trim();
+					clearTimeout(searchTimeout);
+					searchTimeout = window.setTimeout(() => {
+						searchQuery = query;
+						resetPaginationState();
+						loadMangashots(1);
+					}, SEARCH_DEBOUNCE_MS);
+				});
+			}
+
+			function setupFilterListeners() {
+				const filterChipsContainer = document.getElementById("filter-chips");
+				if (!filterChipsContainer) return;
+
+				filterChipsContainer.addEventListener("click", (e) => {
+					const button = (e.target as HTMLElement).closest(".filter-chip") as HTMLButtonElement;
+					if (!button) return;
+
+					const mangaName = button.dataset.manga || "all";
+					if (currentFilter === mangaName) return;
+
+					// 更新按钮的 active 状态
+					filterChipsContainer.querySelectorAll(".filter-chip").forEach((btn) => {
+						btn.classList.toggle("active", btn === button);
+					});
+
+					currentFilter = mangaName;
+					resetPaginationState();
+					loadMangashots(1);
+				});
+			}
+
+			async function loadMangashots(page: number = 1) {
+				const requestToken = page === 1 ? ++activeRequestToken : activeRequestToken;
+
+				if (isLoading && page !== 1 && requestToken === activeRequestToken) return;
+				isLoading = true;
+				let readyPromise: Promise<unknown> = Promise.resolve();
+
+				const elements = {
+					loadingState: document.getElementById("loading-state"),
+					loadMoreIndicator: document.getElementById("load-more-indicator"),
+					errorState: document.getElementById("error-state"),
+					endOfList: document.getElementById("end-of-list"),
+					mangaGrid: document.getElementById("manga-grid"),
+					mangaCount: document.getElementById("manga-count")
+				};
+
+				if (page === 1) {
+					elements.loadingState?.classList.remove(hiddenClass);
+					elements.mangaGrid?.classList.add(hiddenClass);
+					elements.endOfList?.classList.add(hiddenClass);
+				} else {
+					elements.loadMoreIndicator?.classList.remove(hiddenClass);
+				}
+
+				try {
+					let url = `/api/mangashots.json?page=${page}`;
+					if (currentFilter !== "all") {
+						url += `&manga_name=${encodeURIComponent(currentFilter)}`;
+					}
+					if (searchQuery) {
+						url += `&title=${encodeURIComponent(searchQuery)}`;
+					}
+					const response = await fetch(url);
+					if (!response.ok) throw new Error("Failed to fetch");
+
+					const { data, pagination }: MangashotsResponse = await response.json();
+					if (requestToken !== activeRequestToken) return;
+
+					const sortedNewShots = data.sort((a, b) =>
+						new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+					);
+
+					const startIndex = allShots.length;
+					allShots = [...allShots, ...sortedNewShots];
+					currentPage = pagination.page;
+					totalPages = pagination.totalPages ?? 1;
+
+					if (elements.mangaCount) {
+						const totalCount = pagination.total ?? allShots.length;
+						elements.mangaCount.textContent = `共 ${totalCount} 张`;
+					}
+
+					if (elements.mangaGrid) {
+						if (page === 1) {
+							initMasonry(true);
+							setupLightbox();
+							setupInfiniteScroll();
+						}
+						const newItemsReady = addItemsToMasonry(sortedNewShots, startIndex);
+						readyPromise = Promise.allSettled(newItemsReady);
+						if (allShots.length > 0) {
+							elements.mangaGrid.classList.add("has-items");
+						}
+						elements.loadingState?.classList.add(hiddenClass);
+						elements.errorState?.classList.add(hiddenClass);
+						elements.mangaGrid.classList.remove(hiddenClass);
+						// 等待这一页图片落位后再决定是否继续补充高度
+						await readyPromise;
+					}
+
+					elements.loadMoreIndicator?.classList.add(hiddenClass);
+
+					if (currentPage >= totalPages) {
+						elements.endOfList?.classList.remove(hiddenClass);
+					} else {
+						fillViewportIfNeeded();
+					}
+				} catch (error) {
+					if (requestToken !== activeRequestToken) return;
+					console.error("Error loading mangashots:", error);
+					elements.loadingState?.classList.add(hiddenClass);
+					elements.loadMoreIndicator?.classList.add(hiddenClass);
+					if (page === 1) {
+						elements.errorState?.classList.remove(hiddenClass);
+					}
+				} finally {
+					if (requestToken === activeRequestToken) {
+						isLoading = false;
+					}
+				}
+			}
+
+			function fillViewportIfNeeded() {
+				if (fillInProgress || isLoading || currentPage >= totalPages) return;
+				fillInProgress = true;
+
+				const maybeFill = async () => {
+					try {
+						// 连续拉取，直到内容高度超过视口或到结尾
+						while (!isLoading && currentPage < totalPages) {
+							const docHeight = document.documentElement.scrollHeight;
+							const viewport = window.innerHeight;
+							if (docHeight - viewport > VIEWPORT_FILL_BUFFER) break;
+							await loadMangashots(currentPage + 1);
+						}
+					} finally {
+						fillInProgress = false;
+					}
+				};
+
+				// 让浏览器先完成当前布局，再检查高度
+				requestAnimationFrame(maybeFill);
+			}
+
+			function getColumns() {
+				const width = window.innerWidth;
+				if (width <= 768) return 2;
+				if (width <= 1200) return 3;
+				return 4;
+			}
+
+			function initMasonry(force = false) {
+				const mangaGrid = document.getElementById("manga-grid");
+				if (!mangaGrid) return;
+
+				const columns = getColumns();
+				if (!force && columns === currentColumnCount && columnContainers.length === columns) {
+					return false;
+				}
+
+				currentColumnCount = columns;
+				mangaGrid.innerHTML = "";
+				mangaGrid.className = "manga-masonry-grid";
+
+				columnContainers = [];
+				for (let i = 0; i < columns; i++) {
+					const col = document.createElement("div");
+					col.className = "manga-masonry-grid_column";
+					columnContainers.push(col);
+					mangaGrid.appendChild(col);
+				}
+
+				return true;
+			}
+
+			function getImageObserver() {
+				if (imageObserver) return imageObserver;
+
+				imageObserver = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((entry) => {
+							if (!entry.isIntersecting) return;
+
+							const img = entry.target as HTMLImageElement;
+							imageObserver?.unobserve(img);
+
+							const fullSrc = img.dataset.fullSrc;
+							if (!fullSrc || img.dataset.state === "full") return;
+
+							const loader = new Image();
+							img.dataset.state = "full";
+							loader.onload = () => {
+								img.src = fullSrc;
+							};
+							loader.onerror = () => {
+								// 已经有缩略图占位，失败时保持当前内容
+							};
+							loader.src = fullSrc;
+						});
+					},
+					{ rootMargin: `${IMAGE_PRELOAD_MARGIN} 0px` }
+				);
+
+				return imageObserver;
+			}
+
+			function addItemsToMasonry(shots: MangaShot[], startIndex: number) {
+				const readyList: Promise<void>[] = [];
+
+				shots.forEach((shot, index) => {
+					const globalIndex = startIndex + index;
+					const columnIndex = globalIndex % columnContainers.length;
+					const column = columnContainers[columnIndex];
+					const { readyPromise } = createMangaItem(shot, globalIndex, column);
+					readyList.push(readyPromise);
+				});
+
+				return readyList;
+			}
+
+			function createMangaItem(shot: MangaShot, index: number, column: HTMLDivElement) {
+				const div = document.createElement("div");
+				div.className = "manga-shot-item";
+				div.dataset.index = String(index);
+				div.dataset.itemIndex = String(index);
+
+				const button = document.createElement("button");
+				button.className = "manga-shot-button";
+				Object.assign(button.dataset, {
+					photoUrl: shot.photo_url,
+					mangaName: shot.manga_name,
+					title: shot.title,
+					caption: shot.caption || ""
+				});
+				button.setAttribute("aria-label", `查看 ${shot.title}`);
+
+				const img = document.createElement("img");
+				const previewSrc = shot.thumbnail_url || shot.photo_url;
+				img.src = previewSrc;
+				if (shot.thumbnail_url && shot.thumbnail_url !== shot.photo_url) {
+					img.dataset.fullSrc = shot.photo_url;
+				}
+				img.alt = shot.title;
+				img.loading = "lazy";
+				img.decoding = "async";
+				img.className = "manga-shot-img";
+
+				let isPlaced = false;
+				const place = () => {
+					if (isPlaced || !column) return;
+					isPlaced = true;
+					if (!column.contains(div)) column.appendChild(div);
+				};
+
+				const readyPromise = new Promise<void>((resolve) => {
+					let settled = false;
+					const settle = () => {
+						if (settled) return;
+						settled = true;
+						resolve();
+					};
+
+					const done = () => {
+						place();
+						settle();
+					};
+
+					const fallback = window.setTimeout(done, IMAGE_LOAD_TIMEOUT_MS);
+					const clearAndDone = () => {
+						window.clearTimeout(fallback);
+						done();
+					};
+
+					img.addEventListener("load", clearAndDone, { once: true });
+					img.addEventListener(
+						"error",
+						() => {
+							if (img.dataset.fullSrc && img.src !== img.dataset.fullSrc) {
+								img.removeAttribute("data-full-src");
+								img.src = shot.photo_url;
+							}
+							clearAndDone();
+						},
+						{ once: true }
+					);
+
+					if (img.complete && img.naturalWidth) {
+						clearAndDone();
+					}
+				});
+
+				if (img.dataset.fullSrc) {
+					getImageObserver().observe(img);
+				}
+
+				button.appendChild(img);
+				div.appendChild(button);
+				// 提前插入 DOM，避免 lazy image 在未挂载时不加载导致首屏空白
+				place();
+
+				return { item: div, readyPromise };
+			}
+
+			function setupInfiniteScroll() {
+				const loadMoreTrigger = document.getElementById("load-more-trigger");
+				if (!loadMoreTrigger) return;
+
+				loadMoreObserver?.disconnect();
+
+				loadMoreObserver = new IntersectionObserver(
+					(entries) => {
+						if (entries[0].isIntersecting && !isLoading && currentPage < totalPages) {
+							loadMangashots(currentPage + 1);
+						}
+					},
+					{ rootMargin: LOAD_MORE_ROOT_MARGIN }
+				);
+
+				loadMoreObserver.observe(loadMoreTrigger);
+			}
+
+			let resizeTimeout: number;
+			window.addEventListener("resize", () => {
+				clearTimeout(resizeTimeout);
+				resizeTimeout = window.setTimeout(() => {
+					const rebuilt = initMasonry();
+					if (rebuilt) {
+						addItemsToMasonry(allShots, 0);
+					}
+				}, RESIZE_DEBOUNCE_MS);
+			});
+
+			function setupLightbox() {
+				const lightbox = document.getElementById("manga-lightbox") as HTMLDialogElement;
+				const lightboxImg = document.getElementById("manga-lightbox-img") as HTMLImageElement;
+				const lightboxMangaName = document.getElementById("manga-lightbox-manga-name");
+				const lightboxTitle = document.getElementById("manga-lightbox-title");
+				const lightboxCaption = document.getElementById("manga-lightbox-caption-text");
+				const lightboxImageContainer = document.querySelector(".manga-lightbox-image-container");
+
+				if (lightboxInitialized || !lightbox || !lightboxImg) return;
+				lightboxInitialized = true;
+
+				let currentIndex = 0;
+				const preloadCache = new Set<string>();
+
+				const getButtons = () => Array.from(document.querySelectorAll(".manga-shot-button")) as HTMLButtonElement[];
+
+				const preload = (url?: string | null) => {
+					if (!url || preloadCache.has(url)) return;
+					const img = new Image();
+					img.src = url;
+					preloadCache.add(url);
+				};
+
+				const preloadNeighbors = (index: number) => {
+					const buttons = getButtons();
+					if (!buttons.length) return;
+					const next = buttons[(index + 1) % buttons.length]?.dataset.photoUrl;
+					const prev = buttons[(index - 1 + buttons.length) % buttons.length]?.dataset.photoUrl;
+					preload(next);
+					preload(prev);
+				};
+
+				function showImage(index: number) {
+					const buttons = getButtons();
+					if (index < 0 || index >= buttons.length) return;
+
+					const button = buttons[index];
+					const url = button.dataset.photoUrl || "";
+
+					if (lightboxImageContainer) lightboxImageContainer.classList.add("is-loading");
+
+					const loader = new Image();
+					loader.onload = () => {
+						lightboxImg.src = url;
+						lightboxImg.alt = button.dataset.title || "";
+						if (lightboxMangaName) lightboxMangaName.textContent = button.dataset.mangaName || "";
+						if (lightboxTitle) lightboxTitle.textContent = button.dataset.title || "";
+						if (lightboxCaption) lightboxCaption.textContent = button.dataset.caption || "";
+						currentIndex = index;
+						if (lightboxImageContainer) lightboxImageContainer.classList.remove("is-loading");
+						preloadNeighbors(index);
+					};
+					loader.onerror = () => {
+						if (lightboxImageContainer) lightboxImageContainer.classList.remove("is-loading");
+					};
+					loader.src = url;
+				}
+
+				const navigate = (direction: "prev" | "next") => {
+					const buttons = getButtons();
+					const newIndex = direction === "prev"
+						? (currentIndex > 0 ? currentIndex - 1 : buttons.length - 1)
+						: (currentIndex < buttons.length - 1 ? currentIndex + 1 : 0);
+					showImage(newIndex);
+				};
+
+				document.getElementById("manga-grid")?.addEventListener("click", (e) => {
+					const button = (e.target as HTMLElement).closest(".manga-shot-button") as HTMLButtonElement;
+					if (button) {
+						const index = getButtons().indexOf(button);
+						if (index !== -1) {
+							showImage(index);
+							lightbox?.showModal();
+						}
+					}
+				});
+
+				document.querySelector(".manga-lightbox-close")?.addEventListener("click", () => lightbox?.close());
+				document.querySelector(".manga-lightbox-prev")?.addEventListener("click", () => navigate("prev"));
+				document.querySelector(".manga-lightbox-next")?.addEventListener("click", () => navigate("next"));
+
+				document.addEventListener("keydown", (e) => {
+					if (!lightbox?.open) return;
+					if (e.key === "Escape") lightbox.close();
+					if (e.key === "ArrowLeft") navigate("prev");
+					if (e.key === "ArrowRight") navigate("next");
+				});
+
+				let touchStartX = 0;
+				lightbox?.addEventListener("touchstart", (e) => touchStartX = e.changedTouches[0].screenX);
+				lightbox?.addEventListener("touchend", (e) => {
+					const touchEndX = e.changedTouches[0].screenX;
+					const diff = touchEndX - touchStartX;
+					if (Math.abs(diff) > 50) navigate(diff > 0 ? "prev" : "next");
+				});
+			}
+
+			async function initPage() {
+				await loadMangaList();
+				setupSearch();
+				setupFilterListeners();
+				loadMangashots(1);
+			}
+
+			if (document.readyState === "loading") {
+				document.addEventListener("DOMContentLoaded", initPage);
+			} else {
+				initPage();
+			}
+		</script>
+	</body>
+</html>

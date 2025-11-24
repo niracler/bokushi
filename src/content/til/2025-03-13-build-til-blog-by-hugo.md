@@ -5,16 +5,19 @@ pubDate: "Mar 13, 2025"
 socialImage: "https://image.niracler.com/2025/03/e3c2172a09cef870a131c154a70b642a.png"
 tags: [ "TIL", "博客", "部署", "Hugo", "DeepSearch" ]
 ---
+
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
---- | :------------------------- |
-| 第一作者    | Grok DeepSearch            |
-| 校对&编辑   | Niracler                   |
-| 排版      | claude-3.7-sonnet-thinking |
-| Hugo 版本 | v0.145.0                   |
+
+|||
+| :--- | :------------------------- |  
+| 第一作者    | Grok DeepSearch            |  
+| 校对&编辑   | Niracler                   |  
+| 排版      | claude-3.7-sonnet-thinking |  
+| Hugo 版本 | v0.145.0                   |  
 
 <details> <summary>Prompt</summary>
 
-### 1.1 Prompt（此处应折叠）
+### Prompt（此处应折叠）
 
 ```markdown
 我是一个开发者，之前使用过 Hexo 搭建博客系统，但现在想尝试在 Cloudflare Pages 上使用 Hugo 静态网站框架搭建一个 TIL（Today I Learned）博客，用来记录和发布我每天学到的东西。我对 Hugo 是新手，但有一定的技术背景。我希望这个博客有以下特点：
@@ -51,11 +54,11 @@ tags: [ "TIL", "博客", "部署", "Hugo", "DeepSearch" ]
 
 PS. 本文也是计划中的一环
 
-## 2 从零到一的步骤
+## 从零到一的步骤
 
 咱们就一步一步开始吧～
 
-### 2.1 安装和配置 Hugo
+### 安装和配置 Hugo
 
 Hugo 是一个基于 Go 语言的静态网站生成器，以其速度和简单性著称，适合技术背景的用户快速上手。安装方法因操作系统而异：
 
@@ -71,7 +74,7 @@ brew install hugo
 - 进入站点目录：`cd til`。
 - 初始化 Git：`git init`
 
-### 2.2 选择并安装 PaperMod 主题
+### 选择并安装 PaperMod 主题
 
 > 主题是博客外观和功能的核心，根据你的需求（支持标签、分类、搜索，加载快，设计可爱），我们推荐使用 PaperMod 主题。它是免费的，功能丰富，设计简洁，可能符合你对“可爱”风格的期待。
 
@@ -101,7 +104,7 @@ theme = "PaperMod"
 
 主题配置：PaperMod 有多种自定义选项，如支持深色/浅色模式、多语言、社交图标等。详细配置请参考 [PaperMod 文档](https://github.com/adityatelange/hugo-PaperMod/wiki)，包括如何启用搜索功能（通常通过 Lunr.js 或 Fuse.js 实现）。（**这里没有校对**）
 
-### 2.3 编写和发布 TIL 条目
+### 编写和发布 TIL 条目
 
 TIL 博客的内容完全从零开始，按日期排序，并支持标签功能。Hugo 使用 Markdown 文件管理内容，存储在 `content` 目录下。
 
@@ -140,7 +143,7 @@ git commit -m "Added new TIL post"
 git push
 ```
 
-### 2.4 创建 GitHub 仓库并连接 Cloudflare Pages
+### 创建 GitHub 仓库并连接 Cloudflare Pages
 
 为了实现自动部署，需要将博客项目托管在 GitHub 上，并连接到 Cloudflare Pages。
 
@@ -181,7 +184,7 @@ git push -u origin main
 （完成部署啦，可喜可贺）  
 ![CleanShot 2025-03-13 at 16.03.23@2x.png](https://image.niracler.com/2025/03/01d4484fcf47bc75f3ebfb99d7cadd79.png)
 
-### 2.5 设置自定义域名
+### 设置自定义域名
 
 因为上面我设了 `baseURL = "https://til.niracler.com/"`，所以我的博客地址是 `https://til.niracler.com/`，此时需要设置自定义域名。（因为我的域名是托管在 cloudflare 上的，所以直接就用了）
 
@@ -197,9 +200,9 @@ git push -u origin main
 
 ![](https://image.niracler.com/2025/03/e3c2172a09cef870a131c154a70b642a.png)
 
-## 3 One More Thing
+## One More Thing
 
-### 3.1 将 `public` 目录放到 `gitignore`
+### 将 `public` 目录放到 `gitignore`
 
 其实我们是不需要将 public 目录上传上去的。
 
@@ -228,9 +231,9 @@ git push
 - 如果已上传，建议删除（参考 `.gitignore` 清理步骤）。
 - 查看 Cloudflare Pages 部署日志，确保构建命令 `hugo --minify` 正常运行并生成 `public/`。
 
-### 3.2 本地与部署的工作流程
+### 本地与部署的工作流程
 
-#### 3.2.1 本地开发
+#### 本地开发
 
 - 编辑文章（`content/post/`）和配置文件（`hugo.toml`）。
 - 运行 `hugo server` 本地预览，Hugo 会生成 `public/` 文件夹供测试。
@@ -244,17 +247,17 @@ git commit -m "Updated TIL post"
 git push
 ```
 
-#### 3.2.2 Cloudflare Pages 部署
+#### Cloudflare Pages 部署
 
 - Cloudflare Pages 检测到推送后，运行 `hugo --minify`，生成 `public/` 文件并部署。
 - 您无需手动干预 `public/` 的内容。
 
-### 3.3 添加额外功能
+### 添加额外功能
 
 你希望博客有评论系统、访问统计和社交分享按钮，以下是实现方法：
 （略，差不多得了，下篇再写）
 
-## 4 参考资料
+## 参考资料
 
 关键文档
 
@@ -268,3 +271,4 @@ git push
 - 官方 Hugo 文档：[Hugo 官网](https://gohugo.io/)，提供详细教程和 API 参考。
 - PaperMod 社区支持：查看 GitHub 讨论区，获取用户经验分享。
 - Cloudflare Pages 论坛：解决部署问题，优化性能。
+

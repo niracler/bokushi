@@ -2,6 +2,8 @@
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import BlogPost from "../layouts/BlogPost.astro";
 
+export const prerender = true;
+
 export async function getStaticPaths() {
     const blogPosts = await getCollection("blog");
     const monthlyPosts = await getCollection("monthly");
@@ -16,9 +18,15 @@ type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | Collecti
 type Props = BlogEntry;
 
 const post = Astro.props;
-const { Content, headings } = await render(post);
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
 ---
 
-<BlogPost {...post.data} body={post.body} headings={headings}>
-	<Content />
+<BlogPost
+    {...post.data}
+    body={post.body}
+    headings={headings}
+    lastModified={remarkPluginFrontmatter?.lastModified}
+    lastModifiedCommitUrl={remarkPluginFrontmatter?.lastModifiedCommitUrl}
+>
+    <Content />
 </BlogPost>

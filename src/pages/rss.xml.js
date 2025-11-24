@@ -12,9 +12,7 @@ export async function GET(context) {
     const tilPosts = await getCollection("til");
     const posts = [...blogPosts, ...monthlyPosts, ...tilPosts]
         .filter((post) => !post.data.hidden)
-        .sort(
-        (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-    );
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
     const rssContent = await rss({
         title: SITE_TITLE,
         description: SITE_DESCRIPTION,

@@ -1,0 +1,4 @@
+{
+    "*.{js,ts,jsx,tsx,astro,json}": ["biome format --write"],
+    "*.{js,ts,jsx,tsx,astro}": ["biome check --fix"]
+}

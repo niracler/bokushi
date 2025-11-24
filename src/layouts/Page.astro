@@ -2,15 +2,20 @@
 import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
+import GlobalImageLightbox from "../components/GlobalImageLightbox.astro";
 import Prose from "../components/Prose.astro";
 import Remark42Comments from "../components/Remark42Comments.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
 const { frontmatter = {} } = Astro.props as { frontmatter?: Record<string, unknown> };
-const { comments: commentsEnabled, description: pageDescription, title } = frontmatter as {
-	comments?: boolean;
-	description?: string;
-	title?: string;
+const {
+    comments: commentsEnabled,
+    description: pageDescription,
+    title,
+} = frontmatter as {
+    comments?: boolean;
+    description?: string;
+    title?: string;
 };
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 const description = pageDescription || SITE_DESCRIPTION;
@@ -23,12 +28,13 @@ const description = pageDescription || SITE_DESCRIPTION;
 	</head>
 	<body>
 		<Header />
-		<main class="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:space-y-12 sm:py-14">
-			<Prose class="max-w-none text-[var(--color-text-secondary)]">
+		<main class="page-shell max-w-3xl section-stack">
+			<Prose class="max-w-none text-secondary">
 				<slot />
 			</Prose>
 
 			{commentsEnabled && <Remark42Comments />}
+			<GlobalImageLightbox />
 		</main>
 		<Footer />
 	</body>

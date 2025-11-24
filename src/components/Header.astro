@@ -7,14 +7,15 @@ const navLinks = [
     { href: "/", label: "首页" },
     { href: "/blog", label: "文章" },
     { href: "/tags", label: "标签" },
+    { href: "/channel", label: "动态" },
+    { href: "/mangashots", label: "漫画表情包" },
     { href: "/friends", label: "友链" },
     { href: "/plrom", label: "心头好" },
 ];
 
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, "");
 const subpath = pathname.match(/[^/]+/g);
-const isActive = (href: string) =>
-    href === pathname || href === `/${subpath?.[0] || ""}`;
+const isActive = (href: string) => href === pathname || href === `/${subpath?.[0] || ""}`;
 ---
 
 <header
@@ -57,7 +58,7 @@ const isActive = (href: string) =>
                         data-bar-bottom></span>
                 </span>
             </button>
-            <div class="hidden items-center gap-2 sm:gap-3 md:flex">
+            <div class="hidden items-center gap-2 sm:gap-3 md:flex" data-no-preview>
                 {
                     navLinks.map((link) => (
                         <HeaderLink href={link.href}>{link.label}</HeaderLink>
@@ -97,7 +98,7 @@ const isActive = (href: string) =>
                     >
                 </button>
             </div>
-            <nav class="flex flex-col gap-2 text-base">
+            <nav class="flex flex-col gap-2 text-base" data-no-preview>
                 {
                     navLinks.map((link) => (
                         <a
