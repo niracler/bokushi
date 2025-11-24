@@ -404,6 +404,117 @@
         background: #282a36 !important;
     }
 
+    /* Mermaid diagrams */
+    .prose .mermaid {
+        margin: var(--space-4) 0;
+        padding: var(--space-4);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: var(--radius-lg);
+        background: color-mix(in srgb, var(--color-bg-surface) 90%, var(--color-bg-muted) 10%);
+        box-shadow: var(--shadow-soft);
+        overflow-x: auto;
+        --mermaid-font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        --mermaid-font-size: 16px;
+        --mermaid-primary-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-bg-surface));
+        --mermaid-secondary-color: color-mix(in srgb, var(--color-bg-muted) 70%, var(--color-bg-surface) 30%);
+        --mermaid-tertiary-color: color-mix(in srgb, var(--color-accent-soft) 50%, var(--color-bg-surface));
+        --mermaid-primary-text-color: var(--color-text-primary);
+        --mermaid-secondary-text-color: var(--color-text-secondary);
+        --mermaid-line-color: color-mix(in srgb, var(--color-text-primary) 55%, transparent);
+        --mermaid-edge-color: var(--mermaid-line-color);
+        --mermaid-label-bg-color: color-mix(in srgb, var(--color-bg-surface) 92%, var(--color-bg-muted) 8%);
+        --mermaid-label-text-color: var(--color-text-secondary);
+        --mermaid-note-bg-color: color-mix(in srgb, var(--color-note) 22%, var(--color-bg-surface));
+        --mermaid-note-text-color: color-mix(in srgb, var(--color-note) 70%, var(--color-text-primary));
+    }
+
+    html[data-theme="dark"] .prose .mermaid {
+        border-color: var(--color-border-strong);
+        background: color-mix(in srgb, var(--color-bg-surface) 80%, var(--color-bg-muted) 20%);
+        --mermaid-primary-color: color-mix(in srgb, var(--color-accent) 46%, var(--color-bg-surface));
+        --mermaid-secondary-color: color-mix(in srgb, var(--color-bg-muted) 55%, var(--color-bg-surface) 45%);
+        --mermaid-tertiary-color: color-mix(in srgb, var(--color-accent-soft) 45%, var(--color-bg-surface));
+        --mermaid-primary-text-color: var(--color-text-primary);
+        --mermaid-secondary-text-color: color-mix(in srgb, var(--color-text-secondary) 80%, var(--color-text-primary) 20%);
+        --mermaid-line-color: color-mix(in srgb, var(--color-text-primary) 85%, transparent);
+        --mermaid-edge-color: var(--mermaid-line-color);
+        --mermaid-label-bg-color: color-mix(in srgb, var(--color-bg-surface) 72%, var(--color-bg-muted) 28%);
+        --mermaid-label-text-color: color-mix(in srgb, var(--color-text-secondary) 90%, var(--color-text-primary) 10%);
+        --mermaid-note-bg-color: color-mix(in srgb, var(--color-note) 26%, var(--color-bg-surface));
+        --mermaid-note-text-color: color-mix(in srgb, var(--color-note) 82%, var(--color-text-primary));
+    }
+
+    .prose .mermaid svg {
+        width: 100%;
+        height: auto;
+    }
+
+    .prose .mermaid .node rect,
+    .prose .mermaid .node circle,
+    .prose .mermaid .node ellipse,
+    .prose .mermaid .node polygon,
+    .prose .mermaid .node path,
+    .prose .mermaid .mindmap-node rect,
+    .prose .mermaid .mindmap-node circle,
+    .prose .mermaid .mindmap-node ellipse,
+    .prose .mermaid .mindmap-node polygon {
+        fill: var(--mermaid-secondary-color) !important;
+        stroke: var(--mermaid-line-color) !important;
+        stroke-width: 1.6px;
+        fill-opacity: 0.94;
+    }
+
+    .prose .mermaid .cluster rect {
+        fill: var(--mermaid-tertiary-color) !important;
+        stroke: color-mix(in srgb, var(--mermaid-line-color) 70%, transparent) !important;
+    }
+
+    .prose .mermaid .node text,
+    .prose .mermaid .mindmap-node text,
+    .prose .mermaid text,
+    .prose .mermaid tspan {
+        fill: var(--mermaid-primary-text-color) !important;
+    }
+
+    .prose .mermaid .edgePath path,
+    .prose .mermaid .flowchart-link,
+    .prose .mermaid line {
+        stroke: var(--mermaid-edge-color) !important;
+        stroke-width: 2px !important;
+        stroke-linecap: round;
+        opacity: 0.95;
+    }
+
+    .prose .mermaid .arrowheadPath,
+    .prose .mermaid .marker {
+        fill: var(--mermaid-edge-color) !important;
+        stroke: var(--mermaid-edge-color) !important;
+    }
+
+    .prose .mermaid .label rect,
+    .prose .mermaid .label foreignObject {
+        fill: var(--mermaid-label-bg-color) !important;
+        background: var(--mermaid-label-bg-color) !important;
+        stroke: color-mix(in srgb, var(--mermaid-edge-color) 55%, transparent) !important;
+        border-radius: var(--radius-sm);
+    }
+
+    .prose .mermaid .label,
+    .prose .mermaid .label span,
+    .prose .mermaid .label text {
+        color: var(--mermaid-label-text-color) !important;
+        fill: var(--mermaid-label-text-color) !important;
+    }
+
+    .prose .mermaid .note {
+        fill: var(--mermaid-note-bg-color) !important;
+        stroke: color-mix(in srgb, var(--mermaid-note-text-color) 45%, transparent) !important;
+    }
+
+    .prose .mermaid .note text {
+        fill: var(--mermaid-note-text-color) !important;
+    }
+
     .prose hr {
         margin: var(--space-5) 0;
         border: none;

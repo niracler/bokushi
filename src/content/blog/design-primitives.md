@@ -1,5 +1,5 @@
 ---
-title: "博物志：一份设计说明书"
+title: "博物志 - 一份设计说明书"
 description: "从零开始 vibe-coding 出来的个人博客，记录技术选型、设计系统、组件架构，以及那些仍需重构的地方。"
 pubDate: "Nov 21, 2025"
 tags: ["设计", "博客", "Astro", "前端", "DeepSearch"]
