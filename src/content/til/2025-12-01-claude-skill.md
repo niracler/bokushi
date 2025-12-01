@@ -198,6 +198,8 @@ claude plugin marketplace add https://github.com/niracler/skill.git
 
 项目地址：[git-workflow 文档](https://github.com/niracler/skill/blob/main/git-workflow/SKILL.md)
 
+![在 VS Code 的 Claude Code 插件在安装 Marketplace 后可以直接 /git-workflow 呼出 ](https://image.niracler.com/2025/12/64dcea01aaf842b79f4be62587bc9b78.png)
+
 ## 参考资料
 
 - [借助 Skills 提升前端设计（宝玉翻译）](https://baoyu.io/translations/improving-frontend-design-through-skills) - 本文的灵感来源
