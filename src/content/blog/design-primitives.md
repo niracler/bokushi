@@ -286,6 +286,59 @@ flowchart TD
 
 变体：`.surface-card--soft` 使用更弱的边框和混合背景。
 
+### 博客文章页布局框架
+
+用 ASCII 速览 BlogPost 布局（桌面 / 移动）：
+
+```
+[桌面视图]
++------------------------------------------------------------------------------------------------+
+| 视口（全宽）                                                                                   |
+|                                                                                                |
+|   +----------------------------------------------------------------------------------------+   |
+|   | Header：max-w-4xl 容器，Logo/导航/主题切换（内容左对齐，容器居中）                    |   |
+|   +----------------------------------------------------------------------------------------+   |
+|                                                                                                |
+|   +---------------------------------- max-w-3xl (~48rem) --------------------------------+      |
+|   | 文章头（居中）：标题 / 日期 / 标签 / 摘要                                              |      |
+|   +---------------------------------------------------------------------------------------+      |
+|   | 主体正文 .prose 68ch（居中列，左右留白）                                              |      |
+|   | - 段落 / 代码块 / 图片 + GlobalImageLightbox                                          |      |
+|   | - 长滚动内容                                                                           |      |
+|   +---------------------------------------------------------------------------------------+      |
+|   | 评论：Remark42（同正文列宽）                                                           |      |
+|   +---------------------------------------------------------------------------------------+      |
+|                                                                                                |
+|                                                 +----------------------------+                 |
+|                                                 | TOC 侧栏 sticky            |                 |
+|                                                 | 280px 宽，随正文高度       |                 |
+|                                                 | 右侧绝对定位：主体右侧再+3rem |                 |
+|                                                 +----------------------------+                 |
+|                                                                                                |
+|   +----------------------------------------------------------------------------------------+   |
+|   | Footer：page-shell 宽度（~72rem），社交按钮 / CC 版权，内容居中                         |   |
+|   +----------------------------------------------------------------------------------------+   |
+|                                                                                                |
++------------------------------------------------------------------------------------------------+
+
+[移动视图]
++--------------------------------------------------+
+| Header：Logo / 抽屉导航 / 主题切换               |
++--------------------------------------------------+
+| 文章头：标题 + 标签 + 时间                       |
++--------------------------------------------------+
+| 正文（全宽）                                     |
+| - 段落/代码/图像                                 |
+| - GlobalImageLightbox                            |
++--------------------------------------------------+
+| 浮动 TOC 按钮 → 抽屉目录（覆盖侧边，不占主列）    |
++--------------------------------------------------+
+| 评论区                                           |
++--------------------------------------------------+
+| Footer                                           |
++--------------------------------------------------+
+```
+
 ### 关键尺寸参考
 
 这些是整个站点用到的核心尺寸数值：
@@ -300,6 +353,11 @@ flowchart TD
 | `--radius-lg` | `16px` | 大圆角（卡片、图片） |
 | `--line-height-base` | `1.75` | 正文行高 |
 | `--line-height-tight` | `1.22` | 标题行高 |
+
+### 单位说明：rem / ch
+
+- `rem`（root em）：基于根元素字体大小（浏览器默认 16px）；1rem≈16px，48rem≈768px，72rem≈1152px。用户调整系统/浏览器字体时，布局随比例缩放。
+- `ch`（character）：基于当前字体数字“0”的宽度；68ch 代表 68 个“0”的长度，常见设置下约 60–75 字符行长（≈680px），是可读性推荐区间。
 
 响应式断点：
 
@@ -802,3 +860,13 @@ export const useMediaQuery = (query: keyof typeof breakpoints) => {
 这样可以避免设计系统无序增长，保持代码库的一致性。
 
 如果你也在搭建个人博客，希望这份设计说明书能给你一些启发。✨
+
+### 设计/实现参考资料
+
+- CSS 单位与排版：MDN [`length`](https://developer.mozilla.org/en-US/docs/Web/CSS/length#relative_length_units)、[`line-height`](https://developer.mozilla.org/en-US/docs/Web/CSS/line-height)、[`max-width`](https://developer.mozilla.org/en-US/docs/Web/CSS/max-width)、[`clamp()`](https://developer.mozilla.org/en-US/docs/Web/CSS/clamp)
+- 可读性建议：WCAG [Visual Presentation](https://www.w3.org/WAI/WCAG21/Understanding/visual-presentation.html)；Nielsen Norman [Line Length for Readability](https://www.nngroup.com/articles/line-length-readability/)
+- Astro：内容集合 [docs](https://docs.astro.build/zh-cn/guides/content-collections/)，islands 模式 [docs](https://docs.astro.build/zh-cn/concepts/islands/)
+- Tailwind CSS：配置/设计令牌映射 [docs](https://tailwindcss.com/docs/configuration)（`theme` 扩展）
+- Shiki：代码高亮与主题配置 [shiki.style](https://shiki.style/)
+- remark / rehype：插件文档 [remarkjs.org](https://remarkjs.org/)、[rehypejs.org](https://rehypejs.org/)
+- 可访问性：[`prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)、焦点管理与 ARIA [MDN](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA)、[WAI-ARIA Authoring Practices](https://www.w3.org/TR/wai-aria-practices/)
