@@ -8,12 +8,12 @@ tags: [ "TIL", "博客", "部署", "Hugo", "DeepSearch" ]
 
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
-|||
-| :--- | :------------------------- |  
-| 第一作者    | Grok DeepSearch            |  
-| 校对&编辑   | Niracler                   |  
-| 排版      | claude-3.7-sonnet-thinking |  
-| Hugo 版本 | v0.145.0                   |  
+| | |
+| :--- | :------------------------- |
+| 第一作者 | Grok DeepSearch |
+| 校对&编辑 | Niracler |
+| 排版 | claude-3.7-sonnet-thinking |
+| Hugo 版本 | v0.145.0 |
 
 <details> <summary>Prompt</summary>
 

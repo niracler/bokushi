@@ -145,7 +145,7 @@ sudo ufw status
 ## 📊 配置总结
 
 | 项目 | 配置 |
-|------|------|
+| ------ | ------ |
 | Docker 镜像 | `ghcr.io/shadowsocks/ssserver-rust:latest` |
 | 加密方式 | `aes-256-gcm` |
 | 服务器端口 | `8388` (TCP & UDP) |
