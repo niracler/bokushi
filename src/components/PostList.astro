@@ -42,10 +42,10 @@ const groupedPosts = Array.from(postsByYear.entries());
 			<div class="space-y-4" data-year-group>
 				{/* 年份标题 - 使用分隔线而非巨大数字 */}
 				<div class="flex items-center gap-4">
-					<h3 class="text-xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-2xl">
+					<h3 class="text-xl font-bold tracking-tight text-primary sm:text-2xl">
 						{year}
 					</h3>
-					<div class="h-px flex-1 bg-[var(--color-border-soft)]" />
+					<div class="h-px flex-1 bg-border-soft" />
 				</div>
 
 				<ul class="m-0 flex list-none flex-col gap-0 p-0">
@@ -53,18 +53,18 @@ const groupedPosts = Array.from(postsByYear.entries());
 						const isDeepSearch = post.data.tags?.includes('DeepSearch') ?? false;
 						return (
 							<li data-deepsearch={isDeepSearch ? 'true' : 'false'}>
-								<div class="post-link group relative flex items-baseline gap-4 rounded-md px-4 py-2.5 transition-all duration-200 hover:bg-[color-mix(in srgb,var(--color-accent)6%,transparent)]">
-									<h4 class="title flex-1 text-base font-medium tracking-tight text-[var(--color-text-primary)] transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-lg">
+								<div class="post-link group relative flex items-baseline gap-4 rounded-md px-4 py-2.5 transition-all duration-200 hover:bg-[color-mix(in_srgb,var(--color-accent)_6%,transparent)]">
+									<h4 class="title flex-1 text-base font-medium tracking-tight text-primary transition-colors duration-200 group-hover:text-accent sm:text-lg">
 										<a
 											href={`/${post.id}`}
-											class="no-underline text-[var(--color-text-primary)] hover:text-[var(--color-accent)] focus-visible:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]"
+											class="no-underline text-primary hover:text-accent focus-visible:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
 											data-post-id={post.id}
 										>
 											{post.data.title}
 										</a>
 									</h4>
 
-									<p class="date ml-auto shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted transition-colors duration-200 group-hover:text-[var(--color-accent)] sm:text-xs" data-no-preview>
+									<p class="date ml-auto shrink-0 text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted transition-colors duration-200 group-hover:text-accent sm:text-xs" data-no-preview>
 										<FormattedDate date={post.data.pubDate} />
 									</p>
 								</div>

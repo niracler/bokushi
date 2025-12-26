@@ -20,17 +20,17 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
 ---
 
 <header
-    class="bg-[var(--color-bg-surface)] border-b border-[var(--color-border)]"
+    class="bg-surface border-b border-border"
 >
     <nav
         class="mx-auto flex w-full max-w-4xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6"
     >
         <h2
-            class="text-[1.05rem] font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-[1.1rem]"
+            class="text-[1.05rem] font-semibold tracking-tight text-primary sm:text-[1.1rem]"
         >
             <a
                 href="/"
-                class="transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]"
+                class="transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
             >
                 {SITE_TITLE}
             </a>
@@ -39,7 +39,7 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
             <button
                 type="button"
-                class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--color-border-soft)] bg-transparent text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)] md:hidden"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-soft bg-transparent text-secondary transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft md:hidden"
                 aria-label="打开导航菜单"
                 aria-expanded="false"
                 data-nav-toggle
@@ -80,17 +80,17 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
             aria-label="关闭导航菜单"></button>
         <div
             data-nav-drawer
-            class="relative z-10 flex h-full w-72 max-w-[80vw] translate-x-6 flex-col gap-6 border-l border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 text-[var(--color-text-primary)] shadow-xl transition-transform duration-200"
+            class="relative z-10 flex h-full w-72 max-w-[80vw] translate-x-6 flex-col gap-6 border-l border-border bg-surface p-6 text-primary shadow-xl transition-transform duration-200"
         >
             <div class="flex items-center justify-between">
                 <span
-                    class="text-sm font-semibold uppercase tracking-[0.25em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]"
+                    class="text-sm font-semibold uppercase tracking-[0.25em] text-[color-mix(in_srgb,var(--color-text-muted)_70%,transparent)]"
                 >
                     Menu
                 </span>
                 <button
                     type="button"
-                    class="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-md text-secondary transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft"
                     data-nav-close
                     aria-label="关闭导航菜单"
                 >
@@ -105,10 +105,10 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
                         <a
                             href={link.href}
                             class:list={[
-                                "inline-flex items-center rounded-md px-3 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]",
+                                "inline-flex items-center rounded-md px-3 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft",
                                 isActive(link.href)
-                                    ? "bg-[color-mix(in srgb,var(--color-accent)12%,transparent)] text-[var(--color-accent)] font-semibold"
-                                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] hover:bg-[color-mix(in srgb,var(--color-accent)8%,transparent)]",
+                                    ? "bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-accent font-semibold"
+                                    : "text-secondary hover:text-accent hover:bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)]",
                             ]}
                             data-nav-link
                         >
@@ -118,7 +118,7 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
                 }
             </nav>
             <div
-                class="mt-auto border-t border-[var(--color-border-subtle)] pt-4"
+                class="mt-auto border-t border-subtle pt-4"
             >
                 <ThemeToggle variant="mobile" />
             </div>

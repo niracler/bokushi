@@ -61,33 +61,7 @@ const blog = defineCollection({
 
 ### Markdown 处理管道
 
-使用 remark/rehype 插件链处理内容：
-
-**Remark 插件（Markdown → AST）**
-
-- `remarkAlert`：支持 GitHub 风格的提示块（Note、Warning 等）
-- `remarkModifiedTime`：从 Git 历史提取最后修改时间
-
-**Rehype 插件（HTML 处理）**
-
-- `rehypeSlug`：为标题生成 ID
-- `rehypeAutolinkHeadings`：标题自动添加锚点链接
-- `rehypeMermaid`：服务端渲染 Mermaid 图表为内联 SVG
-- `rehypePicture`：生成响应式 `<picture>` 标签
-- `rehypeImgSize`：自动写入图片宽高，防止 CLS（Cumulative Layout Shift）
-- `rehypeFigure`：包装图片为 `<figure>` + `<figcaption>`
-
-**代码高亮**
-使用 Shiki 的双主题配置（`github-light` / `dracula`），跟随系统主题自动切换：
-
-```javascript
-shikiConfig: {
-    themes: {
-        light: "github-light",
-        dark: "dracula",
-    },
-}
-```
+使用 [remark](https://remarkjs.org/) / [rehype](https://rehypejs.org/) 插件链处理 Markdown 内容，包括 GitHub 风格提示块、Git 修改时间、标题锚点、Mermaid 图表、响应式图片等。代码高亮使用 [Shiki](https://shiki.style/) 双主题配置。
 
 ### 样式系统：Tailwind 4
 
@@ -295,59 +269,6 @@ flowchart TD
 - `.surface-card--hover-border`：hover 时边框颜色加深
 - `.surface-card--hover-none`：禁用 hover 效果
 
-### 博客文章页布局框架
-
-用 ASCII 速览 BlogPost 布局（桌面 / 移动）：
-
-```
-[桌面视图]
-+------------------------------------------------------------------------------------------------+
-| 视口（全宽）                                                                                   |
-|                                                                                                |
-|   +----------------------------------------------------------------------------------------+   |
-|   | Header：max-w-4xl 容器，Logo/导航/主题切换（内容左对齐，容器居中）                    |   |
-|   +----------------------------------------------------------------------------------------+   |
-|                                                                                                |
-|   +---------------------------------- max-w-3xl (~48rem) --------------------------------+      |
-|   | 文章头（居中）：标题 / 日期 / 标签 / 摘要                                              |      |
-|   +---------------------------------------------------------------------------------------+      |
-|   | 主体正文 .prose 68ch（居中列，左右留白）                                              |      |
-|   | - 段落 / 代码块 / 图片 + Lightbox                                                      |      |
-|   | - 长滚动内容                                                                           |      |
-|   +---------------------------------------------------------------------------------------+      |
-|   | 评论：Remark42（同正文列宽）                                                           |      |
-|   +---------------------------------------------------------------------------------------+      |
-|                                                                                                |
-|                                                 +----------------------------+                 |
-|                                                 | TOC 侧栏 sticky            |                 |
-|                                                 | 280px 宽，随正文高度       |                 |
-|                                                 | 右侧绝对定位：主体右侧再+3rem |                 |
-|                                                 +----------------------------+                 |
-|                                                                                                |
-|   +----------------------------------------------------------------------------------------+   |
-|   | Footer：page-shell 宽度（~72rem），社交按钮 / CC 版权，内容居中                         |   |
-|   +----------------------------------------------------------------------------------------+   |
-|                                                                                                |
-+------------------------------------------------------------------------------------------------+
-
-[移动视图]
-+--------------------------------------------------+
-| Header：Logo / 抽屉导航 / 主题切换               |
-+--------------------------------------------------+
-| 文章头：标题 + 标签 + 时间                       |
-+--------------------------------------------------+
-| 正文（全宽）                                     |
-| - 段落/代码/图像                                 |
-| - Lightbox                                       |
-+--------------------------------------------------+
-| 浮动 TOC 按钮 → 抽屉目录（覆盖侧边，不占主列）    |
-+--------------------------------------------------+
-| 评论区                                           |
-+--------------------------------------------------+
-| Footer                                           |
-+--------------------------------------------------+
-```
-
 ### 关键尺寸参考
 
 这些是整个站点用到的核心尺寸数值：
@@ -363,29 +284,7 @@ flowchart TD
 | `--line-height-base` | `1.75` | 正文行高 |
 | `--line-height-tight` | `1.22` | 标题行高 |
 
-### 单位说明：rem / ch
-
-- `rem`（root em）：基于根元素字体大小（浏览器默认 16px）；1rem≈16px，48rem≈768px，72rem≈1152px。用户调整系统/浏览器字体时，布局随比例缩放。
-- `ch`（character）：基于当前字体数字“0”的宽度；68ch 代表 68 个“0”的长度，常见设置下约 60–75 字符行长（≈680px），是可读性推荐区间。
-
-响应式断点：
-
-- `640px`：移动端 → 桌面端切换点（padding 增大）
-- `1024px`：显示侧边目录
-- `1280px`（xl）：PostList 预览卡片生效
-
-### 阅读宽度
-
-**为什么要限制正文宽度？**
-太宽的行会让眼睛疲劳，难以找到下一行的开头。所以：
-
-```css
-.prose {
-    max-width: var(--measure); /* 68ch，约 680px */
-}
-```
-
-`ch` 是一个基于字符宽度的单位，`68ch` 大约是 60-80 个字符的行长，符合可读性研究的推荐范围。
+关于 CSS 长度单位（rem、ch 等），参见 [MDN length 文档](https://developer.mozilla.org/en-US/docs/Web/CSS/length)。正文使用 `68ch` 行长以符合可读性推荐（约 60-80 字符）。
 
 ### 行高与字距
 
@@ -668,147 +567,26 @@ body.scroll-locked {
 - PostPreview 卡片可延迟 mount（Intersection Observer）
 - 导航/目录脚本可按需加载（目前是全局加载）
 
-### PageSpeed 实战记录（2025-11-22）
-
-- 字体优化：用 `pyftsubset` 生成 `jf-openhuninn-2.1.subset.woff2`（≈385 KB，覆盖当前内容字符集），`font-display: optional`，移除 TTF 回退，减轻 LCP 链。
-- 缓存策略：`public/_headers` 为 `/fonts/*`、`/_astro/*`、`/images/*` 设置一年 immutable，默认 10 分钟；RSS/Sitemap 1 天。
-- 阻塞脚本：在 Cloudflare 关闭 Email Obfuscation（去掉 `email-decode.min.js`）、可选关闭 Pages Analytics（去掉 `beacon.min.js`），避免 render-blocking / 短 TTL 提示。
-- robots 修复：新增 `public/robots.txt` 指向 `sitemap-index.xml`，通过 Lighthouse SEO 检查。
-- 当前 Mobile 报告（慢 4G 模拟，Moto G Power）：FCP 11.6s、LCP 12.2s、TBT 0、CLS 0，Performance 56。主要瓶颈为网络带宽 + 首屏文字/字体加载。
-
-![PageSpeed Insights mobile report (2025-11-22)](/images/psi-mobile-2025-11-22.png)
-
 ---
 
-## 待重构的部分
-
-这个博客是 vibe-coding 出来的，很多地方各行其道、没有统一规范。下面列出明确需要重构的地方：
+## 待改进
 
 ### 独立策展页模板
 
-**问题**：`/plrom`、`/friends`、`/心头好` 等页面沿用 `BlogPost.astro` 布局，但实际不需要：
+`/plrom`、`/friends`、`/心头好` 等页面目前沿用 `BlogPost.astro` 布局，但不需要评论区、目录和时间戳。计划创建简化的 `Curation.astro` 布局。
 
-- 评论区（策展页不需要讨论）
-- 目录（内容太短不需要导航）
-- 文章头部的发布日期/更新时间（不是时间敏感内容）
+### 不做的事情
 
-**方案**：创建 `Curation.astro` 布局：
+以下"改进想法"评估后决定不实施，记录原因以备后续参考：
 
-- 简化的头部（只保留标题）
-- 更灵活的内容区（支持多栏布局）
-- 在主导航中加入策展入口
-
-### 统一按钮组件
-
-**问题**：整个站点没有统一的按钮样式：
-
-- Channel 页的"在 Telegram 中打开"是一种样式
-- TOC 的浮动按钮是另一种样式
-- 代码块的复制按钮又是一种
-- 灯箱的控制按钮也各不相同
-
-**方案**：提炼 `Button` 组件：
-
-```astro
-<Button
-    variant="primary | secondary | ghost"
-    size="sm | md | lg"
-    icon={true}
->
-    按钮文字
-</Button>
-```
-
-### Token 与 JS 同步
-
-**问题**：设计 token 定义在 `tokens.css` 中，但 TypeScript 脚本中硬编码了数值：
-
-- [postPreview.ts](src/scripts/postPreview.ts) 中的卡片尺寸、间距
-- [blog-interactive.ts](src/scripts/blog-interactive.ts) 中的断点判断
-- 各种动画时长（200ms、300ms、500ms 随意写）
-
-**方案**：
-
-- 方案 A：TS 中使用 `getComputedStyle(document.documentElement).getPropertyValue('--space-4')`
-- 方案 B：构建时生成 `tokens.ts` 文件，自动同步
-
-### 响应式断点管理
-
-**问题**：响应式断点散落在各处：
-
-- CSS 中：`@media (min-width: 640px)`、`@media (max-width: 1024px)`
-- JS 中：`window.innerWidth > 768`、`matchMedia('(min-width: 1280px)')`
-- Tailwind 类：`md:`、`lg:`、`xl:`
-
-断点不统一，难以维护。
-
-**方案**：定义标准断点 + 统一 API：
-
-```typescript
-// breakpoints.ts
-export const breakpoints = {
-    sm: 640,
-    md: 768,
-    lg: 1024,
-    xl: 1280,
-} as const;
-
-export const useMediaQuery = (query: keyof typeof breakpoints) => {
-    // 返回响应式状态
-};
-```
-
-### 表格响应式处理
-
-**问题**：表格在窄屏自动转换为卡片模式，但转换逻辑写在 [blog-interactive.ts](src/scripts/blog-interactive.ts) 中，耦合度高。
-
-**方案**：
-
-- 抽离为独立的 `<ResponsiveTable>` 组件
-- 或使用 CSS `@container` 查询实现（无需 JS）
-
-### 图片处理不一致
-
-**问题**：
-
-- Telegram 图片走代理（`/api/image-proxy`）
-- 本地图片直接引用
-- MangaShots 图片又是另一套逻辑
-
-没有统一的图片加载策略（懒加载、占位符、错误处理）。
-
-**方案**：
-
-- 创建 `<Image>` 组件封装所有图片逻辑
-- 统一懒加载策略（Intersection Observer）
-- 统一错误处理（显示占位图）
-
-### 移动端导航体验
-
-**问题**：
-
-- Header 导航在移动端是抽屉
-- TOC 目录在移动端也是抽屉
-- 两个抽屉的动画、遮罩、焦点管理都是独立实现的
-
-**方案**：
-
-- 抽象 `<Drawer>` 组件
-- 统一抽屉行为（打开/关闭、动画、焦点陷阱）
-
-### CSS 类命名不统一
-
-**问题**：
-
-- 有的用 BEM（`telegram-post__header`）
-- 有的用 utility 类（`flex items-center gap-2`）
-- 有的用语义类（`.prose`、`.pill`）
-- 有的用 `data-` 属性选择器（`[data-tone="accent"]`）
-
-**方案**：
-
-- 制定命名规范文档
-- 或全面迁移到 Tailwind utility 类（但会失去语义）
+| 想法 | 不做的原因 |
+| ------ | ------ |
+| 统一按钮组件 | 按钮类型少，各自实现已够用，过早抽象 |
+| Token 与 JS 同步 | 硬编码几个数值不是问题，同步机制增加复杂度 |
+| 响应式断点管理 | Tailwind 4 的 `@screen` 指令已解决 |
+| 统一图片组件 | 三种来源（本地、Telegram、MangaShots）本质不同，强行统一反而复杂 |
+| 统一抽屉组件 | 两个抽屉（导航、TOC）独立工作良好，无明显 bug |
+| CSS 命名规范 | 重构成本高，现状可接受 |
 
 ---
 

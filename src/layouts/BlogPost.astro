@@ -65,7 +65,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 					]}
 				>
 						<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
-						<h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">{title}</h1>
+						<h1 class="text-3xl font-bold text-primary sm:text-4xl">{title}</h1>
 						<div class="space-y-2 text-sm text-muted">
 							<p>
 								<FormattedDate date={pubDate} />
@@ -79,7 +79,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 													href={lastModifiedCommitUrl}
 													target="_blank"
 													rel="noopener noreferrer"
-													class="underline decoration-dotted underline-offset-4 hover:text-[var(--color-accent)] transition-colors"
+													class="underline decoration-dotted underline-offset-4 hover:text-accent transition-colors"
 												>
 													<FormattedDate date={lastModified ? new Date(lastModified) : updatedDate!} />
 												</a>
@@ -134,18 +134,18 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 								{/* 抽屉内容 */}
 								<div
 									data-toc-mobile-content
-									class="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-[var(--color-bg-surface)] shadow-2xl translate-x-full transition-transform duration-300 pointer-events-auto"
+									class="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-surface shadow-2xl translate-x-full transition-transform duration-300 pointer-events-auto"
 								>
 									<div class="flex h-full flex-col">
 										{/* 头部 */}
 										<div class="flex items-center justify-between border-b border-border-subtle px-6 py-4">
-											<h2 class="text-lg font-semibold text-[var(--color-text-primary)]">目录</h2>
+											<h2 class="text-lg font-semibold text-primary">目录</h2>
 											<button
 												data-toc-mobile-close
-												class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--color-bg-muted)] transition-colors"
+												class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors"
 												aria-label="关闭目录"
 											>
-												<svg class="h-5 w-5 text-[var(--color-text-muted)]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<svg class="h-5 w-5 text-muted" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 													<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 												</svg>
 											</button>

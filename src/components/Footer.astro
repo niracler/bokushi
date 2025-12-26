@@ -5,11 +5,11 @@ import PostPreviewSetup from "./PostPreviewSetup.astro";
 
 const today = new Date();
 const iconButtonClass =
-    "inline-flex h-12 w-12 items-center justify-center rounded-full text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-soft)]";
+    "inline-flex h-12 w-12 items-center justify-center rounded-full text-secondary transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft";
 const iconClass = "h-7 w-7";
 ---
 
-<footer class="bg-[var(--color-bg-page)] py-12 text-center text-sm text-secondary">
+<footer class="bg-page py-12 text-center text-sm text-secondary">
     <div class="page-shell space-y-6">
         <div class="flex flex-wrap items-center justify-center gap-3">
             <a
@@ -85,11 +85,11 @@ const iconClass = "h-7 w-7";
                 href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
                 target="_blank"
                 rel="license noopener noreferrer"
-                class="inline-flex items-center gap-2 transition-colors hover:text-[var(--color-accent)]"
+                class="inline-flex items-center gap-2 transition-colors hover:text-accent"
                 title="本站内容采用 CC BY-NC-SA 4.0 国际许可协议"
             >
                 <span>CC BY-NC-SA 4.0</span>
-                <span class="inline-flex items-center gap-1 text-base text-[var(--color-text-secondary)]">
+                <span class="inline-flex items-center gap-1 text-base text-secondary">
                     <Icon
                         name="ri:creative-commons-fill"
                         class="h-4 w-4"
