@@ -1,0 +1,489 @@
+---
+/**
+ * Unified Lightbox Component
+ *
+ * A reusable lightbox for displaying images in fullscreen mode.
+ * Supports auto-binding to images via selector, loading states,
+ * navigation, and customizable metadata display.
+ *
+ * Props:
+ * - id: Unique identifier for the lightbox (default: "lightbox")
+ * - selector: CSS selector for images to bind (optional, for auto-binding)
+ * - showCounter: Show image counter (default: true)
+ *
+ * Usage:
+ * <Lightbox id="blog-lightbox" selector=".prose img:not([data-lightbox-skip])" />
+ * <Lightbox id="manga-lightbox" selector=".manga-shot-button" />
+ */
+interface Props {
+    id?: string;
+    selector?: string;
+    showCounter?: boolean;
+}
+
+const { id = "lightbox", selector, showCounter = true } = Astro.props;
+---
+
+<dialog
+	id={id}
+	class="lightbox"
+	aria-label="查看大图"
+	data-lightbox
+	data-selector={selector}
+>
+	<div class="lightbox__backdrop" data-lightbox-close></div>
+	<div class="lightbox__content">
+		<button
+			class="lightbox__close"
+			type="button"
+			aria-label="关闭"
+			data-lightbox-close
+		>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path
+					d="M6 6l12 12M18 6L6 18"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+				/>
+			</svg>
+		</button>
+
+		<button
+			class="lightbox__nav lightbox__nav--prev"
+			type="button"
+			aria-label="上一张"
+			data-lightbox-prev
+		>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path
+					d="M15 6l-6 6 6 6"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			</svg>
+		</button>
+
+		<div class="lightbox__image-container" data-lightbox-container>
+			<img data-lightbox-img alt="" />
+		</div>
+
+		<button
+			class="lightbox__nav lightbox__nav--next"
+			type="button"
+			aria-label="下一张"
+			data-lightbox-next
+		>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path
+					d="M9 6l6 6-6 6"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			</svg>
+		</button>
+
+		<div class="lightbox__meta" data-lightbox-meta>
+			<p class="lightbox__caption" data-lightbox-caption></p>
+			{showCounter && <p class="lightbox__counter" data-lightbox-counter></p>}
+		</div>
+	</div>
+</dialog>
+
+<script is:inline>
+	(() => {
+		// Find all lightbox dialogs and initialize them
+		const lightboxes = document.querySelectorAll("[data-lightbox]");
+		lightboxes.forEach((dialog) => initLightbox(dialog));
+
+		function initLightbox(dialog) {
+			if (dialog.dataset.lightboxInitialized) return;
+			dialog.dataset.lightboxInitialized = "true";
+
+			const selector = dialog.dataset.selector;
+			if (!selector) return; // No auto-binding if no selector
+
+			const imgEl = dialog.querySelector("[data-lightbox-img]");
+			const captionEl = dialog.querySelector("[data-lightbox-caption]");
+			const counterEl = dialog.querySelector("[data-lightbox-counter]");
+			const container = dialog.querySelector("[data-lightbox-container]");
+			const closeButtons = dialog.querySelectorAll("[data-lightbox-close]");
+			const prevBtn = dialog.querySelector("[data-lightbox-prev]");
+			const nextBtn = dialog.querySelector("[data-lightbox-next]");
+
+			let shots = [];
+			let current = 0;
+			const preloadCache = new Set();
+
+			const preload = (url) => {
+				if (!url || preloadCache.has(url)) return;
+				const img = new Image();
+				img.src = url;
+				preloadCache.add(url);
+			};
+
+			const preloadNeighbors = (index) => {
+				if (!shots.length) return;
+				const next = shots[(index + 1) % shots.length]?.src;
+				const prev = shots[(index - 1 + shots.length) % shots.length]?.src;
+				preload(next);
+				preload(prev);
+			};
+
+			// Get all matching elements and their data (called on each open for dynamic content)
+			const getShots = () => {
+				const elements = Array.from(document.querySelectorAll(selector));
+				const mapped = elements.map((el) => {
+					const isImg = el.tagName === "IMG";
+					const src = isImg
+						? el.currentSrc || el.src
+						: el.dataset.photoUrl || el.dataset.src || "";
+					const caption =
+						el.getAttribute("alt") ||
+						el.dataset.caption ||
+						el.dataset.title ||
+						el.dataset.mangaName ||
+						"";
+					const index = el.dataset.index ? parseInt(el.dataset.index, 10) : -1;
+					return { el, src, caption, index };
+				});
+				// Sort by index if available (for masonry layouts where DOM order != logical order)
+				if (mapped.some((s) => s.index >= 0)) {
+					mapped.sort((a, b) => a.index - b.index);
+				}
+				return mapped;
+			};
+
+			// Use event delegation for dynamic content support
+			document.addEventListener("click", (event) => {
+				const target = event.target.closest(selector);
+				if (!target) return;
+
+				event.preventDefault();
+				const allShots = getShots();
+				const index = allShots.findIndex((s) => s.el === target);
+				if (index !== -1) {
+					shots = allShots.map(({ src, caption }) => ({ src, caption }));
+					open(index);
+				}
+			});
+
+			const setLoading = (loading) => {
+				if (container) {
+					container.classList.toggle("is-loading", loading);
+				}
+			};
+
+			const showImage = (index) => {
+				const shot = shots[index];
+				if (!shot) return;
+
+				setLoading(true);
+
+				const loader = new Image();
+				loader.onload = () => {
+					if (imgEl) {
+						imgEl.src = shot.src;
+						imgEl.alt = shot.caption;
+					}
+					if (captionEl) captionEl.textContent = shot.caption || "";
+					if (counterEl) counterEl.textContent = `${index + 1} / ${shots.length}`;
+					current = index;
+					setLoading(false);
+					preloadNeighbors(index);
+				};
+				loader.onerror = () => {
+					setLoading(false);
+				};
+				loader.src = shot.src;
+			};
+
+			const open = (index) => {
+				if (!shots.length) return;
+				current = ((index % shots.length) + shots.length) % shots.length;
+				showImage(current);
+				dialog.showModal();
+				dialog.classList.add("is-open");
+				document.body.classList.add("scroll-locked");
+			};
+
+			const close = () => {
+				dialog.close();
+				dialog.classList.remove("is-open");
+				document.body.classList.remove("scroll-locked");
+			};
+
+			const step = (delta) => {
+				if (!shots.length) return;
+
+				// Check if we're at a boundary
+				const atStart = current === 0 && delta < 0;
+				const atEnd = current === shots.length - 1 && delta > 0;
+
+				if (atEnd) {
+					// Show loading state while waiting for more content
+					setLoading(true);
+					// Emit boundary event for "load more" functionality
+					const event = new CustomEvent("lightbox:boundary", {
+						detail: { direction: "next", lightboxId: dialog.id },
+						bubbles: true,
+					});
+					dialog.dispatchEvent(event);
+					return; // Don't wrap around, wait for more content
+				}
+
+				if (atStart) {
+					// At start, just wrap to end (no "load previous" needed)
+					showImage(shots.length - 1);
+					return;
+				}
+
+				const newIndex = current + delta;
+				showImage(newIndex);
+			};
+
+			// Allow external refresh of shots (after new content loads)
+			dialog.addEventListener("lightbox:refresh", () => {
+				const allShots = getShots();
+				const oldLength = shots.length;
+				shots = allShots.map(({ src, caption }) => ({ src, caption }));
+
+				// If we were at the end and new items were added, show the next one
+				if (current === oldLength - 1 && shots.length > oldLength) {
+					showImage(current + 1);
+				} else {
+					// No new content, just hide loading
+					setLoading(false);
+				}
+			});
+
+			// Event listeners
+			closeButtons.forEach((btn) => btn.addEventListener("click", close));
+			prevBtn?.addEventListener("click", () => step(-1));
+			nextBtn?.addEventListener("click", () => step(1));
+
+			dialog.addEventListener("click", (event) => {
+				if (event.target === dialog) close();
+			});
+
+			document.addEventListener("keydown", (event) => {
+				if (!dialog.open) return;
+				if (event.key === "Escape") close();
+				if (event.key === "ArrowLeft") step(-1);
+				if (event.key === "ArrowRight") step(1);
+			});
+
+			// Touch swipe support
+			let touchStartX = 0;
+			dialog.addEventListener("touchstart", (e) => {
+				touchStartX = e.changedTouches[0].screenX;
+			});
+			dialog.addEventListener("touchend", (e) => {
+				const touchEndX = e.changedTouches[0].screenX;
+				const diff = touchEndX - touchStartX;
+				if (Math.abs(diff) > 50) step(diff > 0 ? -1 : 1);
+			});
+
+			// Event delegation is set up above - no explicit collect() needed
+		}
+	})();
+</script>
+
+<style>
+	.lightbox {
+		margin: 0;
+		padding: 0;
+		border: none;
+		background: transparent;
+		width: 100vw;
+		height: 100vh;
+		max-width: none;
+		max-height: none;
+	}
+
+	.lightbox::backdrop {
+		background: var(--color-backdrop);
+		backdrop-filter: blur(6px);
+	}
+
+	.lightbox__backdrop {
+		position: absolute;
+		inset: 0;
+	}
+
+	.lightbox__content {
+		position: fixed;
+		inset: 0;
+		display: grid;
+		grid-template-rows: 1fr auto;
+		align-items: center;
+		justify-items: center;
+		padding: clamp(1rem, 4vw, 2rem);
+		gap: 1rem;
+		pointer-events: none;
+	}
+
+	.lightbox__image-container {
+		position: relative;
+		max-width: min(92vw, 1200px);
+		max-height: 80vh;
+		width: auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		pointer-events: auto;
+	}
+
+	.lightbox__image-container img {
+		max-height: 80vh;
+		max-width: 100%;
+		width: auto;
+		height: auto;
+		display: block;
+		object-fit: contain;
+		box-shadow: var(--shadow-lightbox);
+		border-radius: var(--radius-lg);
+		transition:
+			opacity 0.2s ease,
+			filter 0.2s ease;
+	}
+
+	/* Loading state */
+	.lightbox__image-container.is-loading img {
+		opacity: 0.35;
+		filter: blur(2px);
+	}
+
+	.lightbox__image-container::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 2rem;
+		height: 2rem;
+		margin: -1rem 0 0 -1rem;
+		border: 3px solid rgba(255, 255, 255, 0.25);
+		border-top-color: rgba(255, 255, 255, 0.9);
+		border-radius: 50%;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s ease;
+	}
+
+	.lightbox__image-container.is-loading::after {
+		opacity: 1;
+		animation: lightbox-spin 0.7s linear infinite;
+	}
+
+	@keyframes lightbox-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	/* Close button */
+	.lightbox__close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, 0.35);
+		color: white;
+		background: rgba(0, 0, 0, 0.4);
+		display: grid;
+		place-items: center;
+		cursor: pointer;
+		pointer-events: auto;
+		transition:
+			background 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.lightbox__close:hover {
+		background: rgba(0, 0, 0, 0.6);
+		border-color: rgba(255, 255, 255, 0.5);
+	}
+
+	/* Navigation buttons */
+	.lightbox__nav {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, 0.35);
+		color: white;
+		background: rgba(0, 0, 0, 0.35);
+		display: grid;
+		place-items: center;
+		cursor: pointer;
+		pointer-events: auto;
+		transition:
+			background 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.lightbox__nav:hover {
+		background: rgba(0, 0, 0, 0.6);
+		border-color: rgba(255, 255, 255, 0.5);
+	}
+
+	.lightbox__nav--prev {
+		left: clamp(0.5rem, 4vw, 1.5rem);
+	}
+
+	.lightbox__nav--next {
+		right: clamp(0.5rem, 4vw, 1.5rem);
+	}
+
+	.lightbox__nav svg,
+	.lightbox__close svg {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+
+	/* Meta section */
+	.lightbox__meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		align-items: center;
+		text-align: center;
+		pointer-events: auto;
+		color: var(--color-text-inverse);
+	}
+
+	.lightbox__caption {
+		margin: 0;
+		font-weight: 600;
+	}
+
+	.lightbox__counter {
+		margin: 0;
+		font-size: var(--font-size-sm);
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	/* Mobile adjustments */
+	@media (max-width: 640px) {
+		.lightbox__image-container {
+			max-height: 60vh;
+		}
+
+		.lightbox__image-container img {
+			max-height: 60vh;
+		}
+
+		.lightbox__meta {
+			align-items: stretch;
+			text-align: left;
+		}
+	}
+</style>

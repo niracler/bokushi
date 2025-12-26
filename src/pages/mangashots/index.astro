@@ -2,6 +2,7 @@
 import BaseHead from "../../components/BaseHead.astro";
 import Footer from "../../components/Footer.astro";
 import Header from "../../components/Header.astro";
+import Lightbox from "../../components/Lightbox.astro";
 
 export const prerender = false;
 ---
@@ -62,77 +63,7 @@ export const prerender = false;
 				<p>没有更多了~</p>
 			</div>
 
-			<!-- Lightbox Dialog -->
-			<dialog id="manga-lightbox" class="manga-lightbox">
-				<div class="manga-lightbox-content">
-					<button
-						class="manga-lightbox-close"
-						aria-label="Close lightbox"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="32"
-							height="32"
-							viewBox="0 0 32 32"
-						>
-							<path
-								fill="currentColor"
-								d="M16 2C8.2 2 2 8.2 2 16s6.2 14 14 14s14-6.2 14-14S23.8 2 16 2m5.4 21L16 17.6L10.6 23L9 21.4l5.4-5.4L9 10.6L10.6 9l5.4 5.4L21.4 9l1.6 1.6l-5.4 5.4l5.4 5.4z"
-							></path>
-						</svg>
-					</button>
-
-					<button
-						class="manga-lightbox-prev"
-						aria-label="Previous image"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="32"
-							height="32"
-							viewBox="0 0 32 32"
-						>
-							<path
-								fill="currentColor"
-								d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2m8 15H11.85l5.58 5.573L16 24l-8-8l8-8l1.43 1.393L11.85 15H24Z"
-							></path>
-						</svg>
-					</button>
-
-					<button class="manga-lightbox-next" aria-label="Next image">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="32"
-							height="32"
-							viewBox="0 0 32 32"
-						>
-							<path
-								fill="currentColor"
-								d="M2 16A14 14 0 1 0 16 2A14 14 0 0 0 2 16m6-1h12.15l-5.58-5.607L16 8l8 8l-8 8l-1.43-1.427L20.15 17H8Z"
-							></path>
-						</svg>
-					</button>
-
-					<div class="manga-lightbox-image-container">
-						<img
-							id="manga-lightbox-img"
-							src=""
-							alt=""
-							class="manga-lightbox-img"
-						/>
-					</div>
-
-					<div class="manga-lightbox-caption">
-						<p
-							id="manga-lightbox-manga-name"
-							class="lightbox-manga-name"
-						>
-						</p>
-						<h2 id="manga-lightbox-title"></h2>
-						<p id="manga-lightbox-caption-text"></p>
-					</div>
-				</div>
-			</dialog>
+			<Lightbox id="manga-lightbox" selector=".manga-shot-button" />
 		</main>
 		<Footer />
 
@@ -247,28 +178,27 @@ export const prerender = false;
 				display: none;
 			}
 
-			button.filter-chip,
-			.filter-chips button.filter-chip {
-				display: flex !important;
-				flex-direction: row !important;
-				align-items: center !important;
-				gap: 0.625rem !important;
-				padding: var(--space-2) var(--space-4) !important;
-				border: 1px solid var(--color-border-soft) !important;
-				border-radius: var(--radius-md) !important;
-				background: var(--color-bg-surface) !important;
-				color: var(--color-text-primary) !important;
-				font-size: var(--font-size-sm) !important;
-				font-weight: 500 !important;
-				cursor: pointer !important;
+			.filter-chip {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 0.625rem;
+				padding: var(--space-2) var(--space-4);
+				border: 1px solid var(--color-border-soft);
+				border-radius: var(--radius-md);
+				background: var(--color-bg-surface);
+				color: var(--color-text-primary);
+				font-size: var(--font-size-sm);
+				font-weight: 500;
+				cursor: pointer;
 				transition:
 					border-color 0.2s ease,
-					background-color 0.2s ease !important;
-				white-space: nowrap !important;
-				flex-shrink: 0 !important;
-				min-width: fit-content !important;
-				width: auto !important;
-				box-shadow: none !important;
+					background-color 0.2s ease;
+				white-space: nowrap;
+				flex-shrink: 0;
+				min-width: fit-content;
+				width: auto;
+				box-shadow: none;
 			}
 
 			.filter-chip:hover {
@@ -285,16 +215,16 @@ export const prerender = false;
 			}
 
 			.filter-chip-name {
-				display: inline !important;
-				line-height: 1 !important;
+				display: inline;
+				line-height: 1;
 			}
 
 			.filter-chip-count {
-				display: inline !important;
-				font-size: 0.6875rem !important;
-				font-variant-numeric: tabular-nums !important;
-				opacity: 0.7 !important;
-				font-weight: 600 !important;
+				display: inline;
+				font-size: 0.6875rem;
+				font-variant-numeric: tabular-nums;
+				opacity: 0.7;
+				font-weight: 600;
 			}
 
 			.filter-chip.active .filter-chip-count {
@@ -403,188 +333,6 @@ export const prerender = false;
 				object-fit: cover;
 			}
 
-			/* Lightbox Styles */
-			.manga-lightbox {
-				position: fixed;
-				inset: 0;
-				max-width: 100vw;
-				max-height: 100vh;
-				width: 100vw;
-				height: 100vh;
-				border: none;
-				padding: 0;
-				background: transparent;
-				opacity: 0;
-				transition:
-					opacity 0.3s ease,
-					display 0.3s ease allow-discrete;
-			}
-
-			.manga-lightbox::backdrop {
-				background: var(--color-backdrop);
-				backdrop-filter: blur(12px);
-				opacity: 0;
-				transition: opacity 0.3s ease;
-			}
-
-			.manga-lightbox[open] {
-				opacity: 1;
-			}
-
-			.manga-lightbox[open]::backdrop {
-				opacity: 1;
-			}
-
-			@starting-style {
-				.manga-lightbox[open] {
-					opacity: 0;
-				}
-				.manga-lightbox[open]::backdrop {
-					opacity: 0;
-				}
-			}
-
-			.manga-lightbox-content {
-				position: relative;
-				width: 100%;
-				height: 100%;
-				display: grid;
-				grid-template-columns: 1fr;
-				grid-template-rows: 1fr auto;
-				gap: 1.5rem;
-				padding: 2rem;
-			}
-
-			.manga-lightbox-image-container {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				overflow: hidden;
-				position: relative;
-			}
-
-			.manga-lightbox-img {
-				max-width: 100%;
-				max-height: calc(100vh - 200px);
-				object-fit: contain;
-				border-radius: var(--radius-lg);
-				box-shadow: var(--shadow-lightbox);
-				transition: opacity 0.18s ease, filter 0.18s ease;
-			}
-
-			.manga-lightbox-image-container.is-loading .manga-lightbox-img {
-				opacity: 0.35;
-				filter: blur(1px);
-			}
-
-			.manga-lightbox-image-container::after {
-				content: "";
-				position: absolute;
-				inset: 50% auto auto 50%;
-				width: 2.5rem;
-				height: 2.5rem;
-				margin: -1.25rem 0 0 -1.25rem;
-				border-radius: 50%;
-				border: 3px solid rgba(255, 255, 255, 0.25);
-				border-top-color: rgba(255, 255, 255, 0.9);
-				opacity: 0;
-				transform: scale(0.9);
-				transition: opacity 0.15s ease, transform 0.15s ease;
-				pointer-events: none;
-			}
-
-			.manga-lightbox-image-container.is-loading::after {
-				opacity: 1;
-				transform: scale(1);
-				animation: spin 0.7s linear infinite;
-			}
-
-			.manga-lightbox-caption {
-				text-align: center;
-				color: white;
-				padding: 1rem;
-			}
-
-			.lightbox-manga-name {
-				font-size: var(--font-size-sm);
-				opacity: 0.7;
-				margin-bottom: 0.5rem;
-			}
-
-			.manga-lightbox-caption h2 {
-				margin: 0 0 0.5rem 0;
-				font-size: 1.5rem;
-				font-weight: 700;
-				color: var(--color-accent);
-			}
-
-			.manga-lightbox-caption p {
-				margin: 0.25rem 0;
-				opacity: 0.9;
-				line-height: 1.6;
-			}
-
-			/* Navigation Buttons */
-			.manga-lightbox-close,
-			.manga-lightbox-prev,
-			.manga-lightbox-next {
-				position: absolute;
-				background: rgba(255, 255, 255, 0.15);
-				border: 2px solid rgba(255, 255, 255, 0.3);
-				border-radius: 50%;
-				padding: 0.875rem;
-				cursor: pointer;
-				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-				z-index: 10;
-				backdrop-filter: blur(12px);
-			}
-
-			.manga-lightbox-close:hover,
-			.manga-lightbox-prev:hover,
-			.manga-lightbox-next:hover {
-				background: rgba(251, 143, 104, 0.5);
-				border-color: var(--color-accent);
-				box-shadow: var(--shadow-button-hover);
-			}
-
-			.manga-lightbox-close svg,
-			.manga-lightbox-prev svg,
-			.manga-lightbox-next svg {
-				display: block;
-				color: white;
-				filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-			}
-
-			.manga-lightbox-close {
-				top: 1.5rem;
-				right: 1.5rem;
-			}
-
-			.manga-lightbox-prev {
-				top: 50%;
-				left: 1.5rem;
-				transform: translateY(-50%);
-			}
-
-			.manga-lightbox-prev:hover {
-				transform: translateY(-50%);
-			}
-
-			.manga-lightbox-next {
-				top: 50%;
-				right: 1.5rem;
-				transform: translateY(-50%);
-			}
-
-			.manga-lightbox-next:hover {
-				transform: translateY(-50%);
-			}
-
-			/* Prevent body scroll when lightbox is open */
-			html:has(dialog[open]) {
-				overflow: hidden;
-			}
-
 			/* Loading States */
 			.loading-state,
 			.loading-more,
@@ -634,7 +382,7 @@ export const prerender = false;
 			}
 
 			.manga-hidden {
-				display: none !important;
+				display: none;
 			}
 
 			/* Mobile Responsive */
@@ -668,23 +416,6 @@ export const prerender = false;
 
 				.manga-masonry-grid_column {
 					gap: 1rem;
-				}
-
-				.manga-lightbox-content {
-					padding: 1rem;
-				}
-
-				.manga-lightbox-img {
-					max-height: calc(100vh - 150px);
-				}
-
-				.manga-lightbox-caption h2 {
-					font-size: 1.25rem;
-				}
-
-				.manga-lightbox-prev,
-				.manga-lightbox-next {
-					padding: 0.625rem;
 				}
 
 				.manga-shot-item:hover .manga-shot-button {
@@ -762,7 +493,6 @@ export const prerender = false;
 			let searchQuery = "";
 			let activeRequestToken = 0;
 			let searchTimeout: number;
-			let lightboxInitialized = false;
 			let imageObserver: IntersectionObserver | null = null;
 			let fillInProgress = false;
 
@@ -927,7 +657,6 @@ export const prerender = false;
 					if (elements.mangaGrid) {
 						if (page === 1) {
 							initMasonry(true);
-							setupLightbox();
 							setupInfiniteScroll();
 						}
 						const newItemsReady = addItemsToMasonry(sortedNewShots, startIndex);
@@ -1071,6 +800,7 @@ export const prerender = false;
 				const button = document.createElement("button");
 				button.className = "manga-shot-button";
 				Object.assign(button.dataset, {
+					index: String(index),
 					photoUrl: shot.photo_url,
 					mangaName: shot.manga_name,
 					title: shot.title,
@@ -1174,108 +904,28 @@ export const prerender = false;
 				}, RESIZE_DEBOUNCE_MS);
 			});
 
-			function setupLightbox() {
-				const lightbox = document.getElementById("manga-lightbox") as HTMLDialogElement;
-				const lightboxImg = document.getElementById("manga-lightbox-img") as HTMLImageElement;
-				const lightboxMangaName = document.getElementById("manga-lightbox-manga-name");
-				const lightboxTitle = document.getElementById("manga-lightbox-title");
-				const lightboxCaption = document.getElementById("manga-lightbox-caption-text");
-				const lightboxImageContainer = document.querySelector(".manga-lightbox-image-container");
-
-				if (lightboxInitialized || !lightbox || !lightboxImg) return;
-				lightboxInitialized = true;
-
-				let currentIndex = 0;
-				const preloadCache = new Set<string>();
-
-				const getButtons = () => Array.from(document.querySelectorAll(".manga-shot-button")) as HTMLButtonElement[];
-
-				const preload = (url?: string | null) => {
-					if (!url || preloadCache.has(url)) return;
-					const img = new Image();
-					img.src = url;
-					preloadCache.add(url);
-				};
-
-				const preloadNeighbors = (index: number) => {
-					const buttons = getButtons();
-					if (!buttons.length) return;
-					const next = buttons[(index + 1) % buttons.length]?.dataset.photoUrl;
-					const prev = buttons[(index - 1 + buttons.length) % buttons.length]?.dataset.photoUrl;
-					preload(next);
-					preload(prev);
-				};
-
-				function showImage(index: number) {
-					const buttons = getButtons();
-					if (index < 0 || index >= buttons.length) return;
-
-					const button = buttons[index];
-					const url = button.dataset.photoUrl || "";
-
-					if (lightboxImageContainer) lightboxImageContainer.classList.add("is-loading");
-
-					const loader = new Image();
-					loader.onload = () => {
-						lightboxImg.src = url;
-						lightboxImg.alt = button.dataset.title || "";
-						if (lightboxMangaName) lightboxMangaName.textContent = button.dataset.mangaName || "";
-						if (lightboxTitle) lightboxTitle.textContent = button.dataset.title || "";
-						if (lightboxCaption) lightboxCaption.textContent = button.dataset.caption || "";
-						currentIndex = index;
-						if (lightboxImageContainer) lightboxImageContainer.classList.remove("is-loading");
-						preloadNeighbors(index);
-					};
-					loader.onerror = () => {
-						if (lightboxImageContainer) lightboxImageContainer.classList.remove("is-loading");
-					};
-					loader.src = url;
-				}
-
-				const navigate = (direction: "prev" | "next") => {
-					const buttons = getButtons();
-					const newIndex = direction === "prev"
-						? (currentIndex > 0 ? currentIndex - 1 : buttons.length - 1)
-						: (currentIndex < buttons.length - 1 ? currentIndex + 1 : 0);
-					showImage(newIndex);
-				};
-
-				document.getElementById("manga-grid")?.addEventListener("click", (e) => {
-					const button = (e.target as HTMLElement).closest(".manga-shot-button") as HTMLButtonElement;
-					if (button) {
-						const index = getButtons().indexOf(button);
-						if (index !== -1) {
-							showImage(index);
-							lightbox?.showModal();
-						}
-					}
-				});
-
-				document.querySelector(".manga-lightbox-close")?.addEventListener("click", () => lightbox?.close());
-				document.querySelector(".manga-lightbox-prev")?.addEventListener("click", () => navigate("prev"));
-				document.querySelector(".manga-lightbox-next")?.addEventListener("click", () => navigate("next"));
-
-				document.addEventListener("keydown", (e) => {
-					if (!lightbox?.open) return;
-					if (e.key === "Escape") lightbox.close();
-					if (e.key === "ArrowLeft") navigate("prev");
-					if (e.key === "ArrowRight") navigate("next");
-				});
-
-				let touchStartX = 0;
-				lightbox?.addEventListener("touchstart", (e) => touchStartX = e.changedTouches[0].screenX);
-				lightbox?.addEventListener("touchend", (e) => {
-					const touchEndX = e.changedTouches[0].screenX;
-					const diff = touchEndX - touchStartX;
-					if (Math.abs(diff) > 50) navigate(diff > 0 ? "prev" : "next");
-				});
-			}
-
 			async function initPage() {
 				await loadMangaList();
 				setupSearch();
 				setupFilterListeners();
+				setupLightboxLoadMore();
 				loadMangashots(1);
+			}
+
+			function setupLightboxLoadMore() {
+				// Listen for lightbox boundary event to load more content
+				document.addEventListener("lightbox:boundary", async (event) => {
+					const detail = (event as CustomEvent).detail;
+					if (detail.lightboxId !== "manga-lightbox") return;
+					if (detail.direction !== "next") return;
+					if (isLoading || currentPage >= totalPages) return;
+
+					await loadMangashots(currentPage + 1);
+
+					// Notify lightbox that new content is available
+					const lightbox = document.getElementById("manga-lightbox");
+					lightbox?.dispatchEvent(new Event("lightbox:refresh"));
+				});
 			}
 
 			if (document.readyState === "loading") {

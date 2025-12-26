@@ -48,7 +48,6 @@ Astro 的内容集合系统让我可以用统一的方式管理不同类型的�
 - `blog`：长文，深度思考
 - `monthly`：月记，状态更新
 - `til`：Today I Learned，短记录
-- `galleries`：图集，配合 Pandabox 组件展示
 
 每个集合共享相同的 schema（标题、日期、标签等），但在展示形式和写作节奏上各有特点。
 
@@ -208,7 +207,7 @@ shikiConfig: {
 
 - 无限滚动加载
 - 标题/标签过滤
-- 轻量灯箱（独立实现，不依赖全局灯箱组件）
+- 统一灯箱（使用共享的 `Lightbox.astro` 组件，支持无限滚动时自动加载更多）
 
 数据来源：Cloudflare Worker API（`/api/mangashots`）
 
@@ -225,7 +224,7 @@ flowchart TD
     Home["首页：引言 + 导航"] --> BlogList["文章索引 /blog<br/>PostList 组件<br/>按年份分组 + DeepSearch 过滤"]
     BlogList --> Post["文章页 /[slug]<br/>BlogPost 布局"]
     Post --> TOC["目录<br/>桌面：侧边 Sticky<br/>移动：浮动按钮+抽屉"]
-    Post --> Lightbox["GlobalImageLightbox<br/>正文图片灯箱"]
+    Post --> Lightbox["Lightbox<br/>正文图片灯箱"]
     Post --> Comments["Remark42 评论"]
 
     Home --> Channel["动态 /channel<br/>Telegram 抓取 + SSR"]
@@ -313,7 +312,7 @@ flowchart TD
 |   | 文章头（居中）：标题 / 日期 / 标签 / 摘要                                              |      |
 |   +---------------------------------------------------------------------------------------+      |
 |   | 主体正文 .prose 68ch（居中列，左右留白）                                              |      |
-|   | - 段落 / 代码块 / 图片 + GlobalImageLightbox                                          |      |
+|   | - 段落 / 代码块 / 图片 + Lightbox                                                      |      |
 |   | - 长滚动内容                                                                           |      |
 |   +---------------------------------------------------------------------------------------+      |
 |   | 评论：Remark42（同正文列宽）                                                           |      |
@@ -339,7 +338,7 @@ flowchart TD
 +--------------------------------------------------+
 | 正文（全宽）                                     |
 | - 段落/代码/图像                                 |
-| - GlobalImageLightbox                            |
+| - Lightbox                                       |
 +--------------------------------------------------+
 | 浮动 TOC 按钮 → 抽屉目录（覆盖侧边，不占主列）    |
 +--------------------------------------------------+
@@ -500,27 +499,37 @@ const observer = new IntersectionObserver((entries) => {
 - 阴影：`box-shadow: var(--shadow-soft)`
 - 无 hover 效果（保持静态，点击打开灯箱）
 
-### GlobalImageLightbox：全局灯箱
+### Lightbox：统一灯箱组件
 
-绑定 `.prose` 和 `.telegram-post` 内的所有图片，提供：
+站点统一使用 `Lightbox.astro` 组件处理所有灯箱场景，通过 `selector` 属性自动绑定目标图片：
 
-- 左右导航（键盘 ← →）
+```astro
+<!-- 博客文章 -->
+<Lightbox selector=".prose img:not([data-lightbox-skip])" />
+
+<!-- Telegram 频道 -->
+<Lightbox id="channel-lightbox" selector=".telegram-post .telegram-post-image" />
+
+<!-- 漫画表情包（支持动态加载更多） -->
+<Lightbox id="manga-lightbox" selector=".manga-shot-button" />
+```
+
+**功能特性**：
+
+- 左右导航（键盘 ← →、触摸滑动）
 - ESC 关闭
 - 图片计数（1 / 5）
-- Alt 文本展示
+- Alt/Caption 文本展示
+- 加载状态指示
+- 支持动态内容（事件委托模式）
+- 边界事件（到达最后一张时可触发加载更多）
 
 **工作原理**：
 
-1. 页面加载时收集所有符合条件的图片
+1. 使用事件委托监听点击，支持动态加载的内容
 2. 点击图片时，显示 `<dialog>` 元素（原生 HTML 对话框）
-3. 打开时锁定 body 滚动（`html.lightbox-open { overflow: hidden; }`）
-
-```javascript
-// GlobalImageLightbox.astro
-const images = Array.from(
-    document.querySelectorAll(".prose img, .telegram-post .telegram-post-image")
-);
-```
+3. 打开时锁定 body 滚动（`body.scroll-locked { overflow: hidden; }`）
+4. 支持 `data-index` 属性排序（解决 masonry 布局的 DOM 顺序问题）
 
 ### Telegram 图片代理
 
@@ -536,20 +545,18 @@ Telegram 图片直接引用可能在某些地区无法访问，所以走本域�
 - `Cache-Control: public, max-age=31536000, immutable`（一年缓存）
 - 支持跨域（`Access-Control-Allow-Origin: *`）
 
-### Pandabox：图集灯箱
+### 滚动锁定
 
-用于策展页面的图集展示（`/content/galleries`）：
+所有模态组件（灯箱、抽屉）统一使用 `.scroll-locked` 类锁定页面滚动：
 
-- 使用原生 `<dialog>` 元素
-- 支持滑动、键盘切换
-- 图片预加载
-- 过渡动画
+```css
+/* global.css */
+body.scroll-locked {
+    overflow: hidden;
+}
+```
 
-与 GlobalImageLightbox 相比，Pandabox 更适合精选图集的场景。
-
-### MangaShots 灯箱
-
-独立实现（不依赖全局灯箱），功能类似但样式更简洁，适配无限滚动列表。
+这确保了一致的行为，避免了各组件独立实现滚动锁定的混乱。
 
 ### 代码块
 
@@ -660,7 +667,6 @@ Telegram 图片直接引用可能在某些地区无法访问，所以走本域�
 
 - PostPreview 卡片可延迟 mount（Intersection Observer）
 - 导航/目录脚本可按需加载（目前是全局加载）
-- Pandabox 可抽离为共享灯箱（目前与 GlobalImageLightbox 功能重复）
 
 ### PageSpeed 实战记录（2025-11-22）
 
@@ -677,28 +683,6 @@ Telegram 图片直接引用可能在某些地区无法访问，所以走本域�
 ## 待重构的部分
 
 这个博客是 vibe-coding 出来的，很多地方各行其道、没有统一规范。下面列出明确需要重构的地方：
-
-### 合并灯箱体系
-
-**问题**：三套灯箱实现，功能重复但 API 不兼容：
-
-- **GlobalImageLightbox**：全局绑定 `.prose` 图片，提供左右导航
-- **Pandabox**：用于图集，支持过渡动画
-- **MangaShots 灯箱**：独立实现，样式最简洁
-
-每套都有自己的打开/关闭逻辑、键盘事件、滚动锁定。
-
-**方案**：设计统一的灯箱 API + 可配置皮肤：
-
-```typescript
-// 统一 API
-<Lightbox
-    images={images}
-    variant="minimal" | "gallery" | "manga"
-    navigation={true}
-    caption={true}
-/>
-```
 
 ### 独立策展页模板
 

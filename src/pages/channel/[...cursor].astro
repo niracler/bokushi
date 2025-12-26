@@ -12,8 +12,8 @@
 import BaseHead from "../../components/BaseHead.astro";
 import Footer from "../../components/Footer.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
-import GlobalImageLightbox from "../../components/GlobalImageLightbox.astro";
 import Header from "../../components/Header.astro";
+import Lightbox from "../../components/Lightbox.astro";
 import type { TelegramChannel } from "../../utils/telegram";
 import { fetchTelegramChannel } from "../../utils/telegram";
 
@@ -183,7 +183,7 @@ Astro.response.headers.set(
       ) : null}
     </main>
     <Footer />
-    <GlobalImageLightbox />
+    <Lightbox id="channel-lightbox" selector=".prose img:not([data-lightbox-skip]), .telegram-post .telegram-post-image" />
   </body>
 </html>
 
