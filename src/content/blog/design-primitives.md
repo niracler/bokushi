@@ -286,11 +286,13 @@ flowchart TD
 ```
 
 **变体**：
+
 - `.surface-card--soft`：弱边框 + 混合背景，无阴影
 - `.surface-card--flat`：无阴影，仅保留边框
 - `.surface-card--compact`：使用较小圆角 `--radius-md`
 
 **Hover 行为**：
+
 - `.surface-card--hover-border`：hover 时边框颜色加深
 - `.surface-card--hover-none`：禁用 hover 效果
 

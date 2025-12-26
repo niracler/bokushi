@@ -239,14 +239,14 @@ function initMobileTocDrawer() {
         drawer.setAttribute("aria-hidden", "false");
         overlay.classList.remove("opacity-0", "pointer-events-none");
         content.classList.remove("translate-x-full");
-        document.body.style.overflow = "hidden";
+        document.body.classList.add("scroll-locked");
     };
 
     const closeDrawer = () => {
         isOpen = false;
         overlay.classList.add("opacity-0", "pointer-events-none");
         content.classList.add("translate-x-full");
-        document.body.style.overflow = "";
+        document.body.classList.remove("scroll-locked");
         // 等待动画结束后再隐藏
         setTimeout(() => {
             if (!isOpen) {

@@ -159,7 +159,7 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
             overlay.classList.add("opacity-100");
             drawer.classList.remove("translate-x-6");
             drawer.classList.add("translate-x-0");
-            document.body.classList.add("overflow-hidden");
+            document.body.classList.add("scroll-locked");
             barTop?.classList.add("translate-y-1.5", "rotate-45");
             barBottom?.classList.add("-translate-y-1.5", "-rotate-45");
             barMiddle?.classList.add("opacity-0");
@@ -173,7 +173,7 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
             overlay.classList.add("opacity-0", "pointer-events-none");
             drawer.classList.add("translate-x-6");
             drawer.classList.remove("translate-x-0");
-            document.body.classList.remove("overflow-hidden");
+            document.body.classList.remove("scroll-locked");
             barTop?.classList.remove("translate-y-1.5", "rotate-45");
             barBottom?.classList.remove("-translate-y-1.5", "-rotate-45");
             barMiddle?.classList.remove("opacity-0");

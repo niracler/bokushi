@@ -7,6 +7,11 @@
         accent-color: var(--color-accent);
     }
 
+    /* Scroll lock utility - used by drawers, lightboxes, modals */
+    body.scroll-locked {
+        overflow: hidden;
+    }
+
     html {
         scroll-behavior: smooth;
     }

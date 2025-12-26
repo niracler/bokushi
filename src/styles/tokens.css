@@ -66,6 +66,13 @@
     --shadow-soft: 0 6px 18px rgba(47, 37, 25, 0.08);
     --shadow-strong: 0 16px 36px rgba(47, 37, 25, 0.14);
 
+    /* Lightbox & overlay */
+    --color-backdrop: rgba(0, 0, 0, 0.65);
+    --shadow-lightbox: 0 20px 60px rgba(0, 0, 0, 0.4);
+
+    /* Interactive state */
+    --shadow-button-hover: 0 6px 20px rgba(251, 143, 104, 0.3);
+
     /* Layout helpers */
     --layout-max-width: 72rem;
     --measure: 68ch;
@@ -141,4 +148,11 @@
     /* Shadow presets */
     --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.32);
     --shadow-strong: 0 24px 42px rgba(0, 0, 0, 0.44);
+
+    /* Lightbox & overlay */
+    --color-backdrop: rgba(0, 0, 0, 0.85);
+    --shadow-lightbox: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+    /* Interactive state */
+    --shadow-button-hover: 0 6px 20px rgba(251, 159, 116, 0.35);
 }

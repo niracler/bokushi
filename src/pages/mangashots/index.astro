@@ -421,7 +421,7 @@ export const prerender = false;
 			}
 
 			.manga-lightbox::backdrop {
-				background: rgba(20, 14, 11, 0.95);
+				background: var(--color-backdrop);
 				backdrop-filter: blur(12px);
 				opacity: 0;
 				transition: opacity 0.3s ease;
@@ -467,8 +467,8 @@ export const prerender = false;
 				max-width: 100%;
 				max-height: calc(100vh - 200px);
 				object-fit: contain;
-				border-radius: 12px;
-				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-lightbox);
 				transition: opacity 0.18s ease, filter 0.18s ease;
 			}
 
@@ -544,8 +544,7 @@ export const prerender = false;
 			.manga-lightbox-next:hover {
 				background: rgba(251, 143, 104, 0.5);
 				border-color: var(--color-accent);
-				transform: scale(1.15);
-				box-shadow: 0 6px 20px rgba(251, 143, 104, 0.4);
+				box-shadow: var(--shadow-button-hover);
 			}
 
 			.manga-lightbox-close svg,
@@ -568,7 +567,7 @@ export const prerender = false;
 			}
 
 			.manga-lightbox-prev:hover {
-				transform: translateY(-50%) scale(1.15);
+				transform: translateY(-50%);
 			}
 
 			.manga-lightbox-next {
@@ -578,7 +577,7 @@ export const prerender = false;
 			}
 
 			.manga-lightbox-next:hover {
-				transform: translateY(-50%) scale(1.15);
+				transform: translateY(-50%);
 			}
 
 			/* Prevent body scroll when lightbox is open */
