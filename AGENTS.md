@@ -38,6 +38,8 @@
 ## Design Reference
 
 - For visual principles, spacing, and interaction cues, follow `src/content/blog/design-primitives.md`; keep tokens/components aligned to that guide instead of restating it here.
+- Card components use `.surface-card` and its variants (`--soft`, `--flat`, `--compact`, `--hover-border`, `--hover-none`) defined in `src/styles/global.css`.
+- Hover effects should use color/border changes only; avoid `translateY` lift animations.
 
 ## Configuration & Security Notes
 

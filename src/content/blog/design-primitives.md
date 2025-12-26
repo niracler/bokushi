@@ -273,7 +273,7 @@ flowchart TD
 
 #### `.surface-card`：卡片表面
 
-统一的卡片样式：
+统一的卡片样式，定义在 `src/styles/global.css` 中：
 
 ```css
 .surface-card {
@@ -281,10 +281,18 @@ flowchart TD
     border: 1px solid var(--color-border-soft);
     border-radius: var(--radius-lg); /* 16px */
     box-shadow: var(--shadow-soft);
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 ```
 
-变体：`.surface-card--soft` 使用更弱的边框和混合背景。
+**变体**：
+- `.surface-card--soft`：弱边框 + 混合背景，无阴影
+- `.surface-card--flat`：无阴影，仅保留边框
+- `.surface-card--compact`：使用较小圆角 `--radius-md`
+
+**Hover 行为**：
+- `.surface-card--hover-border`：hover 时边框颜色加深
+- `.surface-card--hover-none`：禁用 hover 效果
 
 ### 博客文章页布局框架
 
@@ -487,15 +495,8 @@ const observer = new IntersectionObserver((entries) => {
 所有 `.prose` 内的图片自动应用：
 
 - 圆角：`border-radius: var(--radius-lg)`（16px）
-- 阴影：`box-shadow` + `filter: drop-shadow`
-- Hover 效果：上浮 4px + 放大 1.04 倍
-
-```css
-.prose img:hover {
-    transform: translateY(-4px) scale(1.04);
-    box-shadow: 0 8px 20px rgba(var(--color-text-primary-rgb), 0.22);
-}
-```
+- 阴影：`box-shadow: var(--shadow-soft)`
+- 无 hover 效果（保持静态，点击打开灯箱）
 
 ### GlobalImageLightbox：全局灯箱
 
@@ -598,15 +599,19 @@ Telegram 图片直接引用可能在某些地区无法访问，所以走本域�
 
 ### Hover 设计原则
 
-**"只调颜色和轻微缩放，不叠加多层阴影"**
+**"只调颜色或边框，不使用 translateY 上浮效果"**
 
-避免过度设计，保持视觉简洁：
+避免过度设计，保持视觉简洁。克制的 hover 策略：
+
+- 背景色微调（默认）
+- 边框颜色变化
+- **不再使用 translateY 上浮效果**
 
 ```css
 .pill:hover {
     background: color-mix(in srgb, var(--color-accent-soft) 85%, transparent);
     border-color: var(--color-accent);
-    /* 不增加阴影，不大幅度移动 */
+    /* 不增加阴影，不位移 */
 }
 ```
 
@@ -670,24 +675,6 @@ Telegram 图片直接引用可能在某些地区无法访问，所以走本域�
 ## 待重构的部分
 
 这个博客是 vibe-coding 出来的，很多地方各行其道、没有统一规范。下面列出明确需要重构的地方：
-
-### 统一卡片样式
-
-**问题**：`/channel`、`/mangashots`、`PostList` 各自定义了卡片样式，代码高度重复：
-
-- 边框颜色不一致（有的用 `--color-border-soft`，有的直接写 `rgba`）
-- 圆角大小不统一（8px、10px、12px、16px 都有）
-- Hover 效果各自实现（有的加阴影，有的只改颜色，有的上浮）
-- Padding 大小随意（1rem、1.25rem、1.5rem）
-
-**方案**：提炼 `Surface` 组件或扩展 `.surface-card` 变体：
-
-```astro
-<!-- 统一的卡片组件 -->
-<Surface variant="soft | elevated | flat" hover="lift | glow | none">
-    <slot />
-</Surface>
-```
 
 ### 合并灯箱体系
 

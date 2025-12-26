@@ -240,9 +240,9 @@ Astro.response.headers.set(
   .channel-info-card {
     background: var(--color-bg-surface);
     border: 1px solid var(--color-border-soft);
-    border-radius: 12px;
-    padding: 1.25rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -325,20 +325,19 @@ Astro.response.headers.set(
 
   .channel-link {
     display: block;
-    padding: 0.5rem 0.875rem;
+    padding: var(--space-2) var(--space-3);
     background: var(--color-accent);
     color: white;
     text-decoration: none;
-    border-radius: 8px;
-    font-size: 0.8125rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
     font-weight: 500;
-    transition: all 0.2s;
+    transition: background-color 0.2s ease;
     text-align: center;
   }
 
   .channel-link:hover {
     background: var(--color-accent-dark);
-    transform: translateY(-1px);
   }
 
   .channel-link.rss-link {
@@ -361,16 +360,16 @@ Astro.response.headers.set(
   .telegram-post {
     background: var(--color-bg-surface);
     border: 1px solid var(--color-border-soft);
-    border-radius: 12px;
-    padding: 1.5rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+    box-shadow: var(--shadow-soft);
   }
 
   .telegram-post:hover {
     border-color: var(--color-border);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
   }
 
   .post-header {
@@ -541,19 +540,12 @@ Astro.response.headers.set(
   .post-content :global(.telegram-post-image) {
     width: 100%;
     height: auto;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     display: block;
     object-fit: contain;
     background: var(--color-bg-muted);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    box-shadow: var(--shadow-soft);
     cursor: pointer;
-    transform: translateY(0) scale(1);
-  }
-
-  .post-content :global(.telegram-post-image:hover) {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.2);
   }
 
   .post-content :global(pre) {
@@ -693,22 +685,22 @@ Astro.response.headers.set(
   }
 
   .pagination-link {
-    padding: 0.75rem 1.5rem;
+    padding: var(--space-3) var(--space-6);
     background: var(--color-bg-surface);
     border: 1px solid var(--color-border-soft);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     color: var(--color-text-primary);
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     font-weight: 500;
-    transition: all 0.2s;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .pagination-link:hover {
     background: var(--color-bg-muted);
     border-color: var(--color-border);
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .pagination-current {

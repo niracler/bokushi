@@ -200,15 +200,17 @@ export const prerender = false;
 
 			.manga-search {
 				width: 100%;
-				padding: 1rem 1.25rem 1rem 3.25rem;
-				border: 2px solid var(--color-border);
-				border-radius: 14px;
+				padding: var(--space-4) var(--space-4) var(--space-4) 3.25rem;
+				border: 1px solid var(--color-border-soft);
+				border-radius: var(--radius-lg);
 				font-size: var(--font-size-base);
 				color: var(--color-text-primary);
 				background: var(--color-bg-surface);
-				transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+				transition:
+					border-color 0.2s ease,
+					box-shadow 0.2s ease;
 				font-family: inherit;
-				box-shadow: 0 2px 8px rgba(42, 28, 23, 0.06);
+				box-shadow: var(--shadow-soft);
 			}
 
 			.manga-search::placeholder {
@@ -218,10 +220,7 @@ export const prerender = false;
 			.manga-search:focus {
 				outline: none;
 				border-color: var(--color-accent);
-				box-shadow:
-					0 0 0 4px var(--color-accent-soft),
-					0 4px 16px rgba(251, 143, 104, 0.15);
-				transform: translateY(-1px);
+				box-shadow: 0 0 0 3px var(--color-accent-soft);
 			}
 
 			/* Filter Section - Horizontal Scroll */
@@ -254,34 +253,34 @@ export const prerender = false;
 				flex-direction: row !important;
 				align-items: center !important;
 				gap: 0.625rem !important;
-				padding: 0.5rem 1.125rem !important;
-				border: 1.5px solid var(--color-border) !important;
-				border-radius: 8px !important;
+				padding: var(--space-2) var(--space-4) !important;
+				border: 1px solid var(--color-border-soft) !important;
+				border-radius: var(--radius-md) !important;
 				background: var(--color-bg-surface) !important;
 				color: var(--color-text-primary) !important;
 				font-size: var(--font-size-sm) !important;
 				font-weight: 500 !important;
 				cursor: pointer !important;
-				transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+				transition:
+					border-color 0.2s ease,
+					background-color 0.2s ease !important;
 				white-space: nowrap !important;
 				flex-shrink: 0 !important;
 				min-width: fit-content !important;
 				width: auto !important;
-				box-shadow: 0 1px 2px rgba(42, 28, 23, 0.05) !important;
+				box-shadow: none !important;
 			}
 
 			.filter-chip:hover {
 				border-color: var(--color-accent);
 				background: var(--color-accent-soft);
-				transform: translateY(-1px);
-				box-shadow: 0 2px 8px rgba(251, 143, 104, 0.12);
 			}
 
 			.filter-chip.active {
 				background: var(--color-accent);
 				border-color: var(--color-accent);
 				color: white;
-				box-shadow: 0 2px 12px rgba(251, 143, 104, 0.3);
+				box-shadow: none;
 				font-weight: 600;
 			}
 
@@ -333,8 +332,8 @@ export const prerender = false;
 			.manga-shot-item {
 				position: relative;
 				overflow: hidden;
-				border-radius: 12px 20px 12px 20px; /* 不对称圆角 */
-				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				border-radius: var(--radius-lg);
+				transition: box-shadow 0.2s ease;
 				animation: itemFadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1)
 					backwards;
 			}
@@ -364,41 +363,37 @@ export const prerender = false;
 			@keyframes itemFadeIn {
 				from {
 					opacity: 0;
-					transform: translateY(30px) scale(0.96);
+					transform: translateY(16px);
 				}
 				to {
 					opacity: 1;
-					transform: translateY(0) scale(1);
+					transform: translateY(0);
 				}
 			}
 
 			.manga-shot-item:hover {
-				transform: translateY(-12px) scale(1.02);
 				z-index: 10;
 			}
 
 			.manga-shot-button {
 				position: relative;
 				width: 100%;
-				border: none;
+				border: 1px solid var(--color-border-soft);
 				padding: 0;
 				background: transparent;
 				cursor: zoom-in;
 				display: block;
-				border-radius: 12px 20px 12px 20px;
+				border-radius: var(--radius-lg);
 				overflow: hidden;
-				box-shadow:
-					0 3px 12px rgba(42, 28, 23, 0.12),
-					0 1px 6px rgba(42, 28, 23, 0.08);
-				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				box-shadow: var(--shadow-soft);
+				transition:
+					border-color 0.2s ease,
+					box-shadow 0.2s ease;
 			}
 
 			.manga-shot-item:hover .manga-shot-button {
-				box-shadow:
-					0 12px 28px rgba(251, 143, 104, 0.25),
-					0 6px 18px rgba(251, 143, 104, 0.18),
-					0 0 0 3px var(--color-accent-soft),
-					inset 0 0 0 1.5px var(--color-accent);
+				border-color: var(--color-accent);
+				box-shadow: var(--shadow-strong);
 			}
 
 			.manga-shot-img {
@@ -406,11 +401,6 @@ export const prerender = false;
 				height: auto;
 				display: block;
 				object-fit: cover;
-				transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-			}
-
-			.manga-shot-button:hover .manga-shot-img {
-				transform: scale(1.08);
 			}
 
 			/* Lightbox Styles */
@@ -698,19 +688,9 @@ export const prerender = false;
 					padding: 0.625rem;
 				}
 
-				.manga-shot-item,
-				.manga-shot-item:hover {
-					transform: none;
-				}
-
 				.manga-shot-item:hover .manga-shot-button {
-					box-shadow:
-						0 3px 12px rgba(42, 28, 23, 0.12),
-						0 1px 6px rgba(42, 28, 23, 0.08);
-				}
-
-				.manga-shot-button:hover .manga-shot-img {
-					transform: none;
+					border-color: var(--color-border-soft);
+					box-shadow: var(--shadow-soft);
 				}
 			}
 
