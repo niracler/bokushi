@@ -10,18 +10,20 @@
  * - id: Unique identifier for the lightbox (default: "lightbox")
  * - selector: CSS selector for images to bind (optional, for auto-binding)
  * - showCounter: Show image counter (default: true)
+ * - canLoadMore: Enable "load more" on reaching last image (default: false)
  *
  * Usage:
  * <Lightbox id="blog-lightbox" selector=".prose img:not([data-lightbox-skip])" />
- * <Lightbox id="manga-lightbox" selector=".manga-shot-button" />
+ * <Lightbox id="manga-lightbox" selector=".manga-shot-button" canLoadMore />
  */
 interface Props {
     id?: string;
     selector?: string;
     showCounter?: boolean;
+    canLoadMore?: boolean;
 }
 
-const { id = "lightbox", selector, showCounter = true } = Astro.props;
+const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = Astro.props;
 ---
 
 <dialog
@@ -30,6 +32,7 @@ const { id = "lightbox", selector, showCounter = true } = Astro.props;
 	aria-label="查看大图"
 	data-lightbox
 	data-selector={selector}
+	data-can-load-more={canLoadMore ? "" : undefined}
 >
 	<div class="lightbox__backdrop" data-lightbox-close></div>
 	<div class="lightbox__content">
@@ -225,15 +228,21 @@ const { id = "lightbox", selector, showCounter = true } = Astro.props;
 				const atEnd = current === shots.length - 1 && delta > 0;
 
 				if (atEnd) {
-					// Show loading state while waiting for more content
-					setLoading(true);
-					// Emit boundary event for "load more" functionality
-					const event = new CustomEvent("lightbox:boundary", {
-						detail: { direction: "next", lightboxId: dialog.id },
-						bubbles: true,
-					});
-					dialog.dispatchEvent(event);
-					return; // Don't wrap around, wait for more content
+					// Check if this lightbox supports "load more" functionality
+					if (dialog.hasAttribute("data-can-load-more")) {
+						// Show loading state while waiting for more content
+						setLoading(true);
+						// Emit boundary event for "load more" functionality
+						const event = new CustomEvent("lightbox:boundary", {
+							detail: { direction: "next", lightboxId: dialog.id },
+							bubbles: true,
+						});
+						dialog.dispatchEvent(event);
+					} else {
+						// No "load more" support, wrap to first image
+						showImage(0);
+					}
+					return;
 				}
 
 				if (atStart) {
