@@ -52,135 +52,133 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 
 	<body>
 		<Header />
-		<main class="page-shell max-w-none">
-			<div
-				data-toc-container
-				class:list={[
-					showToc && 'relative mx-auto max-w-[90rem]',
-				]}
-			>
-				<article
-					class:list={[
-						'mx-auto max-w-3xl space-y-10 text-secondary',
-					]}
-				>
-						<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
-						<h1 class="text-3xl font-bold text-primary sm:text-4xl">{title}</h1>
-						<div class="space-y-2 text-sm text-muted">
-							<p>
-								<FormattedDate date={pubDate} />
-							</p>
-							{
-								(lastModified || updatedDate) && (
-									<p>
-										Last updated on {
-											lastModifiedCommitUrl ? (
-												<a
-													href={lastModifiedCommitUrl}
-													target="_blank"
-													rel="noopener noreferrer"
-													class="underline decoration-dotted underline-offset-4 hover:text-accent transition-colors"
-												>
-													<FormattedDate date={lastModified ? new Date(lastModified) : updatedDate!} />
-												</a>
-											) : (
-												<FormattedDate date={lastModified ? new Date(lastModified) : updatedDate!} />
-											)
-										}
-									</p>
-								)
-							}
-						</div>
-						{tags && tags.length > 0 && (
-							<div class="flex flex-wrap justify-center gap-2">
-								{tags.map((tag: string) => (
-									<a
-										href={`/tags/${tag}`}
-										class="pill"
-										data-tone="accent"
-									>
-										{tag}
-									</a>
-								))}
-							</div>
-						)}
-					</div>
-
-					{showToc && (
-						<>
-							{/* 移动端：浮动按钮 */}
-							<button
-								data-toc-mobile-toggle
-								class="xl:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-md bg-[rgba(251,143,104,0.85)] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_8px_32px_rgba(251,143,104,0.35)] transition-all duration-300 hover:scale-105 hover:bg-[rgba(251,143,104,0.95)] hover:shadow-[0_12px_40px_rgba(251,143,104,0.45)] active:scale-95"
-								aria-label="打开目录"
-							>
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-									<path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-								</svg>
-							</button>
-
-							{/* 移动端：抽屉式目录 */}
-							<div
-								data-toc-mobile-drawer
-								class="xl:hidden fixed inset-0 z-50 pointer-events-none"
-								aria-hidden="true"
-							>
-								{/* 遮罩层 */}
-								<div
-									data-toc-mobile-overlay
-									class="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 pointer-events-none"
-								></div>
-
-								{/* 抽屉内容 */}
-								<div
-									data-toc-mobile-content
-									class="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-surface shadow-2xl translate-x-full transition-transform duration-300 pointer-events-auto"
-								>
-									<div class="flex h-full flex-col">
-										{/* 头部 */}
-										<div class="flex items-center justify-between border-b border-border-subtle px-6 py-4">
-											<h2 class="text-lg font-semibold text-primary">目录</h2>
-											<button
-												data-toc-mobile-close
-												class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors"
-												aria-label="关闭目录"
+		<main class="page-shell max-w-none relative">
+			{/* 文章主体：始终居中 */}
+			<article class="mx-auto max-w-[50rem] sm:px-6">
+				{/* 标题区域 */}
+				<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
+					<h1 class="text-3xl font-bold text-primary sm:text-4xl">{title}</h1>
+					<div class="space-y-2 text-sm text-muted">
+						<p>
+							<FormattedDate date={pubDate} />
+						</p>
+						{
+							(lastModified || updatedDate) && (
+								<p>
+									Last updated on {
+										lastModifiedCommitUrl ? (
+											<a
+												href={lastModifiedCommitUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												class="underline decoration-dotted underline-offset-4 hover:text-accent transition-colors"
 											>
-												<svg class="h-5 w-5 text-muted" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-													<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-												</svg>
-											</button>
-										</div>
+												<FormattedDate date={lastModified ? new Date(lastModified) : updatedDate!} />
+											</a>
+										) : (
+											<FormattedDate date={lastModified ? new Date(lastModified) : updatedDate!} />
+										)
+									}
+								</p>
+							)
+						}
+					</div>
+					{tags && tags.length > 0 && (
+						<div class="flex flex-wrap justify-center gap-2">
+							{tags.map((tag: string) => (
+								<a
+									href={`/tags/${tag}`}
+									class="pill"
+									data-tone="accent"
+								>
+									{tag}
+								</a>
+							))}
+						</div>
+					)}
+				</div>
 
-										{/* 目录内容 */}
-										<div class="flex-1 overflow-y-auto px-6 pt-4 pb-8">
-											<div class="toc-mobile">
-												<TableOfContents headings={headings} />
-											</div>
+				{/* 移动端 TOC */}
+				{showToc && (
+					<>
+						{/* 移动端：浮动按钮 */}
+						<button
+							data-toc-mobile-toggle
+							class="min-[960px]:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-md bg-[rgba(251,143,104,0.85)] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_8px_32px_rgba(251,143,104,0.35)] transition-all duration-300 hover:scale-105 hover:bg-[rgba(251,143,104,0.95)] hover:shadow-[0_12px_40px_rgba(251,143,104,0.45)] active:scale-95"
+							aria-label="打开目录"
+						>
+							<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+								<path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</button>
+
+						{/* 移动端：抽屉式目录 */}
+						<div
+							data-toc-mobile-drawer
+							class="min-[960px]:hidden fixed inset-0 z-50 pointer-events-none"
+							aria-hidden="true"
+						>
+							{/* 遮罩层 */}
+							<div
+								data-toc-mobile-overlay
+								class="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 pointer-events-none"
+							></div>
+
+							{/* 抽屉内容 */}
+							<div
+								data-toc-mobile-content
+								class="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-surface shadow-2xl translate-x-full transition-transform duration-300 pointer-events-auto"
+							>
+								<div class="flex h-full flex-col">
+									{/* 头部 */}
+									<div class="flex items-center justify-between border-b border-border-subtle px-6 py-4">
+										<h2 class="text-lg font-semibold text-primary">目录</h2>
+										<button
+											data-toc-mobile-close
+											class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors"
+											aria-label="关闭目录"
+										>
+											<svg class="h-5 w-5 text-muted" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+											</svg>
+										</button>
+									</div>
+
+									{/* 目录内容 */}
+									<div class="flex-1 overflow-y-auto px-6 pt-4 pb-8">
+										<div class="toc-mobile">
+											<TableOfContents headings={headings} />
 										</div>
 									</div>
 								</div>
 							</div>
-						</>
-					)}
+						</div>
+					</>
+				)}
 
+				{/* 正文 */}
+				<div class="pt-10 space-y-10 text-secondary">
 					<Prose class="text-secondary">
 						<slot />
 					</Prose>
 
 					<Remark42Comments />
 					<Lightbox id="blog-lightbox" selector=".prose img:not([data-lightbox-skip])" />
-				</article>
+				</div>
+			</article>
 
-				{showToc && (
-					<>
-						{/* 侧边栏使用 absolute 定位,不影响文章居中布局 */}
-						{/* 高度由 JavaScript 动态设置,匹配文章高度让 sticky 生效 */}
-						<aside data-toc-sidebar class="hidden xl:block absolute left-[calc(50%+24rem+3rem)] w-[280px]" style="top: 0;">
-							<TableOfContents headings={headings} />
-						</aside>
-					</>
-				)}
-			</div>
+			{/* 桌面端 TOC：固定定位浮动在右侧，top 由 JS 动态设置 */}
+			{showToc && (
+				<aside
+					data-toc-sidebar
+					class="hidden min-[900px]:block fixed w-[220px] min-[1100px]:w-[260px]"
+					style="left: calc(50% + 25rem + 1.5rem); top: 6rem;"
+				>
+					<nav class="toc max-h-[calc(100vh-8rem)] overflow-y-auto">
+						<TableOfContents headings={headings} />
+					</nav>
+				</aside>
+			)}
 		</main>
 		<Footer />
 	</body>

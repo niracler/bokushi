@@ -77,6 +77,9 @@
     --layout-max-width: 72rem;
     --measure: 68ch;
     --measure-wide: 72ch;
+
+    /* Code block colors */
+    --color-code-bg: #f6f8fa;
 }
 
 :root[data-theme="dark"] {
@@ -155,4 +158,7 @@
 
     /* Interactive state */
     --shadow-button-hover: 0 6px 20px rgba(251, 159, 116, 0.35);
+
+    /* Code block colors */
+    --color-code-bg: #282a36;
 }

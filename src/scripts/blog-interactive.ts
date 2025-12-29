@@ -274,18 +274,25 @@ function initMobileTocDrawer() {
 }
 
 // ============ TOC 侧边栏定位 ============
+// 动态计算 TOC 起始位置，使其与文章内容区域对齐（标题分割线下方）
 function adjustTocPosition() {
-    const aside = document.querySelector<HTMLElement>("aside[data-toc-sidebar]");
-    const header = document.querySelector<HTMLElement>("[data-article-header]");
-    const container = document.querySelector<HTMLElement>("[data-toc-container]");
-    if (!aside || !header || !container) return;
+    const tocSidebar = document.querySelector<HTMLElement>("[data-toc-sidebar]");
+    const articleHeader = document.querySelector<HTMLElement>("[data-article-header]");
 
-    const headerBottom = header.offsetTop + header.offsetHeight;
-    aside.style.top = `${headerBottom}px`;
+    if (!tocSidebar || !articleHeader) return;
 
-    const containerHeight = container.offsetHeight;
-    const asideHeight = containerHeight - headerBottom;
-    aside.style.height = `${asideHeight}px`;
+    // 获取文章标题区域底部位置（相对于视口）
+    const headerRect = articleHeader.getBoundingClientRect();
+    const headerBottom = headerRect.bottom;
+
+    // 计算 TOC 应该在的位置
+    // 使用 header 底部位置 + 一点间距，但至少要在 header 导航栏下方 (约 64px)
+    const minTop = 64; // header 导航栏高度
+    const padding = 24; // 与分割线的间距
+    const targetTop = Math.max(minTop, headerBottom + padding);
+
+    // 更新 TOC 位置
+    tocSidebar.style.top = `${targetTop}px`;
 }
 
 // ============ 初始化所有功能 ============

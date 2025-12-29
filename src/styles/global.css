@@ -12,14 +12,24 @@
     --color-primary: var(--color-text-primary);
     --color-secondary: var(--color-text-secondary);
     --color-muted: var(--color-text-muted);
+    --color-inverse: var(--color-text-inverse);
 
-    /* Accent colors */
-    --color-accent: var(--color-accent);
+    /* Accent colors - 引用 tokens.css 中的原始值 */
+    --color-accent: #fb8f68;
+    --color-accent-soft: var(--color-accent-soft);
 
-    /* Border colors */
-    --color-border: var(--color-border);
+    /* Link colors */
+    --color-link: var(--color-link);
+    --color-link-hover: var(--color-link-hover);
+
+    /* Border colors - 引用 tokens.css 中的原始值 */
+    --color-border: #dcc9ba;
     --color-border-soft: var(--color-border-soft);
     --color-border-subtle: var(--color-border-subtle);
+
+    /* Code block colors */
+    --color-code-bg: #f6f8fa;
+    --color-code-bg-dark: #282a36;
 }
 
 @layer base {
@@ -118,7 +128,7 @@
         margin-inline: auto;
         max-width: var(--measure);
         color: var(--color-text-primary);
-        font-size: clamp(1rem, 0.4vw + 0.95rem, 1.1rem);
+        font-size: 1rem;
         line-height: var(--line-height-base);
         counter-reset: h2;
     }
@@ -146,13 +156,13 @@
 
     .prose h1 {
         margin-bottom: var(--space-2);
-        font-size: clamp(1.75rem, 3.2vw, 2.4rem);
+        font-size: clamp(1.75rem, 2.5vw, 2rem);
     }
 
     .prose h2 {
         margin-top: var(--space-8);
         margin-bottom: var(--space-3);
-        font-size: clamp(1.5rem, 2.4vw, 2rem);
+        font-size: clamp(1.5rem, 1.8vw, 1.75rem);
         font-weight: 800;
         letter-spacing: -0.02em;
         counter-reset: h3;
@@ -161,7 +171,7 @@
     .prose h3 {
         margin-top: var(--space-6);
         margin-bottom: var(--space-2);
-        font-size: clamp(1.3rem, 1.9vw, 1.6rem);
+        font-size: clamp(1.3rem, 1.5vw, 1.4rem);
         font-weight: 700;
         letter-spacing: -0.01em;
         counter-reset: h4;
@@ -302,13 +312,12 @@
         padding: var(--space-4);
         border: 1px solid var(--color-border-subtle);
         border-radius: var(--radius-md);
-        background: #f6f8fa !important;
+        background: var(--color-code-bg) !important;
         font-size: 0.95em;
         overflow-x: auto;
     }
 
     html[data-theme="dark"] .prose pre {
-        background: #282a36 !important;
         border-color: rgba(255, 255, 255, 0.1);
     }
 
@@ -406,11 +415,7 @@
     .code-block-wrapper pre {
         margin: 0;
         border-radius: 0 0 var(--radius-md) var(--radius-md);
-        background: #f6f8fa !important;
-    }
-
-    html[data-theme="dark"] .code-block-wrapper pre {
-        background: #282a36 !important;
+        background: var(--color-code-bg) !important;
     }
 
     /* Mermaid diagrams */

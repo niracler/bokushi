@@ -24,19 +24,19 @@ function ensurePreviewCard(): HTMLElement {
     card = document.createElement("div");
     card.id = CARD_ID;
     card.className =
-        "fixed z-[60] w-72 overflow-hidden rounded-xl border border-border-subtle bg-[var(--color-bg-surface)] shadow-lg opacity-0 pointer-events-none transition-all duration-300 ease-out";
+        "fixed z-[60] w-72 overflow-hidden rounded-xl border border-border-subtle bg-surface shadow-lg opacity-0 pointer-events-none transition-all duration-300 ease-out";
     card.style.transform = "translateY(-8px) scale(0.96)";
 
     card.innerHTML = `
-		<div class="h-40 w-full bg-[var(--color-bg-muted)]">
+		<div class="h-40 w-full bg-muted-bg">
 			<img id="${CARD_ID}-image" class="h-full w-full object-cover hidden" alt="" />
-			<div id="${CARD_ID}-no-image" class="hidden h-full flex items-center justify-center text-xs text-[var(--color-text-muted)]">
+			<div id="${CARD_ID}-no-image" class="hidden h-full flex items-center justify-center text-xs text-muted">
 				暂无预览图
 			</div>
 		</div>
 		<div class="space-y-2 p-4 text-sm">
-			<h5 id="${CARD_ID}-title" class="font-semibold text-[var(--color-text-primary)]"></h5>
-			<p id="${CARD_ID}-description" class="text-[var(--color-text-secondary)]"></p>
+			<h5 id="${CARD_ID}-title" class="font-semibold text-primary"></h5>
+			<p id="${CARD_ID}-description" class="text-secondary"></p>
 		</div>
 	`;
 
