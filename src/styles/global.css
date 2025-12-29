@@ -126,9 +126,7 @@
         display: grid;
         gap: var(--space-4);
         margin-inline: auto;
-        max-width: var(--measure);
         color: var(--color-text-primary);
-        font-size: 1rem;
         line-height: var(--line-height-base);
         counter-reset: h2;
     }
@@ -156,13 +154,13 @@
 
     .prose h1 {
         margin-bottom: var(--space-2);
-        font-size: clamp(1.75rem, 2.5vw, 2rem);
+        font-size: var(--font-size-3xl);
     }
 
     .prose h2 {
         margin-top: var(--space-8);
         margin-bottom: var(--space-3);
-        font-size: clamp(1.5rem, 1.8vw, 1.75rem);
+        font-size: var(--font-size-2xl);
         font-weight: 800;
         letter-spacing: -0.02em;
         counter-reset: h3;
@@ -171,7 +169,7 @@
     .prose h3 {
         margin-top: var(--space-6);
         margin-bottom: var(--space-2);
-        font-size: clamp(1.3rem, 1.5vw, 1.4rem);
+        font-size: var(--font-size-xl);
         font-weight: 700;
         letter-spacing: -0.01em;
         counter-reset: h4;
@@ -179,7 +177,7 @@
 
     .prose h4 {
         margin-top: var(--space-5);
-        font-size: 1.125rem;
+        font-size: var(--font-size-lg);
     }
 
     .prose :where(h2, h3, h4) {
@@ -225,7 +223,6 @@
 
     .prose p {
         margin: 0;
-        max-width: var(--measure);
         color: var(--color-text-secondary);
     }
 

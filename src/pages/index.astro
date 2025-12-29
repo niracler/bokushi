@@ -32,7 +32,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
             }
 
             .quote-container {
-                animation: fadeIn 1.5s ease-out;
+                animation: fadeIn 1s ease-out;
             }
 
             .quote-text {
@@ -51,8 +51,18 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
             }
 
             .quote-source {
-                animation: fadeIn 2s ease-out;
+                animation: fadeIn 1.2s ease-out;
                 transition: all 0.3s ease;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                .quote-container,
+                .quote-source {
+                    animation: none;
+                }
+                .quote-emphasis {
+                    animation: none;
+                }
             }
 
             .quote-source:hover {

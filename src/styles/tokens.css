@@ -4,11 +4,11 @@
     --color-bg-surface: #ffffff;
     --color-bg-muted: #f8efe4;
 
-    /* Text colors */
+    /* Text colors - WCAG AA compliant (4.5:1+ contrast) */
     --color-text-primary: #2a1c17;
     --color-text-primary-rgb: 42 28 23;
     --color-text-secondary: #46342a;
-    --color-text-muted: #7b6454;
+    --color-text-muted: #5f4d42;
     --color-text-inverse: #fef9f0;
 
     /* Border tokens */
@@ -36,14 +36,14 @@
     --color-danger: #c84c3a;
     --color-note: #8d7bd6;
 
-    /* Typography */
+    /* Typography - Apple HIG compliant (17px base) */
     --font-size-xs: 0.8125rem;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
-    --font-size-lg: 1.15rem;
+    --font-size-sm: 0.9375rem;
+    --font-size-base: 1.0625rem;
+    --font-size-lg: 1.25rem;
     --font-size-xl: 1.5rem;
-    --font-size-2xl: 1.9rem;
-    --font-size-3xl: 2.6rem;
+    --font-size-2xl: 1.875rem;
+    --font-size-3xl: 2.25rem;
     --line-height-base: 1.75;
     --line-height-relaxed: 1.65;
     --line-height-tight: 1.22;
@@ -90,11 +90,11 @@
     --color-bg-surface: #1b140f;
     --color-bg-muted: #241914;
 
-    /* Text colors */
+    /* Text colors - WCAG AA compliant (4.5:1+ contrast) */
     --color-text-primary: #f8ede1;
     --color-text-primary-rgb: 248 237 225;
     --color-text-secondary: #d7c6b8;
-    --color-text-muted: #a88f80;
+    --color-text-muted: #b8a090;
     --color-text-inverse: #1b120c;
 
     /* Border tokens */
@@ -122,14 +122,14 @@
     --color-danger: #f18879;
     --color-note: #a79fe6;
 
-    /* Typography */
+    /* Typography - Apple HIG compliant (17px base) */
     --font-size-xs: 0.8125rem;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
-    --font-size-lg: 1.15rem;
+    --font-size-sm: 0.9375rem;
+    --font-size-base: 1.0625rem;
+    --font-size-lg: 1.25rem;
     --font-size-xl: 1.5rem;
-    --font-size-2xl: 1.9rem;
-    --font-size-3xl: 2.6rem;
+    --font-size-2xl: 1.875rem;
+    --font-size-3xl: 2.25rem;
     --line-height-base: 1.75;
     --line-height-relaxed: 1.65;
     --line-height-tight: 1.22;
