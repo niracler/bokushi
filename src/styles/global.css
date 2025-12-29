@@ -1,6 +1,27 @@
 @import "./tokens.css";
 @import "tailwindcss";
 
+/* Tailwind v4: Map CSS variables to Tailwind color system */
+@theme inline {
+    /* Background colors - 用于 bg-page, bg-surface, bg-muted-bg 等 */
+    --color-page: var(--color-bg-page);
+    --color-surface: var(--color-bg-surface);
+    --color-muted-bg: var(--color-bg-muted);
+
+    /* Text colors - 用于 text-primary, text-secondary, text-muted 等 */
+    --color-primary: var(--color-text-primary);
+    --color-secondary: var(--color-text-secondary);
+    --color-muted: var(--color-text-muted);
+
+    /* Accent colors */
+    --color-accent: var(--color-accent);
+
+    /* Border colors */
+    --color-border: var(--color-border);
+    --color-border-soft: var(--color-border-soft);
+    --color-border-subtle: var(--color-border-subtle);
+}
+
 @layer base {
     :root {
         color-scheme: light dark;
