@@ -3,33 +3,44 @@
 
 /* Tailwind v4: Map CSS variables to Tailwind color system */
 @theme inline {
-    /* Background colors - 用于 bg-page, bg-surface, bg-muted-bg 等 */
+    /* Background colors */
     --color-page: var(--color-bg-page);
     --color-surface: var(--color-bg-surface);
     --color-muted-bg: var(--color-bg-muted);
 
-    /* Text colors - 用于 text-primary, text-secondary, text-muted 等 */
+    /* Text colors */
     --color-primary: var(--color-text-primary);
     --color-secondary: var(--color-text-secondary);
     --color-muted: var(--color-text-muted);
     --color-inverse: var(--color-text-inverse);
 
-    /* Accent colors - 引用 tokens.css 中的原始值 */
-    --color-accent: #fb8f68;
+    /* Accent colors - reference tokens.css */
+    --color-accent: var(--color-accent);
     --color-accent-soft: var(--color-accent-soft);
+    --color-accent-tint-6: var(--color-accent-tint-6);
+    --color-accent-tint-8: var(--color-accent-tint-8);
+    --color-accent-tint-12: var(--color-accent-tint-12);
+    --color-accent-tint-18: var(--color-accent-tint-18);
 
     /* Link colors */
     --color-link: var(--color-link);
     --color-link-hover: var(--color-link-hover);
 
-    /* Border colors - 引用 tokens.css 中的原始值 */
-    --color-border: #dcc9ba;
+    /* Border colors - reference tokens.css */
+    --color-border: var(--color-border);
     --color-border-soft: var(--color-border-soft);
     --color-border-subtle: var(--color-border-subtle);
 
+    /* Overlay colors */
+    --color-overlay-dark-35: var(--color-overlay-dark-35);
+    --color-overlay-dark-40: var(--color-overlay-dark-40);
+    --color-overlay-dark-60: var(--color-overlay-dark-60);
+    --color-overlay-light-25: var(--color-overlay-light-25);
+    --color-overlay-light-35: var(--color-overlay-light-35);
+    --color-overlay-light-50: var(--color-overlay-light-50);
+
     /* Code block colors */
-    --color-code-bg: #f6f8fa;
-    --color-code-bg-dark: #282a36;
+    --color-code-bg: var(--color-code-bg);
 }
 
 @layer base {
@@ -121,6 +132,47 @@
 }
 
 @layer components {
+    /* =========================================
+     * Utility Components
+     * ========================================= */
+
+    /* Focus ring - consistent focus-visible styling */
+    .focus-ring {
+        outline: none;
+    }
+    .focus-ring:focus-visible {
+        outline: 2px solid var(--color-accent-soft);
+        outline-offset: 2px;
+    }
+
+    /* Icon button - reusable circular button */
+    .icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        border: none;
+        background: transparent;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        transition: color var(--transition-base);
+    }
+    .icon-btn:hover {
+        color: var(--color-accent);
+    }
+    .icon-btn--sm {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    .icon-btn--md {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    /* =========================================
+     * Prose Typography
+     * ========================================= */
+
     /* Prose typography */
     .prose {
         display: grid;

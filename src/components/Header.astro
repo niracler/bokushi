@@ -107,8 +107,8 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
                             class:list={[
                                 "inline-flex items-center rounded-md px-3 py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-soft",
                                 isActive(link.href)
-                                    ? "bg-[color-mix(in_srgb,var(--color-accent)_12%,transparent)] text-accent font-semibold"
-                                    : "text-secondary hover:text-accent hover:bg-[color-mix(in_srgb,var(--color-accent)_8%,transparent)]",
+                                    ? "bg-accent-tint-12 text-accent font-semibold"
+                                    : "text-secondary hover:text-accent hover:bg-accent-tint-8",
                             ]}
                             data-nav-link
                         >

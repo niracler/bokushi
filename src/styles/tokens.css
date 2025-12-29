@@ -23,6 +23,10 @@
     --color-accent-soft: #ffe7dc;
     --color-accent-rgb: 251 143 104;
     --color-accent-tint: rgba(var(--color-accent-rgb), 0.16);
+    --color-accent-tint-6: color-mix(in srgb, var(--color-accent) 6%, transparent);
+    --color-accent-tint-8: color-mix(in srgb, var(--color-accent) 8%, transparent);
+    --color-accent-tint-12: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    --color-accent-tint-18: color-mix(in srgb, var(--color-accent) 18%, transparent);
     --color-link: #c05c3e;
     --color-link-hover: #9a472f;
 
@@ -80,6 +84,21 @@
 
     /* Code block colors */
     --color-code-bg: #f6f8fa;
+
+    /* Overlay tokens - for modals, lightbox, buttons */
+    --color-overlay-dark-35: rgba(0, 0, 0, 0.35);
+    --color-overlay-dark-40: rgba(0, 0, 0, 0.4);
+    --color-overlay-dark-60: rgba(0, 0, 0, 0.6);
+    --color-overlay-light-25: rgba(255, 255, 255, 0.25);
+    --color-overlay-light-35: rgba(255, 255, 255, 0.35);
+    --color-overlay-light-50: rgba(255, 255, 255, 0.5);
+    --color-overlay-light-80: rgba(255, 255, 255, 0.8);
+    --color-overlay-light-90: rgba(255, 255, 255, 0.9);
+
+    /* Transition timing */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
 }
 
 :root[data-theme="dark"] {
@@ -109,6 +128,10 @@
     --color-accent-soft: rgba(251, 159, 116, 0.16);
     --color-accent-rgb: 251 159 116;
     --color-accent-tint: rgba(var(--color-accent-rgb), 0.22);
+    --color-accent-tint-6: color-mix(in srgb, var(--color-accent) 6%, transparent);
+    --color-accent-tint-8: color-mix(in srgb, var(--color-accent) 8%, transparent);
+    --color-accent-tint-12: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    --color-accent-tint-18: color-mix(in srgb, var(--color-accent) 18%, transparent);
     --color-link: #ffb088;
     --color-link-hover: #ffcfb3;
 
@@ -161,4 +184,19 @@
 
     /* Code block colors */
     --color-code-bg: #282a36;
+
+    /* Overlay tokens - same as light, defined for completeness */
+    --color-overlay-dark-35: rgba(0, 0, 0, 0.35);
+    --color-overlay-dark-40: rgba(0, 0, 0, 0.4);
+    --color-overlay-dark-60: rgba(0, 0, 0, 0.6);
+    --color-overlay-light-25: rgba(255, 255, 255, 0.25);
+    --color-overlay-light-35: rgba(255, 255, 255, 0.35);
+    --color-overlay-light-50: rgba(255, 255, 255, 0.5);
+    --color-overlay-light-80: rgba(255, 255, 255, 0.8);
+    --color-overlay-light-90: rgba(255, 255, 255, 0.9);
+
+    /* Transition timing */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
 }
