@@ -95,24 +95,35 @@ const { post, channelUsername } = Astro.props;
 
 .post-card__content :global(.telegram-images) {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-3);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
     margin: var(--space-4) 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
 }
 
 .post-card__content :global(.telegram-images):has(> :only-child) {
     grid-template-columns: 1fr;
+    gap: 0;
 }
 
 .post-card__content :global(.telegram-post-image) {
     width: 100%;
-    height: auto;
-    border-radius: var(--radius-lg);
+    height: 100%;
+    aspect-ratio: 1;
     display: block;
-    object-fit: contain;
+    object-fit: cover;
     background: var(--color-bg-muted);
-    box-shadow: var(--shadow-soft);
     cursor: pointer;
+    border-radius: 0;
+}
+
+.post-card__content :global(.telegram-images):has(> :only-child) :global(.telegram-post-image) {
+    aspect-ratio: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
 }
 
 .post-card__content :global(ol),
@@ -255,7 +266,6 @@ const { post, channelUsername } = Astro.props;
 
 .post-card__tags .pill--clickable:hover {
     opacity: 0.8;
-    transform: translateY(-1px);
 }
 
 .post-card__tags .pill--clickable:focus-visible {
@@ -263,15 +273,13 @@ const { post, channelUsername } = Astro.props;
     outline-offset: 2px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 860px) {
     .post-card {
         padding: var(--space-4);
     }
+}
 
-    .post-card__content :global(.telegram-images) {
-        grid-template-columns: 1fr;
-    }
-
+@media (max-width: 640px) {
     .post-card__footer {
         flex-direction: column;
         align-items: flex-start;

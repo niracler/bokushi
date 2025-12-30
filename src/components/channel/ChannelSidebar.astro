@@ -44,6 +44,22 @@ const { title, description, avatar, username } = Astro.props;
     top: var(--space-6);
 }
 
+@media (max-width: 860px) {
+    .channel-sidebar {
+        position: static;
+    }
+
+    .channel-sidebar__card {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .channel-sidebar__avatar {
+        width: 56px;
+        height: 56px;
+    }
+}
+
 .channel-sidebar__card {
     padding: var(--space-4);
     display: flex;
