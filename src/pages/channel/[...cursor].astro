@@ -89,7 +89,7 @@ Astro.response.headers.set(
       ) : channelData ? (
         <div class="channel-layout">
           {/* Main content: posts + pagination */}
-          <main class="channel-main section-stack">
+          <div class="channel-main section-stack">
             {/* Posts list */}
             <div class="posts-container">
               {channelData.posts.map((post) => (
@@ -120,7 +120,7 @@ Astro.response.headers.set(
                 </a>
               )}
             </nav>
-          </main>
+          </div>
 
           {/* Sidebar: channel info */}
           <ChannelSidebar
@@ -231,7 +231,7 @@ Astro.response.headers.set(
   @media (max-width: 860px) {
     .channel-layout {
       grid-template-columns: 1fr;
-      max-width: 600px;
+      max-width: none;
     }
 
     /* Sidebar moves to top on mobile */
