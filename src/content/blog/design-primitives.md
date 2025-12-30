@@ -204,14 +204,25 @@ flowchart TD
     Post --> Comments["评论"]
 
     Home --> Channel["动态 /channel"]
+    Channel --> PostCard["帖子卡片"]
+    PostCard --> LinkPreview["链接预览"]
+    PostCard --> ReplyQuote["回复引用"]
+
     Home --> Manga["漫画表情包 /mangashots"]
     Home --> Tags["标签索引 /tags"]
 ```
 
 #### 动态内容
 
-- **Telegram 频道** (`/channel`)：SSR 渲染，5 分钟缓存
-- **漫画表情包** (`/mangashots`)：无限滚动，Cloudflare D1 存储
+**Telegram 频道** (`/channel`)：
+
+- SSR 渲染，5 分钟缓存
+- 双栏布局：帖子流 + 频道信息侧边栏
+- 支持链接预览、回复引用、Hashtag 标签
+
+**漫画表情包** (`/mangashots`)：
+
+- 无限滚动，Cloudflare D1 存储
 
 ---
 
