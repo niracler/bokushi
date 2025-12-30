@@ -2,16 +2,16 @@
 /**
  * Telegram Channel Display Page
  *
- * This page displays Telegram channel information and posts.
- * Inspired by https://github.com/ccbikai/BroadcastChannel
- * Implemented with assistance from Claude (Anthropic) via vibe coding approach.
+ * Redesigned with Apple HIG principles: Clarity, Consistency, Deference
+ * Two-column layout: posts (~600px) + sidebar (channel info)
  *
  * @author Niracler
  */
 
 import BaseHead from "../../components/BaseHead.astro";
+import ChannelSidebar from "../../components/channel/ChannelSidebar.astro";
+import PostCard from "../../components/channel/PostCard.astro";
 import Footer from "../../components/Footer.astro";
-import FormattedDate from "../../components/FormattedDate.astro";
 import Header from "../../components/Header.astro";
 import Lightbox from "../../components/Lightbox.astro";
 import type { TelegramChannel } from "../../utils/telegram";
@@ -24,7 +24,7 @@ const { cursor } = Astro.params;
 const CHANNEL_USERNAME = "tomoko_channel";
 const CACHE_SECONDS = 300;
 
-// 解析游标参数
+// Parse cursor parameter
 const cursorType = cursor?.startsWith("before-")
     ? "before"
     : cursor?.startsWith("after-")
@@ -49,18 +49,15 @@ try {
     console.error("Error loading Telegram channel:", e);
 }
 
-// 获取第一篇和最后一篇文章的 ID 用于分页
+// Get first and last post IDs for pagination
 const firstPostId = channelData?.posts?.[0]?.id;
 const lastPostId = channelData?.posts?.[channelData.posts.length - 1]?.id;
 
-// 判断是否有更多内容
-// - 如果是首页（没有 cursor），总是显示"更早的动态"按钮（假设有历史内容）
-// - 如果使用了 after 参数，说明正在查看更新的内容，可以回到最新
-// - 如果使用了 before 参数且返回了数据，说明还有更早的内容
+// Determine if there are more posts
 const hasNewerPosts = cursorType === "before" || cursorType === "after";
 const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.length > 0);
 
-// 为频道页设置短缓存，避免每次刷新都重新抓取
+// Set short cache to avoid re-fetching on every refresh
 Astro.response.headers.set(
     "Cache-Control",
     `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=30`,
@@ -78,9 +75,9 @@ Astro.response.headers.set(
   </head>
   <body>
     <Header />
-    <main class="main-container">
+    <main class="page-shell">
       {error ? (
-        <div class="error-message">
+        <div class="error-message surface-card">
           <h1>加载频道失败</h1>
           <p>{error}</p>
           <p>
@@ -90,107 +87,60 @@ Astro.response.headers.set(
           </p>
         </div>
       ) : channelData ? (
-        <div class="layout-wrapper">
-          <div class="content-main">
+        <div class="channel-layout">
+          {/* Main content: posts + pagination */}
+          <main class="channel-main section-stack">
+            {/* Posts list */}
             <div class="posts-container">
               {channelData.posts.map((post) => (
-                <article class="telegram-post">
-                  <header class="post-header">
-                    {post.forwardedFrom ? (
-                      <div class="post-forwarded">
-                        <svg class="forward-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M13 7L18 12M18 12L13 17M18 12H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        转发自 {post.forwardedFromLink ? (
-                          <a href={post.forwardedFromLink} target="_blank" rel="noopener noreferrer" class="forward-link">
-                            {post.forwardedFrom}
-                          </a>
-                        ) : (
-                          post.forwardedFrom
-                        )}
-                      </div>
-                    ) : (
-                      <div class="post-original">
-                        <svg class="original-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
-                        </svg>
-                        原创
-                      </div>
-                    )}
-                    {post.datetime && (
-                    <time datetime={post.datetime}>
-                      <FormattedDate date={new Date(post.datetime)} />
-                    </time>
-                  )}
-                  </header>
-                  <div class="post-content" set:html={post.content} />
-                </article>
+                <PostCard post={post} channelUsername={CHANNEL_USERNAME} />
               ))}
             </div>
 
-            <!-- 分页导航 -->
+            {/* Pagination */}
             <nav class="pagination">
               {hasNewerPosts && firstPostId && (
-                <a href={`/channel/after-${firstPostId}`} class="pagination-link pagination-newer">
-                  ← 更新的动态
+                <a href={`/channel/after-${firstPostId}`} class="pagination__link pagination__link--prev">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  更新的动态
                 </a>
               )}
-              {!cursor && (
-                <a href="/channel" class="pagination-link pagination-current">
-                  最新
-                </a>
-              )}
+              <a href="/channel"
+                 class:list={["pagination__link", "pagination__link--home", { "pagination__link--active": !cursor }]}>
+                最新
+              </a>
               {hasOlderPosts && lastPostId && (
-                <a href={`/channel/before-${lastPostId}`} class="pagination-link pagination-older">
-                  更早的动态 →
+                <a href={`/channel/before-${lastPostId}`} class="pagination__link pagination__link--next">
+                  更早的动态
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
                 </a>
               )}
             </nav>
-          </div>
+          </main>
 
-          <aside class="sidebar">
-            <div class="channel-info-card">
-              {channelData.avatar && (
-                <img
-                  src={channelData.avatar}
-                  alt={channelData.title}
-                  class="channel-avatar"
-                />
-              )}
-              <h2 class="channel-title">{channelData.title}</h2>
-              {channelData.description && (
-                <div class="channel-description" set:html={channelData.description} />
-              )}
-              <div class="channel-actions">
-                <a
-                  href={`https://t.me/${CHANNEL_USERNAME}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="channel-link"
-                >
-                  在 Telegram 中打开
-                </a>
-                <a
-                  href="/channel-rss.xml"
-                  class="channel-link rss-link"
-                >
-                  RSS 订阅
-                </a>
-              </div>
-            </div>
-          </aside>
+          {/* Sidebar: channel info */}
+          <ChannelSidebar
+            title={channelData.title}
+            description={channelData.description}
+            avatar={channelData.avatar}
+            username={CHANNEL_USERNAME}
+          />
         </div>
       ) : null}
     </main>
     <Footer />
-    <Lightbox id="channel-lightbox" selector=".prose img:not([data-lightbox-skip]), .telegram-post .telegram-post-image" />
+    <Lightbox id="channel-lightbox" selector=".post-card__content img:not([data-lightbox-skip]), .telegram-post-image" />
   </body>
 </html>
 
 <script>
-  // 统一标记频道图片以供全局灯箱使用（并懒加载）
+  // Mark channel images for lightbox and lazy load
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.telegram-post .post-content img').forEach((element) => {
+    document.querySelectorAll('.post-card__content img').forEach((element) => {
       const img = element as HTMLImageElement;
       img.classList.add('telegram-post-image');
       img.loading = img.loading || 'lazy';
@@ -199,32 +149,33 @@ Astro.response.headers.set(
 </script>
 
 <style>
-  .main-container {
-    max-width: 56rem;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-  }
-
-  .layout-wrapper {
+  .channel-layout {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 2rem;
-    align-items: start;
+    grid-template-columns: minmax(0, 600px) 260px;
+    gap: var(--space-6);
+    max-width: 900px;
+    margin: 0 auto;
   }
 
-  .content-main {
+  .channel-main {
     min-width: 0;
+  }
+
+  .posts-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
   }
 
   .error-message {
     text-align: center;
-    padding: 3rem 1rem;
+    padding: var(--space-8) var(--space-4);
     color: var(--color-text-secondary);
   }
 
   .error-message h1 {
     color: var(--color-text-primary);
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
   }
 
   .error-message a {
@@ -232,459 +183,21 @@ Astro.response.headers.set(
     text-decoration: underline;
   }
 
-  .sidebar {
-    position: sticky;
-    top: 2rem;
-  }
-
-  .channel-info-card {
-    background: var(--color-bg-surface);
-    border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-lg);
-    padding: var(--space-4);
-    box-shadow: var(--shadow-soft);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .channel-avatar {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 0.875rem;
-  }
-
-  .channel-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin: 0 0 0.625rem 0;
-    color: var(--color-text-primary);
-    text-align: center;
-  }
-
-  .channel-description {
-    color: var(--color-text-secondary);
-    margin: 0 0 1rem 0;
-    line-height: 1;
-    font-size: 0.8125rem;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    text-align: left;
-    width: 100%;
-  }
-
-  .channel-description :global(ol),
-  .channel-description :global(ul) {
-    margin: 0.75rem 0;
-    padding-left: 0;
-    list-style: none;
-    text-align: left;
-  }
-
-  .channel-description :global(ol li),
-  .channel-description :global(ul li) {
-    position: relative;
-    padding-left: 1.25rem;
-    margin-bottom: 0.375rem;
-    line-height: 1.3;
-  }
-
-  .channel-description :global(ol) {
-    counter-reset: list-counter;
-  }
-
-  .channel-description :global(ol li) {
-    counter-increment: list-counter;
-  }
-
-  .channel-description :global(ol li::before) {
-    content: counter(list-counter) ".";
-    position: absolute;
-    left: 0;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-  }
-
-  .channel-description :global(ul li::before) {
-    content: "•";
-    position: absolute;
-    left: 0.2rem;
-    color: var(--color-text-secondary);
-  }
-
-  .channel-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  .channel-link {
-    display: block;
-    padding: var(--space-2) var(--space-3);
-    background: var(--color-accent);
-    color: white;
-    text-decoration: none;
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-    text-align: center;
-  }
-
-  .channel-link:hover {
-    background: var(--color-accent-dark);
-  }
-
-  .channel-link.rss-link {
-    background: transparent;
-    color: var(--color-accent);
-    border: 1px solid var(--color-accent);
-  }
-
-  .channel-link.rss-link:hover {
-    background: var(--color-accent);
-    color: white;
-  }
-
-  .posts-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .telegram-post {
-    background: var(--color-bg-surface);
-    border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    transition:
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
-    box-shadow: var(--shadow-soft);
-  }
-
-  .telegram-post:hover {
-    border-color: var(--color-border);
-  }
-
-  .post-header {
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-border-soft);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .post-header time {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .post-forwarded {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    background: var(--color-bg-muted);
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-    border: 1px solid var(--color-border-soft);
-    transition: all 0.2s ease;
-  }
-
-  .post-forwarded:hover {
-    border-color: var(--color-border);
-  }
-
-  .post-original {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    background: var(--color-bg-muted);
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    color: var(--color-accent);
-    border: 1px solid var(--color-accent);
-    transition: all 0.2s ease;
-    font-weight: 500;
-  }
-
-  .post-original:hover {
-    background: var(--color-accent);
-    color: white;
-  }
-
-  .original-icon {
-    width: 12px;
-    height: 12px;
-  }
-
-  .forward-icon {
-    width: 12px;
-    height: 12px;
-    opacity: 0.7;
-  }
-
-  .forward-link {
-    color: var(--color-accent);
-    text-decoration: none;
-    transition: opacity 0.2s ease;
-    font-weight: 500;
-  }
-
-  .forward-link:hover {
-    opacity: 0.8;
-    text-decoration: underline;
-  }
-
-  .telegram-post .post-content {
-    color: var(--color-text-primary);
-    line-height: 1.75;
-    margin-bottom: 1rem;
-    font-size: 0.95rem;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    letter-spacing: 0.01em;
-  }
-
-  .telegram-post .post-content :global(ol),
-  .telegram-post .post-content :global(ul) {
-    margin: 1rem 0;
-    padding-left: 0;
-    list-style: none;
-  }
-
-  .telegram-post .post-content :global(ol li),
-  .telegram-post .post-content :global(ul li) {
-    position: relative;
-    padding-left: 1.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .telegram-post .post-content :global(ol) {
-    counter-reset: list-counter;
-  }
-
-  .telegram-post .post-content :global(ol li) {
-    counter-increment: list-counter;
-  }
-
-  .telegram-post .post-content :global(ol li::before) {
-    content: counter(list-counter) ".";
-    position: absolute;
-    left: 0;
-    color: var(--color-text-primary);
-    font-weight: 500;
-  }
-
-  .telegram-post .post-content :global(ul li::before) {
-    content: "•";
-    position: absolute;
-    left: 0.2rem;
-    color: var(--color-text-primary);
-  }
-
-  .telegram-post .post-content :global(a) {
-    color: var(--color-accent);
-    text-decoration: none;
-    transition: all 0.2s ease;
-    position: relative;
-    padding-bottom: 1px;
-  }
-
-  .telegram-post .post-content :global(a::after) {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0;
-    height: 1px;
-    background: var(--color-accent);
-    transition: width 0.3s ease;
-  }
-
-  .telegram-post .post-content :global(a:hover) {
-    opacity: 0.8;
-  }
-
-  .telegram-post .post-content :global(a:hover::after) {
-    width: 100%;
-  }
-
-  .post-content :global(.telegram-images) {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.75rem;
-    margin: 1rem 0;
-  }
-
-  .post-content :global(.telegram-images):has(> :only-child) {
-    grid-template-columns: 1fr;
-  }
-
-  .post-content :global(.telegram-post-image) {
-    width: 100%;
-    height: auto;
-    border-radius: var(--radius-lg);
-    display: block;
-    object-fit: contain;
-    background: var(--color-bg-muted);
-    box-shadow: var(--shadow-soft);
-    cursor: pointer;
-  }
-
-  .post-content :global(pre) {
-    background: var(--color-bg-muted);
-    padding: 1rem 1.25rem;
-    border-radius: var(--radius-md);
-    overflow-x: auto;
-    border: 1px solid var(--color-border-soft);
-    position: relative;
-  }
-
-  .post-content :global(pre:hover) {
-    border-color: var(--color-border);
-  }
-
-  .post-content :global(code) {
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', 'Source Code Pro', monospace;
-    font-size: 0.875em;
-    line-height: 1.6;
-  }
-
-  .post-content :global(:not(pre) > code) {
-    background: var(--color-bg-muted);
-    padding: 0.2em 0.4em;
-    border-radius: var(--radius-sm);
-    font-size: 0.9em;
-    color: var(--color-accent);
-    border: 1px solid var(--color-border-soft);
-  }
-
-  .post-content :global(blockquote) {
-    border-left: 3px solid var(--color-accent);
-    padding: 0.75rem 1rem;
-    margin: 1rem 0;
-    color: var(--color-text-secondary);
-    background: var(--color-bg-muted);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    font-style: italic;
-  }
-
-  /* Emoji 样式增强 */
-  .post-content :global(.emoji) {
-    display: inline-block;
-    font-size: 1.2em;
-    line-height: 1;
-    vertical-align: middle;
-    margin: 0 0.1em;
-  }
-
-  /* 行首 emoji 特殊处理 */
-  .post-content > :global(*:first-child::first-letter) {
-    font-size: 1.3em;
-  }
-
-  /* 图片灯箱样式 */
-  .lightbox {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--color-backdrop);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-    animation: fadeIn 0.2s ease;
-  }
-
-  .lightbox.active {
-    display: flex;
-  }
-
-  .lightbox-close {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    z-index: 10000;
-  }
-
-  .lightbox-close:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.35);
-  }
-
-  #lightbox-image {
-    max-width: 90vw;
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lightbox);
-    animation: zoomIn 0.3s ease;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes zoomIn {
-    from {
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  /* 分页样式 */
+  /* Pagination */
   .pagination {
     display: flex;
-    gap: 1rem;
+    gap: var(--space-3);
     justify-content: center;
     align-items: center;
-    margin-top: 3rem;
-    padding-top: 2rem;
+    padding-top: var(--space-6);
     border-top: 1px solid var(--color-border-soft);
   }
 
-  .pagination-link {
-    padding: var(--space-3) var(--space-6);
+  .pagination__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
     background: var(--color-bg-surface);
     border: 1px solid var(--color-border-soft);
     border-radius: var(--radius-md);
@@ -692,83 +205,50 @@ Astro.response.headers.set(
     text-decoration: none;
     font-size: var(--font-size-sm);
     font-weight: 500;
-    transition:
-      background-color 0.2s ease,
-      border-color 0.2s ease;
+    transition: all var(--transition-base);
   }
 
-  .pagination-link:hover {
+  .pagination__link:hover {
     background: var(--color-bg-muted);
     border-color: var(--color-border);
   }
 
-  .pagination-current {
+  .pagination__link--home {
+    background: var(--color-bg-muted);
+  }
+
+  .pagination__link--active {
     background: var(--color-accent);
     color: white;
     border-color: var(--color-accent);
   }
 
-  .pagination-current:hover {
+  .pagination__link--active:hover {
     background: var(--color-accent-dark);
     border-color: var(--color-accent-dark);
   }
 
-  @media (max-width: 1024px) {
-    .layout-wrapper {
+  @media (max-width: 860px) {
+    .channel-layout {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      max-width: 600px;
     }
 
-    .sidebar {
-      position: static;
+    /* Sidebar moves to top on mobile */
+    .channel-layout > :global(.channel-sidebar) {
       order: -1;
-    }
-
-    .channel-info-card {
-      max-width: 480px;
-      margin: 0 auto;
     }
   }
 
   @media (max-width: 640px) {
-    .main-container {
-      padding: 1.5rem 0.75rem;
-    }
-
-    .channel-info-card {
-      padding: 1.25rem;
-    }
-
-    .channel-avatar {
-      width: 64px;
-      height: 64px;
-    }
-
-    .channel-title {
-      font-size: 1.125rem;
-    }
-
-    .telegram-post {
-      padding: 1.25rem;
-    }
-
-    .posts-container {
-      gap: 1.25rem;
-    }
-
-    .post-content :global(.telegram-images) {
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-    }
-
     .pagination {
       flex-direction: column;
-      gap: 0.75rem;
+      gap: var(--space-2);
     }
 
-    .pagination-link {
+    .pagination__link {
       width: 100%;
-      text-align: center;
+      justify-content: center;
     }
   }
 </style>

@@ -1,0 +1,156 @@
+---
+interface Props {
+    title: string;
+    description: string;
+    avatar: string;
+    username: string;
+}
+
+const { title, description, avatar, username } = Astro.props;
+---
+
+<aside class="channel-sidebar">
+    <div class="channel-sidebar__card surface-card">
+        <img src={avatar} alt={title} class="channel-sidebar__avatar" />
+        <h2 class="channel-sidebar__title">{title}</h2>
+        {description && (
+            <div class="channel-sidebar__description" set:html={description} />
+        )}
+        <div class="channel-sidebar__actions">
+            <a href={`https://t.me/${username}`}
+               target="_blank"
+               rel="noopener noreferrer"
+               class="channel-sidebar__btn channel-sidebar__btn--primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                在 Telegram 中打开
+            </a>
+            <a href="/channel-rss.xml"
+               class="channel-sidebar__btn channel-sidebar__btn--ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="5" cy="19" r="1" fill="currentColor"/>
+                </svg>
+                RSS 订阅
+            </a>
+        </div>
+    </div>
+</aside>
+
+<style>
+.channel-sidebar {
+    position: sticky;
+    top: var(--space-6);
+}
+
+.channel-sidebar__card {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.channel-sidebar__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: var(--space-3);
+}
+
+.channel-sidebar__title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-2);
+    line-height: var(--line-height-tight);
+}
+
+.channel-sidebar__description {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: var(--space-4);
+    text-align: left;
+    width: 100%;
+}
+
+.channel-sidebar__description :global(ol),
+.channel-sidebar__description :global(ul) {
+    margin: var(--space-2) 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.channel-sidebar__description :global(li) {
+    position: relative;
+    padding-left: var(--space-4);
+    margin-bottom: var(--space-1);
+}
+
+.channel-sidebar__description :global(ol) {
+    counter-reset: list-counter;
+}
+
+.channel-sidebar__description :global(ol li) {
+    counter-increment: list-counter;
+}
+
+.channel-sidebar__description :global(ol li::before) {
+    content: counter(list-counter) ".";
+    position: absolute;
+    left: 0;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    font-size: var(--font-size-xs);
+}
+
+.channel-sidebar__description :global(ul li::before) {
+    content: "\2022";
+    position: absolute;
+    left: var(--space-1);
+    color: var(--color-text-muted);
+}
+
+.channel-sidebar__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+}
+
+.channel-sidebar__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+.channel-sidebar__btn--primary {
+    background: var(--color-accent);
+    color: white;
+}
+
+.channel-sidebar__btn--primary:hover {
+    background: var(--color-accent-dark);
+}
+
+.channel-sidebar__btn--ghost {
+    background: transparent;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+}
+
+.channel-sidebar__btn--ghost:hover {
+    background: var(--color-accent);
+    color: white;
+}
+</style>

@@ -1,5 +1,19 @@
 import * as cheerio from "cheerio";
 
+export interface LinkPreview {
+    url: string;
+    siteName?: string;
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+}
+
+export interface ReplyInfo {
+    replyToText?: string;
+    replyToAuthor?: string;
+    replyToLink?: string;
+}
+
 export interface TelegramPost {
     id: string;
     datetime: string;
@@ -8,6 +22,9 @@ export interface TelegramPost {
     text: string;
     forwardedFrom?: string;
     forwardedFromLink?: string;
+    linkPreview?: LinkPreview;
+    replyInfo?: ReplyInfo;
+    hashtags?: string[];
 }
 
 export interface TelegramChannel {
@@ -163,6 +180,78 @@ export async function fetchTelegramChannel(
                 contentHtml = `<div class="telegram-images">${imagesHtml}</div>${contentHtml}`;
             }
 
+            // Extract link preview
+            let linkPreview: LinkPreview | undefined;
+            const $linkPreview = $message.find(".tgme_widget_message_link_preview");
+            if ($linkPreview.length) {
+                const previewUrl = $linkPreview.attr("href") || "";
+                const siteName = $linkPreview.find(".link_preview_site_name").text().trim();
+                const previewTitle = $linkPreview.find(".link_preview_title").text().trim();
+                const previewDescription = $linkPreview
+                    .find(".link_preview_description")
+                    .text()
+                    .trim();
+
+                // Extract image from style or img tag
+                let previewImageUrl = "";
+                const $previewImage = $linkPreview.find(
+                    ".link_preview_image, .link_preview_right_image",
+                );
+                if ($previewImage.length) {
+                    const style = $previewImage.attr("style") || "";
+                    const imgMatch = style.match(/url\(['"](.+?)['"]\)/);
+                    if (imgMatch?.[1]) {
+                        previewImageUrl = getProxiedImageUrl(imgMatch[1]);
+                    } else {
+                        const imgSrc =
+                            $previewImage.find("img").attr("src") || $previewImage.attr("src");
+                        if (imgSrc) {
+                            previewImageUrl = getProxiedImageUrl(imgSrc);
+                        }
+                    }
+                }
+
+                if (previewUrl || previewTitle) {
+                    linkPreview = {
+                        url: previewUrl,
+                        ...(siteName && { siteName }),
+                        ...(previewTitle && { title: previewTitle }),
+                        ...(previewDescription && { description: previewDescription }),
+                        ...(previewImageUrl && { imageUrl: previewImageUrl }),
+                    };
+                }
+            }
+
+            // Extract reply info
+            let replyInfo: ReplyInfo | undefined;
+            const $reply = $message.find(".tgme_widget_message_reply");
+            if ($reply.length) {
+                const replyToAuthor = $reply.find(".tgme_widget_message_author_name").text().trim();
+                const replyToText = $reply
+                    .find(".tgme_widget_message_metatext, .tgme_widget_message_text")
+                    .text()
+                    .trim();
+                const replyToLink = $reply.attr("href") || undefined;
+
+                if (replyToAuthor || replyToText) {
+                    replyInfo = {
+                        ...(replyToAuthor && { replyToAuthor }),
+                        ...(replyToText && { replyToText }),
+                        ...(replyToLink && { replyToLink }),
+                    };
+                }
+            }
+
+            // Extract hashtags
+            const hashtags: string[] = [];
+            $content.find("a").each((_, link) => {
+                const href = $(link).attr("href") || "";
+                const linkText = $(link).text().trim();
+                if (linkText.startsWith("#") && (href.includes("?q=") || href.includes("/s/"))) {
+                    hashtags.push(linkText.slice(1));
+                }
+            });
+
             posts.push({
                 id,
                 datetime,
@@ -171,6 +260,9 @@ export async function fetchTelegramChannel(
                 text,
                 ...(forwardedFrom && { forwardedFrom }),
                 ...(forwardedFromLink && { forwardedFromLink }),
+                ...(linkPreview && { linkPreview }),
+                ...(replyInfo && { replyInfo }),
+                ...(hashtags.length > 0 && { hashtags }),
             });
         });
 

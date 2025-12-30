@@ -1,0 +1,280 @@
+---
+import type { TelegramPost } from "../../utils/telegram";
+import FormattedDate from "../FormattedDate.astro";
+import LinkPreviewCard from "./LinkPreviewCard.astro";
+import ReplyQuote from "./ReplyQuote.astro";
+
+interface Props {
+    post: TelegramPost;
+    channelUsername: string;
+}
+
+const { post, channelUsername } = Astro.props;
+---
+
+<article class="post-card surface-card surface-card--hover-border">
+    {/* Reply quote */}
+    {post.replyInfo && <ReplyQuote reply={post.replyInfo} />}
+
+    {/* Post content */}
+    <div class="post-card__content" set:html={post.content} />
+
+    {/* Link preview */}
+    {post.linkPreview && <LinkPreviewCard preview={post.linkPreview} />}
+
+    {/* Footer */}
+    <footer class="post-card__footer">
+        <div class="post-card__meta">
+            {post.datetime && (
+                <time datetime={post.datetime} class="post-card__date">
+                    <FormattedDate date={new Date(post.datetime)} />
+                </time>
+            )}
+
+            {post.forwardedFrom ? (
+                <span class="post-card__badge post-card__badge--forward">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <path d="M13 7L18 12M18 12L13 17M18 12H6"
+                              stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    转发自
+                    {post.forwardedFromLink ? (
+                        <a href={post.forwardedFromLink} target="_blank"
+                           rel="noopener noreferrer">{post.forwardedFrom}</a>
+                    ) : post.forwardedFrom}
+                </span>
+            ) : (
+                <span class="post-card__badge post-card__badge--original">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    </svg>
+                    原创
+                </span>
+            )}
+        </div>
+
+        {post.hashtags && post.hashtags.length > 0 && (
+            <div class="post-card__tags">
+                {post.hashtags.map(tag => (
+                    <a href={`https://t.me/s/${channelUsername}?q=%23${encodeURIComponent(tag)}`}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="pill pill--clickable"
+                       data-tone="accent">#{tag}</a>
+                ))}
+            </div>
+        )}
+    </footer>
+</article>
+
+<style>
+.post-card {
+    padding: var(--space-6);
+}
+
+.post-card__content {
+    color: var(--color-text-primary);
+    line-height: 1.75;
+    font-size: var(--font-size-base);
+    white-space: pre-wrap;
+    word-break: break-word;
+    letter-spacing: 0.01em;
+}
+
+.post-card__content :global(a) {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: opacity var(--transition-base);
+}
+
+.post-card__content :global(a:hover) {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+.post-card__content :global(.telegram-images) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-3);
+    margin: var(--space-4) 0;
+}
+
+.post-card__content :global(.telegram-images):has(> :only-child) {
+    grid-template-columns: 1fr;
+}
+
+.post-card__content :global(.telegram-post-image) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    display: block;
+    object-fit: contain;
+    background: var(--color-bg-muted);
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+}
+
+.post-card__content :global(ol),
+.post-card__content :global(ul) {
+    margin: var(--space-4) 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.post-card__content :global(ol li),
+.post-card__content :global(ul li) {
+    position: relative;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-2);
+}
+
+.post-card__content :global(ol) {
+    counter-reset: list-counter;
+}
+
+.post-card__content :global(ol li) {
+    counter-increment: list-counter;
+}
+
+.post-card__content :global(ol li::before) {
+    content: counter(list-counter) ".";
+    position: absolute;
+    left: 0;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.post-card__content :global(ul li::before) {
+    content: "\2022";
+    position: absolute;
+    left: var(--space-2);
+    color: var(--color-text-muted);
+}
+
+.post-card__content :global(pre) {
+    background: var(--color-bg-muted);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    border: 1px solid var(--color-border-soft);
+}
+
+.post-card__content :global(code) {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-size: 0.9em;
+}
+
+.post-card__content :global(:not(pre) > code) {
+    background: var(--color-bg-muted);
+    padding: 0.2em 0.4em;
+    border-radius: var(--radius-sm);
+    color: var(--color-accent);
+    border: 1px solid var(--color-border-soft);
+}
+
+.post-card__content :global(blockquote) {
+    border-left: 3px solid var(--color-accent);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-4) 0;
+    color: var(--color-text-secondary);
+    background: var(--color-bg-muted);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-style: italic;
+}
+
+.post-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-soft);
+}
+
+.post-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.post-card__date {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.post-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.post-card__badge--original {
+    background: var(--color-accent-tint-12);
+    color: var(--color-accent);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+.post-card__badge--forward {
+    background: var(--color-bg-muted);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-soft);
+}
+
+.post-card__badge--forward a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+.post-card__badge--forward a:hover {
+    text-decoration: underline;
+}
+
+.post-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.post-card__tags .pill--clickable {
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.post-card__tags .pill--clickable:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+.post-card__tags .pill--clickable:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+    .post-card {
+        padding: var(--space-4);
+    }
+
+    .post-card__content :global(.telegram-images) {
+        grid-template-columns: 1fr;
+    }
+
+    .post-card__footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>

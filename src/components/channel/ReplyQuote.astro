@@ -1,0 +1,77 @@
+---
+import type { ReplyInfo } from "../../utils/telegram";
+
+interface Props {
+    reply: ReplyInfo;
+}
+
+const { reply } = Astro.props;
+const WrapperTag = reply.replyToLink ? "a" : "div";
+const wrapperProps = reply.replyToLink
+    ? { href: reply.replyToLink, target: "_blank", rel: "noopener noreferrer" }
+    : {};
+---
+
+<WrapperTag class:list={["reply-quote", { "reply-quote--clickable": reply.replyToLink }]} {...wrapperProps}>
+    <div class="reply-quote__bar"></div>
+    <div class="reply-quote__content">
+        {reply.replyToAuthor && (
+            <span class="reply-quote__author">{reply.replyToAuthor}</span>
+        )}
+        {reply.replyToText && (
+            <p class="reply-quote__text">{reply.replyToText}</p>
+        )}
+    </div>
+</WrapperTag>
+
+<style>
+.reply-quote {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg-muted);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: inherit;
+}
+
+.reply-quote--clickable {
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.reply-quote--clickable:hover {
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-soft);
+}
+
+.reply-quote__bar {
+    width: 3px;
+    flex-shrink: 0;
+    background: var(--color-accent);
+    border-radius: 2px;
+}
+
+.reply-quote__content {
+    min-width: 0;
+}
+
+.reply-quote__author {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--space-1);
+}
+
+.reply-quote__text {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
