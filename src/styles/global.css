@@ -136,22 +136,28 @@
      * Utility Components
      * ========================================= */
 
-    /* Focus ring - consistent focus-visible styling */
-    .focus-ring {
+    /* Focus accent - consistent focus-visible styling */
+    .focus-accent {
         outline: none;
     }
-    .focus-ring:focus-visible {
+    .focus-accent:focus-visible {
         outline: 2px solid var(--color-accent-soft);
         outline-offset: 2px;
     }
 
-    /* Icon button - reusable circular button */
+    /* Transition interactive - for buttons and links */
+    .transition-interactive {
+        transition:
+            color var(--transition-base),
+            background-color var(--transition-base),
+            border-color var(--transition-base);
+    }
+
+    /* Icon button - reusable button for icons */
     .icon-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 9999px;
-        border: none;
         background: transparent;
         color: var(--color-text-secondary);
         cursor: pointer;
@@ -160,6 +166,12 @@
     .icon-btn:hover {
         color: var(--color-accent);
     }
+
+    /* Icon button - size variants */
+    .icon-btn--xs {
+        width: 2rem;
+        height: 2rem;
+    }
     .icon-btn--sm {
         width: 2.5rem;
         height: 2.5rem;
@@ -167,6 +179,19 @@
     .icon-btn--md {
         width: 3rem;
         height: 3rem;
+    }
+
+    /* Icon button - shape variants */
+    .icon-btn--round {
+        border-radius: 9999px;
+    }
+    .icon-btn--square {
+        border-radius: var(--radius-md);
+    }
+
+    /* Icon button - border variant */
+    .icon-btn--bordered {
+        border: 1px solid var(--color-border-soft);
     }
 
     /* =========================================
@@ -1136,5 +1161,101 @@
     .underline-link:hover::after {
         transform: scaleX(1);
         border-color: var(--color-link-hover);
+    }
+
+    /* =========================================
+     * Theme Toggle Component
+     * ========================================= */
+
+    .theme-toggle {
+        display: inline-flex;
+    }
+
+    .theme-toggle [data-theme-toggle] {
+        position: relative;
+    }
+
+    /* Icon container */
+    .theme-toggle .icon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    /* Icon animation base */
+    .theme-toggle .theme-icon {
+        position: absolute;
+        width: 1.25rem;
+        height: 1.25rem;
+        transition:
+            opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+            rotate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        opacity: 0;
+        transform: scale(0.5) rotate(-90deg);
+        transform-origin: center;
+    }
+
+    /* Show active icon based on preference */
+    .theme-toggle [data-theme-preference="system"] [data-icon="system"],
+    .theme-toggle [data-theme-preference="light"] [data-icon="light"],
+    .theme-toggle [data-theme-preference="dark"] [data-icon="dark"] {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+
+    /* Hide inactive icons */
+    .theme-toggle [data-theme-preference="system"] [data-icon="light"],
+    .theme-toggle [data-theme-preference="system"] [data-icon="dark"],
+    .theme-toggle [data-theme-preference="light"] [data-icon="system"],
+    .theme-toggle [data-theme-preference="light"] [data-icon="dark"],
+    .theme-toggle [data-theme-preference="dark"] [data-icon="system"],
+    .theme-toggle [data-theme-preference="dark"] [data-icon="light"] {
+        opacity: 0;
+        transform: scale(0.5) rotate(90deg);
+        pointer-events: none;
+    }
+
+    /* Hover effect - subtle scale */
+    .theme-toggle [data-theme-toggle]:hover .theme-icon {
+        transform: scale(1.15) rotate(0deg);
+    }
+
+    /* Variant: header - minimal, no border */
+    .theme-toggle[data-variant="header"] [data-theme-toggle] {
+        border: none;
+        background: transparent;
+    }
+
+    /* Variant: mobile - full width with visible label */
+    .theme-toggle[data-variant="mobile"] {
+        display: flex;
+        width: 100%;
+    }
+
+    .theme-toggle[data-variant="mobile"] [data-theme-toggle] {
+        width: 100%;
+        justify-content: flex-start;
+        padding: var(--space-2) var(--space-3);
+        gap: var(--space-3);
+        border: none;
+        background: transparent;
+        text-align: left;
+    }
+
+    .theme-toggle[data-variant="mobile"] [data-theme-toggle]:hover {
+        background: var(--color-accent-tint-8);
+    }
+
+    .theme-toggle[data-variant="mobile"] [data-theme-toggle-label] {
+        position: static;
+        clip: auto;
+        width: auto;
+        height: auto;
+        overflow: visible;
+        white-space: normal;
     }
 }
