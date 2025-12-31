@@ -171,7 +171,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 			{showToc && (
 				<aside
 					data-toc-sidebar
-					class="hidden min-[900px]:block fixed w-[220px] min-[1100px]:w-[260px]"
+					class="hidden min-[900px]:block fixed w-[220px] min-[1100px]:w-[260px] opacity-0 transition-opacity duration-200"
 					style="left: calc(50% + 25rem + 1.5rem); top: 6rem;"
 				>
 					<nav class="toc max-h-[calc(100vh-8rem)] overflow-y-auto">

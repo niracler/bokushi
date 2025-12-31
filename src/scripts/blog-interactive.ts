@@ -274,25 +274,62 @@ function initMobileTocDrawer() {
 }
 
 // ============ TOC 侧边栏定位 ============
-// 动态计算 TOC 起始位置，使其与文章内容区域对齐（标题分割线下方）
+// 动态计算 TOC 起始位置，实现滚动浮动效果
+let tocPositionRAF: number | null = null;
+let tocResizeTimeout: number | null = null;
+let tocScrollTimeout: number | null = null;
+
 function adjustTocPosition() {
-    const tocSidebar = document.querySelector<HTMLElement>("[data-toc-sidebar]");
-    const articleHeader = document.querySelector<HTMLElement>("[data-article-header]");
+    // 取消之前的 RAF，避免重复计算
+    if (tocPositionRAF !== null) {
+        cancelAnimationFrame(tocPositionRAF);
+    }
 
-    if (!tocSidebar || !articleHeader) return;
+    tocPositionRAF = requestAnimationFrame(() => {
+        const tocSidebar = document.querySelector<HTMLElement>("[data-toc-sidebar]");
+        const articleHeader = document.querySelector<HTMLElement>("[data-article-header]");
 
-    // 获取文章标题区域底部位置（相对于视口）
-    const headerRect = articleHeader.getBoundingClientRect();
-    const headerBottom = headerRect.bottom;
+        if (!tocSidebar || !articleHeader) return;
 
-    // 计算 TOC 应该在的位置
-    // 使用 header 底部位置 + 一点间距，但至少要在 header 导航栏下方 (约 64px)
-    const minTop = 64; // header 导航栏高度
-    const padding = 24; // 与分割线的间距
-    const targetTop = Math.max(minTop, headerBottom + padding);
+        // 双重 RAF 确保布局完全稳定后再计算
+        requestAnimationFrame(() => {
+            const headerRect = articleHeader.getBoundingClientRect();
+            const headerBottom = headerRect.bottom;
 
-    // 更新 TOC 位置
-    tocSidebar.style.top = `${targetTop}px`;
+            const minTop = 64; // header 导航栏高度
+            const padding = 24; // 与分割线的间距
+
+            // 滚动浮动逻辑：当标题滚出视口时，TOC 浮动到顶部
+            const targetTop = headerBottom < minTop
+                ? minTop + padding  // 浮动模式：贴着 header
+                : Math.max(minTop + padding, headerBottom + padding); // 跟随模式：对齐标题底部
+
+            tocSidebar.style.top = `${targetTop}px`;
+            tocSidebar.style.opacity = "1"; // 显示 TOC
+
+            tocPositionRAF = null;
+        });
+    });
+}
+
+function debouncedAdjustTocPosition() {
+    if (tocResizeTimeout !== null) {
+        clearTimeout(tocResizeTimeout);
+    }
+
+    tocResizeTimeout = window.setTimeout(() => {
+        adjustTocPosition();
+        tocResizeTimeout = null;
+    }, 150);
+}
+
+function throttledAdjustTocPosition() {
+    if (tocScrollTimeout !== null) return; // 节流：忽略快速连续的调用
+
+    tocScrollTimeout = window.setTimeout(() => {
+        adjustTocPosition();
+        tocScrollTimeout = null;
+    }, 16); // ~60fps
 }
 
 // ============ 初始化所有功能 ============
@@ -314,6 +351,7 @@ export function initBlogInteractive() {
     window.addEventListener("astro:after-swap", initMobileTocDrawer);
 
     adjustTocPosition();
-    window.addEventListener("resize", adjustTocPosition);
+    window.addEventListener("resize", debouncedAdjustTocPosition);
+    window.addEventListener("scroll", throttledAdjustTocPosition, { passive: true });
     window.addEventListener("astro:after-swap", adjustTocPosition);
 }

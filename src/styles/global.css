@@ -905,9 +905,8 @@
 
     /* Table of contents */
     .toc {
-        position: sticky;
-        top: 2rem;
-        max-height: calc(100vh - 4rem);
+        position: static;
+        max-height: calc(100vh - 8rem);
         overflow-y: auto;
         padding: 0;
     }
