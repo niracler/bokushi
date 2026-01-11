@@ -223,35 +223,21 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 			const step = (delta) => {
 				if (!shots.length) return;
 
-				// Check if we're at a boundary
-				const atStart = current === 0 && delta < 0;
 				const atEnd = current === shots.length - 1 && delta > 0;
+				const atStart = current === 0 && delta < 0;
 
-				if (atEnd) {
-					// Check if this lightbox supports "load more" functionality
-					if (dialog.hasAttribute("data-can-load-more")) {
-						// Show loading state while waiting for more content
-						setLoading(true);
-						// Emit boundary event for "load more" functionality
-						const event = new CustomEvent("lightbox:boundary", {
-							detail: { direction: "next", lightboxId: dialog.id },
-							bubbles: true,
-						});
-						dialog.dispatchEvent(event);
-					} else {
-						// No "load more" support, wrap to first image
-						showImage(0);
-					}
+				// Handle "load more" at end boundary
+				if (atEnd && dialog.hasAttribute("data-can-load-more")) {
+					setLoading(true);
+					dialog.dispatchEvent(new CustomEvent("lightbox:boundary", {
+						detail: { direction: "next", lightboxId: dialog.id },
+						bubbles: true,
+					}));
 					return;
 				}
 
-				if (atStart) {
-					// At start, just wrap to end (no "load previous" needed)
-					showImage(shots.length - 1);
-					return;
-				}
-
-				const newIndex = current + delta;
+				// Calculate wrapped index for boundary cases
+				const newIndex = atEnd ? 0 : atStart ? shots.length - 1 : current + delta;
 				showImage(newIndex);
 			};
 
@@ -281,9 +267,11 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 
 			document.addEventListener("keydown", (event) => {
 				if (!dialog.open) return;
-				if (event.key === "Escape") close();
-				if (event.key === "ArrowLeft") step(-1);
-				if (event.key === "ArrowRight") step(1);
+				switch (event.key) {
+					case "Escape": close(); break;
+					case "ArrowLeft": step(-1); break;
+					case "ArrowRight": step(1); break;
+				}
 			});
 
 			// Touch swipe support

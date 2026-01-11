@@ -264,31 +264,9 @@ export const prerender = false;
 				overflow: hidden;
 				border-radius: var(--radius-lg);
 				transition: box-shadow 0.2s ease;
-				animation: itemFadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1)
-					backwards;
+				animation: itemFadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+				animation-delay: calc(var(--item-index, 0) * 0.05s);
 			}
-
-			/* Staggered animation based on data attribute */
-			.manga-shot-item[data-item-index="0"] { animation-delay: 0s; }
-			.manga-shot-item[data-item-index="1"] { animation-delay: 0.05s; }
-			.manga-shot-item[data-item-index="2"] { animation-delay: 0.1s; }
-			.manga-shot-item[data-item-index="3"] { animation-delay: 0.15s; }
-			.manga-shot-item[data-item-index="4"] { animation-delay: 0.2s; }
-			.manga-shot-item[data-item-index="5"] { animation-delay: 0.25s; }
-			.manga-shot-item[data-item-index="6"] { animation-delay: 0.3s; }
-			.manga-shot-item[data-item-index="7"] { animation-delay: 0.35s; }
-			.manga-shot-item[data-item-index="8"] { animation-delay: 0.4s; }
-			.manga-shot-item[data-item-index="9"] { animation-delay: 0.45s; }
-			.manga-shot-item[data-item-index="10"] { animation-delay: 0.5s; }
-			.manga-shot-item[data-item-index="11"] { animation-delay: 0.55s; }
-			.manga-shot-item[data-item-index="12"] { animation-delay: 0.6s; }
-			.manga-shot-item[data-item-index="13"] { animation-delay: 0.65s; }
-			.manga-shot-item[data-item-index="14"] { animation-delay: 0.7s; }
-			.manga-shot-item[data-item-index="15"] { animation-delay: 0.75s; }
-			.manga-shot-item[data-item-index="16"] { animation-delay: 0.8s; }
-			.manga-shot-item[data-item-index="17"] { animation-delay: 0.85s; }
-			.manga-shot-item[data-item-index="18"] { animation-delay: 0.9s; }
-			.manga-shot-item[data-item-index="19"] { animation-delay: 0.95s; }
 
 			@keyframes itemFadeIn {
 				from {
@@ -795,7 +773,7 @@ export const prerender = false;
 				const div = document.createElement("div");
 				div.className = "manga-shot-item";
 				div.dataset.index = String(index);
-				div.dataset.itemIndex = String(index);
+				div.style.setProperty("--item-index", String(index % 20));
 
 				const button = document.createElement("button");
 				button.className = "manga-shot-button";

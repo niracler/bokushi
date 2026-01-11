@@ -143,83 +143,50 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
     const barBottom = toggleButton?.querySelector("[data-bar-bottom]");
     let lastFocusedElement = null;
 
+    // Helper to toggle multiple classes based on state
+    const toggleClasses = (el, add, remove) => {
+        if (!el) return;
+        el.classList.remove(...remove);
+        el.classList.add(...add);
+    };
+
     const setOpen = (open) => {
         if (!overlay || !drawer) return;
 
         overlay.dataset.navState = open ? "open" : "closed";
-        toggleButton?.setAttribute("aria-expanded", open ? "true" : "false");
-        toggleButton?.setAttribute(
-            "aria-label",
-            open ? "关闭导航菜单" : "打开导航菜单",
-        );
+        toggleButton?.setAttribute("aria-expanded", String(open));
+        toggleButton?.setAttribute("aria-label", open ? "关闭导航菜单" : "打开导航菜单");
 
         if (open) {
             lastFocusedElement = document.activeElement;
-            overlay.classList.remove("pointer-events-none", "opacity-0");
-            overlay.classList.add("opacity-100");
-            drawer.classList.remove("translate-x-6");
-            drawer.classList.add("translate-x-0");
+            toggleClasses(overlay, ["opacity-100"], ["pointer-events-none", "opacity-0"]);
+            toggleClasses(drawer, ["translate-x-0"], ["translate-x-6"]);
+            toggleClasses(barTop, ["translate-y-1.5", "rotate-45"], []);
+            toggleClasses(barBottom, ["-translate-y-1.5", "-rotate-45"], []);
+            toggleClasses(barMiddle, ["opacity-0"], []);
             document.body.classList.add("scroll-locked");
-            barTop?.classList.add("translate-y-1.5", "rotate-45");
-            barBottom?.classList.add("-translate-y-1.5", "-rotate-45");
-            barMiddle?.classList.add("opacity-0");
-            requestAnimationFrame(() => {
-                if (navLinks[0]) {
-                    navLinks[0].focus({ preventScroll: true });
-                }
-            });
+            requestAnimationFrame(() => navLinks[0]?.focus({ preventScroll: true }));
         } else {
-            overlay.classList.remove("opacity-100");
-            overlay.classList.add("opacity-0", "pointer-events-none");
-            drawer.classList.add("translate-x-6");
-            drawer.classList.remove("translate-x-0");
+            toggleClasses(overlay, ["opacity-0", "pointer-events-none"], ["opacity-100"]);
+            toggleClasses(drawer, ["translate-x-6"], ["translate-x-0"]);
+            toggleClasses(barTop, [], ["translate-y-1.5", "rotate-45"]);
+            toggleClasses(barBottom, [], ["-translate-y-1.5", "-rotate-45"]);
+            toggleClasses(barMiddle, [], ["opacity-0"]);
             document.body.classList.remove("scroll-locked");
-            barTop?.classList.remove("translate-y-1.5", "rotate-45");
-            barBottom?.classList.remove("-translate-y-1.5", "-rotate-45");
-            barMiddle?.classList.remove("opacity-0");
             if (lastFocusedElement && "focus" in lastFocusedElement) {
                 lastFocusedElement.focus({ preventScroll: true });
             }
         }
     };
 
-    toggleButton?.addEventListener("click", () => {
-        const isOpen = overlay?.dataset.navState === "open";
-        setOpen(!isOpen);
-    });
+    toggleButton?.addEventListener("click", () => setOpen(overlay?.dataset.navState !== "open"));
+    closeButtons.forEach((btn) => btn.addEventListener("click", () => setOpen(false)));
+    overlay?.addEventListener("click", (e) => e.target === overlay && setOpen(false));
+    document.addEventListener("keydown", (e) => e.key === "Escape" && setOpen(false));
+    navLinks.forEach((link) => link.addEventListener("click", () => setOpen(false)));
 
-    closeButtons.forEach((button) => {
-        button.addEventListener("click", () => setOpen(false));
-    });
-
-    overlay?.addEventListener("click", (event) => {
-        if (event.target === overlay) {
-            setOpen(false);
-        }
-    });
-
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-            setOpen(false);
-        }
-    });
-
-    navLinks.forEach((link) => {
-        link.addEventListener("click", () => setOpen(false));
-    });
-
+    // Close drawer when viewport becomes desktop-sized
     const mdQuery = window.matchMedia("(min-width: 768px)");
-    const handleMediaChange = (event) => {
-        if (event.matches) {
-            setOpen(false);
-        }
-    };
-    if (typeof mdQuery.addEventListener === "function") {
-        mdQuery.addEventListener("change", handleMediaChange);
-    } else {
-        const legacyAddListener = Reflect.get(mdQuery, "addListener");
-        if (typeof legacyAddListener === "function") {
-            legacyAddListener.call(mdQuery, handleMediaChange);
-        }
-    }
+    mdQuery.addEventListener?.("change", (e) => e.matches && setOpen(false))
+        ?? mdQuery.addListener?.((e) => e.matches && setOpen(false));
 </script>
