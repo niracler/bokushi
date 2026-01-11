@@ -22,6 +22,8 @@ type Props = EntryData & {
     headings?: MarkdownHeading[];
     lastModified?: string;
     lastModifiedCommitUrl?: string | null;
+    wordCount?: number;
+    readingTime?: string;
 };
 
 const {
@@ -35,6 +37,8 @@ const {
     headings = [],
     lastModified,
     lastModifiedCommitUrl,
+    wordCount,
+    readingTime,
 } = Astro.props;
 
 const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
@@ -59,8 +63,16 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 				<div data-article-header class="space-y-4 border-b border-border-subtle pb-6 text-center">
 					<h1 class="text-3xl font-bold text-primary sm:text-4xl">{title}</h1>
 					<div class="space-y-2 text-sm text-muted">
-						<p>
+						<p class="flex items-center justify-center gap-2 flex-wrap">
 							<FormattedDate date={pubDate} />
+							{wordCount && readingTime && (
+								<>
+									<span class="text-border-subtle">·</span>
+									<span>{wordCount} 字</span>
+									<span class="text-border-subtle">·</span>
+									<span>约 {readingTime}</span>
+								</>
+							)}
 						</p>
 						{
 							(lastModified || updatedDate) && (

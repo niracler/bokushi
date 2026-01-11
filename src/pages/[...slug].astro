@@ -1,6 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import BlogPost from "../layouts/BlogPost.astro";
+import { getReadingTime } from "../utils/readingTime";
 
 export const prerender = true;
 
@@ -19,6 +20,9 @@ type Props = BlogEntry;
 
 const post = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(post);
+
+// 计算阅读时长和字数
+const { wordCount, text: readingTime } = getReadingTime(post.body || "");
 ---
 
 <BlogPost
@@ -27,6 +31,8 @@ const { Content, headings, remarkPluginFrontmatter } = await render(post);
     headings={headings}
     lastModified={remarkPluginFrontmatter?.lastModified}
     lastModifiedCommitUrl={remarkPluginFrontmatter?.lastModifiedCommitUrl}
+    wordCount={wordCount}
+    readingTime={readingTime}
 >
     <Content />
 </BlogPost>
