@@ -365,6 +365,27 @@ updatedDate: "Dec 04, 2025"
   - [Playwright MCP](https://github.com/microsoft/playwright-mcp) - 微软官方的浏览器自动化 MCP 服务。基于 Playwright 的无障碍树而非截图，让 AI 能快速、确定性地操作网页，支持表单填写、数据抓取等场景。**这几天 claude-chrome 插件也出来了，先观望一下**
 - Claude Code Skills
   - [我的 Skill 仓库](https://github.com/niracler/skill) - 我自己写的 Claude Code Skills 集合，包含 Git 工作流、写作助手、Anki 卡片生成、HA 集成审查等。
+- Claude Code 插件配置
+  - 开发辅助类 (官方插件，`claude plugin add <name>` 安装)
+    - **code-review** - 代码审查插件，帮助检查代码质量、发现潜在 bug 和安全漏洞
+    - **code-simplifier** - 代码简化插件，帮助重构代码使其更清晰、可维护
+    - **feature-dev** - 功能开发引导，提供架构分析和实现蓝图
+    - **frontend-design** - 前端设计插件，生成高质量的前端界面代码，避免千篇一律的 AI 风格
+    - **typescript-lsp** - TypeScript 语言服务器，提供更精准的 TS 代码分析
+    - **pyright-lsp** - Python 类型检查器，增强 Python 代码分析能力
+    - **security-guidance** - 安全指导，帮助识别和避免常见安全漏洞
+  - 文档与知识类
+    - **context7** (官方) - 实时查询任意编程库的最新文档和代码示例，告别过时信息
+    - [obsidian](https://github.com/nicholasrq/obsidian-skills) (第三方) - 支持 Obsidian 特有语法：wikilinks、callouts、properties、Canvas 文件等
+  - 工作流增强
+    - [superpowers](https://github.com/anthropics/claude-code-superpowers) (第三方) - 提供一系列高级技能：TDD、系统化调试、头脑风暴、并行任务、代码审查等工作流
+    - [workflow-skills](https://github.com/niracler/skill) (自用) - git-workflow (标准化 Git 提交、PR、Release 流程)、ha-integration-reviewer (Home Assistant 集成代码审查)、yunxiao-cli (阿里云云效 DevOps 工具)
+  - 写作与学习类
+    - [writing-skills](https://github.com/niracler/skill) (自用) - 中文写作助手，启发模式 (写作引导) + 审校模式 (文章润色，含余光中中文风格指南)
+    - [learning-skills](https://github.com/niracler/skill) (自用) - Anki 闪卡生成器，遵循原子化原则，输出 simple-anki-sync 兼容格式
+    - **learning-output-style** (官方) - 学习输出风格，Claude 会边做边解释，适合学习新技术时使用
+  - 趣味类
+    - [fun-skills](https://github.com/niracler/skill) (自用) - 戏言·巫女子风格转换器，将文字转换为西尾维新《戏言系列》葵井巫女子的说话风格
 
 ### 📝 文本编辑 & IDE
 
