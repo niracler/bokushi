@@ -316,9 +316,10 @@ function adjustTocPosition(): void {
             const padding = 24; // 与分割线的间距
 
             // 滚动浮动逻辑：当标题滚出视口时，TOC 浮动到顶部
-            const targetTop = headerBottom < minTop
-                ? minTop + padding
-                : Math.max(minTop + padding, headerBottom + padding);
+            const targetTop =
+                headerBottom < minTop
+                    ? minTop + padding
+                    : Math.max(minTop + padding, headerBottom + padding);
 
             tocSidebar.style.top = `${targetTop}px`;
             tocSidebar.style.opacity = "1";

@@ -187,6 +187,5 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
 
     // Close drawer when viewport becomes desktop-sized
     const mdQuery = window.matchMedia("(min-width: 768px)");
-    mdQuery.addEventListener?.("change", (e) => e.matches && setOpen(false))
-        ?? mdQuery.addListener?.((e) => e.matches && setOpen(false));
+    mdQuery.addEventListener("change", (e) => e.matches && setOpen(false));
 </script>

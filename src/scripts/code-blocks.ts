@@ -133,7 +133,9 @@ function initCodeBlocks(): void {
 
     proseContainers.forEach((prose) => {
         const codeBlocks = prose.querySelectorAll("pre:has(code)");
-        codeBlocks.forEach((pre) => enhanceCodeBlock(pre as HTMLElement));
+        codeBlocks.forEach((pre) => {
+            enhanceCodeBlock(pre as HTMLElement);
+        });
     });
 }
 
@@ -153,13 +155,17 @@ const observer = new MutationObserver((mutations) => {
                 // Check if the added node itself is a prose container
                 if (node.classList.contains("prose")) {
                     const codeBlocks = node.querySelectorAll("pre:has(code)");
-                    codeBlocks.forEach((pre) => enhanceCodeBlock(pre as HTMLElement));
+                    codeBlocks.forEach((pre) => {
+                        enhanceCodeBlock(pre as HTMLElement);
+                    });
                 }
                 // Check for prose containers within the added node
                 const proseContainers = node.querySelectorAll(".prose");
                 proseContainers.forEach((prose) => {
                     const codeBlocks = prose.querySelectorAll("pre:has(code)");
-                    codeBlocks.forEach((pre) => enhanceCodeBlock(pre as HTMLElement));
+                    codeBlocks.forEach((pre) => {
+                        enhanceCodeBlock(pre as HTMLElement);
+                    });
                 });
             }
         });

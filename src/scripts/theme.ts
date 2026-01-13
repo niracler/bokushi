@@ -169,7 +169,6 @@ const cyclePreference = (preference: ThemePreference): ThemePreference => {
             return "light";
         case "light":
             return "dark";
-        case "dark":
         default:
             return "system";
     }

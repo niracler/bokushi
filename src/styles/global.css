@@ -503,33 +503,81 @@
         overflow-x: auto;
         --mermaid-font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
         --mermaid-font-size: 16px;
-        --mermaid-primary-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-bg-surface));
-        --mermaid-secondary-color: color-mix(in srgb, var(--color-bg-muted) 70%, var(--color-bg-surface) 30%);
-        --mermaid-tertiary-color: color-mix(in srgb, var(--color-accent-soft) 50%, var(--color-bg-surface));
+        --mermaid-primary-color: color-mix(
+            in srgb,
+            var(--color-accent) 32%,
+            var(--color-bg-surface)
+        );
+        --mermaid-secondary-color: color-mix(
+            in srgb,
+            var(--color-bg-muted) 70%,
+            var(--color-bg-surface) 30%
+        );
+        --mermaid-tertiary-color: color-mix(
+            in srgb,
+            var(--color-accent-soft) 50%,
+            var(--color-bg-surface)
+        );
         --mermaid-primary-text-color: var(--color-text-primary);
         --mermaid-secondary-text-color: var(--color-text-secondary);
         --mermaid-line-color: color-mix(in srgb, var(--color-text-primary) 55%, transparent);
         --mermaid-edge-color: var(--mermaid-line-color);
-        --mermaid-label-bg-color: color-mix(in srgb, var(--color-bg-surface) 92%, var(--color-bg-muted) 8%);
+        --mermaid-label-bg-color: color-mix(
+            in srgb,
+            var(--color-bg-surface) 92%,
+            var(--color-bg-muted) 8%
+        );
         --mermaid-label-text-color: var(--color-text-secondary);
         --mermaid-note-bg-color: color-mix(in srgb, var(--color-note) 22%, var(--color-bg-surface));
-        --mermaid-note-text-color: color-mix(in srgb, var(--color-note) 70%, var(--color-text-primary));
+        --mermaid-note-text-color: color-mix(
+            in srgb,
+            var(--color-note) 70%,
+            var(--color-text-primary)
+        );
     }
 
     html[data-theme="dark"] .prose .mermaid {
         border-color: var(--color-border-strong);
         background: color-mix(in srgb, var(--color-bg-surface) 80%, var(--color-bg-muted) 20%);
-        --mermaid-primary-color: color-mix(in srgb, var(--color-accent) 46%, var(--color-bg-surface));
-        --mermaid-secondary-color: color-mix(in srgb, var(--color-bg-muted) 55%, var(--color-bg-surface) 45%);
-        --mermaid-tertiary-color: color-mix(in srgb, var(--color-accent-soft) 45%, var(--color-bg-surface));
+        --mermaid-primary-color: color-mix(
+            in srgb,
+            var(--color-accent) 46%,
+            var(--color-bg-surface)
+        );
+        --mermaid-secondary-color: color-mix(
+            in srgb,
+            var(--color-bg-muted) 55%,
+            var(--color-bg-surface) 45%
+        );
+        --mermaid-tertiary-color: color-mix(
+            in srgb,
+            var(--color-accent-soft) 45%,
+            var(--color-bg-surface)
+        );
         --mermaid-primary-text-color: var(--color-text-primary);
-        --mermaid-secondary-text-color: color-mix(in srgb, var(--color-text-secondary) 80%, var(--color-text-primary) 20%);
+        --mermaid-secondary-text-color: color-mix(
+            in srgb,
+            var(--color-text-secondary) 80%,
+            var(--color-text-primary) 20%
+        );
         --mermaid-line-color: color-mix(in srgb, var(--color-text-primary) 85%, transparent);
         --mermaid-edge-color: var(--mermaid-line-color);
-        --mermaid-label-bg-color: color-mix(in srgb, var(--color-bg-surface) 72%, var(--color-bg-muted) 28%);
-        --mermaid-label-text-color: color-mix(in srgb, var(--color-text-secondary) 90%, var(--color-text-primary) 10%);
+        --mermaid-label-bg-color: color-mix(
+            in srgb,
+            var(--color-bg-surface) 72%,
+            var(--color-bg-muted) 28%
+        );
+        --mermaid-label-text-color: color-mix(
+            in srgb,
+            var(--color-text-secondary) 90%,
+            var(--color-text-primary) 10%
+        );
         --mermaid-note-bg-color: color-mix(in srgb, var(--color-note) 26%, var(--color-bg-surface));
-        --mermaid-note-text-color: color-mix(in srgb, var(--color-note) 82%, var(--color-text-primary));
+        --mermaid-note-text-color: color-mix(
+            in srgb,
+            var(--color-note) 82%,
+            var(--color-text-primary)
+        );
     }
 
     .prose .mermaid svg {

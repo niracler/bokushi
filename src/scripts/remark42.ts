@@ -101,7 +101,9 @@ const initRemark42 = (container: HTMLElement) => {
 
 const initAllContainers = () => {
     const containers = Array.from(document.querySelectorAll<HTMLElement>(CONTAINER_SELECTOR));
-    containers.forEach((container) => initRemark42(container));
+    containers.forEach((container) => {
+        initRemark42(container);
+    });
 };
 
 // 初始化
