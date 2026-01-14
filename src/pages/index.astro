@@ -33,27 +33,52 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 
       .quote-container {
         animation: fadeIn 1s ease-out;
+        position: relative;
+        width: 100%;
       }
 
       .quote-text {
         color: var(--color-text-secondary);
         line-height: 1.8;
+        font-size: clamp(1.25rem, 4.5vw, 1.5rem);
+      }
+
+      /* 幽灵容器保持高度稳定 */
+      .quote-ghost {
+        visibility: hidden;
+        pointer-events: none;
+        user-select: none;
+        aria-hidden: true;
+      }
+
+      /* 真实打字机覆盖在幽灵容器上 */
+      .quote-actual {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .quote-actual.is-ready {
+        opacity: 1;
       }
 
       .quote-emphasis {
         display: inline-block;
-        font-size: 2rem;
+        font-size: clamp(1.75rem, 6.5vw, 2.25rem); /* 提升最小字号 */
         font-weight: 700;
         letter-spacing: 0.1em;
         color: var(--color-link);
-        margin: 1rem 0;
+        margin: clamp(0.75rem, 2.5vw, 1rem) 0;
         animation: breathe 4s ease-in-out infinite;
       }
 
       .quote-source {
-        animation: fadeIn 1.2s ease-out;
-        transition: all 0.3s ease;
-        opacity: 0; /* Hidden initially for typewriter */
+        transition: all 0.5s ease;
+        opacity: 0; /* 初始隐藏，由脚本控制显现 */
       }
 
       .quote-source.is-visible {
@@ -95,14 +120,17 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
         width: 100%;
       }
 
-      /* Typewriter cursor */
-      .typewriter-cursor::after {
-        content: "|";
-        animation: blink 0.75s step-end infinite;
-        color: var(--color-accent);
-        margin-left: 2px;
+      /* Typewriter cursor style */
+      .typewriter-cursor {
         display: inline-block;
-        vertical-align: baseline;
+        width: 1.5px;
+        height: 1.2em;
+        background-color: var(--color-accent);
+        margin-left: 2px;
+        animation: blink 0.75s step-end infinite;
+        vertical-align: middle;
+        position: relative;
+        top: -0.05em;
       }
 
       @keyframes blink {
@@ -117,14 +145,38 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
     <main
       class="page-shell flex min-h-[calc(100vh-18rem)] items-center justify-center"
     >
-      <section class="quote-container mx-auto max-w-3xl space-y-8 text-center">
+      <section
+        class="quote-container mx-auto max-w-3xl space-y-6 sm:space-y-8 text-center px-4"
+      >
+        <!-- 幽灵占位符：用于提前撑开高度并固定垂直中心点 -->
         <blockquote
-          class="quote-text space-y-6 text-xl leading-relaxed sm:text-2xl sm:leading-relaxed"
+          class="quote-text quote-ghost space-y-4 sm:space-y-6 leading-relaxed"
+        >
+          <p>
+            <span class="block sm:inline">或许每个人都在证明自己的存在，</span>
+            <span class="block sm:inline">渴望被他人感知。</span>
+          </p>
+          <p>
+            <span class="block sm:inline">一切行为的背后，</span>
+            <span class="block sm:inline">只有一个简洁却悲痛的讯息：</span>
+          </p>
+          <p class="quote-emphasis">「不要忘了我」。</p>
+        </blockquote>
+
+        <!-- 真实显示并打字的 Blockquote -->
+        <blockquote
+          class="quote-text quote-actual space-y-4 sm:space-y-6 leading-relaxed"
           id="typewriter-quote"
         >
-          <p>或许每个人都在证明自己的存在，渴望被他人感知。</p>
-          <p>一切行为的背后，只有一个简洁却悲痛的讯息：</p>
-          <p class="quote-emphasis italic">「不要忘了我」。</p>
+          <p>
+            <span class="block sm:inline">或许每个人都在证明自己的存在，</span>
+            <span class="block sm:inline">渴望被他人感知。</span>
+          </p>
+          <p>
+            <span class="block sm:inline">一切行为的背后，</span>
+            <span class="block sm:inline">只有一个简洁却悲痛的讯息：</span>
+          </p>
+          <p class="quote-emphasis">「不要忘了我」。</p>
         </blockquote>
         <p
           class="quote-source text-right text-base text-muted"
@@ -156,6 +208,9 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
           null
         );
 
+        const cursor = document.createElement("span");
+        cursor.className = "typewriter-cursor";
+
         let node: Node | null;
         while ((node = walker.nextNode())) {
           if (node.parentNode instanceof HTMLElement) {
@@ -164,9 +219,12 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
               text: node.nodeValue || "",
               parent: node.parentNode,
             });
-            node.nodeValue = "";
+            node.nodeValue = "\u200B"; // 使用零宽空格占位
           }
         }
+
+        // 初始化准备就绪，显示语录
+        quoteElement.classList.add("is-ready");
 
         let currentTaskIndex = 0;
         let currentCharIndex = 0;
@@ -174,36 +232,48 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
         const type = () => {
           if (currentTaskIndex < tasks.length) {
             const { node, text, parent } = tasks[currentTaskIndex];
-            parent.classList.add("typewriter-cursor");
 
             if (currentCharIndex < text.length) {
               const char = text.charAt(currentCharIndex);
-              node.nodeValue = (node.nodeValue || "") + char;
+
+              if (node.nodeValue === "\u200B") {
+                node.nodeValue = "";
+                parent.appendChild(cursor);
+              }
+
+              node.nodeValue += char;
+              (node as unknown as ChildNode).after(cursor);
               currentCharIndex++;
 
-              // 智能延迟逻辑
-              let delay = 30 + Math.random() * 50;
-              if (char === "。" || char === "！" || char === "？") {
-                delay = 600; // 句末长停顿
-              } else if (char === "，" || char === "：" || char === "——") {
-                delay = 300; // 句中短停顿
+              // 业界级“流式自然”节奏
+              let delay = 60 + Math.random() * 15; // 稳定流速 (35ms-50ms)
+
+              // 重点词一字一顿策略
+              if (text.includes("不要忘了我")) {
+                delay = 80; // 稳定且略慢，增加郑重感
+              }
+
+              // 逻辑语义停顿 (极其短促，保持心流)
+              if (char === "，" || char === "：") {
+                delay = 120;
+              } else if (char === "。" || char === "！" || char === "？") {
+                delay = 250;
               }
 
               setTimeout(type, delay);
             } else {
-              // 完成当前段落
-              parent.classList.remove("typewriter-cursor");
               currentTaskIndex++;
               currentCharIndex = 0;
-              setTimeout(type, 400); // 段落间停顿
+              setTimeout(type, 100); // 极短行间过渡
             }
           } else if (sourceElement) {
+            cursor.remove();
             sourceElement.classList.add("is-visible");
           }
         };
 
-        // 初始延迟启动
-        setTimeout(type, 1000);
+        // 适中启动速度
+        setTimeout(type, 600);
       }
     </script>
   </body>
