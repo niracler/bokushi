@@ -78,6 +78,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.3.2
         version: 2.3.2
+      '@iconify-json/simple-icons':
+        specifier: ^1.2.66
+        version: 1.2.66
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -682,6 +685,9 @@ packages:
 
   '@iconify-json/ri@1.2.6':
     resolution: {integrity: sha512-tGXRmXtb8oFu8DNg9MsS1pywKFgs9QZ4U6LBzUamBHaw3ePSiPd7ouE64gzHzfEcR16hgVaXoUa+XxD3BB0XOg==}
+
+  '@iconify-json/simple-icons@1.2.66':
+    resolution: {integrity: sha512-D1OnnXwiQXFkVMw5M+Bt8mPsXeMkQyGmMdrmN7lsQlKMUkfLOp6JWhnUJ92po51WXT046aF/zzqSmkKqg08p4Q==}
 
   '@iconify/tools@4.1.4':
     resolution: {integrity: sha512-s6BcNUcCxQ3S6cvhlsoWzOuBt8qKXdVyXB9rT57uSJ/ARHD7dVM43+5ERBWn3tmkMWXeJ/s9DPVc3dUasayzeA==}
@@ -4322,6 +4328,10 @@ snapshots:
   '@fortawesome/fontawesome-free@6.7.2': {}
 
   '@iconify-json/ri@1.2.6':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/simple-icons@1.2.66':
     dependencies:
       '@iconify/types': 2.0.0
 

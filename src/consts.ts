@@ -18,5 +18,6 @@ export const SOCIAL_LINKS = {
     telegram: "https://t.me/tomoko_channel",
     steam: "https://steamcommunity.com/id/niracler/",
     douban: "https://www.douban.com/people/niracler/",
+    folo: "https://app.folo.is/share/users/niracler",
     rss: "/rss.xml",
 };
