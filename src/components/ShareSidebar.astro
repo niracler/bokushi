@@ -5,13 +5,46 @@ import { Icon } from "astro-icon/components";
 
 interface Props {
     title: string;
+    description?: string;
+    tags?: string[];
     url?: string;
 }
 
-const { title, url = Astro.url.href } = Astro.props;
+const { title, description, tags = [], url = Astro.url.href } = Astro.props;
 
-// Encode for URL parameters
-const encodedTitle = encodeURIComponent(title);
+// Twitter: hashtags as comma-separated (without #), max 3 tags
+const twitterHashtags = tags.slice(0, 3).join(",");
+
+// Twitter: truncate description to fit 280 char limit (title + desc + url ~23 + hashtags)
+const maxDescLength = 150;
+const truncatedDesc =
+    description && description.length > maxDescLength
+        ? `${description.slice(0, maxDescLength)}...`
+        : description;
+
+// Twitter text: title + truncated description
+const twitterTextParts = [title];
+if (truncatedDesc) twitterTextParts.push(truncatedDesc);
+const twitterText = twitterTextParts.join("\n\n");
+
+// Build Twitter URL with hashtags and via parameters
+const twitterParams = new URLSearchParams({
+    text: twitterText,
+    url: url,
+    via: "nini38324",
+});
+if (twitterHashtags) twitterParams.set("hashtags", twitterHashtags);
+
+// Telegram: full text with hashtags
+const hashtagsText = tags
+    .slice(0, 3)
+    .map((t) => `#${t}`)
+    .join(" ");
+const telegramTextParts = [title];
+if (description) telegramTextParts.push(description);
+if (hashtagsText) telegramTextParts.push(hashtagsText);
+const telegramText = `\n${telegramTextParts.join("\n\n")}`;
+const encodedTelegramText = encodeURIComponent(telegramText);
 const encodedUrl = encodeURIComponent(url);
 
 const shareLinks = [
@@ -19,13 +52,13 @@ const shareLinks = [
         name: "Twitter",
         label: "分享到 Twitter",
         icon: "ri:twitter-fill",
-        href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+        href: `https://twitter.com/intent/tweet?${twitterParams.toString()}`,
     },
     {
         name: "Telegram",
         label: "分享到 Telegram",
         icon: "ri:telegram-fill",
-        href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
+        href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTelegramText}`,
     },
 ];
 ---
