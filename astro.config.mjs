@@ -21,7 +21,33 @@ export default defineConfig({
     site: "https://niracler.com",
     trailingSlash: "never",
     output: "static", // 静态模式：全部预渲染（动态页面需要单独配置 prerender: false）
-    integrations: [mdx(), sitemap(), icon(), pagefind()],
+    integrations: [
+        mdx(),
+        sitemap(),
+        icon({
+            include: {
+                // Only include icons we actually use to reduce bundle size
+                ri: [
+                    "twitter-fill",
+                    "telegram-fill",
+                    "github-fill",
+                    "steam-fill",
+                    "douban-fill",
+                    "mail-fill",
+                    "rss-fill",
+                    "link",
+                    "share-line",
+                    "check-line",
+                    "creative-commons-fill",
+                    "creative-commons-by-fill",
+                    "creative-commons-nc-fill",
+                    "creative-commons-sa-fill",
+                ],
+                "simple-icons": ["folo"],
+            },
+        }),
+        pagefind(),
+    ],
     adapter: cloudflare({
         imageService: "compile",
     }),
