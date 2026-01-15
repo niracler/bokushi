@@ -37,7 +37,7 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
             </a>
         </h2>
         <SearchModal />
-        <ThemeToggle variant="header" class="hidden md:inline-flex" />
+        <ThemeToggle variant="header" />
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
             <button
                 type="button"
@@ -119,11 +119,6 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
                     ))
                 }
             </nav>
-            <div
-                class="mt-auto border-t border-subtle pt-4"
-            >
-                <ThemeToggle variant="mobile" />
-            </div>
         </div>
     </div>
     <link
