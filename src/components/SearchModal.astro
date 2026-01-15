@@ -1,0 +1,375 @@
+---
+// SearchModal.astro - Full-screen search modal with Pagefind integration
+// Follows Vercel Design Guidelines: keyboard accessible, focus visible, 44px touch targets
+---
+
+<!-- Search trigger button for Header -->
+<button
+    type="button"
+    class="icon-btn icon-btn--sm icon-btn--square icon-btn--bordered focus-accent"
+    aria-label="搜索 (Cmd+K)"
+    data-search-trigger
+>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="h-4 w-4"
+        aria-hidden="true"
+    >
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+    </svg>
+</button>
+
+<!-- Search Modal Overlay -->
+<div
+    data-search-overlay
+    class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 opacity-0 backdrop-blur-sm transition-opacity duration-200 pointer-events-none"
+    data-search-state="closed"
+    role="dialog"
+    aria-modal="true"
+    aria-label="站内搜索"
+>
+    <!-- Backdrop close button -->
+    <button
+        type="button"
+        class="absolute inset-0 h-full w-full cursor-default"
+        data-search-close
+        aria-label="关闭搜索"
+    ></button>
+
+    <!-- Search Container -->
+    <div
+        data-search-container
+        class="relative z-10 mt-[10vh] w-full max-w-2xl translate-y-4 rounded-xl border border-border bg-surface p-4 shadow-2xl transition-transform duration-200 mx-4 sm:mx-6"
+    >
+        <!-- Search Header -->
+        <div class="flex items-center gap-3 border-b border-subtle pb-3">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5 shrink-0 text-muted"
+                aria-hidden="true"
+            >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <label for="search-input" class="sr-only">搜索文章</label>
+            <input
+                id="search-input"
+                type="search"
+                placeholder="搜索文章..."
+                class="w-full bg-transparent text-lg text-primary placeholder:text-muted focus-accent rounded"
+                data-search-input
+                autocomplete="off"
+            />
+            <kbd
+                class="hidden shrink-0 rounded border border-subtle bg-page px-2 py-0.5 text-xs text-muted sm:inline-block"
+                aria-hidden="true"
+            >
+                ESC
+            </kbd>
+            <button
+                type="button"
+                class="icon-btn icon-btn--sm icon-btn--square focus-accent sm:hidden"
+                data-search-close
+                aria-label="关闭搜索"
+            >
+                <span aria-hidden="true" class="text-xl leading-none">&times;</span>
+            </button>
+        </div>
+
+        <!-- Search Results -->
+        <div
+            data-search-results
+            class="max-h-[60vh] overflow-y-auto py-3"
+        >
+            <!-- Empty state -->
+            <div data-search-empty class="py-8 text-center text-muted">
+                <p>输入关键词开始搜索</p>
+                <p class="mt-2 text-sm">支持搜索所有文章、TIL 和月度总结</p>
+            </div>
+            <!-- No results state (hidden by default) -->
+            <div data-search-no-results class="hidden py-8 text-center text-muted">
+                <p>未找到相关内容</p>
+                <p class="mt-2 text-sm">请尝试其他关键词</p>
+            </div>
+            <!-- Results list -->
+            <ul data-search-list class="hidden space-y-2" role="listbox" aria-label="搜索结果">
+            </ul>
+        </div>
+
+        <!-- Search Footer -->
+        <div class="flex items-center justify-between border-t border-subtle pt-3 text-xs text-muted">
+            <span>
+                <kbd class="rounded border border-subtle bg-page px-1.5 py-0.5">↵</kbd>
+                选择
+                <kbd class="ml-2 rounded border border-subtle bg-page px-1.5 py-0.5">↑↓</kbd>
+                导航
+            </span>
+            <span class="flex items-center gap-1">
+                <span>Powered by</span>
+                <a
+                    href="https://pagefind.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-accent hover:underline focus-accent rounded"
+                >
+                    Pagefind
+                </a>
+            </span>
+        </div>
+    </div>
+</div>
+
+<script is:inline>
+    // Search Modal Script - using is:inline to avoid Vite bundling of pagefind
+    (function() {
+        const searchTrigger = document.querySelector("[data-search-trigger]");
+        const searchOverlay = document.querySelector("[data-search-overlay]");
+        const searchContainer = document.querySelector("[data-search-container]");
+        const searchInput = document.querySelector("[data-search-input]");
+        const searchCloseButtons = document.querySelectorAll("[data-search-close]");
+        const searchEmpty = document.querySelector("[data-search-empty]");
+        const searchNoResults = document.querySelector("[data-search-no-results]");
+        const searchList = document.querySelector("[data-search-list]");
+
+        let lastFocusedElement = null;
+        let pagefind = null;
+        let selectedIndex = -1;
+
+        // Load Pagefind on first open
+        async function loadPagefind() {
+            if (pagefind) return pagefind;
+            try {
+                pagefind = await import("/pagefind/pagefind.js");
+                await pagefind.init();
+                return pagefind;
+            } catch (e) {
+                console.error("Failed to load Pagefind:", e);
+                return null;
+            }
+        }
+
+        // Create a search result item using DOM API (safe from XSS)
+        function createResultItem(result, index) {
+            const li = document.createElement("li");
+            li.setAttribute("role", "option");
+            li.setAttribute("aria-selected", "false");
+
+            const link = document.createElement("a");
+            link.href = result.url;
+            link.className = "search-result-item group flex flex-col gap-1 rounded-lg p-3 transition-colors hover:bg-accent-tint-8 focus:bg-accent-tint-8 focus:outline-none";
+            link.dataset.searchResultIndex = String(index);
+
+            const title = document.createElement("span");
+            title.className = "font-medium text-primary group-hover:text-accent group-focus:text-accent";
+            title.textContent = result.meta?.title || result.url;
+
+            const excerpt = document.createElement("span");
+            excerpt.className = "line-clamp-2 text-sm text-secondary search-excerpt";
+            // Pagefind excerpts contain <mark> tags for highlighting
+            // This is safe as it comes from local build-time indexed content
+            if (result.excerpt) {
+                excerpt.innerHTML = result.excerpt;
+            }
+
+            link.appendChild(title);
+            link.appendChild(excerpt);
+            li.appendChild(link);
+
+            return li;
+        }
+
+        // Perform search
+        async function performSearch(query) {
+            if (!query.trim()) {
+                showEmpty();
+                return;
+            }
+
+            const pf = await loadPagefind();
+            if (!pf) return;
+
+            const search = await pf.search(query);
+
+            if (search.results.length === 0) {
+                showNoResults();
+                return;
+            }
+
+            // Load and display results
+            const results = await Promise.all(
+                search.results.slice(0, 10).map((r) => r.data())
+            );
+
+            showResults(results);
+        }
+
+        function showEmpty() {
+            searchEmpty?.classList.remove("hidden");
+            searchNoResults?.classList.add("hidden");
+            searchList?.classList.add("hidden");
+            selectedIndex = -1;
+        }
+
+        function showNoResults() {
+            searchEmpty?.classList.add("hidden");
+            searchNoResults?.classList.remove("hidden");
+            searchList?.classList.add("hidden");
+            selectedIndex = -1;
+        }
+
+        function showResults(results) {
+            searchEmpty?.classList.add("hidden");
+            searchNoResults?.classList.add("hidden");
+            searchList?.classList.remove("hidden");
+
+            if (!searchList) return;
+
+            // Clear existing results
+            searchList.replaceChildren();
+
+            // Create and append result items using DOM API
+            results.forEach((result, index) => {
+                const item = createResultItem(result, index);
+                searchList.appendChild(item);
+            });
+
+            selectedIndex = -1;
+        }
+
+        function updateSelection(newIndex) {
+            const items = searchList?.querySelectorAll("[data-search-result-index]");
+            if (!items || items.length === 0) return;
+
+            // Clamp index
+            if (newIndex < 0) newIndex = items.length - 1;
+            if (newIndex >= items.length) newIndex = 0;
+
+            // Update aria-selected and visual style
+            items.forEach((item, i) => {
+                const li = item.closest("li");
+                if (i === newIndex) {
+                    li?.setAttribute("aria-selected", "true");
+                    item.classList.add("bg-accent-tint-8");
+                    item.focus();
+                } else {
+                    li?.setAttribute("aria-selected", "false");
+                    item.classList.remove("bg-accent-tint-8");
+                }
+            });
+
+            selectedIndex = newIndex;
+        }
+
+        // Open/close handlers
+        function setOpen(open) {
+            if (!searchOverlay || !searchContainer) return;
+
+            searchOverlay.dataset.searchState = open ? "open" : "closed";
+
+            if (open) {
+                lastFocusedElement = document.activeElement;
+                searchOverlay.classList.remove("pointer-events-none", "opacity-0");
+                searchOverlay.classList.add("opacity-100");
+                searchContainer.classList.remove("translate-y-4");
+                searchContainer.classList.add("translate-y-0");
+                document.body.classList.add("scroll-locked");
+                // Focus input after transition
+                requestAnimationFrame(() => {
+                    searchInput?.focus();
+                    searchInput?.select();
+                });
+            } else {
+                searchOverlay.classList.add("pointer-events-none", "opacity-0");
+                searchOverlay.classList.remove("opacity-100");
+                searchContainer.classList.add("translate-y-4");
+                searchContainer.classList.remove("translate-y-0");
+                document.body.classList.remove("scroll-locked");
+                // Restore focus
+                if (lastFocusedElement && "focus" in lastFocusedElement) {
+                    lastFocusedElement.focus();
+                }
+                // Reset state
+                if (searchInput) searchInput.value = "";
+                showEmpty();
+            }
+        }
+
+        // Event listeners
+        searchTrigger?.addEventListener("click", () => setOpen(true));
+        searchCloseButtons.forEach((btn) =>
+            btn.addEventListener("click", () => setOpen(false))
+        );
+
+        // Close on backdrop click
+        searchOverlay?.addEventListener("click", (e) => {
+            if (e.target === searchOverlay) setOpen(false);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener("keydown", (e) => {
+            // Cmd/Ctrl + K to open
+            if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                e.preventDefault();
+                setOpen(true);
+                return;
+            }
+
+            // Only handle these when modal is open
+            if (searchOverlay?.dataset.searchState !== "open") return;
+
+            // ESC to close
+            if (e.key === "Escape") {
+                e.preventDefault();
+                setOpen(false);
+                return;
+            }
+
+            // Arrow navigation
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                updateSelection(selectedIndex + 1);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                updateSelection(selectedIndex - 1);
+            } else if (e.key === "Enter" && selectedIndex >= 0) {
+                const items = searchList?.querySelectorAll("[data-search-result-index]");
+                const selected = items?.[selectedIndex];
+                if (selected) {
+                    e.preventDefault();
+                    selected.click();
+                }
+            }
+        });
+
+        // Search input handler with debounce
+        let debounceTimer;
+        searchInput?.addEventListener("input", (e) => {
+            const query = e.target.value;
+            clearTimeout(debounceTimer);
+            debounceTimer = window.setTimeout(() => performSearch(query), 200);
+        });
+    })();
+</script>
+
+<style>
+    /* Pagefind highlight styles */
+    .search-excerpt :global(mark) {
+        background-color: var(--color-accent-soft);
+        color: var(--color-accent-dark);
+        border-radius: 2px;
+        padding: 0 2px;
+    }
+</style>

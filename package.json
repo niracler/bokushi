@@ -21,6 +21,7 @@
         "astro": "^5.16.3",
         "astro-icon": "^1.1.5",
         "astro-masonry": "^1.2.2",
+        "astro-pagefind": "^1.8.5",
         "cheerio": "^1.1.2",
         "markdown-it": "^14.1.0",
         "mermaid": "^11.10.0",

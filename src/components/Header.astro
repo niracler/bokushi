@@ -1,6 +1,7 @@
 ---
 import { SITE_TITLE } from "../consts";
 import HeaderLink from "./HeaderLink.astro";
+import SearchModal from "./SearchModal.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 
 const navLinks = [
@@ -35,6 +36,7 @@ const isActive = (href: string) => href === pathname || href === `/${subpath?.[0
                 {SITE_TITLE}
             </a>
         </h2>
+        <SearchModal />
         <ThemeToggle variant="header" class="hidden md:inline-flex" />
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
             <button

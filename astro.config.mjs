@@ -6,6 +6,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import icon from "astro-icon";
+import pagefind from "astro-pagefind";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeFigure from "rehype-figure";
 import rehypeImgSize from "rehype-img-size";
@@ -20,7 +21,7 @@ export default defineConfig({
     site: "https://niracler.com",
     trailingSlash: "never",
     output: "static", // 静态模式：全部预渲染（动态页面需要单独配置 prerender: false）
-    integrations: [mdx(), sitemap(), icon()],
+    integrations: [mdx(), sitemap(), icon(), pagefind()],
     adapter: cloudflare({
         imageService: "compile",
     }),
