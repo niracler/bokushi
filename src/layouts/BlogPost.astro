@@ -8,6 +8,7 @@ import Header from "../components/Header.astro";
 import Lightbox from "../components/Lightbox.astro";
 import Prose from "../components/Prose.astro";
 import Remark42Comments from "../components/Remark42Comments.astro";
+import ShareSidebar from "../components/ShareSidebar.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
 import { extractDescription } from "../utils/extractDescription";
@@ -179,6 +180,9 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 					</nav>
 				</aside>
 			)}
+
+			{/* 分享侧边栏：桌面端左侧固定，移动端浮动按钮 */}
+			<ShareSidebar title={title} />
 		</main>
 		<Footer />
 	</body>

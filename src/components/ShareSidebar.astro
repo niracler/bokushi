@@ -1,0 +1,208 @@
+---
+// ShareSidebar.astro - Fixed sidebar for social sharing
+// Follows Vercel Design Guidelines: keyboard accessible, focus visible, 44px touch targets
+import { Icon } from "astro-icon/components";
+
+interface Props {
+    title: string;
+    url?: string;
+}
+
+const { title, url = Astro.url.href } = Astro.props;
+
+// Encode for URL parameters
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl = encodeURIComponent(url);
+
+const shareLinks = [
+    {
+        name: "Twitter",
+        label: "分享到 Twitter",
+        icon: "ri:twitter-fill",
+        href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+    },
+    {
+        name: "Telegram",
+        label: "分享到 Telegram",
+        icon: "ri:telegram-fill",
+        href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
+    },
+];
+---
+
+<!-- Desktop: Fixed sidebar on left (symmetric to TOC on right) -->
+<aside
+    data-share-sidebar
+    class="hidden min-[900px]:flex fixed flex-col gap-3 transition-opacity duration-200 -translate-y-1/2"
+    style="right: calc(50% + 25rem + 2rem); top: 50%;"
+    aria-label="分享文章"
+>
+    {shareLinks.map((link) => (
+        <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:text-accent hover:shadow-md focus-accent"
+            aria-label={link.label}
+        >
+            <Icon name={link.icon} class="h-6 w-6" aria-hidden="true" />
+        </a>
+    ))}
+    <button
+        type="button"
+        class="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:text-accent hover:shadow-md focus-accent"
+        aria-label="复制链接"
+        data-copy-link
+        data-url={url}
+    >
+        <Icon name="ri:link" class="h-6 w-6" aria-hidden="true" />
+    </button>
+</aside>
+
+<!-- Mobile: Floating action button that opens share menu -->
+<div class="min-[900px]:hidden">
+    <!-- Floating trigger button -->
+    <button
+        type="button"
+        data-share-mobile-toggle
+        class="fixed bottom-24 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-md bg-[rgba(100,149,237,0.85)] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_8px_32px_rgba(100,149,237,0.35)] transition-all duration-300 hover:scale-105 hover:bg-[rgba(100,149,237,0.95)] hover:shadow-[0_12px_40px_rgba(100,149,237,0.45)] active:scale-95"
+        aria-label="分享文章"
+        aria-expanded="false"
+    >
+        <Icon name="ri:share-line" class="h-6 w-6" aria-hidden="true" />
+    </button>
+
+    <!-- Share menu (hidden by default) -->
+    <div
+        data-share-menu
+        class="fixed bottom-24 right-6 z-40 flex flex-col-reverse gap-2 pb-16 opacity-0 pointer-events-none transition-opacity duration-200"
+        aria-hidden="true"
+    >
+        {shareLinks.map((link) => (
+            <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border shadow-lg transition-transform duration-200 scale-75 focus-accent"
+                aria-label={link.label}
+                data-share-menu-item
+            >
+                <Icon name={link.icon} class="h-5 w-5 text-secondary" aria-hidden="true" />
+            </a>
+        ))}
+        <button
+            type="button"
+            class="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border shadow-lg transition-transform duration-200 scale-75 focus-accent"
+            aria-label="复制链接"
+            data-copy-link
+            data-url={url}
+            data-share-menu-item
+        >
+            <Icon name="ri:link" class="h-5 w-5 text-secondary" aria-hidden="true" />
+        </button>
+    </div>
+</div>
+
+<!-- Toast notification for copy success -->
+<div
+    data-copy-toast
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-lg bg-surface border border-border px-4 py-3 shadow-lg opacity-0 pointer-events-none transition-all duration-300 translate-y-2"
+    role="status"
+    aria-live="polite"
+>
+    <Icon name="ri:check-line" class="h-5 w-5 text-accent" aria-hidden="true" />
+    <span class="text-sm text-primary">链接已复制</span>
+</div>
+
+<script is:inline>
+(function() {
+    const mobileToggle = document.querySelector("[data-share-mobile-toggle]");
+    const shareMenu = document.querySelector("[data-share-menu]");
+    const shareMenuItems = document.querySelectorAll("[data-share-menu-item]");
+    const copyButtons = document.querySelectorAll("[data-copy-link]");
+    const toast = document.querySelector("[data-copy-toast]");
+
+    let toastTimeout;
+    let menuOpen = false;
+
+    // Mobile menu toggle
+    function setMenuOpen(open) {
+        if (!shareMenu || !mobileToggle) return;
+        menuOpen = open;
+        mobileToggle.setAttribute("aria-expanded", String(open));
+        shareMenu.setAttribute("aria-hidden", String(!open));
+
+        if (open) {
+            shareMenu.classList.remove("opacity-0", "pointer-events-none");
+            shareMenuItems.forEach((item, i) => {
+                setTimeout(() => {
+                    item.classList.remove("scale-75");
+                    item.classList.add("scale-100");
+                }, i * 50);
+            });
+        } else {
+            shareMenu.classList.add("opacity-0", "pointer-events-none");
+            shareMenuItems.forEach((item) => {
+                item.classList.remove("scale-100");
+                item.classList.add("scale-75");
+            });
+        }
+    }
+
+    // Copy link to clipboard
+    async function copyLink(url) {
+        try {
+            await navigator.clipboard.writeText(url);
+            showToast();
+        } catch (err) {
+            // Fallback for older browsers
+            const textarea = document.createElement("textarea");
+            textarea.value = url;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            showToast();
+        }
+    }
+
+    // Show toast notification
+    function showToast() {
+        if (!toast) return;
+        clearTimeout(toastTimeout);
+        toast.classList.remove("opacity-0", "pointer-events-none", "translate-y-2");
+        toastTimeout = setTimeout(() => {
+            toast.classList.add("opacity-0", "pointer-events-none", "translate-y-2");
+        }, 2000);
+    }
+
+    // Event listeners
+    mobileToggle?.addEventListener("click", () => setMenuOpen(!menuOpen));
+
+    // Close menu when clicking outside
+    document.addEventListener("click", (e) => {
+        if (menuOpen && !e.target.closest("[data-share-menu]") && !e.target.closest("[data-share-mobile-toggle]")) {
+            setMenuOpen(false);
+        }
+    });
+
+    // Close menu on escape
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && menuOpen) {
+            setMenuOpen(false);
+            mobileToggle?.focus();
+        }
+    });
+
+    // Copy link buttons
+    copyButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const url = btn.dataset.url;
+            if (url) copyLink(url);
+            if (menuOpen) setMenuOpen(false);
+        });
+    });
+})();
+</script>
