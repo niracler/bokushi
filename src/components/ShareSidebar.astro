@@ -66,8 +66,8 @@ const shareLinks = [
 <!-- Desktop: Fixed sidebar on left (symmetric to TOC on right) -->
 <aside
     data-share-sidebar
-    class="hidden min-[900px]:flex fixed flex-col gap-3 transition-opacity duration-200 -translate-y-1/2"
-    style="right: calc(50% + 25rem + 2rem); top: 50%;"
+    class="hidden min-[900px]:flex fixed flex-col gap-3 opacity-0 transition-opacity duration-200 mt-[5px]"
+    style="right: calc(50% + 25rem + 2rem); top: 6rem;"
     aria-label="分享文章"
 >
     {shareLinks.map((link) => (

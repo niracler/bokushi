@@ -296,18 +296,19 @@ function initMobileTocDrawer() {
     });
 }
 
-// ============ TOC 侧边栏定位 ============
-// 动态计算 TOC 起始位置，实现滚动浮动效果
-let tocPositionRAF: number | null = null;
+// ============ 侧边栏定位（TOC + 分享栏） ============
+// 动态计算侧边栏起始位置，实现滚动浮动效果
+let sidebarPositionRAF: number | null = null;
 
-function adjustTocPosition(): void {
-    if (tocPositionRAF !== null) cancelAnimationFrame(tocPositionRAF);
+function adjustSidebarPositions(): void {
+    if (sidebarPositionRAF !== null) cancelAnimationFrame(sidebarPositionRAF);
 
-    tocPositionRAF = requestAnimationFrame(() => {
+    sidebarPositionRAF = requestAnimationFrame(() => {
         const tocSidebar = document.querySelector<HTMLElement>("[data-toc-sidebar]");
+        const shareSidebar = document.querySelector<HTMLElement>("[data-share-sidebar]");
         const articleHeader = document.querySelector<HTMLElement>("[data-article-header]");
 
-        if (!tocSidebar || !articleHeader) return;
+        if (!articleHeader) return;
 
         // 双重 RAF 确保布局完全稳定后再计算
         requestAnimationFrame(() => {
@@ -315,17 +316,30 @@ function adjustTocPosition(): void {
             const minTop = 64; // header 导航栏高度
             const padding = 24; // 与分割线的间距
 
-            // 滚动浮动逻辑：当标题滚出视口时，TOC 浮动到顶部
+            // 滚动浮动逻辑：当标题滚出视口时，侧边栏浮动到顶部
             const targetTop =
                 headerBottom < minTop
                     ? minTop + padding
                     : Math.max(minTop + padding, headerBottom + padding);
 
-            tocSidebar.style.top = `${targetTop}px`;
-            tocSidebar.style.opacity = "1";
-            tocPositionRAF = null;
+            // 同时更新 TOC 和分享栏位置
+            if (tocSidebar) {
+                tocSidebar.style.top = `${targetTop}px`;
+                tocSidebar.style.opacity = "1";
+            }
+            if (shareSidebar) {
+                shareSidebar.style.top = `${targetTop}px`;
+                shareSidebar.style.opacity = "1";
+            }
+
+            sidebarPositionRAF = null;
         });
     });
+}
+
+// 保持向后兼容的别名
+function adjustTocPosition(): void {
+    adjustSidebarPositions();
 }
 
 const debouncedAdjustTocPosition = debounce(adjustTocPosition, 150);
