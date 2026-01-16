@@ -1,0 +1,13 @@
+# Cloudflare Pages 配置
+# 参考: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+
+name = "bokushi"
+pages_build_output_dir = "./dist"
+compatibility_date = "2024-01-01"
+
+# KV Namespace Bindings
+# 在 Cloudflare Dashboard 创建 KV namespace 后填入 id
+# Workers & Pages > KV > Create namespace > 名称: LIKES
+[[kv_namespaces]]
+binding = "LIKES"
+id = "6fd6bc2e5dcb4f0cb7e648ed115debb5"

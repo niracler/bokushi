@@ -38,6 +38,8 @@ export default defineConfig({
                     "link",
                     "share-line",
                     "check-line",
+                    "heart-line",
+                    "heart-fill",
                     "creative-commons-fill",
                     "creative-commons-by-fill",
                     "creative-commons-nc-fill",

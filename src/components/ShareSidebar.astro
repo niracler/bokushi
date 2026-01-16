@@ -8,9 +8,10 @@ interface Props {
     description?: string;
     tags?: string[];
     url?: string;
+    slug: string;
 }
 
-const { title, description, tags = [], url = Astro.url.href } = Astro.props;
+const { title, description, tags = [], url = Astro.url.href, slug } = Astro.props;
 
 // Twitter: hashtags as comma-separated (without #), max 3 tags
 const twitterHashtags = tags.slice(0, 3).join(",");
@@ -90,6 +91,21 @@ const shareLinks = [
     >
         <Icon name="ri:link" class="h-6 w-6" aria-hidden="true" />
     </button>
+    <!-- 点赞按钮 -->
+    <button
+        type="button"
+        class="relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:shadow-md focus-accent group"
+        aria-label="点赞"
+        data-like-button
+        data-slug={slug}
+    >
+        <Icon name="ri:heart-line" class="h-6 w-6 group-data-[liked]:hidden" aria-hidden="true" />
+        <Icon name="ri:heart-fill" class="h-6 w-6 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
+        <span
+            class="absolute -bottom-1 -right-1 min-w-5 h-5 flex items-center justify-center rounded-full bg-surface border border-border text-xs text-muted"
+            data-like-count
+        ></span>
+    </button>
 </aside>
 
 <!-- Mobile: Floating action button that opens share menu -->
@@ -133,6 +149,22 @@ const shareLinks = [
         >
             <Icon name="ri:link" class="h-5 w-5 text-secondary" aria-hidden="true" />
         </button>
+        <!-- 移动端点赞按钮 -->
+        <button
+            type="button"
+            class="relative flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border shadow-lg transition-transform duration-200 scale-75 focus-accent group"
+            aria-label="点赞"
+            data-like-button
+            data-slug={slug}
+            data-share-menu-item
+        >
+            <Icon name="ri:heart-line" class="h-5 w-5 text-secondary group-data-[liked]:hidden" aria-hidden="true" />
+            <Icon name="ri:heart-fill" class="h-5 w-5 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
+            <span
+                class="absolute -bottom-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center rounded-full bg-surface border border-border text-[10px] text-muted"
+                data-like-count
+            ></span>
+        </button>
     </div>
 </div>
 
@@ -147,6 +179,30 @@ const shareLinks = [
     <span class="text-sm text-primary">链接已复制</span>
 </div>
 
+<style>
+    /* 点赞动画 */
+    @keyframes pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-2px); }
+        75% { transform: translateX(2px); }
+    }
+    .animate-pop { animation: pop 0.2s ease-out; }
+    .animate-shake { animation: shake 0.3s ease-out; }
+
+    /* 点满后的金色效果 */
+    [data-like-button][data-max-reached] {
+        border-color: #f59e0b !important;
+    }
+    [data-like-button][data-max-reached] svg {
+        color: #f59e0b !important;
+    }
+</style>
+
 <script is:inline>
 (function() {
     const mobileToggle = document.querySelector("[data-share-mobile-toggle]");
@@ -154,6 +210,8 @@ const shareLinks = [
     const shareMenuItems = document.querySelectorAll("[data-share-menu-item]");
     const copyButtons = document.querySelectorAll("[data-copy-link]");
     const toast = document.querySelector("[data-copy-toast]");
+    const likeButtons = document.querySelectorAll("[data-like-button]");
+    const likeCountElements = document.querySelectorAll("[data-like-count]");
 
     let toastTimeout;
     let menuOpen = false;
@@ -211,6 +269,113 @@ const shareLinks = [
         }, 2000);
     }
 
+    // ============ 点赞功能（支持多次点赞，最多 16 次）============
+    const LIKE_STORAGE_KEY = "bokushi_likes_v2";
+    const MAX_LIKES = 16;
+
+    // 获取 localStorage 中的点赞记录 { slug: userLikes }
+    function getLikeData() {
+        try {
+            return JSON.parse(localStorage.getItem(LIKE_STORAGE_KEY) || "{}");
+        } catch {
+            return {};
+        }
+    }
+
+    // 保存点赞记录到 localStorage
+    function saveLikeData(data) {
+        localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // 更新所有点赞按钮的 UI
+    function updateLikeUI(count, userLikes, maxReached) {
+        likeButtons.forEach((btn) => {
+            if (userLikes > 0) {
+                btn.setAttribute("data-liked", "");
+            } else {
+                btn.removeAttribute("data-liked");
+            }
+            if (maxReached) {
+                btn.setAttribute("data-max-reached", "");
+            } else {
+                btn.removeAttribute("data-max-reached");
+            }
+        });
+        likeCountElements.forEach((el) => {
+            el.textContent = count > 0 ? String(count) : "";
+        });
+    }
+
+    // 获取点赞状态
+    async function fetchLikeStatus(slug) {
+        // 先用 localStorage 显示
+        const localData = getLikeData();
+        const localUserLikes = localData[slug] || 0;
+        updateLikeUI(localUserLikes, localUserLikes, localUserLikes >= MAX_LIKES);
+
+        try {
+            const res = await fetch(`/api/like?slug=${encodeURIComponent(slug)}`);
+            if (res.ok) {
+                const data = await res.json();
+                // 用服务端数据更新（更准确）
+                const userLikes = Math.max(data.userLikes, localUserLikes);
+                updateLikeUI(data.count, userLikes, userLikes >= MAX_LIKES);
+                // 同步到 localStorage
+                if (userLikes !== localUserLikes) {
+                    localData[slug] = userLikes;
+                    saveLikeData(localData);
+                }
+            }
+        } catch (err) {
+            console.error("Failed to fetch like status:", err);
+        }
+    }
+
+    // 添加点赞（每次 +1）
+    async function addLike(slug) {
+        const localData = getLikeData();
+        const currentLikes = localData[slug] || 0;
+
+        // 已达上限
+        if (currentLikes >= MAX_LIKES) {
+            // 添加一个小动画提示已满
+            likeButtons.forEach((btn) => {
+                btn.classList.add("animate-shake");
+                setTimeout(() => btn.classList.remove("animate-shake"), 300);
+            });
+            return;
+        }
+
+        // 乐观更新 UI
+        const newLikes = currentLikes + 1;
+        localData[slug] = newLikes;
+        saveLikeData(localData);
+
+        likeButtons.forEach((btn) => {
+            btn.setAttribute("data-liked", "");
+            // 点击动画
+            btn.classList.add("animate-pop");
+            setTimeout(() => btn.classList.remove("animate-pop"), 200);
+        });
+
+        try {
+            const res = await fetch("/api/like", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ slug }),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                updateLikeUI(data.count, data.userLikes, data.userLikes >= MAX_LIKES);
+                // 同步 localStorage
+                localData[slug] = data.userLikes;
+                saveLikeData(localData);
+            }
+        } catch (err) {
+            console.error("Failed to add like:", err);
+        }
+    }
+
     // Event listeners
     mobileToggle?.addEventListener("click", () => setMenuOpen(!menuOpen));
 
@@ -237,5 +402,25 @@ const shareLinks = [
             if (menuOpen) setMenuOpen(false);
         });
     });
+
+    // Like buttons
+    likeButtons.forEach((btn) => {
+        const slug = btn.dataset.slug;
+        if (slug) {
+            btn.addEventListener("click", () => {
+                addLike(slug);
+                if (menuOpen) setMenuOpen(false);
+            });
+        }
+    });
+
+    // 页面加载时获取点赞状态
+    const firstLikeButton = likeButtons[0];
+    if (firstLikeButton) {
+        const slug = firstLikeButton.dataset.slug;
+        if (slug) {
+            fetchLikeStatus(slug);
+        }
+    }
 })();
 </script>

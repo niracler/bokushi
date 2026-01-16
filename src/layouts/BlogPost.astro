@@ -42,6 +42,9 @@ const description = providedDescription || (body ? extractDescription(body) : "�
 
 const imageSrc = socialImage || DEFAULT_POST_SOCIAL_IMAGE;
 
+// 从 URL 路径提取 slug（用于点赞 API）
+const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
+
 // 只有当文章有足够的标题时才显示目录（至少 2 个 h2/h3）
 const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;
 ---
@@ -182,7 +185,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 			)}
 
 			{/* 分享侧边栏：桌面端左侧固定，移动端浮动按钮 */}
-			<ShareSidebar title={title} description={description} tags={tags} />
+			<ShareSidebar title={title} description={description} tags={tags} slug={slug} />
 		</main>
 		<Footer />
 	</body>
