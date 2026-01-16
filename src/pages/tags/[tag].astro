@@ -9,9 +9,11 @@ import { SITE_TITLE } from "../../consts";
 export const prerender = true;
 
 export async function getStaticPaths() {
-    const blogPosts = await getCollection("blog");
-    const monthlyPosts = await getCollection("monthly");
-    const tilPosts = await getCollection("til");
+    const [blogPosts, monthlyPosts, tilPosts] = await Promise.all([
+        getCollection("blog"),
+        getCollection("monthly"),
+        getCollection("til"),
+    ]);
     const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter(
         (post) => !post.data.hidden,
     );

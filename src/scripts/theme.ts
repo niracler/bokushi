@@ -40,16 +40,8 @@ const storePreference = (preference: ThemePreference) => {
 const getSystemTheme = (): ThemeName =>
     window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
-const resolveTheme = (preference: ThemePreference): ThemeName => {
-    switch (preference) {
-        case "dark":
-            return "dark";
-        case "light":
-            return "light";
-        default:
-            return getSystemTheme();
-    }
-};
+const resolveTheme = (preference: ThemePreference): ThemeName =>
+    preference === "system" ? getSystemTheme() : preference;
 
 const applyThemeToDocument = (
     theme: ThemeName,

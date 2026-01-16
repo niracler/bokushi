@@ -343,13 +343,8 @@ function adjustSidebarPositions(): void {
     });
 }
 
-// 保持向后兼容的别名
-function adjustTocPosition(): void {
-    adjustSidebarPositions();
-}
-
-const debouncedAdjustTocPosition = debounce(adjustTocPosition, 150);
-const throttledAdjustTocPosition = throttle(adjustTocPosition, 16);
+const debouncedAdjustSidebarPositions = debounce(adjustSidebarPositions, 150);
+const throttledAdjustSidebarPositions = throttle(adjustSidebarPositions, 16);
 
 // ============ 初始化所有功能 ============
 export function initBlogInteractive() {
@@ -369,8 +364,8 @@ export function initBlogInteractive() {
     initMobileTocDrawer();
     window.addEventListener("astro:after-swap", initMobileTocDrawer);
 
-    adjustTocPosition();
-    window.addEventListener("resize", debouncedAdjustTocPosition);
-    window.addEventListener("scroll", throttledAdjustTocPosition, { passive: true });
-    window.addEventListener("astro:after-swap", adjustTocPosition);
+    adjustSidebarPositions();
+    window.addEventListener("resize", debouncedAdjustSidebarPositions);
+    window.addEventListener("scroll", throttledAdjustSidebarPositions, { passive: true });
+    window.addEventListener("astro:after-swap", adjustSidebarPositions);
 }

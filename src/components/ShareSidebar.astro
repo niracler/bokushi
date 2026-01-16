@@ -17,10 +17,10 @@ const { title, description, tags = [], url = Astro.url.href, slug } = Astro.prop
 const twitterHashtags = tags.slice(0, 3).join(",");
 
 // Twitter: truncate description to fit 280 char limit (title + desc + url ~23 + hashtags)
-const maxDescLength = 150;
+const MAX_DESC_LENGTH = 150;
 const truncatedDesc =
-    description && description.length > maxDescLength
-        ? `${description.slice(0, maxDescLength)}...`
+    description && description.length > MAX_DESC_LENGTH
+        ? `${description.slice(0, MAX_DESC_LENGTH)}...`
         : description;
 
 // Twitter text: title + truncated description

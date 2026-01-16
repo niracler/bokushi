@@ -25,12 +25,17 @@ const CHANNEL_USERNAME = "tomoko_channel";
 const CACHE_SECONDS = 300;
 
 // Parse cursor parameter
-const cursorType = cursor?.startsWith("before-")
-    ? "before"
-    : cursor?.startsWith("after-")
-      ? "after"
-      : null;
-const cursorValue = cursor ? cursor.replace(/^(before-|after-)/, "") : undefined;
+function parseCursor(cursor: string | undefined): {
+    type: "before" | "after" | null;
+    value: string | undefined;
+} {
+    if (!cursor) return { type: null, value: undefined };
+    if (cursor.startsWith("before-")) return { type: "before", value: cursor.slice(7) };
+    if (cursor.startsWith("after-")) return { type: "after", value: cursor.slice(6) };
+    return { type: null, value: undefined };
+}
+
+const { type: cursorType, value: cursorValue } = parseCursor(cursor);
 
 let channelData: TelegramChannel | undefined;
 let error: string | null = null;

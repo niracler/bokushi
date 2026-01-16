@@ -12,7 +12,3 @@ export function lockScroll(): void {
 export function unlockScroll(): void {
     document.body.classList.remove(LOCK_CLASS);
 }
-
-export function isScrollLocked(): boolean {
-    return document.body.classList.contains(LOCK_CLASS);
-}
