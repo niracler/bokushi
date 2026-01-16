@@ -251,6 +251,8 @@ function initMobileTocDrawer() {
     const content = document.querySelector("[data-toc-mobile-content]");
     const closeBtn = document.querySelector("[data-toc-mobile-close]");
     const tocLinks = drawer?.querySelectorAll("[data-toc-link]");
+    // 移动端浮动按钮容器（分享、点赞等）
+    const mobileFloatingButtons = document.querySelector("[data-mobile-floating-buttons]");
 
     if (!toggleBtn || !drawer || !overlay || !content || !closeBtn) return;
 
@@ -263,6 +265,8 @@ function initMobileTocDrawer() {
         overlay.classList.remove("opacity-0", "pointer-events-none");
         content.classList.remove("translate-x-full");
         document.body.classList.add("scroll-locked");
+        // 隐藏分享浮动按钮，避免遮挡 TOC 抽屉
+        mobileFloatingButtons?.classList.add("opacity-0", "pointer-events-none");
     };
 
     const closeDrawer = () => {
@@ -270,6 +274,8 @@ function initMobileTocDrawer() {
         overlay.classList.add("opacity-0", "pointer-events-none");
         content.classList.add("translate-x-full");
         document.body.classList.remove("scroll-locked");
+        // 恢复分享浮动按钮
+        mobileFloatingButtons?.classList.remove("opacity-0", "pointer-events-none");
         // 等待动画结束后再隐藏
         setTimeout(() => {
             if (!isOpen) {

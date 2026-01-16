@@ -105,13 +105,13 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 				{/* 移动端 TOC */}
 				{showToc && (
 					<>
-						{/* 移动端：浮动按钮 */}
+						{/* 移动端：浮动按钮 (缩小到 2/3 尺寸) */}
 						<button
 							data-toc-mobile-toggle
-							class="min-[960px]:hidden fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-md bg-[rgba(251,143,104,0.85)] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_8px_32px_rgba(251,143,104,0.35)] transition-all duration-300 hover:scale-105 hover:bg-[rgba(251,143,104,0.95)] hover:shadow-[0_12px_40px_rgba(251,143,104,0.45)] active:scale-95"
+							class="min-[960px]:hidden fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md bg-[rgba(251,143,104,0.85)] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_6px_24px_rgba(251,143,104,0.35)] transition-all duration-300 hover:scale-105 hover:bg-[rgba(251,143,104,0.95)] hover:shadow-[0_8px_32px_rgba(251,143,104,0.45)] active:scale-95 touch-manipulation"
 							aria-label="打开目录"
 						>
-							<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 								<path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 							</svg>
 						</button>

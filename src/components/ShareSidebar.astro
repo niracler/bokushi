@@ -96,6 +96,7 @@ const shareLinks = [
         type="button"
         class="relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:shadow-md focus-accent group"
         aria-label="点赞"
+        aria-pressed="false"
         data-like-button
         data-slug={slug}
     >
@@ -108,23 +109,40 @@ const shareLinks = [
     </button>
 </aside>
 
-<!-- Mobile: Floating action button that opens share menu -->
-<div class="min-[900px]:hidden">
-    <!-- Floating trigger button -->
+<!-- Mobile: Floating action buttons (统一 40px 尺寸，8px 间距) -->
+<div class="min-[900px]:hidden transition-opacity duration-200" data-mobile-floating-buttons>
+    <!-- 点赞按钮（最上方） -->
+    <button
+        type="button"
+        class="fixed bottom-30 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md bg-surface/90 border border-border shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus-accent group touch-manipulation"
+        aria-label="点赞"
+        aria-pressed="false"
+        data-like-button
+        data-slug={slug}
+    >
+        <Icon name="ri:heart-line" class="h-5 w-5 text-secondary group-data-[liked]:hidden" aria-hidden="true" />
+        <Icon name="ri:heart-fill" class="h-5 w-5 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
+        <span
+            class="absolute -bottom-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center rounded-full bg-surface border border-border text-[9px] text-muted"
+            data-like-count
+        ></span>
+    </button>
+
+    <!-- 分享按钮（中间）- z-50 确保在菜单上方可点击 -->
     <button
         type="button"
         data-share-mobile-toggle
-        class="fixed bottom-24 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-md bg-[rgba(100,149,237,0.85)] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_8px_32px_rgba(100,149,237,0.35)] transition-all duration-300 hover:scale-105 hover:bg-[rgba(100,149,237,0.95)] hover:shadow-[0_12px_40px_rgba(100,149,237,0.45)] active:scale-95"
+        class="fixed bottom-[72px] right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md bg-[rgba(100,149,237,0.85)] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_6px_24px_rgba(100,149,237,0.35)] transition-all duration-300 hover:scale-105 hover:bg-[rgba(100,149,237,0.95)] hover:shadow-[0_8px_32px_rgba(100,149,237,0.45)] active:scale-95 touch-manipulation"
         aria-label="分享文章"
         aria-expanded="false"
     >
-        <Icon name="ri:share-line" class="h-6 w-6" aria-hidden="true" />
+        <Icon name="ri:share-line" class="h-5 w-5" aria-hidden="true" />
     </button>
 
     <!-- Share menu (hidden by default) -->
     <div
         data-share-menu
-        class="fixed bottom-24 right-6 z-40 flex flex-col-reverse gap-2 pb-16 opacity-0 pointer-events-none transition-opacity duration-200"
+        class="fixed bottom-[72px] right-6 z-40 flex flex-col-reverse gap-2 pb-12 opacity-0 pointer-events-none transition-opacity duration-200"
         aria-hidden="true"
     >
         {shareLinks.map((link) => (
@@ -132,7 +150,7 @@ const shareLinks = [
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border shadow-lg transition-transform duration-200 scale-75 focus-accent"
+                class="flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
                 aria-label={link.label}
                 data-share-menu-item
             >
@@ -141,29 +159,13 @@ const shareLinks = [
         ))}
         <button
             type="button"
-            class="flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border shadow-lg transition-transform duration-200 scale-75 focus-accent"
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
             aria-label="复制链接"
             data-copy-link
             data-url={url}
             data-share-menu-item
         >
             <Icon name="ri:link" class="h-5 w-5 text-secondary" aria-hidden="true" />
-        </button>
-        <!-- 移动端点赞按钮 -->
-        <button
-            type="button"
-            class="relative flex h-12 w-12 items-center justify-center rounded-full bg-surface border border-border shadow-lg transition-transform duration-200 scale-75 focus-accent group"
-            aria-label="点赞"
-            data-like-button
-            data-slug={slug}
-            data-share-menu-item
-        >
-            <Icon name="ri:heart-line" class="h-5 w-5 text-secondary group-data-[liked]:hidden" aria-hidden="true" />
-            <Icon name="ri:heart-fill" class="h-5 w-5 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
-            <span
-                class="absolute -bottom-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center rounded-full bg-surface border border-border text-[10px] text-muted"
-                data-like-count
-            ></span>
         </button>
     </div>
 </div>
@@ -193,6 +195,14 @@ const shareLinks = [
     }
     .animate-pop { animation: pop 0.2s ease-out; }
     .animate-shake { animation: shake 0.3s ease-out; }
+
+    /* 尊重用户的动画偏好设置 */
+    @media (prefers-reduced-motion: reduce) {
+        .animate-pop,
+        .animate-shake {
+            animation: none;
+        }
+    }
 
     /* 点满后的金色效果 */
     [data-like-button][data-max-reached] {
@@ -289,8 +299,10 @@ const shareLinks = [
 
     // 更新所有点赞按钮的 UI
     function updateLikeUI(count, userLikes, maxReached) {
+        const isLiked = userLikes > 0;
         likeButtons.forEach((btn) => {
-            if (userLikes > 0) {
+            // 更新 data 属性
+            if (isLiked) {
                 btn.setAttribute("data-liked", "");
             } else {
                 btn.removeAttribute("data-liked");
@@ -300,6 +312,9 @@ const shareLinks = [
             } else {
                 btn.removeAttribute("data-max-reached");
             }
+            // 更新无障碍属性
+            btn.setAttribute("aria-pressed", String(isLiked));
+            btn.setAttribute("aria-label", isLiked ? "取消点赞" : "点赞");
         });
         likeCountElements.forEach((el) => {
             el.textContent = count > 0 ? String(count) : "";
@@ -377,11 +392,19 @@ const shareLinks = [
     }
 
     // Event listeners
-    mobileToggle?.addEventListener("click", () => setMenuOpen(!menuOpen));
+    mobileToggle?.addEventListener("click", (e) => {
+        e.stopPropagation(); // 阻止冒泡，避免触发 document click
+        // 直接从 DOM 读取当前状态，避免闭包变量不同步
+        const isCurrentlyOpen = mobileToggle.getAttribute("aria-expanded") === "true";
+        setMenuOpen(!isCurrentlyOpen);
+    });
 
     // Close menu when clicking outside
     document.addEventListener("click", (e) => {
-        if (menuOpen && !e.target.closest("[data-share-menu]") && !e.target.closest("[data-share-mobile-toggle]")) {
+        if (menuOpen &&
+            !e.target.closest("[data-share-mobile-toggle]") &&
+            !e.target.closest("[data-share-menu]") &&
+            !e.target.closest("[data-like-button]")) {
             setMenuOpen(false);
         }
     });
@@ -403,14 +426,11 @@ const shareLinks = [
         });
     });
 
-    // Like buttons
+    // Like buttons (点赞按钮在菜单外，不需要关闭菜单)
     likeButtons.forEach((btn) => {
         const slug = btn.dataset.slug;
         if (slug) {
-            btn.addEventListener("click", () => {
-                addLike(slug);
-                if (menuOpen) setMenuOpen(false);
-            });
+            btn.addEventListener("click", () => addLike(slug));
         }
     });
 
