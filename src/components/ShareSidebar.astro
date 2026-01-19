@@ -256,16 +256,7 @@ const shareLinks = [
             await navigator.clipboard.writeText(url);
             showToast();
         } catch (err) {
-            // Fallback for older browsers
-            const textarea = document.createElement("textarea");
-            textarea.value = url;
-            textarea.style.position = "fixed";
-            textarea.style.opacity = "0";
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand("copy");
-            document.body.removeChild(textarea);
-            showToast();
+            console.error("Failed to copy:", err);
         }
     }
 
