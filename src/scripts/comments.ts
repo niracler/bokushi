@@ -399,8 +399,12 @@ function bindFormSubmit(
             });
 
             if (result.error) {
+                // Temporary: show full debug JSON for Turnstile troubleshooting
+                const debugJson = (result as Record<string, unknown>).debug
+                    ? `\n${JSON.stringify((result as Record<string, unknown>).debug, null, 2)}`
+                    : "";
                 const codes = result.errorCodes?.length ? ` [${result.errorCodes.join(", ")}]` : "";
-                showError(errorEl, `${result.error}${codes}`);
+                showError(errorEl, `${result.error}${codes}${debugJson}`);
                 submitBtn.disabled = false;
                 submitBtn.textContent = "发表评论";
                 return;
@@ -417,6 +421,9 @@ function bindFormSubmit(
 }
 
 function showError(el: HTMLElement, msg: string) {
+    el.style.whiteSpace = "pre-wrap";
+    el.style.fontFamily = "monospace";
+    el.style.fontSize = "12px";
     el.textContent = msg;
     el.classList.remove("hidden");
 }
