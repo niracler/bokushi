@@ -6,6 +6,7 @@
  */
 
 import type { APIRoute } from "astro";
+import { getClientIP, hashIP } from "../../lib/utils";
 
 export const prerender = false;
 
@@ -16,33 +17,6 @@ interface LikeData {
     count: number;
     // 每个 IP 哈希对应的点赞次数
     likes: Record<string, number>;
-}
-
-/**
- * 将 IP 地址转换为 SHA-256 哈希（保护隐私）
- */
-async function hashIP(ip: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(ip);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-/**
- * 获取客户端 IP 地址
- */
-function getClientIP(request: Request): string {
-    // Cloudflare 提供的真实 IP
-    const cfIP = request.headers.get("CF-Connecting-IP");
-    if (cfIP) return cfIP;
-
-    // 标准代理头
-    const forwardedFor = request.headers.get("X-Forwarded-For");
-    if (forwardedFor) return forwardedFor.split(",")[0].trim();
-
-    // 本地开发环境
-    return "127.0.0.1";
 }
 
 export const GET: APIRoute = async ({ request, locals }) => {

@@ -1,10 +1,10 @@
 ---
 import BaseHead from "../components/BaseHead.astro";
+import CommentSection from "../components/CommentSection.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import Lightbox from "../components/Lightbox.astro";
 import Prose from "../components/Prose.astro";
-import Remark42Comments from "../components/Remark42Comments.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 
 const { frontmatter = {} } = Astro.props as { frontmatter?: Record<string, unknown> };
@@ -33,7 +33,7 @@ const description = pageDescription || SITE_DESCRIPTION;
 				<slot />
 			</Prose>
 
-			{commentsEnabled && <Remark42Comments />}
+			{commentsEnabled && <CommentSection />}
 			<Lightbox id="page-lightbox" selector=".prose img:not([data-lightbox-skip])" />
 		</main>
 		<Footer />

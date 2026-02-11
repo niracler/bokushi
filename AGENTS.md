@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-- `src/pages/` stores routes; `src/layouts/` shares shells; `src/components/` holds reusable UI (Header, Footer, BaseHead, Remark42).
+- `src/pages/` stores routes; `src/layouts/` shares shells; `src/components/` holds reusable UI (Header, Footer, BaseHead, CommentSection).
 - Content lives in `src/content/` with `content.config.ts` validating frontmatter; prefer kebab-case slugs. Shared assets go in `public/`; `dist/` is build output and untracked.
 - Styling sits in `src/styles/` (tokens + Tailwind layers); utilities/scripts in `src/utils/`, `src/types/`, and `src/scripts/`; site metadata in `src/consts.ts`.
 - `tailwind.config.mjs` maps CSS variables to utilities; `remark-modified-time.mjs` refreshes post metadata when needed.
@@ -43,5 +43,5 @@
 
 ## Configuration & Security Notes
 
-- Public environment variables: `PUBLIC_REMARK_URL`, `PUBLIC_REMARK_SITE_ID`; set via `.env`/deployment secrets (only `PUBLIC_` values reach the client).
+- Public environment variables: `PUBLIC_TURNSTILE_SITE_KEY`; secrets: `TURNSTILE_SECRET_KEY`, `ADMIN_TOKEN`; set via `.env`/`.dev.vars`/deployment secrets (only `PUBLIC_` values reach the client).
 - Respect `import.meta.env.BASE_URL` for links; avoid hardcoded URLs. Keep secrets out of `public/` and content frontmatter.

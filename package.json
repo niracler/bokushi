@@ -39,6 +39,8 @@
         "@astrojs/check": "^0.9.6",
         "@biomejs/biome": "^2.3.2",
         "@iconify-json/simple-icons": "^1.2.66",
+        "@types/markdown-it": "^14.1.2",
+        "@types/sanitize-html": "^2.16.0",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
         "playwright": "^1.55.1",

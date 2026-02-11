@@ -11,3 +11,10 @@ compatibility_date = "2024-01-01"
 [[kv_namespaces]]
 binding = "LIKES"
 id = "6fd6bc2e5dcb4f0cb7e648ed115debb5"
+
+# D1 Database Bindings
+# Create via: wrangler d1 create bokushi-comments
+[[d1_databases]]
+binding = "COMMENTS_DB"
+database_name = "bokushi-comments"
+database_id = "f95ebf0a-500e-4096-86fb-9e7edfde7679"
