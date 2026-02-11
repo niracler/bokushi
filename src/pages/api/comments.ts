@@ -167,12 +167,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
         // Verify Turnstile token
         if (turnstileSecret) {
             const clientIP = getClientIP(request);
-            const result = await verifyTurnstile(body.turnstile_token, turnstileSecret, clientIP);
+            const token = body.turnstile_token ?? "";
+            const result = await verifyTurnstile(token, turnstileSecret, clientIP);
             if (!result.success) {
                 return jsonResponse(
                     {
                         error: "Turnstile verification failed",
                         errorCodes: result["error-codes"],
+                        debug: {
+                            tokenLength: token.length,
+                            tokenPrefix: token.substring(0, 20),
+                            secretLength: turnstileSecret.length,
+                            secretPrefix: turnstileSecret.substring(0, 10),
+                            clientIP,
+                            siteverifyResponse: result,
+                        },
                     },
                     403,
                 );
