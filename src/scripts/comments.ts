@@ -82,7 +82,7 @@ async function fetchComments(slug: string): Promise<CommentsResponse> {
 
 async function postComment(
     data: Record<string, string | null>,
-): Promise<{ comment?: CommentNode; error?: string }> {
+): Promise<{ comment?: CommentNode; error?: string; errorCodes?: string[] }> {
     const res = await fetch("/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -399,7 +399,8 @@ function bindFormSubmit(
             });
 
             if (result.error) {
-                showError(errorEl, result.error);
+                const codes = result.errorCodes?.length ? ` [${result.errorCodes.join(", ")}]` : "";
+                showError(errorEl, `${result.error}${codes}`);
                 submitBtn.disabled = false;
                 submitBtn.textContent = "发表评论";
                 return;
