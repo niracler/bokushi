@@ -27,14 +27,20 @@ export function getClientIP(request: Request): string {
     return "127.0.0.1";
 }
 
+export interface TurnstileResult {
+    success: boolean;
+    "error-codes"?: string[];
+}
+
 /**
  * Verify a Cloudflare Turnstile token via the siteverify API.
+ * Returns the full result object for debugging.
  */
 export async function verifyTurnstile(
     token: string,
     secretKey: string,
     ip?: string,
-): Promise<boolean> {
+): Promise<TurnstileResult> {
     const formData = new URLSearchParams();
     formData.append("secret", secretKey);
     formData.append("response", token);
@@ -45,14 +51,11 @@ export async function verifyTurnstile(
         body: formData,
     });
 
-    const result = (await response.json()) as {
-        success: boolean;
-        "error-codes"?: string[];
-    };
+    const result = (await response.json()) as TurnstileResult;
     if (!result.success) {
         console.error("Turnstile verification failed:", JSON.stringify(result));
     }
-    return result.success;
+    return result;
 }
 
 /** Input length limits for comment fields. */
