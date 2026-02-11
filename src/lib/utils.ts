@@ -45,7 +45,13 @@ export async function verifyTurnstile(
         body: formData,
     });
 
-    const result = (await response.json()) as { success: boolean };
+    const result = (await response.json()) as {
+        success: boolean;
+        "error-codes"?: string[];
+    };
+    if (!result.success) {
+        console.error("Turnstile verification failed:", JSON.stringify(result));
+    }
     return result.success;
 }
 
