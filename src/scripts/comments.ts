@@ -82,7 +82,7 @@ async function fetchComments(slug: string): Promise<CommentsResponse> {
 
 async function postComment(
     data: Record<string, string | null>,
-): Promise<{ comment?: CommentNode; error?: string; errorCodes?: string[] }> {
+): Promise<{ comment?: CommentNode; error?: string }> {
     const res = await fetch("/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -399,12 +399,7 @@ function bindFormSubmit(
             });
 
             if (result.error) {
-                // Temporary: show full debug JSON for Turnstile troubleshooting
-                const debugJson = (result as Record<string, unknown>).debug
-                    ? `\n${JSON.stringify((result as Record<string, unknown>).debug, null, 2)}`
-                    : "";
-                const codes = result.errorCodes?.length ? ` [${result.errorCodes.join(", ")}]` : "";
-                showError(errorEl, `${result.error}${codes}${debugJson}`);
+                showError(errorEl, result.error);
                 submitBtn.disabled = false;
                 submitBtn.textContent = "发表评论";
                 return;
@@ -421,9 +416,6 @@ function bindFormSubmit(
 }
 
 function showError(el: HTMLElement, msg: string) {
-    el.style.whiteSpace = "pre-wrap";
-    el.style.fontFamily = "monospace";
-    el.style.fontSize = "12px";
     el.textContent = msg;
     el.classList.remove("hidden");
 }
