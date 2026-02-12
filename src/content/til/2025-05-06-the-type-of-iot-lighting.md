@@ -7,7 +7,6 @@ tags: [ "TIL", "物联网", "照明", "协议", "DeepSearch" ]
 ---
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
-
 ## 要点总结
 
 物联网中的灯主要包括可调光（DIM）、可调色温（CCT）、可变色（RGB）等类型，这些分类基于灯具功能。这些分类不是协议，而是描述灯具能力的术语，它们是通用的照明功能描述。照明工程协会（IES）可能通过标准如ANSI/IES LP-12-21提供了相关指导，但这些分类并非由单一机构提出。
@@ -74,4 +73,3 @@ DIM、CCT、RGB等分类不是协议，而是灯具功能的描述。在物联�
 - [Lucas LED RGB RGBW RGB-CCT差异](https://lucasled.ie/blog/post/what-is-the-difference-between-rgb-rgbw-and-rgb-cct-led-strip-lights)
 - [CSA-IOT RGB CCT Dimmable LED Downlight](https://csa-iot.org/csa_product/rgb-cct-dimmable-led-downlight/)
 - [IES照明定义标准](https://www.ies.org/standards/definitions/)
-

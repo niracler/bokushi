@@ -7,7 +7,6 @@ tags: [ "TIL", "网络", "OpenWrt", "IPv6", "DeepSearch" ]
 ---
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
-
 ## 要干什么
 
 我想给我宿舍的 window 配置好公网的 IPv6 然后方便可以使用 tailscale 进行穿透。
@@ -174,11 +173,11 @@ round-trip min/avg/max = 21.384/21.778/22.012 ms
 从子设备进行相同测试，确保能访问 IPv6 站点。使用 [test-ipv6.com](https://test-ipv6.com) 验证 IPv6 连通性。
 
 (虽然说感觉有什么问题，但大体上是可以的)
-![](https://image.niracler.com/2025/03/5c38aaa0c519bf066184b086c76d5304.png)
+![test-ipv6.com IPv6 连通性测试结果](https://image.niracler.com/2025/03/5c38aaa0c519bf066184b086c76d5304.png)
 
 到此，我 windows 设备使用 `tailscale netcheck` 能拿到公网 IPv6 了。
 
-![](https://image.niracler.com/2025/03/6b6464bf6599c8edf0a3b32d7ac286c0.png)
+![tailscale netcheck 显示已获取公网 IPv6](https://image.niracler.com/2025/03/6b6464bf6599c8edf0a3b32d7ac286c0.png)
 
 ## 关键引文（未经校对）
 
@@ -187,4 +186,3 @@ round-trip min/avg/max = 21.384/21.778/22.012 ms
 - [Simple IPv6 setup with OpenWRT Necromancer's notes about 10 words](https://ncrmnt.org/2018/11/25/simple-ipv6-setup-with-openwrt/)  
 - [IPv6 with OpenWrt onemarcfifty video guide about 10 words](https://www.onemarcfifty.com/blog/video/IPv6_with_OpenWrt/)  
 - [IPv6 connectivity test website about 10 words](https://test-ipv6.com)
-

@@ -17,7 +17,7 @@ tags: [ "TIL", "博客", "部署", "Hugo", "DeepSearch" ]
 
 <details> <summary>Prompt</summary>
 
-### Prompt（此处应折叠）
+## Prompt（此处应折叠）
 
 ```markdown
 我是一个开发者，之前使用过 Hexo 搭建博客系统，但现在想尝试在 Cloudflare Pages 上使用 Hugo 静态网站框架搭建一个 TIL（Today I Learned）博客，用来记录和发布我每天学到的东西。我对 Hugo 是新手，但有一定的技术背景。我希望这个博客有以下特点：
@@ -117,11 +117,9 @@ hugo new post/2025-03-13-build-til-blog-by-hugo.md
 **编辑内容**： 打开生成的 Markdown 文件，顶部是前置元数据（front matter），用于定义帖子属性。例如：(就是我当前这篇文章了，呵呵)
 
 ```markdown
----
 title: "从零开始使用 Hugo 搭建 TIL 博客"
 date: 2025-03-13T14:00:00+08:00
 tags: ["til", "hugo"]
----
 ...
 ```
 
@@ -165,9 +163,9 @@ git push -u origin main
 
 **连接 Cloudflare Pages**： 注册 Cloudflare 账户（如果没有），进入 Pages 仪表板，点击“Create a project”。
 
-![](https://image.niracler.com/2025/03/cc12e758a22690d8f6a87a0003d1462d.png)
+![Cloudflare Pages 创建项目页面](https://image.niracler.com/2025/03/cc12e758a22690d8f6a87a0003d1462d.png)
 
-选择“Connect to Git”
+选择"Connect to Git"
 
 ![CleanShot 2025-03-13 at 15.47.48@2x.png](https://image.niracler.com/2025/03/cfb87ed86ae3452296f31fb741690a1b.png)
 
@@ -190,15 +188,15 @@ git push -u origin main
 
 访问 Cloudflare 仪表板，导航至 "Workers & Pages"，选择您的 Pages 项目。进入 "Custom domains" 部分。
 
-![](https://image.niracler.com/2025/03/c5ec3eeee275cb432a384b9af5c917a1.png)
+![Cloudflare Pages 自定义域名设置页面](https://image.niracler.com/2025/03/c5ec3eeee275cb432a384b9af5c917a1.png)
 
 点击 "Set up a custom domain"，输入 "til.niracler.com"，然后选择 "Continue"。 Cloudflare 将提供后续指导，具体取决于域名类型（顶域或子域）。
 
-![](https://image.niracler.com/2025/03/c5ec3eeee275cb432a384b9af5c917a1.png)
+![输入自定义域名并确认](https://image.niracler.com/2025/03/c5ec3eeee275cb432a384b9af5c917a1.png)
 
 好啦，大功告成。请点击：[https://til.niracler.com/](https://til.niracler.com/) 查看效果。（丑爆了，留给未来的自己改吧。）
 
-![](https://image.niracler.com/2025/03/e3c2172a09cef870a131c154a70b642a.png)
+![博客部署完成后的效果页面](https://image.niracler.com/2025/03/e3c2172a09cef870a131c154a70b642a.png)
 
 ## One More Thing
 
@@ -271,4 +269,3 @@ git push
 - 官方 Hugo 文档：[Hugo 官网](https://gohugo.io/)，提供详细教程和 API 参考。
 - PaperMod 社区支持：查看 GitHub 讨论区，获取用户经验分享。
 - Cloudflare Pages 论坛：解决部署问题，优化性能。
-

@@ -7,7 +7,6 @@ tags: [ "TIL", "博客", "RSS", "优化", "DeepSearch" ]
 ---
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
-
 ## 要干什么
 
 我想为博客增强元数据功能，主要包括两方面：
@@ -20,23 +19,21 @@ tags: [ "TIL", "博客", "RSS", "优化", "DeepSearch" ]
 ### 设置预览图和摘要
 
 ```yaml
----
 title: "OpenWRT 设置启用 IPv6 让子设备能拿到 IPv6 的 公网 IP （原理未明）"
 summary: '为了可以更方便 Tailscale 穿透。'
 cover:
   image: 'https://image.niracler.com/2025/03/5c38aaa0c519bf066184b086c76d5304.png'
----
 ```
 
 其实这里有点小问题，封面在正文里也会显示。与我的初衷不符，不过下次再改吧。
 
 （效果图什么的）
 
-![](https://image.niracler.com/2025/03/37095dd3c784d5ae7838ae04b1ecce52.png)
+![博客封面在社交媒体预览中的效果](https://image.niracler.com/2025/03/37095dd3c784d5ae7838ae04b1ecce52.png)
 
 （遗憾的是，Telegram Instant View 要申请好像挺困难的。但整个预览区域是可点击的，直接链接到文章。）
 
-![](https://image.niracler.com/2025/03/5a3cc265aed801fdeffba4966c889e89.png)
+![Telegram 中博客链接的预览效果](https://image.niracler.com/2025/03/5a3cc265aed801fdeffba4966c889e89.png)
 
 ### 添加网站图标（Favicon）
 
@@ -58,7 +55,7 @@ cover:
 可以使用在线工具如 [favicon.io](https://favicon.io/) 生成各种尺寸的图标。添加图标后，网站在浏览器标签页中会显示您的品牌标识，让博客更加专业化。
 
 (效果图)
-![](https://image.niracler.com/2025/03/cbd003b59f85210c39ecd48a558ad65b.png)
+![浏览器标签页中显示 favicon 图标的效果](https://image.niracler.com/2025/03/cbd003b59f85210c39ecd48a558ad65b.png)
 
 ### 添加 RSS 支持
 
@@ -75,7 +72,7 @@ cover:
 ```
 
 (效果图)
-![](https://image.niracler.com/2025/03/c58fede292d013e7dc78cb5e9817e333.png)
+![博客首页显示 RSS 图标的效果](https://image.niracler.com/2025/03/c58fede292d013e7dc78cb5e9817e333.png)
 
 然后顺手做个 Follow 认证吧。
 
@@ -136,9 +133,8 @@ cover:
 重新构建网站部署
 
 (可以啦)
-![](https://image.niracler.com/2025/03/e1ed0212923121b1fd7ea8f60dce7b0a.png)
+![Follow 中 RSS feed 验证成功的结果](https://image.niracler.com/2025/03/e1ed0212923121b1fd7ea8f60dce7b0a.png)
 
 ### 关键引文
 
 - [折腾 Hugo & PaperMod 主题](https://dvel.me/posts/hugo-papermod-config/)
-

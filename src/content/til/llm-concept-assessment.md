@@ -62,7 +62,7 @@ API 调用者可以写任意 System Prompt，平台无法限制。
 
 #### 3.1.4 为什么设计不同？—— 安全哲学的差异
 
-```
+```text
 安全层级对比
               | Claude Code  |  Codex CLI   |     API
 System Prompt | 不可改       | 可改         | 完全自由
@@ -81,12 +81,14 @@ System Prompt | 不可改       | 可改         | 完全自由
 > **参考资料**
 >
 > **Codex CLI (OpenAI)**:
+>
 > - [Custom Prompts](https://developers.openai.com/codex/custom-prompts/) — 介绍如何创建和使用自定义 prompt
 > - [Security](https://developers.openai.com/codex/security/) — 安全模型总览：OS 级沙箱、审批策略、网络隔离
 > - [AGENTS.md Guide](https://developers.openai.com/codex/guides/agents-md) — AGENTS.md 加载机制
 > - [Advanced Configuration](https://developers.openai.com/codex/config-advanced/) — 高级配置选项
 >
 > **Claude Code (Anthropic)**:
+>
 > - [Overview](https://docs.anthropic.com/en/docs/claude-code/overview) — Claude Code 功能概述
 > - [Memory (CLAUDE.md)](https://docs.anthropic.com/en/docs/claude-code/memory) — 四层记忆系统
 > - [GitHub Repo](https://github.com/anthropics/claude-code) — 开源仓库
@@ -131,7 +133,7 @@ System Prompt | 不可改       | 可改         | 完全自由
 
 #### 3.2.3 实际处理流程
 
-```
+```text
 模型训练层 (安全对齐)     <- 绝对优先，无法被 prompt 覆盖
        |
 System Prompt (平台设定)  <- 高优先级，定义身份和行为边界
@@ -166,7 +168,7 @@ User Prompt (对话内容)    <- 具体任务，位置最后有「最后发言�
 
 这是 Agent 的核心模式（Reasoning + Acting）：
 
-```
+```text
 Thought  <- LLM 思考下一步
    |
 Action   <- 调用工具执行
@@ -226,7 +228,7 @@ Yes -> 输出最终答案
 
 #### 3.4.1 层次关系
 
-```
+```text
 Agent Framework 层
   Agent Tools
   - 工具定义 (schema)
@@ -301,7 +303,7 @@ LLM API 层
 
 这是 Skill 的**架构设计核心**：
 
-```
+```text
 启动时
   只加载 metadata（~100 tokens）
     name + description（用于匹配判断）
@@ -334,7 +336,7 @@ LLM API 层
 
 #### 3.5.4 层级结构
 
-```
+```text
 Custom Instructions (CLAUDE.md / AGENTS.md)
   -> 全局、始终生效、定义 repo 级别的约定
 

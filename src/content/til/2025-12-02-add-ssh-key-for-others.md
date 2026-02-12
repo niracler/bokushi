@@ -53,7 +53,7 @@ chown -R username:username /home/username/.ssh
 
 `/etc/ssh/sshd_config` 里确认：
 
-```
+```text
 PubkeyAuthentication yes
 AuthorizedKeysFile .ssh/authorized_keys
 ```

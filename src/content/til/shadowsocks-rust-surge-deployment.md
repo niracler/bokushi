@@ -90,7 +90,7 @@ docker logs -f ss-rust
 
 成功日志示例：
 
-```
+```text
 INFO shadowsocks server 1.23.4 build ...
 INFO shadowsocks tcp server listening on 0.0.0.0:8388
 INFO shadowsocks udp server listening on 0.0.0.0:8388
@@ -152,7 +152,5 @@ sudo ufw status
 | 客户端 | Surge |
 | 是否需要插件 | ❌ 不需要 |
 | 是否需要反向代理 | ❌ 不需要 |
-
----
 
 **优点**: 配置简单、性能优秀、稳定可靠、易于维护。最重要的是：**适合的才是最好的**。

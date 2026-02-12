@@ -22,53 +22,52 @@ tags: [ "TIL", "工具", "邮箱", "自动化" ]
 3. 生成授权码（POP3/IMAP/SMTP服务项）
 
 （中间会有几次发送短信的流程）
-![](https://image.niracler.com/2025/03/b4c7c2db6e596c0d226047fd4ed69463.png)
+![QQ 邮箱开启 IMAP 服务并生成授权码](https://image.niracler.com/2025/03/b4c7c2db6e596c0d226047fd4ed69463.png)
 
 然后来到 Fastmail，在 My email address 中点击 Add address
 
-![](https://image.niracler.com/2025/03/865465ea940fd8ef4c548ca687fe0de3.png)
+![Fastmail 中点击 Add address 添加邮箱地址](https://image.niracler.com/2025/03/865465ea940fd8ef4c548ca687fe0de3.png)
 
 其实我们要做的是 Migrate an address。
 
-![](https://image.niracler.com/2025/03/6cde11ebd882703e724b50a2a214746c.png)
+![选择 Migrate an address 选项](https://image.niracler.com/2025/03/6cde11ebd882703e724b50a2a214746c.png)
 
 然后我们选到 Other（同时我们可以看到 Gmail 那种要同步的话，是超级简单的）
 
-![](https://image.niracler.com/2025/03/b4f0dd24c2d939e430ee8a1714fcab6a.png)
+![选择 Other 邮箱提供商进行迁移](https://image.niracler.com/2025/03/b4f0dd24c2d939e430ee8a1714fcab6a.png)
 
 就是填上面拿到的授权码，不是你登陆邮箱的密码。
 
-![](https://image.niracler.com/2025/03/500661f8413768405f4b4c78212a3982.png)
+![填入 QQ 邮箱 IMAP 授权码进行验证](https://image.niracler.com/2025/03/500661f8413768405f4b4c78212a3982.png)
 
 那我们来开导吧～～
 
-![](https://image.niracler.com/2025/03/24e39ce4971b5d3637da4ad8202b8af2.png)
+![开始邮箱迁移导入过程](https://image.niracler.com/2025/03/24e39ce4971b5d3637da4ad8202b8af2.png)
 
 也算是将各种乱七八糟的邮箱迁移到 Fastmail 了。
 
-![](https://image.niracler.com/2025/03/2d30cccefd14e62c7fd6be42c91c8df5.png)
+![多个邮箱成功迁移到 Fastmail 的结果](https://image.niracler.com/2025/03/2d30cccefd14e62c7fd6be42c91c8df5.png)
 
 ### Apple Mail 的 Fastmail 配置
 
 在 Apple Mail 中，添加账户，然后选择其他账户，然后选择 Fastmail。
 
-![](https://image.niracler.com/2025/03/2fdfd38527340c1e281199116f141918.png)
+![Apple Mail 添加 Fastmail 账户](https://image.niracler.com/2025/03/2fdfd38527340c1e281199116f141918.png)
 
 然后在 Fastmail 中的 Privacy & security -> Connected apps & API tokens 点击 Manage app passwords and access
 
-![](https://image.niracler.com/2025/03/a679b5b497a6579254659fa134977a03.png)
+![Fastmail 中管理应用密码页面](https://image.niracler.com/2025/03/a679b5b497a6579254659fa134977a03.png)
 
 我们 new 一个 password
 
-![](https://image.niracler.com/2025/03/ff1efb97e46e714d566fef56ccc72ba7.png)
+![创建新的应用专用密码](https://image.niracler.com/2025/03/ff1efb97e46e714d566fef56ccc72ba7.png)
 
 然后再回到 Apple Mail 中，填入刚才的 password 就可以了。
 
-![](https://image.niracler.com/2025/03/90816d70068cb7048e9077a4fbadce21.png)
+![在 Apple Mail 中填入应用密码完成配置](https://image.niracler.com/2025/03/90816d70068cb7048e9077a4fbadce21.png)
 
 ## 总结
 
 大功告成！
 
-![](https://image.niracler.com/2025/03/40cc47308bdf5fa56bfc6d033aac0d5d.png)
-
+![Apple Mail 中成功显示 Fastmail 邮箱](https://image.niracler.com/2025/03/40cc47308bdf5fa56bfc6d033aac0d5d.png)
