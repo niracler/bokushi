@@ -27,41 +27,6 @@ export function getClientIP(request: Request): string {
     return "127.0.0.1";
 }
 
-export interface TurnstileResult {
-    success: boolean;
-    "error-codes"?: string[];
-    challenge_ts?: string;
-    hostname?: string;
-    action?: string;
-    cdata?: string;
-}
-
-/**
- * Verify a Cloudflare Turnstile token via the siteverify API.
- * Returns the full result object for debugging.
- */
-export async function verifyTurnstile(
-    token: string,
-    secretKey: string,
-    ip?: string,
-): Promise<TurnstileResult> {
-    const formData = new URLSearchParams();
-    formData.append("secret", secretKey);
-    formData.append("response", token);
-    if (ip) formData.append("remoteip", ip);
-
-    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-        method: "POST",
-        body: formData,
-    });
-
-    const result = (await response.json()) as TurnstileResult;
-    if (!result.success) {
-        console.error("Turnstile verification failed:", JSON.stringify(result));
-    }
-    return result;
-}
-
 /** Input length limits for comment fields. */
 export const COMMENT_LIMITS = {
     author: 50,

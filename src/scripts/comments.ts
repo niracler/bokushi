@@ -1,6 +1,5 @@
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
-import { getActiveTheme, onThemeChange } from "./theme";
 
 // --- Types ---
 
@@ -220,7 +219,7 @@ function renderReplyCard(reply: CommentNode, topLevelId: string): string {
 		</div>`;
 }
 
-function renderCommentForm(siteKey: string, parentId?: string, replyAuthor?: string): string {
+function renderCommentForm(parentId?: string, replyAuthor?: string): string {
     const prefix = replyAuthor ? `@${replyAuthor} ` : "";
     const cancelBtn = parentId
         ? `<button type="button" class="cancel-reply-btn text-sm text-muted hover:text-primary transition-colors">取消</button>`
@@ -260,27 +259,24 @@ function renderCommentForm(siteKey: string, parentId?: string, replyAuthor?: str
 				rows="4"
 				class="w-full rounded-lg border border-border-subtle bg-surface px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent resize-y"
 			>${prefix}</textarea>
-			<div class="flex items-center justify-between">
-				<div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="${getActiveTheme()}"></div>
-				<div class="flex items-center gap-3">
-					${cancelBtn}
-					<button
-						type="submit"
-						class="submit-btn rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
-					>
-						发表评论
-					</button>
-				</div>
+			<div class="flex items-center justify-end gap-3">
+				${cancelBtn}
+				<button
+					type="submit"
+					class="submit-btn rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					发表评论
+				</button>
 			</div>
 			<p class="form-error hidden text-sm text-red-500"></p>
 		</form>`;
 }
 
-function renderCommentList(data: CommentsResponse, siteKey: string): string {
+function renderCommentList(data: CommentsResponse): string {
     if (data.comments.length === 0) {
         return `
 			<p class="text-muted text-sm mb-4">暂无评论，来发表第一条吧</p>
-			${renderCommentForm(siteKey)}`;
+			${renderCommentForm()}`;
     }
 
     let html = '<div class="comment-list">';
@@ -291,13 +287,13 @@ function renderCommentList(data: CommentsResponse, siteKey: string): string {
         }
     }
     html += "</div>";
-    html += renderCommentForm(siteKey);
+    html += renderCommentForm();
     return html;
 }
 
 // --- Event handling ---
 
-function bindEvents(container: HTMLElement, slug: string, siteKey: string) {
+function bindEvents(container: HTMLElement, slug: string) {
     // Reply buttons
     container.addEventListener("click", (e) => {
         const target = e.target as HTMLElement;
@@ -318,11 +314,8 @@ function bindEvents(container: HTMLElement, slug: string, siteKey: string) {
             // Insert reply form after the comment card
             const card = target.closest(".comment-card");
             if (!card) return;
-            const formHtml = renderCommentForm(siteKey, parentId, replyAuthor);
+            const formHtml = renderCommentForm(parentId, replyAuthor);
             card.insertAdjacentHTML("afterend", formHtml);
-
-            // Re-render Turnstile in the new form
-            renderTurnstileWidgets(container);
 
             // Focus textarea
             const newForm = card.nextElementSibling as HTMLFormElement;
@@ -334,23 +327,18 @@ function bindEvents(container: HTMLElement, slug: string, siteKey: string) {
             });
 
             // Bind submit for reply form
-            bindFormSubmit(newForm, slug, siteKey, container);
+            bindFormSubmit(newForm, slug, container);
         }
     });
 
     // Bind submit for main form
     const mainForm = container.querySelector<HTMLFormElement>(".comment-form[data-parent-id='']");
     if (mainForm) {
-        bindFormSubmit(mainForm, slug, siteKey, container);
+        bindFormSubmit(mainForm, slug, container);
     }
 }
 
-function bindFormSubmit(
-    form: HTMLFormElement,
-    slug: string,
-    siteKey: string,
-    container: HTMLElement,
-) {
+function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElement) {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -366,19 +354,8 @@ function bindFormSubmit(
         const content = (formData.get("content") as string)?.trim();
         const parentId = form.dataset.parentId || null;
 
-        // Get Turnstile token
-        const turnstileInput = form.querySelector<HTMLInputElement>(
-            "[name='cf-turnstile-response']",
-        );
-        const turnstileToken = turnstileInput?.value;
-
         if (!author || !content) {
             showError(errorEl, "请填写昵称和评论内容");
-            return;
-        }
-
-        if (!turnstileToken) {
-            showError(errorEl, "请等待验证完成后再提交");
             return;
         }
 
@@ -395,7 +372,6 @@ function bindFormSubmit(
                 email,
                 website,
                 content,
-                turnstile_token: turnstileToken,
             });
 
             if (result.error) {
@@ -406,7 +382,7 @@ function bindFormSubmit(
             }
 
             // Success: reload the entire comment list
-            await loadComments(container, slug, siteKey);
+            await loadComments(container, slug);
         } catch {
             showError(errorEl, "提交失败，请稍后重试");
             submitBtn.disabled = false;
@@ -425,33 +401,6 @@ function hideError(el: HTMLElement) {
     el.classList.add("hidden");
 }
 
-// --- Turnstile ---
-
-function renderTurnstileWidgets(container: HTMLElement) {
-    // If Turnstile script loaded, render widgets
-    const turnstile = (
-        window as unknown as {
-            turnstile?: { render: (el: HTMLElement, opts: Record<string, string>) => void };
-        }
-    ).turnstile;
-    if (turnstile) {
-        container.querySelectorAll<HTMLElement>(".cf-turnstile:empty").forEach((el) => {
-            turnstile.render(el, {
-                sitekey: el.dataset.sitekey ?? "",
-                theme: el.dataset.theme || "auto",
-            });
-        });
-    }
-}
-
-function ensureTurnstileScript() {
-    if (document.querySelector("script[src*='turnstile']")) return;
-    const script = document.createElement("script");
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-    script.async = true;
-    document.head.appendChild(script);
-}
-
 // --- Gravatar async loading ---
 
 async function loadGravatars(container: HTMLElement) {
@@ -467,14 +416,13 @@ async function loadGravatars(container: HTMLElement) {
 
 // --- Main init ---
 
-async function loadComments(container: HTMLElement, slug: string, siteKey: string) {
+async function loadComments(container: HTMLElement, slug: string) {
     container.innerHTML = '<p class="text-muted text-sm">加载评论中...</p>';
 
     try {
         const data = await fetchComments(slug);
-        container.innerHTML = renderCommentList(data, siteKey);
-        bindEvents(container, slug, siteKey);
-        renderTurnstileWidgets(container);
+        container.innerHTML = renderCommentList(data);
+        bindEvents(container, slug);
         loadGravatars(container);
     } catch {
         container.innerHTML = '<p class="text-red-500 text-sm">评论加载失败</p>';
@@ -486,20 +434,10 @@ function initCommentSection() {
     if (!container) return;
 
     const slug = container.dataset.commentSlug;
-    const siteKey = container.dataset.turnstileSiteKey;
-    if (!slug || !siteKey) return;
+    if (!slug) return;
 
-    ensureTurnstileScript();
-    loadComments(container, slug, siteKey);
+    loadComments(container, slug);
 }
-
-// Theme change: update Turnstile widget theme
-onThemeChange((state) => {
-    const widgets = document.querySelectorAll<HTMLElement>(".cf-turnstile");
-    widgets.forEach((el) => {
-        el.dataset.theme = state.theme;
-    });
-});
 
 // Init on load
 if (document.readyState === "loading") {

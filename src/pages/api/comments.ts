@@ -6,13 +6,7 @@
  */
 
 import type { APIRoute } from "astro";
-import {
-    getClientIP,
-    hashIP,
-    jsonResponse,
-    validateCommentInput,
-    verifyTurnstile,
-} from "../../lib/utils";
+import { getClientIP, hashIP, jsonResponse, validateCommentInput } from "../../lib/utils";
 
 export const prerender = false;
 
@@ -123,7 +117,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
             email?: string;
             website?: string;
             content?: string;
-            turnstile_token?: string;
         };
 
         // Validate required fields and lengths
@@ -136,10 +129,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
             return jsonResponse({ error: "Missing slug" }, 400);
         }
 
-        if (!body.turnstile_token) {
-            return jsonResponse({ error: "Missing Turnstile token" }, 400);
-        }
-
         // Safe to access after validateCommentInput passed
         const author = (body.author ?? "").trim();
         const content = (body.content ?? "").trim();
@@ -147,7 +136,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const website = body.website?.trim() || null;
 
         const db = locals.runtime?.env?.COMMENTS_DB;
-        const turnstileSecret = locals.runtime?.env?.TURNSTILE_SECRET_KEY;
 
         // Mock fallback for local dev
         if (!db) {
@@ -162,23 +150,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 replies: [],
             };
             return jsonResponse({ comment: mockComment }, 201);
-        }
-
-        // Verify Turnstile token
-        if (turnstileSecret) {
-            const clientIP = getClientIP(request);
-            const token = body.turnstile_token ?? "";
-            const result = await verifyTurnstile(token, turnstileSecret, clientIP);
-            if (!result.success) {
-                const errorCodes = result["error-codes"] ?? [];
-                console.error("Turnstile verification failed:", JSON.stringify(result));
-                return jsonResponse(
-                    {
-                        error: `Turnstile verification failed [${errorCodes.join(", ")}]`,
-                    },
-                    403,
-                );
-            }
         }
 
         const id = crypto.randomUUID();

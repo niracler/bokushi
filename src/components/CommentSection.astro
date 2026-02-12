@@ -1,7 +1,5 @@
 ---
 const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
-// Turnstile site key — set via PUBLIC_TURNSTILE_SITE_KEY env var
-const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
 ---
 
 <div class="mt-12 border-t border-border-subtle pt-6">
@@ -9,7 +7,6 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || "1x0000000
   <div
     id="comment-section"
     data-comment-slug={slug}
-    data-turnstile-site-key={turnstileSiteKey}
   ></div>
 </div>
 
