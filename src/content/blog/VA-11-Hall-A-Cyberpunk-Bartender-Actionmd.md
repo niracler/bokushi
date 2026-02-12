@@ -29,7 +29,7 @@ description: 遵循着赛伯朋克的知识网络，嗅到并玩了这个游戏�
 
 现在晚上下班的时候真的有点想找个小酒馆来倾吐一些无聊的废话什么的。或者说真想找个 Lilim 来抱一下，治愈我的疲倦的心灵。(别抓我，我不是萝莉控)
 
-![](https://image.niracler.com/2025/06/cc45c3ac050588dee35ae874396ee090.jpeg)
+![想找个小酒馆倾吐废话或者抱一下 Lilim](https://image.niracler.com/2025/06/cc45c3ac050588dee35ae874396ee090.jpeg)
 
 最让我可惜的是，最后没有去成 \*Kira\* Miki 的演唱会。
 ![下面是没有去成的演唱会的结局](https://image.niracler.com/2025/06/8ba58d6b964fdb41761b5d05bf8b2de9.jpeg)

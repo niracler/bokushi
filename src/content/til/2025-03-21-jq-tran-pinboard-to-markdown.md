@@ -7,7 +7,6 @@ tags: [ "TIL", "工具", "脚本", "书签" ]
 ---
 > **提示：** 本文主要由 DeepSearch 生成，作者仅做校对与补充。
 
-
 ## 要干什么
 
 主要是为了写周记的时候方便，可以直接复制粘贴。
@@ -43,4 +42,3 @@ PS. 注意，国内需要代理才能访问 pinboard.in
 - [pinboard password](https://pinboard.in/settings/password) - 这里可以找到 token
 - [pinboard api](https://pinboard.in/api) - 还可以加更多一些过滤条件，例如 tag 以及时间
 - [jq Manual (development version)](https://stedolan.github.io/jq/manual/) - 这个其实问 gpt 即可，' 用 jq 命令去 parse, 格式为每行 [description](href) - extended'
-

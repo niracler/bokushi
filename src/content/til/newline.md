@@ -49,6 +49,7 @@ index 8cde782..e75154b 100644
       ![image](https://image.niracler.com/2025/10/e88744d0f0688809bafe988b58eab997.png)
 3. **linter 插件**：可以装一些 linter 插件什么的， 例如 pylint， 在你没有换行符号结尾的时候自动加换行符。
 4. **shell 脚本**：自动给目录下的所有文件，没有换行符结尾的话，都加一个换行符。
+
    ```bash
     nini_ensure_newline(){
         find . -type f | while read -r file; do

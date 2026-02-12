@@ -12,8 +12,6 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 
 本文采用 [Apple Human Interface Guidelines (HIG)](https://developer.apple.com/design/human-interface-guidelines) 的分类方式组织，从基础到具体：**Foundations → Patterns → Components**。
 
----
-
 ## Overview
 
 ### 设计哲学
@@ -37,8 +35,6 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 ### 技术栈概述
 
 使用 [Astro](https://astro.build) 静态优先架构 + [Tailwind CSS 4](https://tailwindcss.com) 样式系统，部署在 Cloudflare Pages。详细配置见代码库。
-
----
 
 ## Foundations
 
@@ -84,8 +80,6 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 
 使用时直接写 `bg-bg-page`、`text-accent` 等 utility class。
 
----
-
 ### Typography
 
 > HIG: Typography helps establish hierarchy and express your app's character. Use fonts that are easy to read and complement the content.
@@ -114,8 +108,6 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 
 **粗体特殊处理**：所有 `<strong>` 自动应用强调色，而非仅加粗。
 
----
-
 ### Spacing & Layout
 
 > HIG: Adequate spacing helps people focus on key information and understand the relationship between onscreen elements.
@@ -137,8 +129,6 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 | `--radius-lg` | `16px` | 大圆角（卡片、图片） |
 | `--radius-md` | `12px` | 中圆角（紧凑组件）   |
 
----
-
 ### Dark Mode
 
 > HIG: Dark Mode uses a dark color palette that works system-wide and provides a comfortable viewing experience in low-light environments.
@@ -157,8 +147,6 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 - 阴影在深色模式下更加柔和
 - 保持暖色调基底（夜棕而非冷黑）
 
----
-
 ## Patterns
 
 ### Navigation
@@ -176,8 +164,6 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 - 点击按钮打开，ESC 或点击遮罩关闭
 - 打开时锁定 body 滚动
 - 焦点管理：关闭后焦点回到触发按钮
-
----
 
 ### Content Architecture
 
@@ -224,8 +210,6 @@ flowchart TD
 
 - 无限滚动，Cloudflare D1 存储
 
----
-
 ### Modals & Overlays
 
 > HIG: Use modality only when clarity or focus is essential. When you use modality, keep experiences brief and focused.
@@ -255,8 +239,6 @@ body.scroll-locked {
 }
 ```
 
----
-
 ## Components
 
 ### Cards
@@ -279,8 +261,6 @@ body.scroll-locked {
 - `.surface-card--hover-border`：hover 时边框颜色加深
 - `.surface-card--hover-none`：禁用 hover 效果
 
----
-
 ### Pills & Tags
 
 > HIG: A tag is a keyword or label that helps identify and organize items.
@@ -290,8 +270,6 @@ body.scroll-locked {
 - 背景使用强调色的淡化版本
 - Hover 时背景加深、边框显现
 - 不使用位移动效
-
----
 
 ### Code Blocks
 
@@ -309,8 +287,6 @@ body.scroll-locked {
 | ---- | --------- |
 | 浅色 | `#f6f8fa` |
 | 深色 | `#282a36` |
-
----
 
 ### Images
 
@@ -331,8 +307,6 @@ body.scroll-locked {
 - Alt/Caption 文本展示
 - 支持动态内容（事件委托模式）
 - 边界事件（可触发加载更多）
-
----
 
 ## Accessibility
 
@@ -382,8 +356,6 @@ body.scroll-locked {
 | 图片代理 | 一年缓存                        |
 
 使用 `rehype-img-size` 自动写入图片宽高，防止 CLS（Cumulative Layout Shift）。
-
----
 
 ## 参考资料
 

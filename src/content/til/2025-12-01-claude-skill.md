@@ -89,10 +89,8 @@ skill/
 每个技能的 `SKILL.md` 是 Claude 识别和触发技能的关键：
 
 ```markdown
----
 name: git-workflow
 description: Personal Git workflow for commits, pull requests, and releases following conventional commits and semantic versioning. Use when creating commits, pull requests, or releases.
----
 
 # Git Workflow Skill
 
