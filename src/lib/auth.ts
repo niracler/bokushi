@@ -38,7 +38,13 @@ export interface SessionUser {
  * Create a new session in KV and return the Set-Cookie header value.
  */
 export async function createSession(kv: KVNamespace, userId: string): Promise<string> {
-    const token = crypto.randomUUID();
+    // Use 32 bytes of random data (base64url-encoded) for stronger session tokens
+    const bytes = new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    const token = btoa(String.fromCharCode(...bytes))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=/g, "");
     const data: SessionData = {
         userId,
         createdAt: new Date().toISOString(),
@@ -104,15 +110,15 @@ export interface TelegramAuthData {
 
 /**
  * Verify Telegram Login Widget callback data using HMAC-SHA256.
- * Returns true if signature is valid and auth_date is within 5 minutes.
+ * Returns true if signature is valid and auth_date is within 10 minutes.
  */
 export async function verifyTelegramAuth(
     botToken: string,
     data: TelegramAuthData,
 ): Promise<boolean> {
-    // Check auth_date is within 5 minutes
+    // Check auth_date is within 10 minutes (allows for clock skew and slow networks)
     const now = Math.floor(Date.now() / 1000);
-    if (now - data.auth_date > 300) return false;
+    if (now - data.auth_date > 600) return false;
 
     // Build data_check_string: alphabetically sorted key=value pairs (excluding hash)
     const { hash, ...rest } = data;

@@ -205,8 +205,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
         const id = crypto.randomUUID();
         const now = new Date().toISOString();
-        const clientIP = getClientIP(request);
-        const ipHash = await hashIP(clientIP);
+        // Only hash IP for anonymous users; authenticated users are identified by user_id
+        const ipHash = userId ? null : await hashIP(getClientIP(request));
 
         await db
             .prepare(

@@ -7,6 +7,7 @@
 
 import { GitHub, generateState } from "arctic";
 import type { APIRoute } from "astro";
+import { jsonResponse } from "../../../lib/utils";
 
 export const prerender = false;
 
@@ -15,7 +16,7 @@ const STATE_TTL = 60 * 10; // 10 minutes
 export const GET: APIRoute = async ({ request, locals }) => {
     const env = locals.runtime?.env;
     if (!env?.GITHUB_CLIENT_ID || !env?.GITHUB_CLIENT_SECRET || !env?.SESSIONS) {
-        return new Response("OAuth not configured", { status: 503 });
+        return jsonResponse({ error: "OAuth not configured" }, 503);
     }
 
     const url = new URL(request.url);
