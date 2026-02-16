@@ -6,6 +6,7 @@
  */
 
 import type { APIRoute } from "astro";
+import { getSessionUser } from "../../lib/auth";
 import { getClientIP, hashIP, jsonResponse, validateCommentInput } from "../../lib/utils";
 
 export const prerender = false;
@@ -22,6 +23,10 @@ interface CommentRow {
     status: string;
     created_at: string;
     updated_at: string | null;
+    user_id: string | null;
+    user_name: string | null;
+    user_avatar: string | null;
+    user_role: string | null;
 }
 
 interface CommentNode {
@@ -32,6 +37,9 @@ interface CommentNode {
     content: string;
     status: string;
     created_at: string;
+    user_id: string | null;
+    avatar_url: string | null;
+    is_admin: boolean;
     replies: CommentNode[];
 }
 
@@ -41,14 +49,18 @@ function buildCommentTree(rows: CommentRow[]): { comments: CommentNode[]; total:
 
     // Group replies by parent_id
     for (const row of rows) {
+        const isDeleted = row.status === "deleted";
         const node: CommentNode = {
             id: row.id,
-            author: row.status === "deleted" ? "" : row.author,
-            email: row.status === "deleted" ? null : row.email,
-            website: row.status === "deleted" ? null : row.website,
-            content: row.status === "deleted" ? "" : row.content,
+            author: isDeleted ? "" : row.user_name || row.author,
+            email: isDeleted ? null : row.email,
+            website: isDeleted ? null : row.website,
+            content: isDeleted ? "" : row.content,
             status: row.status,
             created_at: row.created_at,
+            user_id: isDeleted ? null : row.user_id,
+            avatar_url: isDeleted ? null : row.user_avatar,
+            is_admin: !isDeleted && row.user_role === "admin",
             replies: [],
         };
 
@@ -94,9 +106,11 @@ export const GET: APIRoute = async ({ request, locals }) => {
     try {
         const { results } = await db
             .prepare(
-                `SELECT * FROM comments
-				 WHERE slug = ? AND status IN ('visible', 'deleted')
-				 ORDER BY created_at ASC`,
+                `SELECT c.*, u.name AS user_name, u.avatar_url AS user_avatar, u.role AS user_role
+				 FROM comments c
+				 LEFT JOIN users u ON c.user_id = u.id
+				 WHERE c.slug = ? AND c.status IN ('visible', 'deleted')
+				 ORDER BY c.created_at ASC`,
             )
             .bind(slug)
             .all<CommentRow>();
@@ -119,23 +133,57 @@ export const POST: APIRoute = async ({ request, locals }) => {
             content?: string;
         };
 
-        // Validate required fields and lengths
-        const validationError = validateCommentInput(body);
-        if (validationError) {
-            return jsonResponse({ error: validationError }, 400);
-        }
-
         if (!body.slug) {
             return jsonResponse({ error: "Missing slug" }, 400);
         }
+        if (!body.content || body.content.trim().length === 0) {
+            return jsonResponse({ error: "content is required" }, 400);
+        }
 
-        // Safe to access after validateCommentInput passed
-        const author = (body.author ?? "").trim();
-        const content = (body.content ?? "").trim();
-        const email = body.email?.trim() || null;
-        const website = body.website?.trim() || null;
+        const env = locals.runtime?.env;
+        const db = env?.COMMENTS_DB;
 
-        const db = locals.runtime?.env?.COMMENTS_DB;
+        // Check if user is logged in
+        let sessionUser: {
+            id: string;
+            name: string;
+            avatar_url: string | null;
+            role: string;
+        } | null = null;
+        if (db && env?.SESSIONS) {
+            sessionUser = await getSessionUser(db, env.SESSIONS, request);
+        }
+
+        let author: string;
+        let email: string | null;
+        let website: string | null;
+        let userId: string | null;
+        let avatarUrl: string | null;
+        let isAdmin: boolean;
+
+        if (sessionUser) {
+            // Logged-in user: use account info, ignore body fields
+            author = sessionUser.name;
+            email = null;
+            website = null;
+            userId = sessionUser.id;
+            avatarUrl = sessionUser.avatar_url;
+            isAdmin = sessionUser.role === "admin";
+        } else {
+            // Anonymous: validate and use body fields
+            const validationError = validateCommentInput(body);
+            if (validationError) {
+                return jsonResponse({ error: validationError }, 400);
+            }
+            author = (body.author ?? "").trim();
+            email = body.email?.trim() || null;
+            website = body.website?.trim() || null;
+            userId = null;
+            avatarUrl = null;
+            isAdmin = false;
+        }
+
+        const content = body.content.trim();
 
         // Mock fallback for local dev
         if (!db) {
@@ -147,6 +195,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 content,
                 status: "visible",
                 created_at: new Date().toISOString(),
+                user_id: userId,
+                avatar_url: avatarUrl,
+                is_admin: isAdmin,
                 replies: [],
             };
             return jsonResponse({ comment: mockComment }, 201);
@@ -154,13 +205,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
         const id = crypto.randomUUID();
         const now = new Date().toISOString();
-        const clientIP = getClientIP(request);
-        const ipHash = await hashIP(clientIP);
+        // Only hash IP for anonymous users; authenticated users are identified by user_id
+        const ipHash = userId ? null : await hashIP(getClientIP(request));
 
         await db
             .prepare(
-                `INSERT INTO comments (id, slug, parent_id, author, email, website, content, ip_hash, status, created_at)
-				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'visible', ?)`,
+                `INSERT INTO comments (id, slug, parent_id, author, email, website, content, ip_hash, user_id, status, created_at)
+				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'visible', ?)`,
             )
             .bind(
                 id,
@@ -171,6 +222,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 website,
                 content,
                 ipHash,
+                userId,
                 now,
             )
             .run();
@@ -183,6 +235,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
             content,
             status: "visible",
             created_at: now,
+            user_id: userId,
+            avatar_url: avatarUrl,
+            is_admin: isAdmin,
             replies: [],
         };
 
