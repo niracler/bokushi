@@ -12,6 +12,12 @@ compatibility_date = "2024-01-01"
 binding = "LIKES"
 id = "6fd6bc2e5dcb4f0cb7e648ed115debb5"
 
+# Sessions KV Namespace
+# Create via: Workers & Pages > KV > Create namespace > Name: bokushi-sessions
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "a2e1f143c0664e6d860930df0927e033"
+
 # D1 Database Bindings
 # Create via: wrangler d1 create bokushi-comments
 [[d1_databases]]
