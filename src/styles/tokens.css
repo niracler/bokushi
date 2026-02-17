@@ -20,6 +20,7 @@
     --space-2: 0.5rem;
     --space-3: 0.75rem;
     --space-4: 1rem;
+    --space-5: 1.25rem;
     --space-6: 1.5rem;
     --space-8: 2rem;
     --space-12: 3rem;
@@ -115,11 +116,7 @@
     /* Mermaid diagram theme */
     --mermaid-font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
     --mermaid-font-size: 16px;
-    --mermaid-primary-color: color-mix(
-        in srgb,
-        var(--color-accent) 32%,
-        var(--color-bg-surface)
-    );
+    --mermaid-primary-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-bg-surface));
     --mermaid-secondary-color: color-mix(
         in srgb,
         var(--color-bg-muted) 70%,
@@ -141,11 +138,7 @@
     );
     --mermaid-label-text-color: var(--color-text-secondary);
     --mermaid-note-bg-color: color-mix(in srgb, var(--color-note) 22%, var(--color-bg-surface));
-    --mermaid-note-text-color: color-mix(
-        in srgb,
-        var(--color-note) 70%,
-        var(--color-text-primary)
-    );
+    --mermaid-note-text-color: color-mix(in srgb, var(--color-note) 70%, var(--color-text-primary));
 }
 
 /* =============================================
@@ -210,11 +203,7 @@
     --color-code-bg: #282a36;
 
     /* Mermaid diagram theme */
-    --mermaid-primary-color: color-mix(
-        in srgb,
-        var(--color-accent) 46%,
-        var(--color-bg-surface)
-    );
+    --mermaid-primary-color: color-mix(in srgb, var(--color-accent) 46%, var(--color-bg-surface));
     --mermaid-secondary-color: color-mix(
         in srgb,
         var(--color-bg-muted) 55%,
@@ -244,9 +233,5 @@
         var(--color-text-primary) 10%
     );
     --mermaid-note-bg-color: color-mix(in srgb, var(--color-note) 26%, var(--color-bg-surface));
-    --mermaid-note-text-color: color-mix(
-        in srgb,
-        var(--color-note) 82%,
-        var(--color-text-primary)
-    );
+    --mermaid-note-text-color: color-mix(in srgb, var(--color-note) 82%, var(--color-text-primary));
 }

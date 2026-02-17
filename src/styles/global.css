@@ -275,6 +275,12 @@
         font-weight: 700;
         letter-spacing: 0.02em;
         font-variant-numeric: tabular-nums;
+        opacity: 0.5;
+        transition: opacity var(--transition-base);
+    }
+
+    .prose :where(h2, h3, h4):hover > .anchor-link {
+        opacity: 1;
     }
 
     .prose h2 > .anchor-link::before {
@@ -311,6 +317,15 @@
         margin-top: var(--space-2);
     }
 
+    /* Tighten spacing when a sub-heading directly follows its parent heading */
+    .prose :is(h2) + :is(h3) {
+        margin-top: var(--space-3);
+    }
+
+    .prose :is(h3) + :is(h4) {
+        margin-top: var(--space-2);
+    }
+
     .prose a {
         color: var(--color-link);
         text-underline-offset: 0.2em;
@@ -333,6 +348,10 @@
         color: var(--color-text-secondary);
     }
 
+    .prose blockquote > * + * {
+        margin-top: var(--space-2);
+    }
+
     .prose :is(ul, ol) {
         margin: 0;
         display: grid;
@@ -348,6 +367,7 @@
 
     .prose ol {
         list-style-type: decimal;
+        font-variant-numeric: tabular-nums;
     }
 
     .prose :is(ul, ol) :is(ul, ol) {
@@ -364,6 +384,10 @@
 
     .prose li::marker {
         color: var(--color-text-muted);
+    }
+
+    .prose li > * + * {
+        margin-top: var(--space-2);
     }
 
     .prose code {
@@ -593,6 +617,7 @@
         background: var(--color-bg-surface);
         box-shadow: var(--shadow-soft);
         font-size: 0.95rem;
+        font-variant-numeric: tabular-nums;
     }
 
     .prose table thead {
@@ -811,6 +836,8 @@
     .prose figcaption {
         color: var(--color-text-muted);
         font-size: var(--font-size-sm);
+        font-style: italic;
+        line-height: var(--line-height-relaxed);
         text-align: center;
     }
 
@@ -1308,7 +1335,7 @@
     .comment-login-hint {
         display: inline-flex;
         align-items: center;
-        gap: var(--space-1);
+        gap: var(--space-2);
         font-size: var(--font-size-xs);
     }
 
@@ -1320,20 +1347,26 @@
     .comment-login-link {
         display: inline-flex;
         align-items: center;
-        gap: 3px;
-        color: var(--color-text-muted);
+        gap: 4px;
+        color: var(--color-text-secondary);
         text-decoration: none;
-        border: none;
-        background: none;
-        padding: 0;
+        border: 1px solid var(--color-border-soft);
+        background: var(--color-bg-surface);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-sm);
         font-size: var(--font-size-xs);
         font-family: inherit;
         cursor: pointer;
-        transition: color var(--transition-base);
+        transition:
+            color var(--transition-base),
+            border-color var(--transition-base),
+            background-color var(--transition-base);
     }
 
     .comment-login-link:hover {
         color: var(--color-accent);
+        border-color: var(--color-accent-tint);
+        background: var(--color-accent-tint-6);
     }
 
     .comment-login-link svg {
@@ -1773,5 +1806,51 @@
         50% {
             opacity: 0.4;
         }
+    }
+
+    /* =========================================
+     * Custom Checkbox (ghost/outlined style)
+     * ========================================= */
+
+    .deepsearch-checkbox {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 1rem;
+        height: 1rem;
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--radius-xs);
+        background: transparent;
+        cursor: pointer;
+        position: relative;
+        flex-shrink: 0;
+        transition:
+            border-color var(--transition-base),
+            background-color var(--transition-base);
+    }
+
+    .deepsearch-checkbox:hover {
+        border-color: var(--color-border-strong);
+    }
+
+    .deepsearch-checkbox:checked {
+        border-color: var(--color-accent);
+        background: var(--color-accent-tint);
+    }
+
+    .deepsearch-checkbox:checked::after {
+        content: "";
+        position: absolute;
+        left: 3px;
+        top: 0.5px;
+        width: 5px;
+        height: 9px;
+        border-right: 2px solid var(--color-accent);
+        border-bottom: 2px solid var(--color-accent);
+        transform: rotate(45deg);
+    }
+
+    .deepsearch-checkbox:focus-visible {
+        outline: 2px solid var(--color-accent-soft);
+        outline-offset: 2px;
     }
 }

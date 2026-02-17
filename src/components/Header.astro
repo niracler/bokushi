@@ -9,7 +9,7 @@ const navLinks = [
     { href: "/blog", label: "文章" },
     { href: "/tags", label: "标签" },
     { href: "/channel", label: "动态" },
-    { href: "/mangashots", label: "漫画表情包" },
+    { href: "/mangashots", label: "表情包" },
     { href: "/friends", label: "友链" },
     { href: "/plrom", label: "心头好" },
     { href: "/about", label: "关于" },
@@ -76,7 +76,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
     </nav>
     <div
         data-nav-overlay
-        class="fixed inset-0 z-40 flex items-start justify-end bg-black/30 opacity-0 transition-opacity duration-200 pointer-events-none md:hidden"
+        class="fixed inset-0 z-40 flex items-start justify-end bg-black/30 opacity-0 transition-opacity duration-300 pointer-events-none md:hidden"
         data-nav-state="closed"
     >
         <button
@@ -86,7 +86,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
             aria-label="关闭导航菜单"></button>
         <div
             data-nav-drawer
-            class="relative z-10 flex h-full w-72 max-w-[80vw] translate-x-6 flex-col gap-6 border-l border-border bg-surface p-6 text-primary shadow-xl transition-transform duration-200"
+            class="relative z-10 flex h-full w-72 max-w-[80vw] translate-x-full flex-col gap-6 border-l border-border bg-surface p-6 text-primary shadow-xl transition-transform duration-300 ease-out"
         >
             <div class="flex items-center justify-between">
                 <span
@@ -111,7 +111,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
                         <a
                             href={link.href}
                             class:list={[
-                                "inline-flex items-center rounded-md px-3 py-2.5 transition-interactive focus-accent",
+                                "inline-flex items-center rounded-md px-3 py-3 transition-interactive focus-accent",
                                 isActive(link.href)
                                     ? "bg-accent-tint-12 text-accent font-semibold"
                                     : "text-secondary hover:text-accent hover:bg-accent-tint-8",
@@ -161,7 +161,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
         if (open) {
             lastFocusedElement = document.activeElement;
             toggleClasses(overlay, ["opacity-100"], ["pointer-events-none", "opacity-0"]);
-            toggleClasses(drawer, ["translate-x-0"], ["translate-x-6"]);
+            toggleClasses(drawer, ["translate-x-0"], ["translate-x-full"]);
             toggleClasses(barTop, ["translate-y-1.5", "rotate-45"], []);
             toggleClasses(barBottom, ["-translate-y-1.5", "-rotate-45"], []);
             toggleClasses(barMiddle, ["opacity-0"], []);
@@ -169,7 +169,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
             requestAnimationFrame(() => navLinks[0]?.focus({ preventScroll: true }));
         } else {
             toggleClasses(overlay, ["opacity-0", "pointer-events-none"], ["opacity-100"]);
-            toggleClasses(drawer, ["translate-x-6"], ["translate-x-0"]);
+            toggleClasses(drawer, ["translate-x-full"], ["translate-x-0"]);
             toggleClasses(barTop, [], ["translate-y-1.5", "rotate-45"]);
             toggleClasses(barBottom, [], ["-translate-y-1.5", "-rotate-45"]);
             toggleClasses(barMiddle, [], ["opacity-0"]);
