@@ -8,9 +8,10 @@ type Props = {
     title: string;
     description: string;
     image?: string;
+    type?: string;
 };
 
-const { title, description, image = SITE_SOCIAL_IMAGE } = Astro.props as Props;
+const { title, description, image = SITE_SOCIAL_IMAGE, type = "website" } = Astro.props as Props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -87,7 +88,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <meta name="license" content="CC BY-NC-SA 4.0" />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={type} />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />

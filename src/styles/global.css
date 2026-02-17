@@ -1603,6 +1603,17 @@
         gap: var(--space-3);
     }
 
+    @media (max-width: 899px) {
+        .comment-form-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .comment-form-actions {
+            justify-content: flex-end;
+        }
+    }
+
     .comment-cancel-btn {
         border: none;
         background: none;
