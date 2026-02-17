@@ -226,9 +226,8 @@ Astro.response.headers.set(
       }
     });
 
-    // Collapse long posts — dual trigger: text length >400 chars OR rendered height >384px
+    // Collapse long posts based on rendered height (384px desktop / 256px mobile)
     const HEIGHT_THRESHOLD = 384; // 24rem
-    const CHAR_THRESHOLD = 400;
 
     document.querySelectorAll<HTMLElement>('[data-post-content-wrapper]').forEach((wrapper) => {
       const content = wrapper.querySelector<HTMLElement>('.post-card__content');
@@ -236,19 +235,17 @@ Astro.response.headers.set(
       const label = btn?.querySelector<HTMLElement>('[data-expand-label]');
       if (!content || !btn || !label) return;
 
-      const textLength = Number.parseInt(wrapper.dataset.textLength || '0', 10);
-      const shouldCollapse =
-        content.scrollHeight > HEIGHT_THRESHOLD || textLength > CHAR_THRESHOLD;
-
-      if (shouldCollapse) {
+      if (content.scrollHeight > HEIGHT_THRESHOLD) {
         wrapper.dataset.collapsed = 'true';
         btn.hidden = false;
+        btn.setAttribute('aria-expanded', 'false');
 
         btn.addEventListener('click', () => {
           const isCollapsed = wrapper.dataset.collapsed === 'true';
           wrapper.dataset.collapsed = isCollapsed ? 'false' : 'true';
           label.textContent = isCollapsed ? '收起' : '展开全文';
           btn.setAttribute('aria-label', isCollapsed ? '收起' : '展开全文');
+          btn.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
         });
       }
     });

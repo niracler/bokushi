@@ -19,11 +19,11 @@ const { post, channelUsername } = Astro.props;
     {/* Post content with collapsible long text */}
     <div
         class="post-card__content-wrapper"
+        id={`post-content-${post.id}`}
         data-post-content-wrapper
-        data-text-length={post.text.length}
     >
         <div class="post-card__content" set:html={post.content} />
-        <button class="post-card__expand-btn" data-expand-btn aria-label="展开全文" hidden>
+        <button class="post-card__expand-btn" data-expand-btn aria-label="展开全文" aria-expanded="false" aria-controls={`post-content-${post.id}`} hidden>
             <span data-expand-label>展开全文</span>
             <svg class="post-card__expand-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </button>
