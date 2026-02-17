@@ -320,7 +320,7 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		align-items: center;
 		justify-items: center;
 		padding: clamp(1rem, 4vw, 2rem);
-		gap: 1rem;
+		gap: var(--space-4);
 		pointer-events: none;
 	}
 
@@ -345,8 +345,8 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		box-shadow: var(--shadow-lightbox);
 		border-radius: var(--radius-lg);
 		transition:
-			opacity 0.2s ease,
-			filter 0.2s ease;
+			opacity var(--transition-base),
+			filter var(--transition-base);
 	}
 
 	/* Loading state */
@@ -360,15 +360,15 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		width: 2rem;
-		height: 2rem;
+		width: var(--space-8);
+		height: var(--space-8);
 		margin: -1rem 0 0 -1rem;
 		border: 3px solid var(--color-overlay-light-25);
 		border-top-color: var(--color-overlay-light-90);
 		border-radius: 50%;
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 0.2s ease;
+		transition: opacity var(--transition-base);
 	}
 
 	.lightbox__image-container.is-loading::after {
@@ -385,8 +385,8 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 	/* Close button */
 	.lightbox__close {
 		position: absolute;
-		top: 1rem;
-		right: 1rem;
+		top: var(--space-4);
+		right: var(--space-4);
 		width: 2.5rem;
 		height: 2.5rem;
 		border-radius: 50%;
@@ -398,8 +398,8 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		cursor: pointer;
 		pointer-events: auto;
 		transition:
-			background 0.2s ease,
-			border-color 0.2s ease;
+			background var(--transition-base),
+			border-color var(--transition-base);
 	}
 
 	.lightbox__close:hover {
@@ -412,8 +412,8 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
-		width: 3rem;
-		height: 3rem;
+		width: var(--space-12);
+		height: var(--space-12);
 		border-radius: 50%;
 		border: 1px solid var(--color-overlay-light-35);
 		color: white;
@@ -423,8 +423,8 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		cursor: pointer;
 		pointer-events: auto;
 		transition:
-			background 0.2s ease,
-			border-color 0.2s ease;
+			background var(--transition-base),
+			border-color var(--transition-base);
 	}
 
 	.lightbox__nav:hover {

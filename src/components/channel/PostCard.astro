@@ -309,24 +309,6 @@ const { post, channelUsername } = Astro.props;
     gap: var(--space-2);
 }
 
-.post-card__tags .pill--clickable {
-    text-decoration: none;
-    cursor: pointer;
-    transition: all var(--transition-base);
-    border: none;
-    font-family: inherit;
-    font-size: inherit;
-}
-
-.post-card__tags .pill--clickable:hover {
-    opacity: 0.8;
-}
-
-.post-card__tags .pill--clickable:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-}
-
 @media (max-width: 860px) {
     .post-card {
         padding: var(--space-4);

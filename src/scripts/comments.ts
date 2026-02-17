@@ -365,8 +365,9 @@ function renderCommentList(data: CommentsResponse): string {
     }
 
     let html = '<div class="comment-list">';
-    for (const comment of data.comments) {
-        html += '<div class="comment-thread">';
+    for (let i = 0; i < data.comments.length; i++) {
+        const comment = data.comments[i];
+        html += `<div class="comment-thread" style="--thread-index:${i}">`;
         html += renderCommentCard(comment);
         if (comment.replies.length > 0) {
             html += '<div class="comment-replies">';
