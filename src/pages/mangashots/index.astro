@@ -83,12 +83,18 @@ export const prerender = false;
 
 			/* Main Layout */
 			.manga-shots-main {
-				max-width: 56rem; /* 与 Header max-w-4xl 接近（4xl=56rem） */
+				max-width: var(--layout-max-width);
 				width: 100%;
 				margin: 0 auto;
-				padding: 2rem clamp(1rem, 2.5vw, 1.25rem); /* 与 Header px-4 / sm:px-6 呼应 */
+				padding: var(--space-8) var(--space-4);
 				background: var(--color-bg-page);
 				box-sizing: border-box;
+			}
+
+			@media (min-width: 640px) {
+				.manga-shots-main {
+					padding-inline: var(--space-6);
+				}
 			}
 
 			/* Header Section */
@@ -96,11 +102,11 @@ export const prerender = false;
 				display: flex;
 				justify-content: space-between;
 				align-items: baseline;
-				margin-bottom: 2rem;
+				margin-bottom: var(--space-8);
 			}
 
 			.manga-title {
-				font-size: 2.5rem;
+				font-size: var(--font-size-3xl);
 				font-weight: 700;
 				color: var(--color-text-primary);
 				margin: 0;
@@ -116,7 +122,7 @@ export const prerender = false;
 			/* Search Box */
 			.manga-search-wrapper {
 				position: relative;
-				margin-bottom: 1.5rem;
+				margin-bottom: var(--space-6);
 			}
 
 			.manga-search-icon {
@@ -138,8 +144,8 @@ export const prerender = false;
 				color: var(--color-text-primary);
 				background: var(--color-bg-surface);
 				transition:
-					border-color 0.2s ease,
-					box-shadow 0.2s ease;
+					border-color var(--transition-base),
+					box-shadow var(--transition-base);
 				font-family: inherit;
 				box-shadow: var(--shadow-soft);
 			}
@@ -156,7 +162,7 @@ export const prerender = false;
 
 			/* Filter Section - Horizontal Scroll */
 			.filter-section {
-				margin-bottom: 3rem;
+				margin-bottom: var(--space-12);
 				position: relative;
 			}
 
@@ -165,13 +171,13 @@ export const prerender = false;
 				flex-direction: row;
 				flex-wrap: nowrap;
 				align-items: center;
-				gap: 0.75rem;
+				gap: var(--space-3);
 				overflow-x: auto;
 				overflow-y: hidden;
 				scroll-behavior: smooth;
 				scrollbar-width: none;
 				-ms-overflow-style: none;
-				padding-bottom: 0.5rem;
+				padding-bottom: var(--space-2);
 			}
 
 			.filter-chips::-webkit-scrollbar {
@@ -182,7 +188,7 @@ export const prerender = false;
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-				gap: 0.625rem;
+				gap: var(--space-2);
 				padding: var(--space-2) var(--space-4);
 				border: 1px solid var(--color-border-soft);
 				border-radius: var(--radius-md);
@@ -192,13 +198,14 @@ export const prerender = false;
 				font-weight: 500;
 				cursor: pointer;
 				transition:
-					border-color 0.2s ease,
-					background-color 0.2s ease;
+					border-color var(--transition-base),
+					background-color var(--transition-base);
 				white-space: nowrap;
 				flex-shrink: 0;
 				min-width: fit-content;
 				width: auto;
 				box-shadow: none;
+				font-family: inherit;
 			}
 
 			.filter-chip:hover {
@@ -234,26 +241,26 @@ export const prerender = false;
 			.filter-error {
 				color: var(--color-accent-dark);
 				font-size: var(--font-size-sm);
-				padding: 0.5rem 0;
+				padding: var(--space-2) 0;
 				margin: 0;
 			}
 
 			/* Masonry Grid */
 			.manga-masonry-grid {
 				display: flex;
-				gap: 1.25rem;
+				gap: var(--space-4);
 				width: 100%;
 				margin-top: 0;
 			}
 
 			.manga-masonry-grid.has-items {
-				margin-top: 1.25rem;
+				margin-top: var(--space-4);
 			}
 
 			.manga-masonry-grid_column {
 				display: flex;
 				flex-direction: column;
-				gap: 1.25rem;
+				gap: var(--space-4);
 				flex: 1;
 				min-width: 0;
 			}
@@ -263,7 +270,7 @@ export const prerender = false;
 				position: relative;
 				overflow: hidden;
 				border-radius: var(--radius-lg);
-				transition: box-shadow 0.2s ease;
+				transition: box-shadow var(--transition-base);
 				animation: itemFadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 				animation-delay: calc(var(--item-index, 0) * 0.05s);
 			}
@@ -288,15 +295,15 @@ export const prerender = false;
 				width: 100%;
 				border: 1px solid var(--color-border-soft);
 				padding: 0;
-				background: transparent;
+				background: var(--color-bg-muted);
 				cursor: zoom-in;
 				display: block;
 				border-radius: var(--radius-lg);
 				overflow: hidden;
 				box-shadow: var(--shadow-soft);
 				transition:
-					border-color 0.2s ease,
-					box-shadow 0.2s ease;
+					border-color var(--transition-base),
+					box-shadow var(--transition-base);
 			}
 
 			.manga-shot-item:hover .manga-shot-button {
@@ -309,6 +316,8 @@ export const prerender = false;
 				height: auto;
 				display: block;
 				object-fit: cover;
+				background: var(--color-bg-muted);
+				min-height: 120px;
 			}
 
 			/* Loading States */
@@ -317,7 +326,7 @@ export const prerender = false;
 			.error-state,
 			.end-of-list {
 				text-align: center;
-				padding: 3rem 1rem;
+				padding: var(--space-8) var(--space-4);
 			}
 
 			.loading-spinner {
@@ -343,7 +352,7 @@ export const prerender = false;
 			}
 
 			.loading-text {
-				margin-top: 1rem;
+				margin-top: var(--space-4);
 				color: var(--color-text-muted);
 				font-size: var(--font-size-sm);
 			}
@@ -356,7 +365,7 @@ export const prerender = false;
 			.end-of-list {
 				color: var(--color-text-muted);
 				font-size: var(--font-size-sm);
-				padding: 2rem;
+				padding: var(--space-8);
 			}
 
 			.manga-hidden {
@@ -366,34 +375,35 @@ export const prerender = false;
 			/* Mobile Responsive */
 			@media (max-width: 768px) {
 				.manga-shots-main {
-					padding: 1.5rem clamp(1rem, 4vw, 1.25rem);
+					padding: var(--space-6) var(--space-4);
 				}
 
 				.manga-header {
 					flex-direction: column;
 					align-items: flex-start;
-					gap: 0.5rem;
-					margin-bottom: 1.5rem;
+					gap: var(--space-2);
+					margin-bottom: var(--space-6);
 				}
 
 				.manga-title {
-					font-size: 2rem;
+					font-size: var(--font-size-2xl);
 				}
 
 				.manga-search {
-					padding: 0.875rem 1rem 0.875rem 3rem;
+					padding: var(--space-3) var(--space-4) var(--space-3) 3rem;
 				}
 
 				.filter-chip {
-					padding: 0.75rem 1.25rem;
+					padding: var(--space-3) var(--space-4);
+					min-height: 2.75rem;
 				}
 
 				.manga-masonry-grid {
-					gap: 1rem;
+					gap: var(--space-4);
 				}
 
 				.manga-masonry-grid_column {
-					gap: 1rem;
+					gap: var(--space-4);
 				}
 
 				.manga-shot-item:hover .manga-shot-button {
@@ -404,16 +414,16 @@ export const prerender = false;
 
 			@media (max-width: 480px) {
 				.manga-shots-main {
-					padding-inline: clamp(0.75rem, 6vw, 1.1rem);
+					padding-inline: var(--space-3);
 				}
 
 				.manga-masonry-grid,
 				.manga-masonry-grid_column {
-					gap: 0.75rem;
+					gap: var(--space-3);
 				}
 
 				.manga-title {
-					font-size: 1.75rem;
+					font-size: var(--font-size-xl);
 				}
 
 				.manga-search {

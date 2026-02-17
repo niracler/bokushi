@@ -27,7 +27,7 @@ const groupedPosts = Array.from(postsByYear.entries());
 
 <section class="section-stack">
 	<div class="flex items-center justify-end">
-		<label class="inline-flex select-none items-center gap-2 text-sm text-muted">
+		<label class="inline-flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-2 text-sm text-muted transition-colors hover:bg-accent-tint-6">
 			<input
 				id="filter-deepsearch"
 				type="checkbox"
@@ -53,7 +53,7 @@ const groupedPosts = Array.from(postsByYear.entries());
 						const isDeepSearch = post.data.tags?.includes('DeepSearch') ?? false;
 						return (
 							<li data-deepsearch={isDeepSearch ? 'true' : 'false'}>
-								<div class="post-link group relative flex items-baseline gap-4 rounded-md px-4 py-2.5 transition-all duration-200 hover:bg-accent-tint-6">
+								<div class="post-link group relative flex items-baseline gap-4 rounded-md px-4 py-3 transition-all duration-200 hover:bg-accent-tint-6 sm:py-2.5">
 									<h4 class="title flex-1 text-base font-medium tracking-tight text-primary transition-colors duration-200 group-hover:text-accent sm:text-lg">
 										<a
 											href={`/${post.id}`}
