@@ -1308,78 +1308,17 @@
 
     /* ── Comment Section ─────────────────────────────── */
 
-    /* Auth bar */
-    .comment-auth-bar {
-        background: var(--color-bg-surface);
-        border: 1px solid var(--color-border-soft);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-soft);
-        padding: var(--space-4) var(--space-6);
-    }
-
-    .comment-login-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        padding: var(--space-2) var(--space-5, 1.25rem);
-        border: 1px solid var(--color-border-soft);
-        border-radius: var(--radius-md);
-        background: var(--color-bg-surface);
-        color: var(--color-text-secondary);
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-        cursor: pointer;
-        transition:
-            border-color var(--transition-base),
-            background-color var(--transition-base),
-            color var(--transition-base),
-            box-shadow var(--transition-base);
-    }
-
-    .comment-login-btn:hover {
-        border-color: var(--color-accent);
-        color: var(--color-accent);
-        background: var(--color-accent-soft);
-    }
-
-    .comment-login-btn svg {
-        width: 1.125rem;
-        height: 1.125rem;
-        flex-shrink: 0;
-        opacity: 0.8;
-    }
-
-    .comment-login-btn:hover svg {
-        opacity: 1;
-    }
-
-    .comment-divider {
-        display: flex;
-        align-items: center;
-        gap: var(--space-3);
-        margin-block: var(--space-3);
-        font-size: var(--font-size-xs);
-        color: var(--color-text-muted);
-    }
-
-    .comment-divider::before,
-    .comment-divider::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: var(--color-border-subtle);
-    }
-
-    /* Logged-in user bar */
+    /* Logged-in user bar (inside comment form) */
     .comment-user-bar {
         display: flex;
         align-items: center;
         gap: var(--space-3);
+        margin-bottom: var(--space-2);
     }
 
     .comment-user-bar img {
-        width: 2.25rem;
-        height: 2.25rem;
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
         border: 2px solid var(--color-accent-soft);
     }
@@ -1397,22 +1336,68 @@
         color: var(--color-text-primary);
     }
 
-    .comment-user-bar .user-action {
+    /* Inline action links (logout, link account, login) */
+    .comment-inline-action {
         font-size: var(--font-size-xs);
         color: var(--color-text-muted);
         cursor: pointer;
         border: none;
         background: none;
         padding: 0;
+        text-decoration: none;
         transition: color var(--transition-base);
     }
 
-    .comment-user-bar .user-action:hover {
+    .comment-inline-action:hover {
         color: var(--color-accent);
     }
 
-    .comment-user-bar .user-action--danger:hover {
+    .comment-inline-action--danger:hover {
         color: var(--color-danger);
+    }
+
+    .comment-inline-sep {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+        opacity: 0.4;
+    }
+
+    /* Login hint in form footer */
+    .comment-login-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        font-size: var(--font-size-xs);
+    }
+
+    .comment-login-hint-text {
+        color: var(--color-text-muted);
+        opacity: 0.6;
+    }
+
+    .comment-login-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        border: none;
+        background: none;
+        padding: 0;
+        font-size: var(--font-size-xs);
+        font-family: inherit;
+        cursor: pointer;
+        transition: color var(--transition-base);
+    }
+
+    .comment-login-link:hover {
+        color: var(--color-accent);
+    }
+
+    .comment-login-link svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
     }
 
     /* Comment cards */

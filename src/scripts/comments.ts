@@ -105,68 +105,6 @@ async function logout(): Promise<boolean> {
     }
 }
 
-// --- Auth bar rendering ---
-
-function renderAuthBar(user: AuthUser | null): string {
-    if (user) {
-        const avatarSrc = user.avatar_url
-            ? escapeHtml(user.avatar_url)
-            : "https://www.gravatar.com/avatar/?d=mp&s=48";
-
-        const adminBadge = user.role === "admin" ? ` <span class="comment-badge">Admin</span>` : "";
-
-        // Build link buttons for missing providers
-        const linkButtons: string[] = [];
-        if (!user.linkedProviders.includes("telegram")) {
-            linkButtons.push(
-                `<button class="link-telegram-btn user-action">关联 Telegram</button>`,
-            );
-        }
-        if (!user.linkedProviders.includes("github")) {
-            linkButtons.push(
-                `<a href="/api/auth/github?redirect=${encodeURIComponent(window.location.pathname)}" class="user-action">关联 GitHub</a>`,
-            );
-        }
-
-        const linkSection =
-            linkButtons.length > 0
-                ? `<span class="user-action">·</span>${linkButtons.join('<span class="user-action">·</span>')}`
-                : "";
-
-        return `
-            <div class="comment-auth-bar">
-                <div class="comment-user-bar">
-                    <img src="${avatarSrc}" alt="" />
-                    <div class="user-meta">
-                        <span class="user-name">${escapeHtml(user.name)}</span>
-                        ${adminBadge}
-                        <span class="user-action">·</span>
-                        <button class="logout-btn user-action user-action--danger">登出</button>
-                        ${linkSection}
-                    </div>
-                </div>
-            </div>`;
-    }
-
-    // Not logged in: show login buttons + divider
-    return `
-        <div class="comment-auth-bar">
-            <div style="display:flex;gap:0.75rem;justify-content:center">
-                <a href="/api/auth/github?redirect=${encodeURIComponent(window.location.pathname)}" class="comment-login-btn">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                    GitHub 登录
-                </a>
-                <div id="telegram-login-container" style="display:flex;align-items:center">
-                    <button id="telegram-login-btn" class="comment-login-btn">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                        Telegram 登录
-                    </button>
-                </div>
-            </div>
-            <div class="comment-divider"><span>或匿名评论</span></div>
-        </div>`;
-}
-
 // --- API helpers ---
 
 async function fetchComments(slug: string): Promise<CommentsResponse> {
@@ -211,7 +149,6 @@ function formatTime(iso: string): string {
 // --- DOM rendering ---
 
 const CONTAINER_SELECTOR = "#comment-section";
-const AUTH_BAR_SELECTOR = "#comment-auth-bar";
 
 function createAuthorEl(comment: CommentNode): string {
     const name = escapeHtml(comment.author);
@@ -231,9 +168,7 @@ function escapeHtml(str: string): string {
 }
 
 function getCommentAvatarUrl(comment: CommentNode): string {
-    // Logged-in user: use OAuth avatar
     if (comment.avatar_url) return comment.avatar_url;
-    // Anonymous: will be resolved via Gravatar async loading
     return gravatarUrl("");
 }
 
@@ -294,6 +229,7 @@ function renderReplyCard(reply: CommentNode, topLevelId: string): string {
     );
 }
 
+// Unified comment form: auth is integrated, not separate
 function renderCommentForm(parentId?: string, replyAuthor?: string): string {
     const prefix = replyAuthor ? `@${replyAuthor} ` : "";
     const formClass = parentId ? "comment-form comment-form--reply" : "comment-form";
@@ -303,17 +239,77 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 
     const placeholder = parentId ? `回复 ${replyAuthor || ""}...` : "写下你的评论... 支持 Markdown";
 
-    // Logged-in users don't need author/email/website fields
-    const identityFields = currentUser
-        ? ""
-        : `<div class="comment-form-fields">
-				<input type="text" name="author" placeholder="昵称 *" required maxlength="50" class="comment-input" />
-				<input type="email" name="email" placeholder="邮箱（选填，用于头像）" maxlength="200" class="comment-input" />
-				<input type="url" name="website" placeholder="网站（选填）" maxlength="200" class="comment-input" />
-			</div>`;
+    // Logged-in: show user bar above textarea
+    // Not logged in: show identity fields + login links in footer
+    let userBar = "";
+    let identityFields = "";
+    let loginHint = "";
+
+    if (currentUser) {
+        const avatarSrc = currentUser.avatar_url
+            ? escapeHtml(currentUser.avatar_url)
+            : "https://www.gravatar.com/avatar/?d=mp&s=48";
+        const adminBadge =
+            currentUser.role === "admin" ? ` <span class="comment-badge">Admin</span>` : "";
+
+        const linkButtons: string[] = [];
+        if (!currentUser.linkedProviders.includes("telegram")) {
+            linkButtons.push(
+                `<button class="link-telegram-btn comment-inline-action">关联 Telegram</button>`,
+            );
+        }
+        if (!currentUser.linkedProviders.includes("github")) {
+            linkButtons.push(
+                `<a href="/api/auth/github?redirect=${encodeURIComponent(window.location.pathname)}" class="comment-inline-action">关联 GitHub</a>`,
+            );
+        }
+        const linkSection =
+            linkButtons.length > 0
+                ? `<span class="comment-inline-sep">·</span>${linkButtons.join('<span class="comment-inline-sep">·</span>')}`
+                : "";
+
+        userBar = `
+            <div class="comment-user-bar">
+                <img src="${avatarSrc}" alt="" />
+                <div class="user-meta">
+                    <span class="user-name">${escapeHtml(currentUser.name)}</span>
+                    ${adminBadge}
+                    <span class="comment-inline-sep">·</span>
+                    <button class="logout-btn comment-inline-action comment-inline-action--danger">登出</button>
+                    ${linkSection}
+                </div>
+            </div>`;
+    } else {
+        identityFields = `
+            <div class="comment-form-fields">
+                <input type="text" name="author" placeholder="昵称 *" required maxlength="50" class="comment-input" />
+                <input type="email" name="email" placeholder="邮箱（选填，用于头像）" maxlength="200" class="comment-input" />
+                <input type="url" name="website" placeholder="网站（选填）" maxlength="200" class="comment-input" />
+            </div>`;
+
+        // Small inline login links in the footer
+        const redirect = encodeURIComponent(window.location.pathname);
+        loginHint = `
+            <span class="comment-login-hint">
+                <span class="comment-login-hint-text">或</span>
+                <a href="/api/auth/github?redirect=${redirect}" class="comment-login-link">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                </a>
+                <span class="comment-login-hint-text">·</span>
+                <div id="telegram-login-container" style="display:inline-flex;align-items:center">
+                    <button id="telegram-login-btn" class="comment-login-link">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                        Telegram
+                    </button>
+                </div>
+                <span class="comment-login-hint-text">登录</span>
+            </span>`;
+    }
 
     return `
 		<form class="${formClass}" data-parent-id="${parentId || ""}">
+			${userBar}
 			${identityFields}
 			<textarea
 				name="content"
@@ -327,6 +323,7 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 			<div class="comment-form-footer">
 				<span class="comment-form-hint">支持 Markdown 语法</span>
 				<div class="comment-form-actions">
+					${loginHint}
 					${cancelBtn}
 					<button type="submit" class="submit-btn comment-submit-btn">${parentId ? "回复" : "发表评论"}</button>
 				</div>
@@ -398,7 +395,6 @@ function renderCommentList(data: CommentsResponse): string {
 
 // --- Telegram Widget ---
 
-// Global callback for Telegram Login Widget
 declare global {
     interface Window {
         onTelegramAuth: (user: Record<string, unknown>) => void;
@@ -406,29 +402,22 @@ declare global {
 }
 
 function setupTelegramWidget(container: HTMLElement) {
-    // For the login button in auth bar (when not logged in)
     const loginBtn = container.querySelector("#telegram-login-btn");
     if (loginBtn) {
         loginBtn.addEventListener("click", () => {
-            // We need to create the Telegram widget dynamically
-            // The widget will call window.onTelegramAuth on success
             openTelegramLoginPopup();
         });
     }
 }
 
 function openTelegramLoginPopup() {
-    // Telegram Login Widget requires a real bot name.
-    // The widget script is loaded dynamically and creates a popup.
-    // We use the data-auth-url approach: Telegram sends data to our callback.
     const widgetContainer = document.getElementById("telegram-login-container");
     if (!widgetContainer) return;
 
-    // Replace button with actual Telegram widget
     widgetContainer.innerHTML = "";
     const script = document.createElement("script");
     script.src = "https://telegram.org/js/telegram-widget.js?22";
-    script.setAttribute("data-telegram-login", "tomoko_aibot"); // bot username
+    script.setAttribute("data-telegram-login", "tomoko_aibot");
     script.setAttribute("data-size", "medium");
     script.setAttribute("data-onauth", "onTelegramAuth(user)");
     script.setAttribute("data-request-access", "write");
@@ -443,7 +432,6 @@ async function handleTelegramAuth(telegramData: Record<string, unknown>) {
             body: JSON.stringify(telegramData),
         });
         if (res.ok) {
-            // Reload to reflect logged-in state
             window.location.reload();
         }
     } catch {
@@ -469,9 +457,7 @@ async function handleTelegramLink(telegramData: Record<string, unknown>) {
     }
 }
 
-// Set up global Telegram callback
 window.onTelegramAuth = (user: Record<string, unknown>) => {
-    // Determine if this is login or linking based on current state
     if (currentUser) {
         handleTelegramLink(user);
     } else {
@@ -481,9 +467,9 @@ window.onTelegramAuth = (user: Record<string, unknown>) => {
 
 // --- Event handling ---
 
-function bindAuthBarEvents(authBar: HTMLElement) {
-    // Logout button
-    authBar.querySelector(".logout-btn")?.addEventListener("click", async () => {
+function bindFormAuthEvents(container: HTMLElement) {
+    // Logout button (inside form user bar)
+    container.querySelector(".logout-btn")?.addEventListener("click", async () => {
         const ok = await logout();
         if (ok) {
             currentUser = null;
@@ -492,12 +478,12 @@ function bindAuthBarEvents(authBar: HTMLElement) {
     });
 
     // Link Telegram button
-    authBar.querySelector(".link-telegram-btn")?.addEventListener("click", () => {
+    container.querySelector(".link-telegram-btn")?.addEventListener("click", () => {
         openTelegramLoginPopup();
     });
 
-    // Telegram login (when not logged in)
-    setupTelegramWidget(authBar);
+    // Telegram login button (inside form footer)
+    setupTelegramWidget(container);
 }
 
 function bindEvents(container: HTMLElement, slug: string) {
@@ -510,7 +496,6 @@ function bindEvents(container: HTMLElement, slug: string) {
             const parentId = target.dataset.replyParent ?? "";
             const replyAuthor = target.dataset.replyAuthor ?? "";
 
-            // Remove any existing reply forms
             for (const f of container.querySelectorAll(
                 ".comment-form[data-parent-id]:not([data-parent-id=''])",
             )) {
@@ -521,7 +506,6 @@ function bindEvents(container: HTMLElement, slug: string) {
             if (!card) return;
             const formHtml = renderCommentForm(parentId, replyAuthor);
 
-            // Insert reply form after the thread wrapper (for top-level) or after the card
             const thread = card.closest(".comment-thread");
             const insertTarget = thread || card;
             insertTarget.insertAdjacentHTML("afterend", formHtml);
@@ -532,13 +516,15 @@ function bindEvents(container: HTMLElement, slug: string) {
                 newForm.remove();
             });
             bindFormSubmit(newForm, slug, container);
+            bindFormAuthEvents(newForm);
         }
     });
 
-    // Bind submit for main form
+    // Bind submit + auth events for main form
     const mainForm = container.querySelector<HTMLFormElement>(".comment-form[data-parent-id='']");
     if (mainForm) {
         bindFormSubmit(mainForm, slug, container);
+        bindFormAuthEvents(mainForm);
     }
 }
 
@@ -559,7 +545,6 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
             return;
         }
 
-        // Build post data based on auth state
         const postData: Record<string, string | null> = {
             slug,
             parent_id: parentId,
@@ -567,7 +552,6 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
         };
 
         if (!currentUser) {
-            // Anonymous: need author
             const author = (formData.get("author") as string)?.trim();
             if (!author) {
                 showError(errorEl, "请填写昵称和评论内容");
@@ -642,19 +626,13 @@ async function loadComments(container: HTMLElement, slug: string) {
 
 async function initCommentSection() {
     const container = document.querySelector<HTMLElement>(CONTAINER_SELECTOR);
-    const authBar = document.querySelector<HTMLElement>(AUTH_BAR_SELECTOR);
     if (!container) return;
 
     const slug = container.dataset.commentSlug;
     if (!slug) return;
 
-    // Fetch auth state and render auth bar
+    // Fetch auth state before rendering (auth is integrated into the form)
     currentUser = await fetchCurrentUser();
-    if (authBar) {
-        authBar.innerHTML = renderAuthBar(currentUser);
-        bindAuthBarEvents(authBar);
-    }
-
     loadComments(container, slug);
 }
 

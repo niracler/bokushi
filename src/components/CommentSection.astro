@@ -4,7 +4,6 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
 
 <div class="mt-12 border-t border-border-subtle pt-6">
   <h2 class="mb-6 text-xl font-semibold text-primary">评论</h2>
-  <div id="comment-auth-bar" class="mb-4"></div>
   <div
     id="comment-section"
     data-comment-slug={slug}
