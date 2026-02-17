@@ -13,7 +13,7 @@ const { posts } = Astro.props;
 
 {posts.length > 0 && (
     <section class="related-posts">
-        <h2 class="related-posts__heading">Related Posts</h2>
+        <h2 class="related-posts__heading">相关文章</h2>
         <div class="related-posts__grid">
             {posts.map((post) => (
                 <a href={`/${post.id}`} class="related-posts__card surface-card surface-card--soft surface-card--hover-border">

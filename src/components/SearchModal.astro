@@ -147,6 +147,8 @@
         let lastFocusedElement = null;
         let pagefind = null;
         let selectedIndex = -1;
+        let currentSearchResults = []; // All raw pagefind result handles
+        let resultsToShow = 10; // Number of results currently visible
 
         // Load Pagefind on first open
         async function loadPagefind() {
@@ -194,6 +196,8 @@
         // Perform search
         async function performSearch(query) {
             if (!query.trim()) {
+                currentSearchResults = [];
+                resultsToShow = 10;
                 showEmpty();
                 return;
             }
@@ -204,16 +208,30 @@
             const search = await pf.search(query);
 
             if (search.results.length === 0) {
+                currentSearchResults = [];
+                resultsToShow = 10;
                 showNoResults();
                 return;
             }
 
-            // Load and display results
-            const results = await Promise.all(
-                search.results.slice(0, 10).map((r) => r.data())
-            );
+            // Store all result handles and reset visible count
+            currentSearchResults = search.results;
+            resultsToShow = 10;
 
-            showResults(results);
+            await renderResults();
+        }
+
+        // Load data for the visible slice and render
+        async function renderResults() {
+            const visible = currentSearchResults.slice(0, resultsToShow);
+            const results = await Promise.all(visible.map((r) => r.data()));
+            showResults(results, currentSearchResults.length);
+        }
+
+        // Show more results on button click
+        async function showMoreResults() {
+            resultsToShow += 10;
+            await renderResults();
         }
 
         function showEmpty() {
@@ -230,7 +248,7 @@
             selectedIndex = -1;
         }
 
-        function showResults(results) {
+        function showResults(results, totalCount) {
             searchEmpty?.classList.add("hidden");
             searchNoResults?.classList.add("hidden");
             searchList?.classList.remove("hidden");
@@ -245,6 +263,31 @@
                 const item = createResultItem(result, index);
                 searchList.appendChild(item);
             });
+
+            // Result count indicator
+            const shownCount = results.length;
+            const countLi = document.createElement("li");
+            countLi.setAttribute("role", "presentation");
+            const countText = document.createElement("p");
+            countText.className = "pt-2 text-center text-sm text-muted";
+            countText.textContent = "显示 " + shownCount + " / " + totalCount + " 条结果";
+            countLi.appendChild(countText);
+            searchList.appendChild(countLi);
+
+            // "Show more" button if there are more results
+            if (shownCount < totalCount) {
+                const btnLi = document.createElement("li");
+                btnLi.setAttribute("role", "presentation");
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "mt-2 w-full rounded-lg border border-subtle py-2 text-sm text-secondary transition-colors hover:bg-accent-tint-8 hover:text-accent focus:bg-accent-tint-8 focus:outline-none focus-accent";
+                btn.textContent = "显示更多";
+                btn.addEventListener("click", function () {
+                    showMoreResults();
+                });
+                btnLi.appendChild(btn);
+                searchList.appendChild(btnLi);
+            }
 
             selectedIndex = -1;
         }
@@ -303,6 +346,8 @@
                 }
                 // Reset state
                 if (searchInput) searchInput.value = "";
+                currentSearchResults = [];
+                resultsToShow = 10;
                 showEmpty();
             }
         }

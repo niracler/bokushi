@@ -26,25 +26,22 @@ const { Content, headings, remarkPluginFrontmatter } = await render(post);
 const currentTags = post.data.tags ?? [];
 const otherPosts = allPosts.filter((p) => p.id !== post.id && !p.data.hidden);
 
-let relatedPosts: BlogEntry[];
+// Only show posts that actually share tags (no fallback to "most recent")
+let relatedPosts: BlogEntry[] = [];
 if (currentTags.length > 0) {
-    // Score each post by number of shared tags
     const scored = otherPosts.map((p) => {
         const pTags = p.data.tags ?? [];
         const shared = currentTags.filter((t: string) => pTags.includes(t)).length;
         return { post: p, score: shared };
     });
-    // Sort by shared tag count (desc), then by date (desc) for ties
     scored.sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score;
         return b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf();
     });
-    relatedPosts = scored.slice(0, 3).map((s) => s.post);
-} else {
-    // Fallback: most recent posts
-    relatedPosts = otherPosts
-        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-        .slice(0, 3);
+    relatedPosts = scored
+        .filter((s) => s.score > 0)
+        .slice(0, 3)
+        .map((s) => s.post);
 }
 ---
 

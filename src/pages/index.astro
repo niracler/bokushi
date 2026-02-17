@@ -55,7 +55,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
         visibility: hidden;
         pointer-events: none;
         user-select: none;
-        aria-hidden: true;
       }
 
       /* 真实打字机覆盖在幽灵容器上 */
@@ -159,6 +158,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
         <!-- 幽灵占位符：用于提前撑开高度并固定垂直中心点 -->
         <blockquote
           class="quote-text quote-ghost space-y-4 sm:space-y-6 leading-relaxed"
+          aria-hidden="true"
         >
           <p>
             <span class="block sm:inline">或许每个人都在证明自己的存在，</span>
