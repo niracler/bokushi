@@ -58,10 +58,10 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 | 用途     | 浅色      | 深色      |
 | -------- | --------- | --------- |
 | 页面背景 | `#fffaf4` | `#140e0b` |
-| 卡片背景 | `#ffffff` | `#1c1512` |
-| 主要文字 | `#2a1c17` | `#f5ebe0` |
-| 次要文字 | `#46342a` | `#c4b5a8` |
-| 弱化文字 | `#7b6454` | `#8c7d6f` |
+| 卡片背景 | `#ffffff` | `#1b140f` |
+| 主要文字 | `#2a1c17` | `#f8ede1` |
+| 次要文字 | `#46342a` | `#d7c6b8` |
+| 弱化文字 | `#5f4d42` | `#b8a090` |
 | 强调色   | `#fb8f68` | `#fb9f74` |
 
 > **博客变体**：配色起点来自 [Obsidian Shiba Inu 主题](https://github.com/faroukx/Obsidian-shiba-inu-theme)，经调整形成"旧书页+琥珀"风格。
@@ -127,7 +127,7 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 | `--space-4`   | `1rem` | 基础间距单位         |
 | `--space-8`   | `2rem` | Section 上下距离     |
 | `--radius-lg` | `16px` | 大圆角（卡片、图片） |
-| `--radius-md` | `12px` | 中圆角（紧凑组件）   |
+| `--radius-md` | `10px` | 中圆角（紧凑组件）   |
 
 ### Dark Mode
 
@@ -146,6 +146,8 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 - 所有色彩 token 都有对应的深色版本
 - 阴影在深色模式下更加柔和
 - 保持暖色调基底（夜棕而非冷黑）
+- UI 组件边框使用 `border-soft` 而非 `border-subtle`，确保暗色模式下满足 WCAG AA 3:1 对比度
+- 图片/媒体区域添加 `bg-muted` 占位背景，避免深色背景上的"隐形"加载状态
 
 ## Patterns
 
@@ -203,12 +205,17 @@ flowchart TD
 **Telegram 频道** (`/channel`)：
 
 - SSR 渲染，5 分钟缓存
-- 双栏布局：帖子流 + 频道信息侧边栏
+- 双栏布局：帖子流（600px）+ 频道信息侧边栏（280px），最大宽度 920px
 - 支持链接预览、回复引用、Hashtag 标签
+- 长帖自动折叠：超过 384px（桌面）/ 256px（移动端）的帖子会被折叠，显示渐变遮罩和"展开全文"按钮
+- 频道内表格样式：支持 Telegram 帖子中的 HTML 表格，含斑马纹和 hover 高亮
+- Markdown 内容支持 pipe 分隔表格自动转换为 HTML `<table>`
 
 **漫画表情包** (`/mangashots`)：
 
 - 无限滚动，Cloudflare D1 存储
+- 深色模式下为懒加载图片提供 `var(--color-bg-muted)` 占位背景，避免页面显示空白
+- 标签筛选使用横向滚动（移动端），避免多行换行占用空间
 
 ### Modals & Overlays
 
@@ -260,6 +267,18 @@ body.scroll-locked {
 
 - `.surface-card--hover-border`：hover 时边框颜色加深
 - `.surface-card--hover-none`：禁用 hover 效果
+
+### Comment Section
+
+> HIG: Forms should be simple, straightforward, and help people finish their task quickly.
+
+评论系统支持 GitHub/Telegram OAuth 登录及匿名评论：
+
+- **加载骨架屏**：评论加载时显示3组骨架动画（头像 + 文字行），避免空白闪烁
+- **线程式回复**：回复以嵌套缩进展示，通过 `.comment-replies` 区分层级
+- **登录按钮**：使用 ghost 按钮风格（`bg-surface` + `border-soft`），hover 时变为强调色，避免喧宾夺主
+- **空状态**：无评论时显示对话气泡图标和友好提示文字
+- **表单输入**：暗色模式下使用 `border-soft` 保证 WCAG AA 3:1 对比度
 
 ### Pills & Tags
 
@@ -321,6 +340,26 @@ body.scroll-locked {
 | 主要文字 | 12.5:1+ |
 | 次要文字 | 7.2:1+  |
 | 弱化文字 | 4.5:1+  |
+
+### 触控目标
+
+所有可交互元素满足 Apple HIG 44x44pt 最小触控目标：
+
+| 组件       | 尺寸    |
+| ---------- | ------- |
+| icon-btn-sm | 44px (2.75rem) |
+| icon-btn-md | 48px (3rem)    |
+| Footer 图标 | 48px (3rem)    |
+
+### 404 错误页面
+
+品牌化 404 页面：大号半透明强调色数字 + 友好提示文案 + 返回首页按钮，保持暖色调一致性。
+
+### SEO Meta Tags
+
+- `theme-color`：浅色 `#fffaf4` / 深色 `#140e0b`（通过 `media` 属性自动切换）
+- `color-scheme: light dark`：告知浏览器支持双主题
+- `author`：站点作者信息
 
 ### 键盘导航
 
