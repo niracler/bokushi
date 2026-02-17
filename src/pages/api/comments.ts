@@ -7,6 +7,7 @@
 
 import type { APIRoute } from "astro";
 import { getSessionUser } from "../../lib/auth";
+import { notifyNewComment } from "../../lib/telegram-notify";
 import { getClientIP, hashIP, jsonResponse, validateCommentInput } from "../../lib/utils";
 
 export const prerender = false;
@@ -226,6 +227,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 now,
             )
             .run();
+
+        // Fire-and-forget: notify Telegram group
+        if (env?.TELEGRAM_BOT_TOKEN && env?.TELEGRAM_NOTIFY_CHAT_ID) {
+            const notifyPromise = notifyNewComment(
+                env.TELEGRAM_BOT_TOKEN,
+                env.TELEGRAM_NOTIFY_CHAT_ID,
+                {
+                    slug: body.slug,
+                    author,
+                    content,
+                    isReply: !!body.parent_id,
+                },
+            );
+            const ctx = locals.runtime?.ctx;
+            if (ctx?.waitUntil) {
+                ctx.waitUntil(notifyPromise);
+            }
+        }
 
         const comment: CommentNode = {
             id,
