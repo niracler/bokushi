@@ -90,26 +90,66 @@ function getProxiedImageUrl(imageUrl: string): string {
 }
 
 /**
+ * Decode common HTML entities so pipe-table detection works on
+ * Telegram's HTML output (e.g. `&amp;`, `&#124;`, `&lt;`, `&gt;`).
+ */
+function decodeHtmlEntities(text: string): string {
+    return text
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#0*39;/g, "'")
+        .replace(/&#0*124;/g, "|")
+        .replace(/&nbsp;/g, " ");
+}
+
+/**
  * Convert pipe-delimited table text into HTML <table> elements.
  * Uses line-by-line scanning instead of a single regex to handle
  * edge cases with HTML entities and varied newline formats.
+ *
+ * Handles tables with or without leading/trailing pipes, and
+ * decodes HTML entities before testing pipe-line patterns.
  */
 function convertPipeTables(html: string): string {
     const lines = html.split("\n");
     const result: string[] = [];
     let i = 0;
 
+    /** Test whether a line looks like a pipe-delimited row. */
     const isPipeLine = (line: string) => {
-        const t = line.trim();
-        return t.startsWith("|") && t.endsWith("|") && t.length > 2;
+        const t = decodeHtmlEntities(line).trim();
+        // Standard: |col|col|
+        if (t.startsWith("|") && t.endsWith("|") && t.length > 2) return true;
+        // Variant without outer pipes: col | col
+        if (!t.startsWith("|") && t.includes("|") && t.split("|").length >= 2) return true;
+        return false;
     };
-    const isSeparator = (line: string) => /^\|[\s\-:]+(\|[\s\-:]+)+\|$/.test(line.trim());
-    const parseCells = (line: string) =>
-        line
-            .trim()
-            .split("|")
-            .slice(1, -1)
-            .map((c) => c.trim());
+
+    /** Test whether a line is the --- separator row. */
+    const isSeparator = (line: string) => {
+        const t = decodeHtmlEntities(line).trim();
+        // With outer pipes: | --- | --- |
+        if (/^\|[\s\-:]+(\|[\s\-:]+)+\|$/.test(t)) return true;
+        // Without outer pipes: --- | ---
+        if (/^[\s\-:]+(\|[\s\-:]+)+$/.test(t)) return true;
+        return false;
+    };
+
+    /** Split a pipe-delimited line into cell values. */
+    const parseCells = (line: string) => {
+        const t = decodeHtmlEntities(line).trim();
+        if (t.startsWith("|")) {
+            // Standard: |col|col|  — drop first and last empty splits
+            return t
+                .split("|")
+                .slice(1, -1)
+                .map((c) => c.trim());
+        }
+        // Without outer pipes: col | col
+        return t.split("|").map((c) => c.trim());
+    };
 
     while (i < lines.length) {
         // Look for a sequence of 3+ pipe lines (header + separator + data)
@@ -128,20 +168,26 @@ function convertPipeTables(html: string): string {
                     j++;
                 }
 
-                const headers = parseCells(headerLine);
-                let tableHtml = "<table><thead><tr>";
-                for (const h of headers) tableHtml += `<th>${h}</th>`;
-                tableHtml += "</tr></thead><tbody>";
+                // Only emit a table if there is at least one data row
+                if (j > i + 2) {
+                    const headers = parseCells(headerLine);
+                    let tableHtml = "<table><thead><tr>";
+                    for (const h of headers) tableHtml += `<th>${h}</th>`;
+                    tableHtml += "</tr></thead><tbody>";
 
-                for (let k = i + 2; k < j; k++) {
-                    const cells = parseCells(lines[k]);
-                    tableHtml += "<tr>";
-                    for (const c of cells) tableHtml += `<td>${c}</td>`;
-                    tableHtml += "</tr>";
+                    for (let k = i + 2; k < j; k++) {
+                        const cells = parseCells(lines[k]);
+                        tableHtml += "<tr>";
+                        for (const c of cells) tableHtml += `<td>${c}</td>`;
+                        tableHtml += "</tr>";
+                    }
+                    tableHtml += "</tbody></table>";
+                    result.push(tableHtml);
+                    i = j;
+                } else {
+                    result.push(lines[i]);
+                    i++;
                 }
-                tableHtml += "</tbody></table>";
-                result.push(tableHtml);
-                i = j;
             } catch {
                 // Malformed table - return original lines as-is
                 result.push(lines[i]);

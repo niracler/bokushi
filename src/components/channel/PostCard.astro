@@ -17,11 +17,15 @@ const { post, channelUsername } = Astro.props;
     {post.replyInfo && <ReplyQuote reply={post.replyInfo} />}
 
     {/* Post content with collapsible long text */}
-    <div class="post-card__content-wrapper" data-post-content-wrapper>
+    <div
+        class="post-card__content-wrapper"
+        data-post-content-wrapper
+        data-text-length={post.text.length}
+    >
         <div class="post-card__content" set:html={post.content} />
         <button class="post-card__expand-btn" data-expand-btn aria-label="展开全文" hidden>
-            展开全文
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            <span data-expand-label>展开全文</span>
+            <svg class="post-card__expand-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </button>
     </div>
 
@@ -212,13 +216,22 @@ const { post, channelUsername } = Astro.props;
 }
 
 /* Table styling for markdown tables in Telegram posts */
+.post-card__content :global(.table-scroll-wrapper) {
+    overflow-x: auto;
+    margin: var(--space-4) 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.post-card__content :global(.table-scroll-wrapper) :global(table) {
+    margin: 0;
+}
+
 .post-card__content :global(table) {
     width: 100%;
     border-collapse: collapse;
     margin: var(--space-4) 0;
     font-size: var(--font-size-sm);
-    overflow-x: auto;
-    display: block;
+    white-space: normal;
 }
 
 .post-card__content :global(thead) {
@@ -245,6 +258,20 @@ const { post, channelUsername } = Astro.props;
 
 .post-card__content :global(tr:hover) {
     background: var(--color-accent-soft);
+}
+
+/* Fallback for raw pipe tables that were not parsed server-side */
+.post-card__content :global(.pipe-table-fallback) {
+    background: var(--color-bg-muted);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    border: 1px solid var(--color-border-soft);
+    white-space: pre;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    -webkit-overflow-scrolling: touch;
 }
 
 .post-card__footer {
@@ -350,8 +377,13 @@ const { post, channelUsername } = Astro.props;
     color: var(--color-accent);
 }
 
-.post-card__content-wrapper[data-collapsed="false"] .post-card__expand-btn {
-    display: none;
+.post-card__expand-icon {
+    transition: transform var(--transition-base);
+}
+
+/* Rotate chevron when expanded */
+.post-card__content-wrapper[data-collapsed="false"] .post-card__expand-icon {
+    transform: rotate(180deg);
 }
 
 @media (max-width: 640px) {
