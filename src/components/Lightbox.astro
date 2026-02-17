@@ -468,6 +468,12 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		color: var(--color-overlay-light-80);
 	}
 
+	.lightbox__close:focus-visible,
+	.lightbox__nav:focus-visible {
+		outline: 2px solid white;
+		outline-offset: 2px;
+	}
+
 	/* Mobile adjustments */
 	@media (max-width: 640px) {
 		.lightbox__image-container {
@@ -482,5 +488,10 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 			align-items: stretch;
 			text-align: left;
 		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.lightbox__image-container img { transition: none; }
+		.lightbox__image-container::after { animation: none; }
 	}
 </style>

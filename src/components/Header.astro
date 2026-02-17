@@ -23,7 +23,11 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
 <header
     class="bg-surface border-b border-border"
 >
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-surface focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-primary focus:border focus:border-border">
+        跳转到主要内容
+    </a>
     <nav
+        aria-label="主导航"
         class="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6"
     >
         <h2
@@ -101,7 +105,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
                     >
                 </button>
             </div>
-            <nav class="flex flex-col gap-2 text-base" data-no-preview>
+            <nav aria-label="移动端导航" class="flex flex-col gap-2 text-base" data-no-preview>
                 {
                     navLinks.map((link) => (
                         <a

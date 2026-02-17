@@ -7,6 +7,7 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
   <div
     id="comment-section"
     data-comment-slug={slug}
+    aria-live="polite"
   ></div>
 </div>
 

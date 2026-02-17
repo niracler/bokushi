@@ -209,6 +209,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 							data-reply-to="${comment.id}"
 							data-reply-author="${escapeHtml(comment.author)}"
 							data-reply-parent="${replyParent}"
+							aria-label="回复 ${escapeHtml(comment.author)}"
 						>
 							回复
 						</button>
@@ -317,7 +318,7 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 					<button type="submit" class="submit-btn comment-submit-btn">${parentId ? "回复" : "发表评论"}</button>
 				</div>
 			</div>
-			<p class="form-error comment-error" style="display:none"></p>
+			<p class="form-error comment-error" role="alert" style="display:none"></p>
 		</form>`;
 }
 
