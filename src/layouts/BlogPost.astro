@@ -52,7 +52,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={title} description={description} image={imageSrc} type="article" />
-		<script type="application/ld+json" set:html={JSON.stringify({
+		<script is:inline type="application/ld+json" set:html={JSON.stringify({
 			"@context": "https://schema.org",
 			"@type": "BlogPosting",
 			"headline": title,

@@ -9,7 +9,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 <html lang="zh-CN">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    <script type="application/ld+json" set:html={JSON.stringify({
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": SITE_TITLE,
