@@ -51,12 +51,35 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 
 <html lang="zh-CN">
 	<head>
-		<BaseHead title={title} description={description} image={imageSrc} />
+		<BaseHead title={title} description={description} image={imageSrc} type="article" />
+		<script type="application/ld+json" set:html={JSON.stringify({
+			"@context": "https://schema.org",
+			"@type": "BlogPosting",
+			"headline": title,
+			"description": description,
+			"image": new URL(imageSrc, Astro.site).toString(),
+			"datePublished": pubDate.toISOString(),
+			...(updatedDate ? { "dateModified": updatedDate.toISOString() } : lastModified ? { "dateModified": new Date(lastModified).toISOString() } : {}),
+			"author": {
+				"@type": "Person",
+				"name": "Niracler",
+				"url": "https://www.niracler.com"
+			},
+			"publisher": {
+				"@type": "Person",
+				"name": "Niracler"
+			},
+			"mainEntityOfPage": {
+				"@type": "WebPage",
+				"@id": new URL(Astro.url.pathname, Astro.site).toString()
+			},
+			...(tags && tags.length > 0 ? { "keywords": tags.join(", ") } : {})
+		})} />
 	</head>
 
 	<body>
 		<Header />
-		<main class="page-shell max-w-none relative">
+		<main id="main-content" class="page-shell max-w-none relative">
 			{/* 文章主体：始终居中 */}
 			<article class="mx-auto max-w-[50rem] sm:px-6">
 				{/* 标题区域 */}

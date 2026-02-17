@@ -9,6 +9,13 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 <html lang="zh-CN">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": SITE_TITLE,
+      "description": SITE_DESCRIPTION,
+      "url": Astro.site?.toString()
+    })} />
     <style>
       @keyframes fadeIn {
         from {
@@ -143,6 +150,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
   <body>
     <Header />
     <main
+      id="main-content"
       class="page-shell flex min-h-[calc(100vh-18rem)] items-center justify-center"
     >
       <section
