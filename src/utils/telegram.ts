@@ -1,20 +1,44 @@
 import * as cheerio from "cheerio";
 
+/** Maximum input length for numbered list conversion to prevent ReDoS. */
+const MAX_NUMBERED_LIST_INPUT = 50_000;
+
 /** Convert plain-text numbered lists (1. 2. 3.) into HTML <ol>/<li> markup. */
 function convertNumberedLists(text: string): string {
-    let result = text.replace(
-        /(?:^|\n)(\d+)\.\s+(.+?)(?=\n\d+\.\s+|\n\n|$)/gs,
-        (_match, num, content) => {
-            if (num === "1") {
-                return `<ol><li>${content.trim()}</li>`;
+    // Guard against excessively long input that could trigger catastrophic backtracking
+    if (text.length > MAX_NUMBERED_LIST_INPUT) return text;
+
+    // Use a line-based approach instead of a single regex with lookahead
+    const lines = text.split("\n");
+    const result: string[] = [];
+    let inList = false;
+
+    for (const line of lines) {
+        const match = line.match(/^(\d+)\.\s+(.+)$/);
+        if (match) {
+            const [, num, content] = match;
+            if (!inList && num === "1") {
+                result.push(`<ol><li>${content.trim()}</li>`);
+                inList = true;
+            } else if (inList) {
+                result.push(`<li>${content.trim()}</li>`);
+            } else {
+                // Numbered line that doesn't start with 1 and not in a list - keep as-is
+                result.push(line);
             }
-            return `<li>${content.trim()}</li>`;
-        },
-    );
-    if (result.includes("<ol>")) {
-        result = result.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, "$1</ol>");
+        } else {
+            if (inList) {
+                result.push("</ol>");
+                inList = false;
+            }
+            result.push(line);
+        }
     }
-    return result;
+    if (inList) {
+        result.push("</ol>");
+    }
+
+    return result.join("\n");
 }
 
 export interface LinkPreview {
@@ -95,28 +119,34 @@ function convertPipeTables(html: string): string {
             isPipeLine(lines[i + 1]) &&
             isSeparator(lines[i + 1])
         ) {
-            // Found a table starting at line i
-            const headerLine = lines[i];
-            // Skip separator (i+1), collect data rows
-            let j = i + 2;
-            while (j < lines.length && isPipeLine(lines[j]) && !isSeparator(lines[j])) {
-                j++;
-            }
+            try {
+                // Found a table starting at line i
+                const headerLine = lines[i];
+                // Skip separator (i+1), collect data rows
+                let j = i + 2;
+                while (j < lines.length && isPipeLine(lines[j]) && !isSeparator(lines[j])) {
+                    j++;
+                }
 
-            const headers = parseCells(headerLine);
-            let tableHtml = "<table><thead><tr>";
-            for (const h of headers) tableHtml += `<th>${h}</th>`;
-            tableHtml += "</tr></thead><tbody>";
+                const headers = parseCells(headerLine);
+                let tableHtml = "<table><thead><tr>";
+                for (const h of headers) tableHtml += `<th>${h}</th>`;
+                tableHtml += "</tr></thead><tbody>";
 
-            for (let k = i + 2; k < j; k++) {
-                const cells = parseCells(lines[k]);
-                tableHtml += "<tr>";
-                for (const c of cells) tableHtml += `<td>${c}</td>`;
-                tableHtml += "</tr>";
+                for (let k = i + 2; k < j; k++) {
+                    const cells = parseCells(lines[k]);
+                    tableHtml += "<tr>";
+                    for (const c of cells) tableHtml += `<td>${c}</td>`;
+                    tableHtml += "</tr>";
+                }
+                tableHtml += "</tbody></table>";
+                result.push(tableHtml);
+                i = j;
+            } catch {
+                // Malformed table - return original lines as-is
+                result.push(lines[i]);
+                i++;
             }
-            tableHtml += "</tbody></table>";
-            result.push(tableHtml);
-            i = j;
         } else {
             result.push(lines[i]);
             i++;
