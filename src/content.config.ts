@@ -28,22 +28,6 @@ const til = defineCollection({
     schema: sharedSchema,
 });
 
-// Galleries collection for Pandabox lightbox component
-const galleries = defineCollection({
-    loader: glob({ base: "./src/content/galleries", pattern: "*.json" }),
-    schema: ({ image }) =>
-        z.object({
-            images: z.array(
-                z.object({
-                    src: image(),
-                    alt: z.string(),
-                    title: z.string().optional(),
-                    description: z.string().optional(),
-                }),
-            ),
-        }),
-});
-
 // Mangashots collection - fetches data from worker API or D1 database
 const mangashots = defineCollection({
     loader: async () => {
@@ -90,4 +74,4 @@ const mangashots = defineCollection({
     }),
 });
 
-export const collections = { blog, monthly, til, galleries, mangashots };
+export const collections = { blog, monthly, til, mangashots };
