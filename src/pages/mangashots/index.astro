@@ -304,6 +304,25 @@ export const prerender = false;
 				transition:
 					border-color var(--transition-base),
 					box-shadow var(--transition-base);
+				background:
+					linear-gradient(
+						90deg,
+						var(--color-bg-muted) 0%,
+						var(--color-border-subtle) 50%,
+						var(--color-bg-muted) 100%
+					);
+				background-size: 200% 100%;
+				animation: skeletonPulse 1.5s ease-in-out infinite;
+			}
+
+			.manga-shot-button.loaded {
+				background: var(--color-bg-muted);
+				animation: none;
+			}
+
+			@keyframes skeletonPulse {
+				0% { background-position: 200% 0; }
+				100% { background-position: -200% 0; }
 			}
 
 			.manga-shot-item:hover .manga-shot-button {
@@ -317,7 +336,8 @@ export const prerender = false;
 				display: block;
 				object-fit: cover;
 				background: var(--color-bg-muted);
-				min-height: 120px;
+				min-height: 180px;
+				aspect-ratio: 3 / 4;
 			}
 
 			/* Loading States */
@@ -824,6 +844,7 @@ export const prerender = false;
 
 					const done = () => {
 						place();
+						button.classList.add("loaded");
 						settle();
 					};
 
