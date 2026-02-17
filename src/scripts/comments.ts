@@ -69,10 +69,10 @@ function renderMarkdown(raw: string): string {
 
 // --- Gravatar ---
 
-async function md5Hash(input: string): Promise<string> {
+async function sha256Hash(input: string): Promise<string> {
     const encoder = new TextEncoder();
     const data = encoder.encode(input.trim().toLowerCase());
-    const hashBuffer = await crypto.subtle.digest("MD5", data).catch(() => null);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data).catch(() => null);
     if (!hashBuffer) return "";
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -592,7 +592,7 @@ async function loadGravatars(container: HTMLElement) {
     for (const img of avatars) {
         const email = img.dataset.email;
         if (email) {
-            const hash = await md5Hash(email);
+            const hash = await sha256Hash(email);
             img.src = gravatarUrl(hash);
         }
     }
