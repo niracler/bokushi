@@ -8,10 +8,14 @@ import FormattedDate from "../components/FormattedDate.astro";
 import Header from "../components/Header.astro";
 import Lightbox from "../components/Lightbox.astro";
 import Prose from "../components/Prose.astro";
+import RelatedPosts from "../components/RelatedPosts.astro";
 import ShareSidebar from "../components/ShareSidebar.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
 import { extractDescription } from "../utils/extractDescription";
+import { estimateReadingTime } from "../utils/readingTime";
+
+type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
 
 type EntryData =
     | CollectionEntry<"blog">["data"]
@@ -23,6 +27,7 @@ type Props = EntryData & {
     headings?: MarkdownHeading[];
     lastModified?: string;
     lastModifiedCommitUrl?: string | null;
+    relatedPosts?: BlogEntry[];
 };
 
 const {
@@ -36,9 +41,11 @@ const {
     headings = [],
     lastModified,
     lastModifiedCommitUrl,
+    relatedPosts = [],
 } = Astro.props;
 
 const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
+const readingTime = estimateReadingTime(body);
 
 const imageSrc = socialImage || DEFAULT_POST_SOCIAL_IMAGE;
 
@@ -88,6 +95,8 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 					<div class="space-y-2 text-sm text-muted">
 						<p>
 							<FormattedDate date={pubDate} />
+							<span class="mx-1">·</span>
+							<span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">约 {readingTime} 分钟</span>
 						</p>
 						{
 							(lastModified || updatedDate) && (
@@ -189,6 +198,8 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						<slot />
 					</Prose>
 
+					<RelatedPosts posts={relatedPosts} />
+
 					<CommentSection />
 					<Lightbox id="blog-lightbox" selector=".prose img:not([data-lightbox-skip])" />
 				</div>
@@ -209,6 +220,19 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 
 			{/* 分享侧边栏：桌面端左侧固定，移动端浮动按钮 */}
 			<ShareSidebar title={title} description={description} tags={tags} slug={slug} />
+
+			{/* 回到顶部浮动按钮：滚动 500px 后淡入显示 */}
+			{/* 移动端：左下角（避开右侧 TOC/分享/点赞按钮），桌面端：右下角 */}
+			<button
+				data-back-to-top
+				class="fixed z-40 flex items-center justify-center rounded-[var(--radius-md)] border opacity-0 pointer-events-none transition-opacity duration-300 bottom-6 left-6 h-11 w-11 min-[900px]:bottom-6 min-[900px]:right-6 min-[900px]:left-auto min-[900px]:h-10 min-[900px]:w-10 text-muted hover:text-secondary touch-manipulation"
+				style="background: var(--color-bg-surface); border-color: var(--color-border-soft); box-shadow: var(--shadow-soft);"
+				aria-label="回到顶部"
+			>
+				<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</button>
 		</main>
 		<Footer />
 	</body>
@@ -222,5 +246,41 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 		} else {
 			initBlogInteractive();
 		}
+	</script>
+	<script is:inline>
+	(function() {
+		var btn = document.querySelector("[data-back-to-top]");
+		if (!btn) return;
+
+		var THRESHOLD = 500;
+		var visible = false;
+		var ticking = false;
+
+		function update() {
+			var shouldShow = window.scrollY > THRESHOLD;
+			if (shouldShow !== visible) {
+				visible = shouldShow;
+				if (visible) {
+					btn.classList.remove("opacity-0", "pointer-events-none");
+					btn.classList.add("opacity-100");
+				} else {
+					btn.classList.remove("opacity-100");
+					btn.classList.add("opacity-0", "pointer-events-none");
+				}
+			}
+			ticking = false;
+		}
+
+		window.addEventListener("scroll", function() {
+			if (!ticking) {
+				ticking = true;
+				requestAnimationFrame(update);
+			}
+		}, { passive: true });
+
+		btn.addEventListener("click", function() {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		});
+	})();
 	</script>
 </html>

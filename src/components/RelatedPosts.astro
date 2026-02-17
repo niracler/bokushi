@@ -1,0 +1,103 @@
+---
+import type { CollectionEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+
+type AnyPost = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
+
+interface Props {
+    posts: AnyPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 && (
+    <section class="related-posts">
+        <h2 class="related-posts__heading">Related Posts</h2>
+        <div class="related-posts__grid">
+            {posts.map((post) => (
+                <a href={`/${post.id}`} class="related-posts__card surface-card surface-card--soft surface-card--hover-border">
+                    <h3 class="related-posts__title">{post.data.title}</h3>
+                    <p class="related-posts__date">
+                        <FormattedDate date={post.data.pubDate} />
+                    </p>
+                    {post.data.tags && post.data.tags.length > 0 && (
+                        <div class="related-posts__tags">
+                            {post.data.tags.map((tag: string) => (
+                                <span class="pill" data-tone="accent">{tag}</span>
+                            ))}
+                        </div>
+                    )}
+                </a>
+            ))}
+        </div>
+    </section>
+)}
+
+<style>
+.related-posts {
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.related-posts__heading {
+    margin: 0 0 var(--space-6);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.related-posts__grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .related-posts__grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.related-posts__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    text-decoration: none;
+    color: inherit;
+}
+
+.related-posts__title {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: var(--line-height-tight);
+    transition: color var(--transition-base);
+}
+
+.related-posts__card:hover .related-posts__title {
+    color: var(--color-accent);
+}
+
+.related-posts__date {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.related-posts__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: auto;
+}
+
+.related-posts__tags .pill {
+    font-size: var(--font-size-2xs);
+    padding: 0.125rem var(--space-2);
+    pointer-events: none;
+}
+</style>
