@@ -167,12 +167,7 @@ function escapeHtml(str: string): string {
     return div.innerHTML;
 }
 
-function getCommentAvatarUrl(comment: CommentNode): string {
-    if (comment.avatar_url) return comment.avatar_url;
-    return gravatarUrl("");
-}
-
-function renderCommentCard(comment: CommentNode, isReply = false): string {
+function renderCommentCard(comment: CommentNode, isReply = false, parentOverride?: string): string {
     const replyClass = isReply ? " comment-card--reply" : "";
 
     if (comment.status === "deleted") {
@@ -182,11 +177,12 @@ function renderCommentCard(comment: CommentNode, isReply = false): string {
 			</div>`;
     }
 
-    const avatarUrl = getCommentAvatarUrl(comment);
+    const avatarUrl = comment.avatar_url || gravatarUrl("");
     const authorEl = createAuthorEl(comment);
     const time = formatTime(comment.created_at);
     const contentHtml = renderMarkdown(comment.content);
     const avatarClass = isReply ? "comment-avatar--sm" : "comment-avatar--md";
+    const replyParent = parentOverride || comment.id;
 
     return `
 		<div class="comment-card${replyClass}" data-comment-id="${comment.id}">
@@ -212,7 +208,7 @@ function renderCommentCard(comment: CommentNode, isReply = false): string {
 							class="reply-btn comment-reply-btn"
 							data-reply-to="${comment.id}"
 							data-reply-author="${escapeHtml(comment.author)}"
-							data-reply-parent="${comment.id}"
+							data-reply-parent="${replyParent}"
 						>
 							回复
 						</button>
@@ -220,13 +216,6 @@ function renderCommentCard(comment: CommentNode, isReply = false): string {
 				</div>
 			</div>
 		</div>`;
-}
-
-function renderReplyCard(reply: CommentNode, topLevelId: string): string {
-    return renderCommentCard({ ...reply }, true).replace(
-        `data-reply-parent="${reply.id}"`,
-        `data-reply-parent="${topLevelId}"`,
-    );
 }
 
 // Unified comment form: auth is integrated, not separate
@@ -382,7 +371,7 @@ function renderCommentList(data: CommentsResponse): string {
         if (comment.replies.length > 0) {
             html += '<div class="comment-replies">';
             for (const reply of comment.replies) {
-                html += renderReplyCard(reply, comment.id);
+                html += renderCommentCard(reply, true, comment.id);
             }
             html += "</div>";
         }
