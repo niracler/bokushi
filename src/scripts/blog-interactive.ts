@@ -91,6 +91,24 @@ function applyResponsiveTables() {
     }
 }
 
+// ============ 图片懒加载与解码优化 ============
+function enhanceProseImages() {
+    const images = document.querySelectorAll<HTMLImageElement>(".prose img");
+
+    for (const img of images) {
+        // Skip images that are already above the fold (e.g. hero images marked eager)
+        if (img.loading === "eager") continue;
+
+        // Set lazy loading and async decoding for better performance
+        if (!img.hasAttribute("loading")) {
+            img.loading = "lazy";
+        }
+        if (!img.hasAttribute("decoding")) {
+            img.decoding = "async";
+        }
+    }
+}
+
 // ============ Iframe 嵌入处理 ============
 function handleEmbedIframes() {
     const iframes = document.querySelectorAll('iframe[data-testid="embed-iframe"]');
@@ -352,6 +370,10 @@ export function initBlogInteractive() {
     const ensureResponsiveTables = () => window.requestAnimationFrame(applyResponsiveTables);
     ensureResponsiveTables();
     window.addEventListener("astro:after-swap", ensureResponsiveTables);
+
+    // 图片懒加载优化
+    enhanceProseImages();
+    window.addEventListener("astro:after-swap", enhanceProseImages);
 
     // Iframe 处理
     handleEmbedIframes();

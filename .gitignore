@@ -26,3 +26,8 @@ pnpm-debug.log*
 .wrangler/
 .playwright-mcp
 .venv
+
+# QA artifacts
+docs/
+mobile-qa/
+screenshots/

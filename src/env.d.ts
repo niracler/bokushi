@@ -10,6 +10,7 @@ interface Env {
     GITHUB_CLIENT_ID: string;
     GITHUB_CLIENT_SECRET: string;
     TELEGRAM_BOT_TOKEN: string;
+    TELEGRAM_NOTIFY_CHAT_ID?: string;
     ADMIN_GITHUB_ID: string;
 }
 

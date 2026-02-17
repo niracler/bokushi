@@ -8,9 +8,10 @@ type Props = {
     title: string;
     description: string;
     image?: string;
+    type?: string;
 };
 
-const { title, description, image = SITE_SOCIAL_IMAGE } = Astro.props as Props;
+const { title, description, image = SITE_SOCIAL_IMAGE, type = "website" } = Astro.props as Props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -58,15 +59,20 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     href={new URL("rss.xml", Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
+<meta name="theme-color" content="#fffaf4" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#140e0b" media="(prefers-color-scheme: dark)" />
+<meta name="color-scheme" content="light dark" />
+<meta name="author" content="Niracler" />
 
 <!-- Fonts -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/jf-openhuninn-2.1.subset.woff2" crossorigin />
 <style>
     @font-face {
         font-family: "jf-openhuninn-2.0";
         src: url("/fonts/jf-openhuninn-2.1.subset.woff2") format("woff2");
         font-weight: normal;
         font-style: normal;
-        font-display: optional;
+        font-display: swap;
     }
 </style>
 
@@ -83,7 +89,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <meta name="license" content="CC BY-NC-SA 4.0" />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={type} />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />

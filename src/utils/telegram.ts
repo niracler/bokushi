@@ -1,5 +1,46 @@
 import * as cheerio from "cheerio";
 
+/** Maximum input length for numbered list conversion to prevent ReDoS. */
+const MAX_NUMBERED_LIST_INPUT = 50_000;
+
+/** Convert plain-text numbered lists (1. 2. 3.) into HTML <ol>/<li> markup. */
+function convertNumberedLists(text: string): string {
+    // Guard against excessively long input that could trigger catastrophic backtracking
+    if (text.length > MAX_NUMBERED_LIST_INPUT) return text;
+
+    // Use a line-based approach instead of a single regex with lookahead
+    const lines = text.split("\n");
+    const result: string[] = [];
+    let inList = false;
+
+    for (const line of lines) {
+        const match = line.match(/^(\d+)\.\s+(.+)$/);
+        if (match) {
+            const [, num, content] = match;
+            if (!inList && num === "1") {
+                result.push(`<ol><li>${content.trim()}</li>`);
+                inList = true;
+            } else if (inList) {
+                result.push(`<li>${content.trim()}</li>`);
+            } else {
+                // Numbered line that doesn't start with 1 and not in a list - keep as-is
+                result.push(line);
+            }
+        } else {
+            if (inList) {
+                result.push("</ol>");
+                inList = false;
+            }
+            result.push(line);
+        }
+    }
+    if (inList) {
+        result.push("</ol>");
+    }
+
+    return result.join("\n");
+}
+
 export interface LinkPreview {
     url: string;
     siteName?: string;
@@ -49,6 +90,119 @@ function getProxiedImageUrl(imageUrl: string): string {
 }
 
 /**
+ * Decode common HTML entities so pipe-table detection works on
+ * Telegram's HTML output (e.g. `&amp;`, `&#124;`, `&lt;`, `&gt;`).
+ */
+function decodeHtmlEntities(text: string): string {
+    return text
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#0*39;/g, "'")
+        .replace(/&#0*124;/g, "|")
+        .replace(/&nbsp;/g, " ");
+}
+
+/**
+ * Convert pipe-delimited table text into HTML <table> elements.
+ * Uses line-by-line scanning instead of a single regex to handle
+ * edge cases with HTML entities and varied newline formats.
+ *
+ * Handles tables with or without leading/trailing pipes, and
+ * decodes HTML entities before testing pipe-line patterns.
+ */
+function convertPipeTables(html: string): string {
+    const lines = html.split("\n");
+    const result: string[] = [];
+    let i = 0;
+
+    /** Test whether a line looks like a pipe-delimited row. */
+    const isPipeLine = (line: string) => {
+        const t = decodeHtmlEntities(line).trim();
+        // Standard: |col|col|
+        if (t.startsWith("|") && t.endsWith("|") && t.length > 2) return true;
+        // Variant without outer pipes: col | col
+        if (!t.startsWith("|") && t.includes("|") && t.split("|").length >= 2) return true;
+        return false;
+    };
+
+    /** Test whether a line is the --- separator row. */
+    const isSeparator = (line: string) => {
+        const t = decodeHtmlEntities(line).trim();
+        // With outer pipes: | --- | --- |
+        if (/^\|[\s\-:]+(\|[\s\-:]+)+\|$/.test(t)) return true;
+        // Without outer pipes: --- | ---
+        if (/^[\s\-:]+(\|[\s\-:]+)+$/.test(t)) return true;
+        return false;
+    };
+
+    /** Split a pipe-delimited line into cell values. */
+    const parseCells = (line: string) => {
+        const t = decodeHtmlEntities(line).trim();
+        if (t.startsWith("|")) {
+            // Standard: |col|col|  — drop first and last empty splits
+            return t
+                .split("|")
+                .slice(1, -1)
+                .map((c) => c.trim());
+        }
+        // Without outer pipes: col | col
+        return t.split("|").map((c) => c.trim());
+    };
+
+    while (i < lines.length) {
+        // Look for a sequence of 3+ pipe lines (header + separator + data)
+        if (
+            isPipeLine(lines[i]) &&
+            i + 2 < lines.length &&
+            isPipeLine(lines[i + 1]) &&
+            isSeparator(lines[i + 1])
+        ) {
+            try {
+                // Found a table starting at line i
+                const headerLine = lines[i];
+                // Skip separator (i+1), collect data rows
+                let j = i + 2;
+                while (j < lines.length && isPipeLine(lines[j]) && !isSeparator(lines[j])) {
+                    j++;
+                }
+
+                // Only emit a table if there is at least one data row
+                if (j > i + 2) {
+                    const headers = parseCells(headerLine);
+                    let tableHtml = "<table><thead><tr>";
+                    for (const h of headers) tableHtml += `<th>${h}</th>`;
+                    tableHtml += "</tr></thead><tbody>";
+
+                    for (let k = i + 2; k < j; k++) {
+                        const cells = parseCells(lines[k]);
+                        tableHtml += "<tr>";
+                        for (const c of cells) tableHtml += `<td>${c}</td>`;
+                        tableHtml += "</tr>";
+                    }
+                    tableHtml += "</tbody></table>";
+                    result.push(tableHtml);
+                    i = j;
+                } else {
+                    result.push(lines[i]);
+                    i++;
+                }
+            } catch {
+                // Malformed table - return original lines as-is
+                result.push(lines[i]);
+                i++;
+            }
+        } else {
+            result.push(lines[i]);
+            i++;
+        }
+    }
+
+    return result.join("\n");
+}
+
+/**
  * Fetch and parse Telegram channel information from public web page
  * @param channelUsername - Telegram channel username (without @)
  * @param options - Pagination options (before/after message ID)
@@ -81,21 +235,7 @@ export async function fetchTelegramChannel(
         $description.find("br").replaceWith("\n");
 
         // Convert numbered lists in description
-        let description = $description.text().trim();
-        // Replace numbered lists with HTML
-        description = description.replace(
-            /(?:^|\n)(\d+)\.\s+(.+?)(?=\n\d+\.\s+|\n\n|$)/gs,
-            (_match, num, text) => {
-                if (num === "1") {
-                    return `<ol><li>${text.trim()}</li>`;
-                }
-                return `<li>${text.trim()}</li>`;
-            },
-        );
-        // Close the last <ol> tag if there was a list
-        if (description.includes("<ol>")) {
-            description = description.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, "$1</ol>");
-        }
+        const description = convertNumberedLists($description.text().trim());
 
         const avatarSrc = $(".tgme_page_photo_image img").attr("src") || "";
         const avatar = getProxiedImageUrl(avatarSrc);
@@ -152,22 +292,10 @@ export async function fetchTelegramChannel(
             });
 
             // Build content HTML and convert numbered lists
-            let contentHtml = $content.html() || "";
+            let contentHtml = convertNumberedLists($content.html() || "");
 
-            // Convert numbered lists (1. 2. 3.) to proper HTML lists
-            contentHtml = contentHtml.replace(
-                /(?:^|\n)(\d+)\.\s+(.+?)(?=\n\d+\.\s+|\n\n|$)/gs,
-                (_match, num, text) => {
-                    if (num === "1") {
-                        return `<ol><li>${text.trim()}</li>`;
-                    }
-                    return `<li>${text.trim()}</li>`;
-                },
-            );
-            // Close the last <ol> tag if there was a list
-            if (contentHtml.includes("<ol>")) {
-                contentHtml = contentHtml.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, "$1</ol>");
-            }
+            // Convert pipe-delimited tables to HTML tables
+            contentHtml = convertPipeTables(contentHtml);
 
             // Add images if any
             if (images.length > 0) {

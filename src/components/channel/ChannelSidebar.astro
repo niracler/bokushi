@@ -58,6 +58,11 @@ const { title, description, avatar, username } = Astro.props;
         width: 56px;
         height: 56px;
     }
+
+    /* Hide full description on mobile; only show channel name + actions */
+    .channel-sidebar__description {
+        display: none;
+    }
 }
 
 .channel-sidebar__card {
@@ -85,12 +90,14 @@ const { title, description, avatar, username } = Astro.props;
 }
 
 .channel-sidebar__description {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-muted);
-    line-height: 1.5;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
     margin-bottom: var(--space-4);
     text-align: left;
     width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .channel-sidebar__description :global(ol),

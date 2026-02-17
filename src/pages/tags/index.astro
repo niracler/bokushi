@@ -40,14 +40,14 @@ const pageTitle = "标签索引";
 	</head>
 	<body>
 		<Header />
-		<main class="page-shell max-w-5xl section-stack">
+		<main id="main-content" class="page-shell max-w-5xl section-stack">
 			<header class="space-y-3 text-center">
 				<h1 class="text-3xl font-semibold tracking-tight text-primary sm:text-4xl">{pageTitle}</h1>
 				<p class="text-sm uppercase tracking-[0.25em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
 					从这里探索所有话题
 				</p>
 			</header>
-			<section class="space-y-8">
+			<section class="space-y-16">
 				{primaryTags.length > 0 && (
 					<div class="space-y-3">
 						<h2 class="text-center text-xs font-semibold uppercase tracking-[0.38em] text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)]">
@@ -58,7 +58,7 @@ const pageTitle = "标签索引";
 								<p class="m-0">
 									<a
 										href={`/tags/${tag}`}
-										class="inline-flex items-center rounded-full border border-border-subtle bg-surface px-4 py-2 text-sm font-medium text-secondary transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent"
+										class="inline-flex items-center rounded-full border border-border-subtle bg-surface px-4 py-2.5 text-sm font-medium text-secondary transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent sm:py-2"
 									>
 										<span>{tag}</span>
 										<span class="ml-2 text-xs font-semibold text-muted">
@@ -81,7 +81,7 @@ const pageTitle = "标签索引";
 								<p class="m-0">
 									<a
 										href={`/tags/${tag}`}
-										class="inline-flex items-center rounded-full border border-border-subtle bg-surface px-4 py-2 text-sm font-medium text-secondary transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent"
+										class="inline-flex items-center rounded-full border border-border-subtle bg-surface px-4 py-2.5 text-sm font-medium text-secondary transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent sm:py-2"
 									>
 									<span>{tag}</span>
 									<span class="ml-2 text-[0.75rem] font-semibold text-[color-mix(in srgb, var(--color-text-muted) 65%, transparent)]">

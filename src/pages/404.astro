@@ -1,0 +1,89 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { SITE_TITLE } from "../consts";
+---
+
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <BaseHead
+            title={`404 · ${SITE_TITLE}`}
+            description="页面走丢了"
+        />
+        <meta name="robots" content="noindex, follow" />
+    </head>
+    <body>
+        <Header />
+        <main id="main-content" class="page-shell max-w-5xl section-stack">
+            <div class="error-page">
+                <div class="error-page__code">404</div>
+                <h1 class="error-page__title">页面走丢了</h1>
+                <p class="error-page__desc">
+                    你访问的页面不存在，可能已经被移动或删除。
+                </p>
+                <a href="/" class="error-page__link">
+                    回到首页
+                </a>
+            </div>
+        </main>
+        <Footer />
+    </body>
+</html>
+
+<style>
+    .error-page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 50vh;
+        text-align: center;
+        padding: var(--space-8) var(--space-4);
+    }
+
+    .error-page__code {
+        font-size: clamp(6rem, 15vw, 10rem);
+        font-weight: 800;
+        line-height: 1;
+        color: var(--color-accent);
+        opacity: 0.2;
+        margin-bottom: var(--space-2);
+    }
+
+    .error-page__title {
+        font-size: var(--font-size-2xl, 1.5rem);
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin: 0 0 var(--space-3);
+    }
+
+    .error-page__desc {
+        font-size: var(--font-size-base);
+        color: var(--color-text-secondary);
+        margin: 0 0 var(--space-6);
+        max-width: 40ch;
+    }
+
+    .error-page__link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-6);
+        background: var(--color-accent);
+        color: white;
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: var(--font-size-sm);
+        transition:
+            background-color var(--transition-base),
+            transform var(--transition-base);
+    }
+
+    .error-page__link:hover {
+        background: var(--color-accent);
+        opacity: 0.9;
+    }
+</style>

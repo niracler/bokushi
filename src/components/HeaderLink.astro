@@ -16,6 +16,7 @@ const isActive = href === pathname || href === `/${firstSegment}`;
 		className,
 		{ "text-accent border-b-accent": isActive },
 	]}
+	aria-current={isActive ? "page" : undefined}
 	{...props}
 >
 	<slot />

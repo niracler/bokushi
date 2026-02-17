@@ -173,8 +173,8 @@
         height: 2rem;
     }
     .icon-btn--sm {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.75rem;
+        height: 2.75rem;
     }
     .icon-btn--md {
         width: 3rem;
@@ -183,7 +183,7 @@
 
     /* Icon button - shape variants */
     .icon-btn--round {
-        border-radius: 9999px;
+        border-radius: var(--radius-full);
     }
     .icon-btn--square {
         border-radius: var(--radius-md);
@@ -275,6 +275,12 @@
         font-weight: 700;
         letter-spacing: 0.02em;
         font-variant-numeric: tabular-nums;
+        opacity: 0.5;
+        transition: opacity var(--transition-base);
+    }
+
+    .prose :where(h2, h3, h4):hover > .anchor-link {
+        opacity: 1;
     }
 
     .prose h2 > .anchor-link::before {
@@ -311,6 +317,15 @@
         margin-top: var(--space-2);
     }
 
+    /* Tighten spacing when a sub-heading directly follows its parent heading */
+    .prose :is(h2) + :is(h3) {
+        margin-top: var(--space-3);
+    }
+
+    .prose :is(h3) + :is(h4) {
+        margin-top: var(--space-2);
+    }
+
     .prose a {
         color: var(--color-link);
         text-underline-offset: 0.2em;
@@ -333,6 +348,10 @@
         color: var(--color-text-secondary);
     }
 
+    .prose blockquote > * + * {
+        margin-top: var(--space-2);
+    }
+
     .prose :is(ul, ol) {
         margin: 0;
         display: grid;
@@ -348,6 +367,7 @@
 
     .prose ol {
         list-style-type: decimal;
+        font-variant-numeric: tabular-nums;
     }
 
     .prose :is(ul, ol) :is(ul, ol) {
@@ -364,6 +384,10 @@
 
     .prose li::marker {
         color: var(--color-text-muted);
+    }
+
+    .prose li > * + * {
+        margin-top: var(--space-2);
     }
 
     .prose code {
@@ -467,7 +491,7 @@
         font-family: inherit;
         font-size: var(--font-size-xs);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all var(--transition-base);
     }
 
     .code-copy-button:hover {
@@ -501,83 +525,11 @@
         background: color-mix(in srgb, var(--color-bg-surface) 90%, var(--color-bg-muted) 10%);
         box-shadow: var(--shadow-soft);
         overflow-x: auto;
-        --mermaid-font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-        --mermaid-font-size: 16px;
-        --mermaid-primary-color: color-mix(
-            in srgb,
-            var(--color-accent) 32%,
-            var(--color-bg-surface)
-        );
-        --mermaid-secondary-color: color-mix(
-            in srgb,
-            var(--color-bg-muted) 70%,
-            var(--color-bg-surface) 30%
-        );
-        --mermaid-tertiary-color: color-mix(
-            in srgb,
-            var(--color-accent-soft) 50%,
-            var(--color-bg-surface)
-        );
-        --mermaid-primary-text-color: var(--color-text-primary);
-        --mermaid-secondary-text-color: var(--color-text-secondary);
-        --mermaid-line-color: color-mix(in srgb, var(--color-text-primary) 55%, transparent);
-        --mermaid-edge-color: var(--mermaid-line-color);
-        --mermaid-label-bg-color: color-mix(
-            in srgb,
-            var(--color-bg-surface) 92%,
-            var(--color-bg-muted) 8%
-        );
-        --mermaid-label-text-color: var(--color-text-secondary);
-        --mermaid-note-bg-color: color-mix(in srgb, var(--color-note) 22%, var(--color-bg-surface));
-        --mermaid-note-text-color: color-mix(
-            in srgb,
-            var(--color-note) 70%,
-            var(--color-text-primary)
-        );
     }
 
     html[data-theme="dark"] .prose .mermaid {
         border-color: var(--color-border-strong);
         background: color-mix(in srgb, var(--color-bg-surface) 80%, var(--color-bg-muted) 20%);
-        --mermaid-primary-color: color-mix(
-            in srgb,
-            var(--color-accent) 46%,
-            var(--color-bg-surface)
-        );
-        --mermaid-secondary-color: color-mix(
-            in srgb,
-            var(--color-bg-muted) 55%,
-            var(--color-bg-surface) 45%
-        );
-        --mermaid-tertiary-color: color-mix(
-            in srgb,
-            var(--color-accent-soft) 45%,
-            var(--color-bg-surface)
-        );
-        --mermaid-primary-text-color: var(--color-text-primary);
-        --mermaid-secondary-text-color: color-mix(
-            in srgb,
-            var(--color-text-secondary) 80%,
-            var(--color-text-primary) 20%
-        );
-        --mermaid-line-color: color-mix(in srgb, var(--color-text-primary) 85%, transparent);
-        --mermaid-edge-color: var(--mermaid-line-color);
-        --mermaid-label-bg-color: color-mix(
-            in srgb,
-            var(--color-bg-surface) 72%,
-            var(--color-bg-muted) 28%
-        );
-        --mermaid-label-text-color: color-mix(
-            in srgb,
-            var(--color-text-secondary) 90%,
-            var(--color-text-primary) 10%
-        );
-        --mermaid-note-bg-color: color-mix(in srgb, var(--color-note) 26%, var(--color-bg-surface));
-        --mermaid-note-text-color: color-mix(
-            in srgb,
-            var(--color-note) 82%,
-            var(--color-text-primary)
-        );
     }
 
     .prose .mermaid svg {
@@ -665,6 +617,7 @@
         background: var(--color-bg-surface);
         box-shadow: var(--shadow-soft);
         font-size: 0.95rem;
+        font-variant-numeric: tabular-nums;
     }
 
     .prose table thead {
@@ -820,7 +773,7 @@
         user-select: none;
         font-weight: 600;
         color: var(--color-text-primary);
-        transition: color 0.2s ease;
+        transition: color var(--transition-base);
     }
 
     .prose summary:hover {
@@ -883,6 +836,8 @@
     .prose figcaption {
         color: var(--color-text-muted);
         font-size: var(--font-size-sm);
+        font-style: italic;
+        line-height: var(--line-height-relaxed);
         text-align: center;
     }
 
@@ -999,15 +954,15 @@
         padding: 0.125rem 0;
         color: var(--color-text-muted);
         text-decoration: none;
-        font-size: 0.8125rem;
+        font-size: var(--font-size-xs);
         line-height: 1.6;
-        transition: color 0.2s ease;
+        transition: color var(--transition-base);
     }
 
     .toc-number {
         padding-top: 0.05rem;
         color: color-mix(in srgb, var(--color-text-muted) 50%, transparent);
-        font-size: 0.6875rem;
+        font-size: var(--font-size-2xs);
         font-weight: 500;
         font-variant-numeric: tabular-nums;
         user-select: none;
@@ -1066,7 +1021,7 @@
     }
 
     .toc-mobile .toc-link {
-        font-size: 0.9375rem;
+        font-size: var(--font-size-sm);
         padding: 0.375rem 0;
     }
 
@@ -1152,7 +1107,7 @@
         align-items: center;
         gap: var(--space-2);
         padding: var(--space-1) var(--space-3);
-        border-radius: 999px;
+        border-radius: var(--radius-full);
         border: 1px solid var(--color-border-subtle);
         background: var(--color-bg-muted);
         color: var(--color-text-secondary);
@@ -1161,9 +1116,23 @@
         letter-spacing: 0.04em;
         text-transform: none;
         transition:
-            color 0.2s ease,
-            border-color 0.2s ease,
-            background 0.2s ease;
+            color var(--transition-base),
+            border-color var(--transition-base),
+            background var(--transition-base);
+    }
+
+    .pill--clickable {
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .pill--clickable:hover {
+        opacity: 0.8;
+    }
+
+    .pill--clickable:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
     }
 
     .pill[data-tone="accent"] {
@@ -1308,70 +1277,17 @@
 
     /* ── Comment Section ─────────────────────────────── */
 
-    .comment-auth-bar {
-        background: var(--color-bg-surface);
-        border: 1px solid var(--color-border-soft);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-soft);
-        padding: var(--space-4) var(--space-6);
-    }
-
-    .comment-login-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-2);
-        padding: var(--space-2) var(--space-4);
-        border: 1px solid var(--color-border-subtle);
-        border-radius: var(--radius-md);
-        background: var(--color-bg-muted);
-        color: var(--color-text-primary);
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-        cursor: pointer;
-        transition:
-            border-color 0.2s ease,
-            background-color 0.2s ease,
-            box-shadow 0.2s ease;
-    }
-
-    .comment-login-btn:hover {
-        border-color: var(--color-accent);
-        background: var(--color-accent-soft);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent);
-    }
-
-    .comment-login-btn svg {
-        width: 1.125rem;
-        height: 1.125rem;
-        flex-shrink: 0;
-    }
-
-    .comment-divider {
-        display: flex;
-        align-items: center;
-        gap: var(--space-3);
-        margin-block: var(--space-3);
-        font-size: var(--font-size-xs);
-        color: var(--color-text-muted);
-    }
-
-    .comment-divider::before,
-    .comment-divider::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: var(--color-border-subtle);
-    }
-
+    /* Logged-in user bar (inside comment form) */
     .comment-user-bar {
         display: flex;
         align-items: center;
         gap: var(--space-3);
+        margin-bottom: var(--space-2);
     }
 
     .comment-user-bar img {
-        width: 2.25rem;
-        height: 2.25rem;
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
         border: 2px solid var(--color-accent-soft);
     }
@@ -1389,35 +1305,105 @@
         color: var(--color-text-primary);
     }
 
-    .comment-user-bar .user-action {
+    /* Inline action links (logout, link account, login) */
+    .comment-inline-action {
         font-size: var(--font-size-xs);
         color: var(--color-text-muted);
         cursor: pointer;
         border: none;
         background: none;
         padding: 0;
-        transition: color 0.2s ease;
+        text-decoration: none;
+        transition: color var(--transition-base);
     }
 
-    .comment-user-bar .user-action:hover {
+    .comment-inline-action:hover {
         color: var(--color-accent);
     }
 
-    .comment-user-bar .user-action--danger:hover {
+    .comment-inline-action--danger:hover {
         color: var(--color-danger);
     }
 
+    .comment-inline-sep {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+        opacity: 0.4;
+    }
+
+    /* Login hint in form footer */
+    .comment-login-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--font-size-xs);
+    }
+
+    .comment-login-hint-text {
+        color: var(--color-text-muted);
+        opacity: 0.6;
+    }
+
+    .comment-login-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        border: 1px solid var(--color-border-soft);
+        background: var(--color-bg-surface);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-xs);
+        font-family: inherit;
+        cursor: pointer;
+        transition:
+            color var(--transition-base),
+            border-color var(--transition-base),
+            background-color var(--transition-base);
+    }
+
+    .comment-login-link:hover {
+        color: var(--color-accent);
+        border-color: var(--color-accent-tint);
+        background: var(--color-accent-tint-6);
+    }
+
+    .comment-login-link svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+    }
+
+    /* Comment cards */
     .comment-card {
         padding-block: var(--space-4);
-        animation: comment-fade-in 0.3s ease-out;
+        animation: comment-fade-in 0.35s ease-out both;
     }
 
     .comment-card + .comment-card {
         border-top: 1px solid var(--color-border-subtle);
     }
 
+    /* Reply thread wrapper with connecting line */
+    .comment-replies {
+        position: relative;
+        margin-left: calc(1.25rem + var(--space-3));
+        padding-left: var(--space-6);
+    }
+
+    .comment-replies::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: var(--space-4);
+        width: 2px;
+        border-radius: 1px;
+        background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+    }
+
     .comment-card--reply {
-        margin-left: var(--space-12);
         padding-block: var(--space-3);
     }
 
@@ -1440,12 +1426,19 @@
         }
     }
 
+    /* Staggered animation: --thread-index is set by JS in comments.ts */
+    .comment-thread {
+        animation: comment-fade-in 0.35s ease-out both;
+        animation-delay: calc(var(--thread-index, 0) * 0.04s);
+    }
+
+    /* Avatars */
     .comment-avatar {
         flex-shrink: 0;
         border-radius: 50%;
         background: var(--color-bg-muted);
         border: 2px solid var(--color-border-subtle);
-        transition: border-color 0.2s ease;
+        transition: border-color var(--transition-base);
     }
 
     .comment-card:hover .comment-avatar {
@@ -1462,9 +1455,10 @@
         height: 2.5rem;
     }
 
+    /* Comment header: author + time */
     .comment-header {
         display: flex;
-        align-items: center;
+        align-items: baseline;
         gap: var(--space-2);
         font-size: var(--font-size-sm);
     }
@@ -1487,8 +1481,8 @@
         display: inline-flex;
         align-items: center;
         padding: 1px var(--space-2);
-        border-radius: 999px;
-        font-size: 0.6875rem;
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-2xs);
         font-weight: 600;
         letter-spacing: 0.02em;
         background: color-mix(in srgb, var(--color-accent) 14%, transparent);
@@ -1501,8 +1495,9 @@
         color: var(--color-text-muted);
     }
 
+    /* Comment body */
     .comment-body {
-        margin-top: var(--space-1);
+        margin-top: var(--space-2);
         font-size: var(--font-size-sm);
         color: var(--color-text-secondary);
         line-height: var(--line-height-base);
@@ -1539,6 +1534,7 @@
         color: var(--color-text-muted);
     }
 
+    /* Reply button */
     .comment-actions {
         margin-top: var(--space-2);
     }
@@ -1546,11 +1542,11 @@
     .comment-reply-btn {
         border: none;
         background: none;
-        padding: 0;
+        padding: var(--space-1) 0;
         font-size: var(--font-size-xs);
         color: var(--color-text-muted);
         cursor: pointer;
-        transition: color 0.2s ease;
+        transition: color var(--transition-base);
     }
 
     .comment-reply-btn:hover {
@@ -1565,7 +1561,9 @@
     .comment-form--reply {
         margin-top: var(--space-3);
         margin-bottom: var(--space-4);
-        margin-left: var(--space-12);
+        margin-left: calc(1.25rem + var(--space-3));
+        padding-left: var(--space-6);
+        border-left: 2px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
     }
 
     .comment-form-fields {
@@ -1583,26 +1581,33 @@
     .comment-input {
         width: 100%;
         padding: var(--space-2) var(--space-3);
-        border: 1px solid var(--color-border-subtle);
+        border: 1px solid var(--color-border-soft);
         border-radius: var(--radius-md);
         background: var(--color-bg-surface);
         color: var(--color-text-primary);
         font-size: var(--font-size-sm);
         font-family: inherit;
         transition:
-            border-color 0.2s ease,
-            box-shadow 0.2s ease;
+            border-color var(--transition-base),
+            box-shadow var(--transition-base),
+            background-color var(--transition-base);
     }
 
     .comment-input::placeholder {
         color: var(--color-text-muted);
-        opacity: 0.7;
+        opacity: 0.6;
+        transition: opacity var(--transition-base);
+    }
+
+    .comment-input:focus::placeholder {
+        opacity: 0.4;
     }
 
     .comment-input:focus {
         outline: none;
         border-color: var(--color-accent);
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent);
+        background: var(--color-bg-surface);
     }
 
     textarea.comment-input {
@@ -1622,7 +1627,7 @@
     .comment-form-hint {
         font-size: var(--font-size-xs);
         color: var(--color-text-muted);
-        opacity: 0.7;
+        opacity: 0.6;
     }
 
     .comment-form-actions {
@@ -1631,18 +1636,33 @@
         gap: var(--space-3);
     }
 
+    @media (max-width: 899px) {
+        .comment-form-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .comment-form-actions {
+            justify-content: flex-end;
+        }
+    }
+
     .comment-cancel-btn {
         border: none;
         background: none;
-        padding: 0;
+        padding: var(--space-1) var(--space-2);
         font-size: var(--font-size-sm);
         color: var(--color-text-muted);
         cursor: pointer;
-        transition: color 0.2s ease;
+        border-radius: var(--radius-sm);
+        transition:
+            color var(--transition-base),
+            background-color var(--transition-base);
     }
 
     .comment-cancel-btn:hover {
         color: var(--color-text-primary);
+        background: var(--color-bg-muted);
     }
 
     .comment-submit-btn {
@@ -1656,8 +1676,8 @@
         font-family: inherit;
         cursor: pointer;
         transition:
-            background-color 0.2s ease,
-            box-shadow 0.2s ease,
+            background-color var(--transition-base),
+            box-shadow var(--transition-base),
             transform 0.1s ease;
     }
 
@@ -1682,20 +1702,155 @@
         color: var(--color-danger);
     }
 
+    /* Empty state */
     .comment-empty {
         text-align: center;
-        padding: var(--space-8) var(--space-4);
+        padding: var(--space-12) var(--space-4);
         color: var(--color-text-muted);
     }
 
-    .comment-empty-icon {
-        font-size: 2rem;
-        margin-bottom: var(--space-2);
-        opacity: 0.4;
+    .comment-empty-illustration {
+        width: 4rem;
+        height: 4rem;
+        margin: 0 auto var(--space-4);
+        border-radius: 50%;
+        background: var(--color-bg-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .comment-empty p {
+    .comment-empty-illustration svg {
+        width: 1.75rem;
+        height: 1.75rem;
+        color: var(--color-text-muted);
+        opacity: 0.5;
+    }
+
+    .comment-empty-title {
         font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        margin: 0 0 var(--space-1);
+    }
+
+    .comment-empty-subtitle {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
         margin: 0;
+    }
+
+    /* Loading skeleton */
+    .comment-skeleton {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+        padding-block: var(--space-4);
+    }
+
+    .comment-skeleton-item {
+        display: flex;
+        gap: var(--space-3);
+    }
+
+    .comment-skeleton-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: var(--color-bg-muted);
+        flex-shrink: 0;
+        animation: skeleton-pulse 1.6s ease-in-out infinite;
+    }
+
+    .comment-skeleton-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .comment-skeleton-line {
+        height: 0.75rem;
+        border-radius: var(--radius-sm);
+        background: var(--color-bg-muted);
+        animation: skeleton-pulse 1.6s ease-in-out infinite;
+    }
+
+    .comment-skeleton-line--short {
+        width: 40%;
+    }
+
+    .comment-skeleton-line--medium {
+        width: 70%;
+    }
+
+    .comment-skeleton-line--long {
+        width: 90%;
+    }
+
+    .comment-skeleton-item:nth-child(2) .comment-skeleton-avatar,
+    .comment-skeleton-item:nth-child(2) .comment-skeleton-line {
+        animation-delay: 0.15s;
+    }
+
+    .comment-skeleton-item:nth-child(3) .comment-skeleton-avatar,
+    .comment-skeleton-item:nth-child(3) .comment-skeleton-line {
+        animation-delay: 0.3s;
+    }
+
+    @keyframes skeleton-pulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.4;
+        }
+    }
+
+    /* =========================================
+     * Custom Checkbox (ghost/outlined style)
+     * ========================================= */
+
+    .deepsearch-checkbox {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 1rem;
+        height: 1rem;
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--radius-xs);
+        background: transparent;
+        cursor: pointer;
+        position: relative;
+        flex-shrink: 0;
+        transition:
+            border-color var(--transition-base),
+            background-color var(--transition-base);
+    }
+
+    .deepsearch-checkbox:hover {
+        border-color: var(--color-border-strong);
+    }
+
+    .deepsearch-checkbox:checked {
+        border-color: var(--color-accent);
+        background: var(--color-accent-tint);
+    }
+
+    .deepsearch-checkbox:checked::after {
+        content: "";
+        position: absolute;
+        left: 3px;
+        top: 0.5px;
+        width: 5px;
+        height: 9px;
+        border-right: 2px solid var(--color-accent);
+        border-bottom: 2px solid var(--color-accent);
+        transform: rotate(45deg);
+    }
+
+    .deepsearch-checkbox:focus-visible {
+        outline: 2px solid var(--color-accent-soft);
+        outline-offset: 2px;
     }
 }
