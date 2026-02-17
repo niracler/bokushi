@@ -183,7 +183,32 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
     toggleButton?.addEventListener("click", () => setOpen(overlay?.dataset.navState !== "open"));
     closeButtons.forEach((btn) => btn.addEventListener("click", () => setOpen(false)));
     overlay?.addEventListener("click", (e) => e.target === overlay && setOpen(false));
-    document.addEventListener("keydown", (e) => e.key === "Escape" && setOpen(false));
+    document.addEventListener("keydown", (e) => {
+        if (overlay?.dataset.navState !== "open") return;
+
+        if (e.key === "Escape") {
+            setOpen(false);
+            return;
+        }
+
+        if (e.key === "Tab" && drawer) {
+            const focusable = [...drawer.querySelectorAll(
+                'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            )];
+            if (focusable.length === 0) return;
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+    });
     navLinks.forEach((link) => link.addEventListener("click", () => setOpen(false)));
 
     // Close drawer when viewport becomes desktop-sized
