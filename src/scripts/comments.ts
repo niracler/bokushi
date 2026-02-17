@@ -535,6 +535,14 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
             return;
         }
 
+        if (parentId) {
+            const parentCard = container.querySelector(`[data-comment-id="${parentId}"]`);
+            if (!parentCard) {
+                showError(errorEl, "该评论已被删除，无法回复");
+                return;
+            }
+        }
+
         const postData: Record<string, string | null> = {
             slug,
             parent_id: parentId,

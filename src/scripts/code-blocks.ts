@@ -52,6 +52,7 @@ function createCopyButton(): HTMLButtonElement {
     const button = document.createElement("button");
     button.className = "code-copy-button";
     button.setAttribute("aria-label", "Copy code to clipboard");
+    button.setAttribute("aria-live", "polite");
     button.innerHTML = "<span>Copy</span>";
     return button;
 }
