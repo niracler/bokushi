@@ -1,5 +1,22 @@
 import * as cheerio from "cheerio";
 
+/** Convert plain-text numbered lists (1. 2. 3.) into HTML <ol>/<li> markup. */
+function convertNumberedLists(text: string): string {
+    let result = text.replace(
+        /(?:^|\n)(\d+)\.\s+(.+?)(?=\n\d+\.\s+|\n\n|$)/gs,
+        (_match, num, content) => {
+            if (num === "1") {
+                return `<ol><li>${content.trim()}</li>`;
+            }
+            return `<li>${content.trim()}</li>`;
+        },
+    );
+    if (result.includes("<ol>")) {
+        result = result.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, "$1</ol>");
+    }
+    return result;
+}
+
 export interface LinkPreview {
     url: string;
     siteName?: string;
@@ -142,21 +159,7 @@ export async function fetchTelegramChannel(
         $description.find("br").replaceWith("\n");
 
         // Convert numbered lists in description
-        let description = $description.text().trim();
-        // Replace numbered lists with HTML
-        description = description.replace(
-            /(?:^|\n)(\d+)\.\s+(.+?)(?=\n\d+\.\s+|\n\n|$)/gs,
-            (_match, num, text) => {
-                if (num === "1") {
-                    return `<ol><li>${text.trim()}</li>`;
-                }
-                return `<li>${text.trim()}</li>`;
-            },
-        );
-        // Close the last <ol> tag if there was a list
-        if (description.includes("<ol>")) {
-            description = description.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, "$1</ol>");
-        }
+        const description = convertNumberedLists($description.text().trim());
 
         const avatarSrc = $(".tgme_page_photo_image img").attr("src") || "";
         const avatar = getProxiedImageUrl(avatarSrc);
@@ -213,22 +216,7 @@ export async function fetchTelegramChannel(
             });
 
             // Build content HTML and convert numbered lists
-            let contentHtml = $content.html() || "";
-
-            // Convert numbered lists (1. 2. 3.) to proper HTML lists
-            contentHtml = contentHtml.replace(
-                /(?:^|\n)(\d+)\.\s+(.+?)(?=\n\d+\.\s+|\n\n|$)/gs,
-                (_match, num, text) => {
-                    if (num === "1") {
-                        return `<ol><li>${text.trim()}</li>`;
-                    }
-                    return `<li>${text.trim()}</li>`;
-                },
-            );
-            // Close the last <ol> tag if there was a list
-            if (contentHtml.includes("<ol>")) {
-                contentHtml = contentHtml.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, "$1</ol>");
-            }
+            let contentHtml = convertNumberedLists($content.html() || "");
 
             // Convert pipe-delimited tables to HTML tables
             contentHtml = convertPipeTables(contentHtml);
