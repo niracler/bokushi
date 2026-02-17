@@ -143,12 +143,30 @@ Astro.response.headers.set(
 </html>
 
 <script>
-  // Mark channel images for lightbox and lazy load
+  // Mark channel images for lightbox and lazy load + collapse long posts
   document.addEventListener('DOMContentLoaded', () => {
+    // Images
     document.querySelectorAll('.post-card__content img').forEach((element) => {
       const img = element as HTMLImageElement;
       img.classList.add('telegram-post-image');
       img.loading = img.loading || 'lazy';
+    });
+
+    // Collapse long posts (threshold: 384px = 24rem)
+    const COLLAPSE_THRESHOLD = 384;
+    document.querySelectorAll<HTMLElement>('[data-post-content-wrapper]').forEach((wrapper) => {
+      const content = wrapper.querySelector<HTMLElement>('.post-card__content');
+      const btn = wrapper.querySelector<HTMLButtonElement>('[data-expand-btn]');
+      if (!content || !btn) return;
+
+      if (content.scrollHeight > COLLAPSE_THRESHOLD) {
+        wrapper.dataset.collapsed = 'true';
+        btn.hidden = false;
+        btn.addEventListener('click', () => {
+          wrapper.dataset.collapsed = 'false';
+          btn.hidden = true;
+        });
+      }
     });
   });
 </script>
@@ -156,14 +174,15 @@ Astro.response.headers.set(
 <style>
   .channel-layout {
     display: grid;
-    grid-template-columns: minmax(0, 600px) 260px;
+    grid-template-columns: minmax(0, 600px) 280px;
     gap: var(--space-6);
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
   }
 
   .channel-main {
     min-width: 0;
+    overflow: hidden;
   }
 
   .posts-container {

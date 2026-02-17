@@ -36,6 +36,8 @@ const { preview } = Astro.props;
     text-decoration: none;
     color: inherit;
     margin-top: var(--space-4);
+    overflow: hidden;
+    min-width: 0;
 }
 
 .link-preview__image {
@@ -82,7 +84,7 @@ const { preview } = Astro.props;
 
 .link-preview__desc {
     font-size: var(--font-size-xs);
-    color: var(--color-text-muted);
+    color: var(--color-text-secondary);
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;

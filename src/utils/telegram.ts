@@ -49,6 +49,67 @@ function getProxiedImageUrl(imageUrl: string): string {
 }
 
 /**
+ * Convert pipe-delimited table text into HTML <table> elements.
+ * Uses line-by-line scanning instead of a single regex to handle
+ * edge cases with HTML entities and varied newline formats.
+ */
+function convertPipeTables(html: string): string {
+    const lines = html.split("\n");
+    const result: string[] = [];
+    let i = 0;
+
+    const isPipeLine = (line: string) => {
+        const t = line.trim();
+        return t.startsWith("|") && t.endsWith("|") && t.length > 2;
+    };
+    const isSeparator = (line: string) => /^\|[\s\-:]+(\|[\s\-:]+)+\|$/.test(line.trim());
+    const parseCells = (line: string) =>
+        line
+            .trim()
+            .split("|")
+            .slice(1, -1)
+            .map((c) => c.trim());
+
+    while (i < lines.length) {
+        // Look for a sequence of 3+ pipe lines (header + separator + data)
+        if (
+            isPipeLine(lines[i]) &&
+            i + 2 < lines.length &&
+            isPipeLine(lines[i + 1]) &&
+            isSeparator(lines[i + 1])
+        ) {
+            // Found a table starting at line i
+            const headerLine = lines[i];
+            // Skip separator (i+1), collect data rows
+            let j = i + 2;
+            while (j < lines.length && isPipeLine(lines[j]) && !isSeparator(lines[j])) {
+                j++;
+            }
+
+            const headers = parseCells(headerLine);
+            let tableHtml = "<table><thead><tr>";
+            for (const h of headers) tableHtml += `<th>${h}</th>`;
+            tableHtml += "</tr></thead><tbody>";
+
+            for (let k = i + 2; k < j; k++) {
+                const cells = parseCells(lines[k]);
+                tableHtml += "<tr>";
+                for (const c of cells) tableHtml += `<td>${c}</td>`;
+                tableHtml += "</tr>";
+            }
+            tableHtml += "</tbody></table>";
+            result.push(tableHtml);
+            i = j;
+        } else {
+            result.push(lines[i]);
+            i++;
+        }
+    }
+
+    return result.join("\n");
+}
+
+/**
  * Fetch and parse Telegram channel information from public web page
  * @param channelUsername - Telegram channel username (without @)
  * @param options - Pagination options (before/after message ID)
@@ -168,6 +229,9 @@ export async function fetchTelegramChannel(
             if (contentHtml.includes("<ol>")) {
                 contentHtml = contentHtml.replace(/(<li>.*?<\/li>)(?!.*<li>)/s, "$1</ol>");
             }
+
+            // Convert pipe-delimited tables to HTML tables
+            contentHtml = convertPipeTables(contentHtml);
 
             // Add images if any
             if (images.length > 0) {
