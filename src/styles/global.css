@@ -173,8 +173,8 @@
         height: 2rem;
     }
     .icon-btn--sm {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.75rem;
+        height: 2.75rem;
     }
     .icon-btn--md {
         width: 3rem;
@@ -1308,6 +1308,7 @@
 
     /* ── Comment Section ─────────────────────────────── */
 
+    /* Auth bar */
     .comment-auth-bar {
         background: var(--color-bg-surface);
         border: 1px solid var(--color-border-soft);
@@ -1320,30 +1321,36 @@
         display: inline-flex;
         align-items: center;
         gap: var(--space-2);
-        padding: var(--space-2) var(--space-4);
-        border: 1px solid var(--color-border-subtle);
+        padding: var(--space-2) var(--space-5, 1.25rem);
+        border: 1px solid var(--color-border-soft);
         border-radius: var(--radius-md);
-        background: var(--color-bg-muted);
-        color: var(--color-text-primary);
+        background: var(--color-bg-surface);
+        color: var(--color-text-secondary);
         font-size: var(--font-size-sm);
         font-weight: 500;
         cursor: pointer;
         transition:
-            border-color 0.2s ease,
-            background-color 0.2s ease,
-            box-shadow 0.2s ease;
+            border-color var(--transition-base),
+            background-color var(--transition-base),
+            color var(--transition-base),
+            box-shadow var(--transition-base);
     }
 
     .comment-login-btn:hover {
         border-color: var(--color-accent);
+        color: var(--color-accent);
         background: var(--color-accent-soft);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent);
     }
 
     .comment-login-btn svg {
         width: 1.125rem;
         height: 1.125rem;
         flex-shrink: 0;
+        opacity: 0.8;
+    }
+
+    .comment-login-btn:hover svg {
+        opacity: 1;
     }
 
     .comment-divider {
@@ -1363,6 +1370,7 @@
         background: var(--color-border-subtle);
     }
 
+    /* Logged-in user bar */
     .comment-user-bar {
         display: flex;
         align-items: center;
@@ -1396,7 +1404,7 @@
         border: none;
         background: none;
         padding: 0;
-        transition: color 0.2s ease;
+        transition: color var(--transition-base);
     }
 
     .comment-user-bar .user-action:hover {
@@ -1407,17 +1415,35 @@
         color: var(--color-danger);
     }
 
+    /* Comment cards */
     .comment-card {
         padding-block: var(--space-4);
-        animation: comment-fade-in 0.3s ease-out;
+        animation: comment-fade-in 0.35s ease-out both;
     }
 
     .comment-card + .comment-card {
         border-top: 1px solid var(--color-border-subtle);
     }
 
+    /* Reply thread wrapper with connecting line */
+    .comment-replies {
+        position: relative;
+        margin-left: calc(1.25rem + var(--space-3));
+        padding-left: var(--space-6);
+    }
+
+    .comment-replies::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: var(--space-4);
+        width: 2px;
+        border-radius: 1px;
+        background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+    }
+
     .comment-card--reply {
-        margin-left: var(--space-12);
         padding-block: var(--space-3);
     }
 
@@ -1440,12 +1466,34 @@
         }
     }
 
+    /* Staggered animation for comment list children */
+    .comment-thread:nth-child(1) {
+        animation-delay: 0s;
+    }
+    .comment-thread:nth-child(2) {
+        animation-delay: 0.04s;
+    }
+    .comment-thread:nth-child(3) {
+        animation-delay: 0.08s;
+    }
+    .comment-thread:nth-child(4) {
+        animation-delay: 0.12s;
+    }
+    .comment-thread:nth-child(5) {
+        animation-delay: 0.16s;
+    }
+
+    .comment-thread {
+        animation: comment-fade-in 0.35s ease-out both;
+    }
+
+    /* Avatars */
     .comment-avatar {
         flex-shrink: 0;
         border-radius: 50%;
         background: var(--color-bg-muted);
         border: 2px solid var(--color-border-subtle);
-        transition: border-color 0.2s ease;
+        transition: border-color var(--transition-base);
     }
 
     .comment-card:hover .comment-avatar {
@@ -1462,9 +1510,10 @@
         height: 2.5rem;
     }
 
+    /* Comment header: author + time */
     .comment-header {
         display: flex;
-        align-items: center;
+        align-items: baseline;
         gap: var(--space-2);
         font-size: var(--font-size-sm);
     }
@@ -1501,8 +1550,9 @@
         color: var(--color-text-muted);
     }
 
+    /* Comment body */
     .comment-body {
-        margin-top: var(--space-1);
+        margin-top: var(--space-2);
         font-size: var(--font-size-sm);
         color: var(--color-text-secondary);
         line-height: var(--line-height-base);
@@ -1539,6 +1589,7 @@
         color: var(--color-text-muted);
     }
 
+    /* Reply button */
     .comment-actions {
         margin-top: var(--space-2);
     }
@@ -1546,11 +1597,11 @@
     .comment-reply-btn {
         border: none;
         background: none;
-        padding: 0;
+        padding: var(--space-1) 0;
         font-size: var(--font-size-xs);
         color: var(--color-text-muted);
         cursor: pointer;
-        transition: color 0.2s ease;
+        transition: color var(--transition-base);
     }
 
     .comment-reply-btn:hover {
@@ -1565,7 +1616,9 @@
     .comment-form--reply {
         margin-top: var(--space-3);
         margin-bottom: var(--space-4);
-        margin-left: var(--space-12);
+        margin-left: calc(1.25rem + var(--space-3));
+        padding-left: var(--space-6);
+        border-left: 2px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
     }
 
     .comment-form-fields {
@@ -1583,26 +1636,33 @@
     .comment-input {
         width: 100%;
         padding: var(--space-2) var(--space-3);
-        border: 1px solid var(--color-border-subtle);
+        border: 1px solid var(--color-border-soft);
         border-radius: var(--radius-md);
         background: var(--color-bg-surface);
         color: var(--color-text-primary);
         font-size: var(--font-size-sm);
         font-family: inherit;
         transition:
-            border-color 0.2s ease,
-            box-shadow 0.2s ease;
+            border-color var(--transition-base),
+            box-shadow var(--transition-base),
+            background-color var(--transition-base);
     }
 
     .comment-input::placeholder {
         color: var(--color-text-muted);
-        opacity: 0.7;
+        opacity: 0.6;
+        transition: opacity var(--transition-base);
+    }
+
+    .comment-input:focus::placeholder {
+        opacity: 0.4;
     }
 
     .comment-input:focus {
         outline: none;
         border-color: var(--color-accent);
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent);
+        background: var(--color-bg-surface);
     }
 
     textarea.comment-input {
@@ -1622,7 +1682,7 @@
     .comment-form-hint {
         font-size: var(--font-size-xs);
         color: var(--color-text-muted);
-        opacity: 0.7;
+        opacity: 0.6;
     }
 
     .comment-form-actions {
@@ -1634,15 +1694,19 @@
     .comment-cancel-btn {
         border: none;
         background: none;
-        padding: 0;
+        padding: var(--space-1) var(--space-2);
         font-size: var(--font-size-sm);
         color: var(--color-text-muted);
         cursor: pointer;
-        transition: color 0.2s ease;
+        border-radius: var(--radius-sm);
+        transition:
+            color var(--transition-base),
+            background-color var(--transition-base);
     }
 
     .comment-cancel-btn:hover {
         color: var(--color-text-primary);
+        background: var(--color-bg-muted);
     }
 
     .comment-submit-btn {
@@ -1656,8 +1720,8 @@
         font-family: inherit;
         cursor: pointer;
         transition:
-            background-color 0.2s ease,
-            box-shadow 0.2s ease,
+            background-color var(--transition-base),
+            box-shadow var(--transition-base),
             transform 0.1s ease;
     }
 
@@ -1682,20 +1746,109 @@
         color: var(--color-danger);
     }
 
+    /* Empty state */
     .comment-empty {
         text-align: center;
-        padding: var(--space-8) var(--space-4);
+        padding: var(--space-12) var(--space-4);
         color: var(--color-text-muted);
     }
 
-    .comment-empty-icon {
-        font-size: 2rem;
-        margin-bottom: var(--space-2);
-        opacity: 0.4;
+    .comment-empty-illustration {
+        width: 4rem;
+        height: 4rem;
+        margin: 0 auto var(--space-4);
+        border-radius: 50%;
+        background: var(--color-bg-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .comment-empty p {
+    .comment-empty-illustration svg {
+        width: 1.75rem;
+        height: 1.75rem;
+        color: var(--color-text-muted);
+        opacity: 0.5;
+    }
+
+    .comment-empty-title {
         font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        margin: 0 0 var(--space-1);
+    }
+
+    .comment-empty-subtitle {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
         margin: 0;
+    }
+
+    /* Loading skeleton */
+    .comment-skeleton {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+        padding-block: var(--space-4);
+    }
+
+    .comment-skeleton-item {
+        display: flex;
+        gap: var(--space-3);
+    }
+
+    .comment-skeleton-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: var(--color-bg-muted);
+        flex-shrink: 0;
+        animation: skeleton-pulse 1.6s ease-in-out infinite;
+    }
+
+    .comment-skeleton-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .comment-skeleton-line {
+        height: 0.75rem;
+        border-radius: var(--radius-sm);
+        background: var(--color-bg-muted);
+        animation: skeleton-pulse 1.6s ease-in-out infinite;
+    }
+
+    .comment-skeleton-line--short {
+        width: 40%;
+    }
+
+    .comment-skeleton-line--medium {
+        width: 70%;
+    }
+
+    .comment-skeleton-line--long {
+        width: 90%;
+    }
+
+    .comment-skeleton-item:nth-child(2) .comment-skeleton-avatar,
+    .comment-skeleton-item:nth-child(2) .comment-skeleton-line {
+        animation-delay: 0.15s;
+    }
+
+    .comment-skeleton-item:nth-child(3) .comment-skeleton-avatar,
+    .comment-skeleton-item:nth-child(3) .comment-skeleton-line {
+        animation-delay: 0.3s;
+    }
+
+    @keyframes skeleton-pulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.4;
+        }
     }
 }

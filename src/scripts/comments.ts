@@ -266,6 +266,7 @@ function renderCommentCard(comment: CommentNode, isReply = false): string {
 				<div style="min-width:0;flex:1">
 					<div class="comment-header">
 						${authorEl}
+						<span class="comment-time-sep" style="color:var(--color-text-muted);opacity:0.4">·</span>
 						<time class="comment-time" datetime="${comment.created_at}">${time}</time>
 					</div>
 					<div class="comment-body">
@@ -300,6 +301,8 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
         ? `<button type="button" class="cancel-reply-btn comment-cancel-btn">取消</button>`
         : "";
 
+    const placeholder = parentId ? `回复 ${replyAuthor || ""}...` : "写下你的评论... 支持 Markdown";
+
     // Logged-in users don't need author/email/website fields
     const identityFields = currentUser
         ? ""
@@ -314,10 +317,10 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 			${identityFields}
 			<textarea
 				name="content"
-				placeholder="写下你的评论... 支持 Markdown"
+				placeholder="${escapeHtml(placeholder)}"
 				required
 				maxlength="5000"
-				rows="4"
+				rows="${parentId ? "3" : "4"}"
 				class="comment-input"
 				style="margin-top:var(--space-3)"
 			>${prefix}</textarea>
@@ -325,29 +328,68 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 				<span class="comment-form-hint">支持 Markdown 语法</span>
 				<div class="comment-form-actions">
 					${cancelBtn}
-					<button type="submit" class="submit-btn comment-submit-btn">发表评论</button>
+					<button type="submit" class="submit-btn comment-submit-btn">${parentId ? "回复" : "发表评论"}</button>
 				</div>
 			</div>
 			<p class="form-error comment-error" style="display:none"></p>
 		</form>`;
 }
 
+function renderLoadingSkeleton(): string {
+    return `
+		<div class="comment-skeleton">
+			<div class="comment-skeleton-item">
+				<div class="comment-skeleton-avatar"></div>
+				<div class="comment-skeleton-content">
+					<div class="comment-skeleton-line comment-skeleton-line--short"></div>
+					<div class="comment-skeleton-line comment-skeleton-line--long"></div>
+					<div class="comment-skeleton-line comment-skeleton-line--medium"></div>
+				</div>
+			</div>
+			<div class="comment-skeleton-item">
+				<div class="comment-skeleton-avatar"></div>
+				<div class="comment-skeleton-content">
+					<div class="comment-skeleton-line comment-skeleton-line--short"></div>
+					<div class="comment-skeleton-line comment-skeleton-line--medium"></div>
+				</div>
+			</div>
+			<div class="comment-skeleton-item">
+				<div class="comment-skeleton-avatar"></div>
+				<div class="comment-skeleton-content">
+					<div class="comment-skeleton-line comment-skeleton-line--short"></div>
+					<div class="comment-skeleton-line comment-skeleton-line--long"></div>
+				</div>
+			</div>
+		</div>`;
+}
+
 function renderCommentList(data: CommentsResponse): string {
     if (data.comments.length === 0) {
         return `
 			<div class="comment-empty">
-				<div class="comment-empty-icon">💬</div>
-				<p>暂无评论，来发表第一条吧</p>
+				<div class="comment-empty-illustration">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+					</svg>
+				</div>
+				<p class="comment-empty-title">还没有评论</p>
+				<p class="comment-empty-subtitle">来发表第一条吧</p>
 			</div>
 			${renderCommentForm()}`;
     }
 
     let html = '<div class="comment-list">';
     for (const comment of data.comments) {
+        html += '<div class="comment-thread">';
         html += renderCommentCard(comment);
-        for (const reply of comment.replies) {
-            html += renderReplyCard(reply, comment.id);
+        if (comment.replies.length > 0) {
+            html += '<div class="comment-replies">';
+            for (const reply of comment.replies) {
+                html += renderReplyCard(reply, comment.id);
+            }
+            html += "</div>";
         }
+        html += "</div>";
     }
     html += "</div>";
     html += renderCommentForm();
@@ -478,9 +520,13 @@ function bindEvents(container: HTMLElement, slug: string) {
             const card = target.closest(".comment-card");
             if (!card) return;
             const formHtml = renderCommentForm(parentId, replyAuthor);
-            card.insertAdjacentHTML("afterend", formHtml);
 
-            const newForm = card.nextElementSibling as HTMLFormElement;
+            // Insert reply form after the thread wrapper (for top-level) or after the card
+            const thread = card.closest(".comment-thread");
+            const insertTarget = thread || card;
+            insertTarget.insertAdjacentHTML("afterend", formHtml);
+
+            const newForm = insertTarget.nextElementSibling as HTMLFormElement;
             newForm?.querySelector("textarea")?.focus();
             newForm?.querySelector(".cancel-reply-btn")?.addEventListener("click", () => {
                 newForm.remove();
@@ -581,8 +627,7 @@ async function loadGravatars(container: HTMLElement) {
 // --- Main init ---
 
 async function loadComments(container: HTMLElement, slug: string) {
-    container.innerHTML =
-        '<p style="font-size:var(--font-size-sm);color:var(--color-text-muted)">加载评论中...</p>';
+    container.innerHTML = renderLoadingSkeleton();
 
     try {
         const data = await fetchComments(slug);
@@ -591,7 +636,7 @@ async function loadComments(container: HTMLElement, slug: string) {
         loadGravatars(container);
     } catch {
         container.innerHTML =
-            '<p style="font-size:var(--font-size-sm);color:var(--color-danger)">评论加载失败</p>';
+            '<p style="font-size:var(--font-size-sm);color:var(--color-danger)">评论加载失败，请稍后重试</p>';
     }
 }
 
