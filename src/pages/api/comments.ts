@@ -230,6 +230,19 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
         // Fire-and-forget: notify Telegram group
         if (env?.TELEGRAM_BOT_TOKEN && env?.TELEGRAM_NOTIFY_CHAT_ID) {
+            let parentAuthor: string | undefined;
+            if (body.parent_id && db) {
+                const parent = await db
+                    .prepare(
+                        `SELECT c.author, u.name AS user_name FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = ?`,
+                    )
+                    .bind(body.parent_id)
+                    .first<{ author: string; user_name: string | null }>();
+                if (parent) {
+                    parentAuthor = parent.user_name || parent.author;
+                }
+            }
+
             const notifyPromise = notifyNewComment(
                 env.TELEGRAM_BOT_TOKEN,
                 env.TELEGRAM_NOTIFY_CHAT_ID,
@@ -238,6 +251,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                     author,
                     content,
                     isReply: !!body.parent_id,
+                    parentAuthor,
                 },
             );
             const ctx = locals.runtime?.ctx;
