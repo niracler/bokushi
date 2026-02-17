@@ -58,6 +58,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     href={new URL("rss.xml", Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
+<meta name="theme-color" content="#fffaf4" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#140e0b" media="(prefers-color-scheme: dark)" />
+<meta name="color-scheme" content="light dark" />
+<meta name="author" content="Niracler" />
 
 <!-- Fonts -->
 <style>
