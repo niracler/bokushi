@@ -58,6 +58,11 @@ const { title, description, avatar, username } = Astro.props;
         width: 56px;
         height: 56px;
     }
+
+    /* Hide full description on mobile; only show channel name + actions */
+    .channel-sidebar__description {
+        display: none;
+    }
 }
 
 .channel-sidebar__card {
