@@ -19,16 +19,21 @@ export async function GET(context) {
         site: context.site,
         trailingSlash: false,
         items: posts.map((post) => ({
-            ...post.data,
+            title: post.data.title,
+            description: post.data.description,
+            pubDate: post.data.pubDate,
             link: `/${post.id}`,
+            categories: post.data.tags,
             content: sanitizeHtml(parser.render(post.body), {
                 allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
             }),
         })),
-        customData: `<follow_challenge>
-			<feedId>151531310966515712</feedId>
-			<userId>41434914948866048</userId>
-		</follow_challenge>`,
+        customData: `<language>zh-CN</language>
+<atom:link href="${context.site}rss.xml" rel="self" type="application/rss+xml" xmlns:atom="http://www.w3.org/2005/Atom" />
+<follow_challenge>
+    <feedId>151531310966515712</feedId>
+    <userId>41434914948866048</userId>
+</follow_challenge>`,
         stylesheet: "/pretty-feed-v3.xsl",
     });
 
