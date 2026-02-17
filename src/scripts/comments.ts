@@ -323,7 +323,7 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 
 function renderLoadingSkeleton(): string {
     return `
-		<div class="comment-skeleton">
+		<div class="comment-skeleton" aria-busy="true" aria-label="Loading comments">
 			<div class="comment-skeleton-item">
 				<div class="comment-skeleton-avatar"></div>
 				<div class="comment-skeleton-content">

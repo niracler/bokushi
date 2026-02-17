@@ -1,3 +1,5 @@
+import { SITE_URL } from "../consts";
+
 /** HTML-escape for Telegram HTML parse mode */
 function escapeHtml(text: string): string {
     return text
@@ -40,7 +42,7 @@ export async function notifyNewComment(
                   : "";
 
         const text = [
-            `💬 <b>新评论</b> · <a href="https://niracler.com/${encodeURIComponent(params.slug)}#comment-section">${escapeHtml(params.slug)}</a>`,
+            `💬 <b>新评论</b> · <a href="${SITE_URL}/${encodeURIComponent(params.slug)}#comment-section">${escapeHtml(params.slug)}</a>`,
             "",
             `<b>${escapeHtml(params.author)}</b> 写道：${replyLine}`,
             `<blockquote>${escapeHtml(truncatedContent)}</blockquote>`,

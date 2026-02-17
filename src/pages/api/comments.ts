@@ -257,6 +257,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
             const ctx = locals.runtime?.ctx;
             if (ctx?.waitUntil) {
                 ctx.waitUntil(notifyPromise);
+            } else {
+                console.warn("ctx.waitUntil unavailable; awaiting Telegram notify inline");
+                await notifyPromise;
             }
         }
 
