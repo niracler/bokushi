@@ -547,6 +547,7 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
             slug,
             parent_id: parentId,
             content,
+            post_title: document.title,
         };
 
         if (!currentUser) {

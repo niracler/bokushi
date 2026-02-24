@@ -9,15 +9,63 @@ function escapeHtml(text: string): string {
         .replace(/"/g, "&quot;");
 }
 
-interface NotifyCommentParams {
-    slug: string;
-    author: string;
-    content: string;
-    isReply: boolean;
-    parentAuthor?: string;
+/** Truncate text to a maximum length, appending "..." if needed */
+function truncate(text: string, maxLength: number): string {
+    if (text.length <= maxLength) return text;
+    return `${text.substring(0, maxLength)}...`;
 }
 
-const MAX_CONTENT_LENGTH = 500;
+export interface NotifyCommentParams {
+    slug: string;
+    commentId: string;
+    author: string;
+    content: string;
+    parentId?: string;
+    parentAuthor?: string;
+    parentContent?: string;
+    postTitle?: string;
+}
+
+const COMMENT_TEXT_LENGTH_LIMIT = 100;
+
+/**
+ * Build notification message in Remark42 style.
+ *
+ * Format:
+ *   <a href="commentUrl">Author</a> -> <a href="parentUrl">ParentAuthor</a>
+ *
+ *   Comment text...
+ *
+ *   "Parent comment text..."
+ *
+ *   ↦  <a href="postUrl">Post Title</a>
+ */
+function buildMessage(params: NotifyCommentParams): string {
+    const postUrl = `${SITE_URL}/${encodeURIComponent(params.slug)}`;
+    const commentUrl = `${postUrl}#comment-${params.commentId}`;
+
+    // Line 1: Author (-> ParentAuthor)
+    let msg = `<a href="${commentUrl}">${escapeHtml(params.author)}</a>`;
+
+    if (params.parentId && params.parentAuthor) {
+        const parentUrl = `${postUrl}#comment-${params.parentId}`;
+        msg += ` → <a href="${parentUrl}">${escapeHtml(params.parentAuthor)}</a>`;
+    }
+
+    // Comment content
+    msg += `\n\n${escapeHtml(truncate(params.content, COMMENT_TEXT_LENGTH_LIMIT))}`;
+
+    // Parent comment quote
+    if (params.parentId && params.parentContent) {
+        msg += `\n\n"<i>${escapeHtml(truncate(params.parentContent, COMMENT_TEXT_LENGTH_LIMIT))}</i>"`;
+    }
+
+    // Post title link
+    const title = params.postTitle || params.slug;
+    msg += `\n\n↦  <a href="${postUrl}">${escapeHtml(title)}</a>`;
+
+    return msg;
+}
 
 /**
  * Send a notification to Telegram when a new comment is posted.
@@ -29,24 +77,7 @@ export async function notifyNewComment(
     params: NotifyCommentParams,
 ): Promise<void> {
     try {
-        const truncatedContent =
-            params.content.length > MAX_CONTENT_LENGTH
-                ? `${params.content.substring(0, MAX_CONTENT_LENGTH)}...`
-                : params.content;
-
-        const replyLine =
-            params.isReply && params.parentAuthor
-                ? `\n↩️ 回复 <b>${escapeHtml(params.parentAuthor)}</b>`
-                : params.isReply
-                  ? "\n↩️ 回复了一条评论"
-                  : "";
-
-        const text = [
-            `💬 <b>新评论</b> · <a href="${SITE_URL}/${encodeURIComponent(params.slug)}#comment-section">${escapeHtml(params.slug)}</a>`,
-            "",
-            `<b>${escapeHtml(params.author)}</b> 写道：${replyLine}`,
-            `<blockquote>${escapeHtml(truncatedContent)}</blockquote>`,
-        ].join("\n");
+        const text = buildMessage(params);
 
         const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
         const response = await fetch(url, {

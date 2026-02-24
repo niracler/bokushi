@@ -132,6 +132,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             email?: string;
             website?: string;
             content?: string;
+            post_title?: string;
         };
 
         if (!body.slug) {
@@ -231,15 +232,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
         // Fire-and-forget: notify Telegram group
         if (env?.TELEGRAM_BOT_TOKEN && env?.TELEGRAM_NOTIFY_CHAT_ID) {
             let parentAuthor: string | undefined;
+            let parentContent: string | undefined;
             if (body.parent_id && db) {
                 const parent = await db
                     .prepare(
-                        `SELECT c.author, u.name AS user_name FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = ?`,
+                        `SELECT c.author, c.content, u.name AS user_name FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = ?`,
                     )
                     .bind(body.parent_id)
-                    .first<{ author: string; user_name: string | null }>();
+                    .first<{ author: string; content: string; user_name: string | null }>();
                 if (parent) {
                     parentAuthor = parent.user_name || parent.author;
+                    parentContent = parent.content;
                 }
             }
 
@@ -248,10 +251,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 env.TELEGRAM_NOTIFY_CHAT_ID,
                 {
                     slug: body.slug,
+                    commentId: id,
                     author,
                     content,
-                    isReply: !!body.parent_id,
+                    parentId: body.parent_id,
                     parentAuthor,
+                    parentContent,
+                    postTitle: body.post_title?.trim() || undefined,
                 },
             );
             const ctx = locals.runtime?.ctx;
