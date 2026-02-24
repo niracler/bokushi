@@ -21,6 +21,7 @@ updatedDate: "Dec 04, 2025"
 
 - [阮一峰](https://www.ruanyifeng.com/blog/) - 他的科技爱好者周刊是我每周必读的，文章通俗易懂，特别适合初学者。
 - [DIYgod](https://diygod.me/) - 无论是 RSSHub ~~还是 XLog~~，都充满了温度和人情味，怎能不喜欢呢？(默哀 XLog 基本不能用了)
+- [宝玉](https://baoyu.io/) - 在国内 AI 方面，精华资讯翻译面向普通程序员的搬运感觉就数这位了。
 - …此处其实应该多找一点，尤其是国外的英文博主
 
 ### ✍️ 作家
@@ -342,7 +343,6 @@ updatedDate: "Dec 04, 2025"
 - [rclone](https://rclone.org/) - 可以将本地文件传输到云存储上。用过 S3、R2、OSS 等云产品的同学应该都多多少少用过的。
 - [imagemagick](https://imagemagick.org/index.php) - 用于处理图片的命令行工具，我主要用它来批量转换图片格式。
 - [ffmpeg](https://ffmpeg.org/) - 用于处理视频的命令行工具，简单的视频切片、转码等操作都可以用它来完成。
-- [ollama](https://ollama.com/) - 很方便地在本地跑 LLM 的工具，当然了，电脑性能是否足够是另外的问题了。
 - [onefetch](https://github.com/o2sh/onefetch) - 用 Rust 编写的命令行 Git 仓库信息展示工具，类似于 neofetch 但专门用于显示代码仓库的详细信息。
 
 <details>
@@ -350,42 +350,53 @@ updatedDate: "Dec 04, 2025"
 
 - [frp](https://github.com/fatedier/frp) - 用于内网穿透的工具，我用它来将我的树莓派暴露出来，为了 ServerCat 可以连上。（Cloudflare Tunnel 穿透出来的连不上） **在用上 tailscale 之后就基本不用它了**
 - [hurl](https://github.com/Orange-OpenSource/hurl) - 用于测试 HTTP 请求的工具。**基本没在用了**
+- ~~[ollama](https://ollama.com/) - 很方便地在本地跑 LLM 的工具。~~ **有了 Claude Code 之后本地模型基本不玩了**
 
 </details>
 
 ### 🤖 大模型工具
 
-> 配合 Claude Code 使用的 MCP 服务和 Skill 插件
+> 配合 Coding Agent 使用的 MCP 服务和 Skill 插件。下面这些是我常用的。
 
-- 开发框架
-  - [OpenSpec](https://github.com/Fission-AI/OpenSpec) - 规范驱动开发框架，让人和 AI 在写代码前先对齐需求。通过 proposal → review → implement → archive 的工作流，避免 AI 编程的不可预测性，特别适合非 0→1 的存量项目迭代。
-  - [ccusage](https://github.com/ryoppippi/ccusage) - Claude Code 用量分析工具，订阅场景下主要用来看 100 刀的极限能用多少 😂
-- MCP (Model Context Protocol)
-  - [Context7](https://context7.com/) - 为 LLM 提供最新库文档的 MCP 服务。解决了 AI 训练数据过时的问题，可以实时获取各种库的 API 参考和代码示例。
-  - [Playwright MCP](https://github.com/microsoft/playwright-mcp) - 微软官方的浏览器自动化 MCP 服务。基于 Playwright 的无障碍树而非截图，让 AI 能快速、确定性地操作网页，支持表单填写、数据抓取等场景。**这几天 claude-chrome 插件也出来了，先观望一下**
-- Claude Code Skills
-  - [我的 Skill 仓库](https://github.com/niracler/skill) - 我自己写的 Claude Code Skills 集合，包含 Git 工作流、写作助手、Anki 卡片生成、HA 集成审查等。
-- Claude Code 插件配置
-  - 开发辅助类 (官方插件，`claude plugin add <name>` 安装)
-    - **code-review** - 代码审查插件，帮助检查代码质量、发现潜在 bug 和安全漏洞
-    - **code-simplifier** - 代码简化插件，帮助重构代码使其更清晰、可维护
-    - **feature-dev** - 功能开发引导，提供架构分析和实现蓝图
-    - **frontend-design** - 前端设计插件，生成高质量的前端界面代码，避免千篇一律的 AI 风格
-    - **typescript-lsp** - TypeScript 语言服务器，提供更精准的 TS 代码分析
-    - **pyright-lsp** - Python 类型检查器，增强 Python 代码分析能力
-    - **security-guidance** - 安全指导，帮助识别和避免常见安全漏洞
-  - 文档与知识类
-    - **context7** (官方) - 实时查询任意编程库的最新文档和代码示例，告别过时信息
-    - [obsidian](https://github.com/nicholasrq/obsidian-skills) (第三方) - 支持 Obsidian 特有语法：wikilinks、callouts、properties、Canvas 文件等
-  - 工作流增强
-    - [superpowers](https://github.com/anthropics/claude-code-superpowers) (第三方) - 提供一系列高级技能：TDD、系统化调试、头脑风暴、并行任务、代码审查等工作流
-    - [workflow-skills](https://github.com/niracler/skill) (自用) - git-workflow (标准化 Git 提交、PR、Release 流程)、ha-integration-reviewer (Home Assistant 集成代码审查)、yunxiao-cli (阿里云云效 DevOps 工具)
-  - 写作与学习类
-    - [writing-skills](https://github.com/niracler/skill) (自用) - 中文写作助手，启发模式 (写作引导) + 审校模式 (文章润色，含余光中中文风格指南)
-    - [learning-skills](https://github.com/niracler/skill) (自用) - Anki 闪卡生成器，遵循原子化原则，输出 simple-anki-sync 兼容格式
-    - **learning-output-style** (官方) - 学习输出风格，Claude 会边做边解释，适合学习新技术时使用
-  - 趣味类
-    - [fun-skills](https://github.com/niracler/skill) (自用) - 戏言·巫女子风格转换器，将文字转换为西尾维新《戏言系列》葵井巫女子的说话风格
+**开发框架**
+
+- [OpenSpec](https://github.com/Fission-AI/OpenSpec) - 规范驱动开发框架，让人和 AI 在写代码前先对齐需求。通过 proposal → review → implement → archive 的工作流，避免 AI 编程的不可预测性，特别适合非 0→1 的存量项目迭代。**最近更新了 1.0 版本，做了一些流程细化，有 explore 阶段就可以抛弃 superpower 的头脑风暴了（不是**
+- [ccusage](https://github.com/ryoppippi/ccusage) - Claude Code Token 用量分析工具，订阅场景下主要用来看 100 刀的极限能用多少 😂。Codex 可用 `npx @ccusage/codex@latest`
+
+**MCP 服务**（要开启 `ENABLE_TOOL_SEARCH=true` 等功能才能装多一两个， 不然 context 消耗太快了）
+
+- [Context7](https://context7.com/) - 为 LLM 提供最新库文档的 MCP 服务。解决了 AI 训练数据过时的问题，可以实时获取各种库的 API 参考和代码示例。
+- [Playwright MCP](https://github.com/microsoft/playwright-mcp) - 微软官方的浏览器自动化 MCP 服务。基于 Playwright 的无障碍树而非截图，让 AI 能快速、确定性地操作网页。
+- [Greptile](https://www.greptile.com/) - 代码库语义搜索和 PR 审查服务，可以基于整个代码库上下文回答问题。**如果项目有 4 G 大小的 SDK 仓库的同学，可以试试**
+- [云效 Yunxiao](https://github.com/aliyun/alibabacloud-devops-mcp-server) - 阿里云 DevOps 平台 MCP 服务，支持代码仓库、流水线、工作项等操作。
+- [Figma MCP](https://help.figma.com/hc/en-us/articles/32132100833559-Guide-to-the-Figma-MCP-server) - Figma 官方 MCP 服务,让 AI 能访问设计文件、连接设计组件与代码组件(Code Connect)、获取设计系统规则和变量定义,实现设计到代码的无缝协作。**装了，但基本还没用起来**
+
+**Agent Skills**
+
+- [skills.sh](https://skills.sh/) - AI Agent Skills 开源生态市场，社区驱动的 skills 分发平台。有热度排行榜和分类浏览，能发现各种高质量 skills（React 最佳实践、Web 设计规范、安全指南等）。支持 Claude Code、Cursor、Copilot 等 30+ 种 agent。
+- [skills CLI](https://github.com/vercel-labs/skills) - Vercel 出品的 Agent Skills 管理命令行工具，`npx skills add <owner/repo>` 一键安装。支持全局/项目级安装、自动检测本地 agent、批量更新 skills。配合 skills.sh 使用，形成完整的 skills 发现→安装→管理流程。
+- [find-skills](https://skills.sh/vercel-labs/skills/find-skills) - 搜索和推荐适合你的 Skill，通过对话了解需求后提供个性化推荐。
+- [我的 Skill 仓库](https://github.com/niracler/skill) - 个人 Skills 集合，涵盖工作流自动化(Git、云效、代码同步、工作回顾等)、写作辅助(校对、灵感、日记)、学习工具(Anki)和趣味转换(戏言风格)。
+- [humanizer-zh](https://skills.sh/op7418/humanizer-zh/humanizer-zh) - 去除中文 AI 痕迹，让文字更像人写的。基于维基百科的 AI 写作特征指南，检测并修复夸大象征、宣传性语言、模糊归因等模式。
+- [superpowers](https://github.com/anthropics/claude-code-superpowers) - 提供 TDD、系统化调试、头脑风暴、并行任务、代码审查等高级工作流。**最近没怎么用了，跟 claude 官方插件有不少重复的**
+- [obsidian-skills](https://github.com/nicholasrq/obsidian-skills) - 支持 Obsidian 特有语法：wikilinks、callouts、properties、Canvas 文件等。
+- [ui-ux-pro-max](https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max) - UI/UX 设计智能，支持 50 种风格、21 种配色方案、50 种字体组合，涵盖 React、Next.js、Vue 等 9 种技术栈。
+- [slidev](https://skills.sh/antfu/skills/slidev) - 用 Markdown 创建开发者演示文稿（Slidev），支持代码高亮、动画、Vue 组件等。
+- [antfu/skills](https://github.com/antfu/skills) - Anthony Fu 的 Vue 生态技能集合，包含 17 个技能：Vue、Nuxt、Vite、Vitest、VitePress、Pinia、UnoCSS、pnpm、Slidev 等，直接从官方文档同步。
+- [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) - Vercel 官方 React/Next.js 性能优化指南，包含 57 条规则分 8 个类别：消除瀑布流、包体积优化、服务端性能、客户端数据获取等。
+- [document-skills](https://github.com/anthropics/skills) - 官方文档技能全家桶，包含 16 个子技能：PDF/DOCX/PPTX/XLSX 处理、前端设计、MCP 构建器、算法艺术、Web Artifacts 等。
+
+**官方插件** (`claude plugin add <name>` 安装)
+
+- **code-review** - 代码审查插件，帮助检查代码质量、发现潜在 bug 和安全漏洞
+- **code-simplifier** - 代码简化插件，帮助重构代码使其更清晰、可维护
+- **feature-dev** - 功能开发引导，提供架构分析和实现蓝图
+- **frontend-design** - 前端设计插件，生成高质量的前端界面代码，避免千篇一律的 AI 风格
+- **typescript-lsp** - TypeScript 语言服务器，提供更精准的 TS 代码分析
+- **pyright-lsp** - Python 类型检查器，增强 Python 代码分析能力
+- **security-guidance** - 安全指导，帮助识别和避免常见安全漏洞
+- **context7** - 实时查询任意编程库的最新文档和代码示例，告别过时信息
+- **learning-output-style** - 学习输出风格，Claude 会边做边解释，适合学习新技术时使用
 
 ### 📝 文本编辑 & IDE
 
@@ -425,14 +436,14 @@ updatedDate: "Dec 04, 2025"
 - [Chatgpt App](https://openai.com/chatgpt/overview/) - 绑定了 cmd + space 来快速打开。一般用来快速问答。
 - [Raycast](https://www.raycast.com/) - 用了都说好，好漂亮的界面，现在很多时候就靠它来做各种桌面操作了。粘贴板历史功能是几乎必须的工具。**现在 Spotlight 的功能也稍微起来了**
 - [keybr.com](https://www.keybr.com/) - 我前段时间用来练习打字的网站。
-- [iStat Menus](https://bjango.com/mac/istatmenus/)(Setapp) - 用于在菜单栏显示系统状态的工具。(其实我觉得没有什么用，😂)
-- [Session](https://setapp.com/apps/session)(Setapp) - 番茄钟软件，是在 Setapp 大礼包中的，优点在于可以联动 Apple 体系的日历、能够多端联动、以及桌面端足够好用。
 
 <details>
 <summary>过期列表</summary>
 
+- [iStat Menus](https://bjango.com/mac/istatmenus/)(Setapp) - 用于在菜单栏显示系统状态的工具。(其实我觉得没有什么用，😂)
+- [Session](https://setapp.com/apps/session)(Setapp) - 番茄钟软件，是在 Setapp 大礼包中的，优点在于可以联动 Apple 体系的日历、能够多端联动、以及桌面端足够好用。**不打算继续订阅 setapp 了，故放弃**
 - ~~[Alfred](https://www.alfredapp.com/)~~ - 最开始是用它的粘贴板历史功能，但是后面用上 Raycast 之后就不怎么用，被平替掉了，毕竟要钱。不过它的搜索功能还是很好用的。
-- [OpenCat Pro](https://opencat.app/)(¥38) - 用来作为 ChatGPT 的桌面客户端，因为在网页上不开 plus 只能用一定次数的 4，所以就通过他来用 gpt-4 了。（当然，也可以用 [DeepSeek](https://www.deepseek.com/zh) 啦）**订阅了 claude pro 之后就基本没用上了，抱歉☹️**
+- ~~[OpenCat Pro](https://opencat.app/)(¥38) - 用来作为 ChatGPT 的桌面客户端，因为在网页上不开 plus 只能用一定次数的 4，所以就通过他来用 gpt-4 了。~~ **订阅了 claude pro 之后就完全不用了**
 - [ServerCat](https://servercat.app/)(¥38) - 与上面的 OpenCat 一样，都是知名网红开发者 [Baye](https://twitter.com/waylybaye) 的作品。用于查看服务器的状态。**也没怎么用了**
 
 </details>
@@ -477,7 +488,13 @@ updatedDate: "Dec 04, 2025"
 - [PicGo](https://picgo.github.io/PicGo-Doc/zh/guide/) - 用于上传图片到图床的工具，我用的是 XXX 图床。
 - [upscayl](https://github.com/upscayl/upscayl) - 用来做高分辨率重建的工具，看上去效果是挺不错的。
 - [webp](https://webp.se/) - 能够自动加水印，压缩图片的重定向服务，我的图床就用它套了一层。主要是谢谢 yu 君的 [从零开始搭建你的免费图床系统 （Cloudflare R2 + WebP Cloud + PicGo）](https://www.pseudoyu.com/zh/2024/06/30/free_image_hosting_system_using_r2_webp_cloud_and_picgo/)
-- [TouchRetouch](https://setapp.com/apps/touchretouch)(Setapp) - 专业的图片修复和物体移除工具，可以轻松去除照片中不需要的物体或瑕疵。
+
+<details>
+<summary>过期列表</summary>
+
+- [TouchRetouch](https://setapp.com/apps/touchretouch)(Setapp) - 专业的图片修复和物体移除工具，可以轻松去除照片中不需要的物体或瑕疵。**不打算继续订阅 setapp 了，故放弃**
+
+</details>
 
 ### ☁️ 云服务器
 
@@ -642,11 +659,11 @@ updatedDate: "Dec 04, 2025"
 
 - [多邻国](https://www.duolingo.com/)(¥40/y) - 用来学习日语，感觉是用了就停不下来，每天早上晚上都打一次卡。可以通过这个 [链接](https://www.duolingo.com/profile/niracler?via=share_profile) 与我互关 (不过要国区的帐号才能加～～) **稍微有点不想继续了**
 - [Anki](https://apps.ankiweb.net/) - 间隔重复记忆软件，用于高效记忆和复习各种知识点。最近看书为了不忘记一些内容，试着做了一些 anki 的 card，也专门写了一个 prompt 用于生成对应的 card。
-- [MindNode](https://mindnode.com)(Setapp) - 用来做思维导图的工具，我主要用它来做一些知识的整理。看书的时候必备的工具。
 
 <details>
 <summary>过期列表</summary>
 
+- [MindNode](https://mindnode.com)(Setapp) - 用来做思维导图的工具，我主要用它来做一些知识的整理。看书的时候必备的工具。**不打算继续订阅 setapp 了，故放弃**
 - [xmind](https://www.xmind.cn/) - 用来做思维导图的工具，我主要用它来做一些知识的整理。看书的时候必备的工具。
 
 </details>
@@ -736,8 +753,7 @@ updatedDate: "Dec 04, 2025"
 
 ### 🖥️ 开发工具
 
-- [Ghostty](https://ghostty.org) - 现在主要使用的终端，简洁轻量，没有多余的功能，正是我想要的。性能也很不错，同样支持配置下拉式终端。
-- [iTerm 2](https://iterm2.com/) - 之前主要使用的终端，现在用得比较少了。主要是它可以设置一个超级优雅的下拉式终端。我之前有写一篇 [文章](https://niracler.com/quake-terminal) 专门说这个
+- [iTerm 2](https://iterm2.com/) - 现在主要使用的终端，可以设置一个超级优雅的下拉式终端。我之前有写一篇 [文章](https://niracler.com/quake-terminal) 专门说这个
 - [MongoDB Compass](https://www.mongodb.com/products/compass) - 用于连接 MongoDB 数据库的客户端。
 - [MQTTX](https://mqttx.app/) - 用于测试 MQTT 协议的工具，我一般用它来测试 Mosquitto 的配置。
 - [Wireshark](https://www.wireshark.org/) - 用于抓包的工具，不过我也不是很会用。
@@ -746,21 +762,23 @@ updatedDate: "Dec 04, 2025"
 <summary>过期列表</summary>
 
 - ~~[Warp](https://www.warp.dev)~~ - AI 辅助功能比较鸡肋，界面也有点复杂，最后还是回归简洁的终端了。
+- ~~[Ghostty](https://ghostty.org) - 简洁轻量的终端，性能不错。~~ **还有不少问题，暂时退役了**
 
 </details>
 
 ### 📸 截图和录屏
 
-- [CleanShot X](https://cleanshot.com/)(Setapp) - 截图软件，感觉我没用上它的高级功能，录制视频时还能进行简单的剪辑，(还有滚动截屏的功能)
+- [CleanShot X](https://cleanshot.com/) - 截图软件，感觉我没用上它的高级功能，录制视频时还能进行简单的剪辑，(还有滚动截屏的功能)
 
 ### 🛠️ 系统工具
 
-- [CleanMyMac X](https://setapp.com/apps/cleanmymac)(Setapp) - Mac 系统清理和优化工具，既然在 Setapp 礼包中，就秉承着来都来了的原则，就装上了。（我怀疑你不仅仅只是清理垃圾，你还有其他功能）
 - [Raspberry Pi Imager](https://www.raspberrypi.com/software/) - 用于将树莓派的镜像写入到 SD 卡上的工具。
 - [Windows App](https://apps.microsoft.com/detail/9n1f85v9t8bn?hl=en-us&gl=US) - 用来远程控制 Windows 的软件，感觉挺好用的。应该是官方出品。
+- [BuhoCleaner](https://www.drbuho.com/buhocleaner) - Mac 系统清理工具，终身版，替代了之前的 CleanMyMac X。
 
 <summary>过期列表</summary>
 
+- [CleanMyMac X](https://setapp.com/apps/cleanmymac)(Setapp) - Mac 系统清理和优化工具，既然在 Setapp 礼包中，就秉承着来都来了的原则，就装上了。（我怀疑你不仅仅只是清理垃圾，你还有其他功能）**不打算继续订阅 setapp 了，故放弃**
 - [Applite](https://github.com/milanvarady/Applite) - ~~现在主要是用它统一管理 mac 上的各种桌面应用了。虽说只是 brew 的套壳，但是在 GUI 加持下就有其独特的优势。~~ 基本没有在用了
 
 </details>
@@ -775,11 +793,11 @@ updatedDate: "Dec 04, 2025"
 
 - ~~[Zoom](https://zoom.us/)~~ - 用于远程会议的工具，基本没有在用了。
 
+> 🎁 软件订阅平台
+
+- [Setapp](https://setapp.com/)(¥30/m) - 是一个订阅服务，提供超过 200 款 Mac 和 iOS 应用，涵盖生产力、设计、开发等多个领域。给人的感觉就是「**打包了一堆绝大多数情况用不到的软件卖给你**」，说实话有点鸡肋。大部分软件让我感觉只是我之前订阅的「低级替代品」。但我本身已经订阅了其中几个软件，例如 CleanShot、MindNode、iStat。如果单算这些软件的年度订阅费用，其实总价已经和 Setapp 差不多了。（注意: 消费主义陷阱!!!）**不打算继续订阅 setapp 了，故放弃**
+
 </details>
-
-### 🎁 软件订阅平台
-
-- [Setapp](https://setapp.com/)(¥30/m) - 是一个订阅服务，提供超过 200 款 Mac 和 iOS 应用，涵盖生产力、设计、开发等多个领域。给人的感觉就是「**打包了一堆绝大多数情况用不到的软件卖给你**」，说实话有点鸡肋。大部分软件让我感觉只是我之前订阅的「低级替代品」。但我本身已经订阅了其中几个软件，例如 CleanShot、MindNode、iStat。如果单算这些软件的年度订阅费用，其实总价已经和 Setapp 差不多了。（注意: 消费主义陷阱!!!）
 
 ## 维护说明
 
