@@ -35,9 +35,12 @@ jobs:
         env:
           PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_TURNSTILE_SITE_KEY }}
 
+      - name: Prepare Pages wrangler config
+        run: cp wrangler.pages.toml wrangler.toml
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: --config wrangler.pages.toml pages deploy dist/ --project-name=bokushi
+          command: pages deploy dist/ --project-name=bokushi
