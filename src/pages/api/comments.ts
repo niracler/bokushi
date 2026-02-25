@@ -47,6 +47,7 @@ interface CommentNode {
     content: string;
     status: string;
     created_at: string;
+    updated_at: string | null;
     user_id: string | null;
     avatar_url: string | null;
     is_admin: boolean;
@@ -73,6 +74,7 @@ async function buildCommentTree(
             content: isDeleted ? "" : row.content,
             status: row.status,
             created_at: row.created_at,
+            updated_at: row.updated_at,
             user_id: isDeleted ? null : row.user_id,
             avatar_url: isDeleted ? null : row.user_avatar,
             is_admin: !isDeleted && row.user_role === "admin",
@@ -147,7 +149,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     try {
         const body = (await request.json()) as {
             slug?: string;
-            parent_id?: string;
+            parent_id?: string | null;
             author?: string;
             email?: string;
             website?: string;
@@ -156,6 +158,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
         };
 
         if (!body.slug) {
+            return jsonResponse({ error: "Missing slug" }, 400);
+        }
+        const slug = body.slug.trim();
+        if (!slug) {
             return jsonResponse({ error: "Missing slug" }, 400);
         }
         if (!body.content || body.content.trim().length === 0) {
@@ -212,6 +218,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }
 
         const content = body.content.trim();
+        const parentId =
+            typeof body.parent_id === "string" && body.parent_id.trim().length > 0
+                ? body.parent_id.trim()
+                : null;
 
         // Mock fallback for local dev
         if (!db) {
@@ -223,12 +233,42 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 content,
                 status: "visible",
                 created_at: new Date().toISOString(),
+                updated_at: null,
                 user_id: userId,
                 avatar_url: avatarUrl,
                 is_admin: isAdmin,
                 replies: [],
             };
             return jsonResponse({ comment: mockComment }, 201);
+        }
+
+        // Validate parent comment in the same slug before creating a reply.
+        let parentRow: {
+            author: string;
+            content: string;
+            email: string | null;
+            user_id: string | null;
+            user_name: string | null;
+        } | null = null;
+        if (parentId) {
+            parentRow = await db
+                .prepare(
+                    `SELECT c.author, c.content, c.email, c.user_id, u.name AS user_name
+                     FROM comments c LEFT JOIN users u ON c.user_id = u.id
+                     WHERE c.id = ? AND c.slug = ? AND c.status = 'visible'`,
+                )
+                .bind(parentId, slug)
+                .first<{
+                    author: string;
+                    content: string;
+                    email: string | null;
+                    user_id: string | null;
+                    user_name: string | null;
+                }>();
+
+            if (!parentRow) {
+                return jsonResponse({ error: "Parent comment not found" }, 400);
+            }
         }
 
         const id = crypto.randomUUID();
@@ -239,46 +279,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
         await db
             .prepare(
                 `INSERT INTO comments (id, slug, parent_id, author, email, website, content, ip_hash, user_id, status, created_at)
-				 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'visible', ?)`,
+					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'visible', ?)`,
             )
-            .bind(
-                id,
-                body.slug,
-                body.parent_id || null,
-                author,
-                email,
-                website,
-                content,
-                ipHash,
-                userId,
-                now,
-            )
+            .bind(id, slug, parentId, author, email, website, content, ipHash, userId, now)
             .run();
-
-        // Fetch parent comment once for both Telegram and email notifications
-        let parentRow: {
-            author: string;
-            content: string;
-            email: string | null;
-            user_id: string | null;
-            user_name: string | null;
-        } | null = null;
-        if (body.parent_id && db) {
-            parentRow = await db
-                .prepare(
-                    `SELECT c.author, c.content, c.email, c.user_id, u.name AS user_name
-                     FROM comments c LEFT JOIN users u ON c.user_id = u.id
-                     WHERE c.id = ?`,
-                )
-                .bind(body.parent_id)
-                .first<{
-                    author: string;
-                    content: string;
-                    email: string | null;
-                    user_id: string | null;
-                    user_name: string | null;
-                }>();
-        }
 
         // Fire-and-forget: notify Telegram group
         if (env?.TELEGRAM_BOT_TOKEN && env?.TELEGRAM_NOTIFY_CHAT_ID) {
@@ -289,11 +293,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 env.TELEGRAM_BOT_TOKEN,
                 env.TELEGRAM_NOTIFY_CHAT_ID,
                 {
-                    slug: body.slug,
+                    slug,
                     commentId: id,
                     author,
                     content,
-                    parentId: body.parent_id,
+                    parentId: parentId ?? undefined,
                     parentAuthor,
                     parentContent,
                     postTitle: body.post_title?.trim() || undefined,
@@ -309,7 +313,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }
 
         // Email notification for replies
-        if (body.parent_id && env?.EMAIL && parentRow?.email) {
+        if (parentId && env?.EMAIL && parentRow?.email) {
             const parentName = parentRow.user_name || parentRow.author;
 
             const emailPromise = notifyCommentReply(env.EMAIL, {
@@ -318,8 +322,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 replyAuthor: author,
                 replyContent: content,
                 parentContent: parentRow.content,
-                postTitle: body.post_title?.trim() || body.slug,
-                postSlug: body.slug,
+                postTitle: body.post_title?.trim() || slug,
+                postSlug: slug,
             });
 
             const ctx = locals.runtime?.ctx;
@@ -338,6 +342,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             content,
             status: "visible",
             created_at: now,
+            updated_at: null,
             user_id: userId,
             avatar_url: avatarUrl,
             is_admin: isAdmin,

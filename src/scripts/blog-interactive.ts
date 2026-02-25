@@ -351,10 +351,14 @@ function updateTocProgress(): void {
             return;
         }
 
-        const articleTop = article.offsetTop;
+        const articleTop = article.getBoundingClientRect().top + window.scrollY;
         const articleHeight = article.offsetHeight;
-        const scrolled = window.scrollY - articleTop + window.innerHeight * 0.2;
-        const percent = Math.min(100, Math.max(0, Math.round((scrolled / articleHeight) * 100)));
+        const scrollableDistance = Math.max(1, articleHeight - window.innerHeight);
+        const scrolled = window.scrollY - articleTop;
+        const percent = Math.min(
+            100,
+            Math.max(0, Math.round((scrolled / scrollableDistance) * 100)),
+        );
 
         if (progressBar) progressBar.style.width = `${percent}%`;
         if (progressLabel) progressLabel.textContent = `${percent}%`;

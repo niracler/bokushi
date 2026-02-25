@@ -590,6 +590,11 @@ function bindFormAuthEvents(container: HTMLElement) {
 }
 
 function bindEditEvents(container: HTMLElement) {
+    if (container.dataset.editEventsBound === "true") {
+        return;
+    }
+    container.dataset.editEventsBound = "true";
+
     container.addEventListener("click", async (e) => {
         const target = e.target as HTMLElement;
 
