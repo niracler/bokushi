@@ -1,0 +1,19 @@
+# Cloudflare Pages deployment config
+# Keep only fields supported by Pages runtime.
+
+name = "bokushi"
+pages_build_output_dir = "./dist"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "LIKES"
+id = "6fd6bc2e5dcb4f0cb7e648ed115debb5"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "a2e1f143c0664e6d860930df0927e033"
+
+[[d1_databases]]
+binding = "COMMENTS_DB"
+database_name = "bokushi-comments"
+database_id = "f95ebf0a-500e-4096-86fb-9e7edfde7679"
