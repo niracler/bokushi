@@ -13,3 +13,4 @@ hidden: true
 - [LOTUS BLOG](https://blog.lotusssb.com/) - 记录主机折腾、自由主义和日常灵光。（有前途）
 - [Haruki](https://haruki.tweblog.com/) - 社交媒体博客化工具，把推特等平台的碎片整理成可读的长篇。（好可爱）
 - [LavaCx](https://blog.lavac.cc/) - AnyScript 的谦逊探索者，前端开发与系统折腾。（社畜中）
+- [烤烤肉](https://www.lowbee.icu/) - xLog 时期的笔友，周记超级有趣的（找回中）
