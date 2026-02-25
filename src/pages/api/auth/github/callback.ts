@@ -39,11 +39,17 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     // Verify and consume state
-    const redirectUrl = await env.SESSIONS.get(`oauth_state:${state}`);
-    if (redirectUrl === null) {
+    const rawRedirect = await env.SESSIONS.get(`oauth_state:${state}`);
+    if (rawRedirect === null) {
         return jsonResponse({ error: "Invalid or expired state" }, 400);
     }
     await env.SESSIONS.delete(`oauth_state:${state}`);
+
+    // Defense-in-depth: re-validate redirect URL from KV
+    const redirectUrl =
+        rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") && !rawRedirect.includes("://")
+            ? rawRedirect
+            : "/";
 
     // Exchange code for access token
     const github = new GitHub(
@@ -58,7 +64,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
         accessToken = tokens.accessToken();
     } catch (error) {
         console.error("GitHub token exchange failed:", error);
-        return Response.redirect(`${url.origin}${redirectUrl}`, 302);
+        return Response.redirect(
+            `${url.origin}${redirectUrl}?auth_error=token_exchange_failed`,
+            302,
+        );
     }
 
     // Fetch GitHub user info
@@ -71,7 +80,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
         ghUser = (await res.json()) as GitHubUser;
     } catch (error) {
         console.error("GitHub user fetch failed:", error);
-        return Response.redirect(`${url.origin}${redirectUrl}`, 302);
+        return Response.redirect(`${url.origin}${redirectUrl}?auth_error=github_api_failed`, 302);
     }
 
     const db = env.COMMENTS_DB;

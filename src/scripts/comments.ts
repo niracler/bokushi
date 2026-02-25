@@ -6,11 +6,12 @@ import sanitizeHtml from "sanitize-html";
 interface CommentNode {
     id: string;
     author: string;
-    email: string | null;
+    gravatar_hash: string | null;
     website: string | null;
     content: string;
     status: string;
     created_at: string;
+    updated_at?: string | null;
     user_id: string | null;
     avatar_url: string | null;
     is_admin: boolean;
@@ -54,11 +55,9 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
         "pre",
         "blockquote",
         "hr",
-        "img",
     ],
     allowedAttributes: {
         a: ["href", "target", "rel"],
-        img: ["src", "alt"],
     },
 };
 
@@ -67,21 +66,52 @@ function renderMarkdown(raw: string): string {
     return sanitizeHtml(html, SANITIZE_OPTIONS);
 }
 
-// --- Gravatar ---
+// --- Avatar helpers ---
 
-async function sha256Hash(input: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input.trim().toLowerCase());
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data).catch(() => null);
-    if (!hashBuffer) return "";
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+function gravatarUrl(hash: string | null): string {
+    if (!hash) return "";
+    return `https://www.gravatar.com/avatar/${hash}?d=404&s=48`;
 }
 
-function gravatarUrl(emailHash: string): string {
-    if (!emailHash) return "https://www.gravatar.com/avatar/?d=mp&s=48";
-    return `https://www.gravatar.com/avatar/${emailHash}?d=mp&s=48`;
+function dicebearUrl(name: string): string {
+    return `https://api.dicebear.com/9.x/bottts-neutral/svg?seed=${encodeURIComponent(name)}`;
 }
+
+function faviconUrl(website: string | null): string {
+    if (!website) return "";
+    try {
+        const { hostname } = new URL(website);
+        return `https://www.google.com/s2/favicons?domain=${hostname}&sz=48`;
+    } catch {
+        return "";
+    }
+}
+
+function handleAvatarError(img: HTMLImageElement): void {
+    const fallbackAttr = img.getAttribute("data-fallback") || "";
+    const fallbacks = fallbackAttr.split(",").filter(Boolean);
+    if (fallbacks.length === 0) {
+        img.removeAttribute("onerror");
+        return;
+    }
+    const next = fallbacks.shift();
+    if (!next) {
+        img.removeAttribute("onerror");
+        return;
+    }
+    img.setAttribute("data-fallback", fallbacks.join(","));
+    img.src = next;
+    if (fallbacks.length === 0) {
+        img.removeAttribute("onerror");
+    }
+}
+
+declare global {
+    interface Window {
+        handleAvatarError: typeof handleAvatarError;
+    }
+}
+window.handleAvatarError = handleAvatarError;
 
 // --- Auth helpers ---
 
@@ -120,6 +150,18 @@ async function postComment(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+    });
+    return res.json();
+}
+
+async function editComment(
+    id: string,
+    content: string,
+): Promise<{ success?: boolean; content?: string; updated_at?: string; error?: string }> {
+    const res = await fetch(`/api/comments/${encodeURIComponent(id)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
     });
     return res.json();
 }
@@ -177,30 +219,74 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 			</div>`;
     }
 
-    const avatarUrl = comment.avatar_url || gravatarUrl("");
+    let avatarSrc: string;
+    let fallbacks: string[];
+
+    if (comment.avatar_url) {
+        // OAuth user
+        avatarSrc = comment.avatar_url;
+        fallbacks = [dicebearUrl(comment.author)];
+    } else if (comment.gravatar_hash) {
+        // Anonymous with email
+        avatarSrc = gravatarUrl(comment.gravatar_hash);
+        fallbacks = [faviconUrl(comment.website), dicebearUrl(comment.author)].filter(
+            Boolean,
+        ) as string[];
+    } else if (comment.website) {
+        // Anonymous with website only
+        avatarSrc = faviconUrl(comment.website);
+        fallbacks = [dicebearUrl(comment.author)];
+    } else {
+        // No identity info
+        avatarSrc = dicebearUrl(comment.author);
+        fallbacks = [];
+    }
+
+    const onerrorAttr =
+        fallbacks.length > 0
+            ? ` onerror="handleAvatarError(this)" data-fallback="${fallbacks.join(",")}"`
+            : "";
+
     const authorEl = createAuthorEl(comment);
     const time = formatTime(comment.created_at);
     const contentHtml = renderMarkdown(comment.content);
     const avatarClass = isReply ? "comment-avatar--sm" : "comment-avatar--md";
     const replyParent = parentOverride || comment.id;
 
+    const isEditableByCurrentUser =
+        currentUser && comment.user_id === currentUser.id && comment.status !== "deleted";
+    const editedIndicator = comment.updated_at
+        ? `<span class="comment-edited-indicator" title="已于 ${formatTime(comment.updated_at)} 编辑">（已编辑）</span>`
+        : "";
+    const editBtn = isEditableByCurrentUser
+        ? `<button
+							class="edit-btn comment-edit-btn"
+							data-edit-id="${comment.id}"
+							data-edit-content="${escapeHtml(comment.content)}"
+							data-created-at="${comment.created_at}"
+							aria-label="编辑评论"
+						>
+							编辑
+						</button>`
+        : "";
+
     return `
 		<div class="comment-card${replyClass}" data-comment-id="${comment.id}">
 			<div style="display:flex;gap:0.75rem">
 				<img
-					src="${avatarUrl}"
+					src="${avatarSrc}"
 					alt=""
 					class="comment-avatar ${avatarClass}"
-					data-email="${!comment.user_id && comment.email ? escapeHtml(comment.email) : ""}"
-					loading="lazy"
+					loading="lazy"${onerrorAttr}
 				/>
 				<div style="min-width:0;flex:1">
 					<div class="comment-header">
 						${authorEl}
 						<span class="comment-time-sep" style="color:var(--color-text-muted);opacity:0.4">·</span>
 						<time class="comment-time" datetime="${comment.created_at}">${time}</time>
+						${editedIndicator}
 					</div>
-					<div class="comment-body">
+					<div class="comment-body" data-comment-body="${comment.id}">
 						${contentHtml}
 					</div>
 					<div class="comment-actions">
@@ -213,9 +299,36 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						>
 							回复
 						</button>
+						${editBtn}
 					</div>
 				</div>
 			</div>
+		</div>`;
+}
+
+const EDIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function renderEditForm(commentId: string, originalContent: string, createdAt: string): string {
+    const remaining = Math.max(0, EDIT_WINDOW_MS - (Date.now() - new Date(createdAt).getTime()));
+    const remainingMin = Math.ceil(remaining / 60000);
+    const timeHint = remaining > 0 ? `剩余 ${remainingMin} 分钟可编辑` : "编辑窗口已关闭";
+
+    return `
+		<div class="comment-edit-form" data-edit-form="${commentId}">
+			<textarea
+				class="comment-input comment-edit-textarea"
+				rows="4"
+				maxlength="5000"
+				aria-label="编辑评论内容"
+			>${escapeHtml(originalContent)}</textarea>
+			<div class="comment-edit-footer">
+				<span class="comment-form-hint">${timeHint}</span>
+				<div class="comment-form-actions">
+					<button type="button" class="comment-cancel-btn comment-edit-cancel" data-edit-id="${commentId}">取消</button>
+					<button type="button" class="comment-submit-btn comment-edit-save" data-edit-id="${commentId}">保存</button>
+				</div>
+			</div>
+			<p class="comment-error comment-edit-error" role="alert" style="display:none"></p>
 		</div>`;
 }
 
@@ -476,6 +589,114 @@ function bindFormAuthEvents(container: HTMLElement) {
     setupTelegramWidget(container);
 }
 
+function bindEditEvents(container: HTMLElement) {
+    container.addEventListener("click", async (e) => {
+        const target = e.target as HTMLElement;
+
+        // Open edit form
+        if (target.classList.contains("edit-btn")) {
+            e.preventDefault();
+            const commentId = target.dataset.editId ?? "";
+            const originalContent = target.dataset.editContent ?? "";
+            const createdAt = target.dataset.createdAt ?? "";
+
+            // Remove any existing edit form for this comment
+            container.querySelector(`[data-edit-form="${commentId}"]`)?.remove();
+
+            const bodyEl = container.querySelector(`[data-comment-body="${commentId}"]`);
+            if (!bodyEl) return;
+
+            bodyEl.insertAdjacentHTML(
+                "afterend",
+                renderEditForm(commentId, originalContent, createdAt),
+            );
+            const form = container.querySelector(`[data-edit-form="${commentId}"]`);
+            (form?.querySelector(".comment-edit-textarea") as HTMLTextAreaElement)?.focus();
+            return;
+        }
+
+        // Cancel edit
+        if (target.classList.contains("comment-edit-cancel")) {
+            e.preventDefault();
+            const commentId = target.dataset.editId ?? "";
+            container.querySelector(`[data-edit-form="${commentId}"]`)?.remove();
+            return;
+        }
+
+        // Save edit
+        if (target.classList.contains("comment-edit-save")) {
+            e.preventDefault();
+            const commentId = target.dataset.editId ?? "";
+            const form = container.querySelector(`[data-edit-form="${commentId}"]`);
+            if (!form) return;
+
+            const textarea = form.querySelector<HTMLTextAreaElement>(".comment-edit-textarea");
+            const errorEl = form.querySelector<HTMLElement>(".comment-edit-error");
+            const saveBtn = target as HTMLButtonElement;
+            if (!textarea || !errorEl) return;
+
+            const newContent = textarea.value.trim();
+            if (!newContent) {
+                errorEl.textContent = "内容不能为空";
+                errorEl.style.display = "block";
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = "保存中...";
+            errorEl.style.display = "none";
+
+            try {
+                const result = await editComment(commentId, newContent);
+                if (result.error) {
+                    errorEl.textContent = result.error;
+                    errorEl.style.display = "block";
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = "保存";
+                    return;
+                }
+
+                // Update the comment body in-place
+                const bodyEl = container.querySelector(`[data-comment-body="${commentId}"]`);
+                if (bodyEl) {
+                    bodyEl.innerHTML = renderMarkdown(newContent);
+                }
+
+                // Update edit button's data-edit-content for future edits
+                const editBtn = container.querySelector<HTMLButtonElement>(
+                    `.edit-btn[data-edit-id="${commentId}"]`,
+                );
+                if (editBtn) {
+                    editBtn.dataset.editContent = newContent;
+                }
+
+                // Add/update edited indicator in header
+                const card = container.querySelector(`[data-comment-id="${commentId}"]`);
+                if (card && result.updated_at) {
+                    const existing = card.querySelector(".comment-edited-indicator");
+                    const indicator = `<span class="comment-edited-indicator" title="已于 ${formatTime(result.updated_at)} 编辑">（已编辑）</span>`;
+                    if (existing) {
+                        existing.outerHTML = indicator;
+                    } else {
+                        card.querySelector(".comment-header")?.insertAdjacentHTML(
+                            "beforeend",
+                            indicator,
+                        );
+                    }
+                }
+
+                // Remove edit form
+                form.remove();
+            } catch {
+                errorEl.textContent = "保存失败，请稍后重试";
+                errorEl.style.display = "block";
+                saveBtn.disabled = false;
+                saveBtn.textContent = "保存";
+            }
+        }
+    });
+}
+
 function bindEvents(container: HTMLElement, slug: string) {
     // Reply buttons
     container.addEventListener("click", (e) => {
@@ -515,6 +736,11 @@ function bindEvents(container: HTMLElement, slug: string) {
     if (mainForm) {
         bindFormSubmit(mainForm, slug, container);
         bindFormAuthEvents(mainForm);
+    }
+
+    // Bind edit events (only relevant when user is logged in)
+    if (currentUser) {
+        bindEditEvents(container);
     }
 }
 
@@ -571,7 +797,7 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
             if (result.error) {
                 showError(errorEl, result.error);
                 submitBtn.disabled = false;
-                submitBtn.textContent = "发表评论";
+                submitBtn.textContent = parentId ? "回复" : "发表评论";
                 return;
             }
 
@@ -579,7 +805,7 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
         } catch {
             showError(errorEl, "提交失败，请稍后重试");
             submitBtn.disabled = false;
-            submitBtn.textContent = "发表评论";
+            submitBtn.textContent = parentId ? "回复" : "发表评论";
         }
     });
 }
@@ -594,19 +820,6 @@ function hideError(el: HTMLElement) {
     el.style.display = "none";
 }
 
-// --- Gravatar async loading ---
-
-async function loadGravatars(container: HTMLElement) {
-    const avatars = container.querySelectorAll<HTMLImageElement>(".comment-avatar[data-email]");
-    for (const img of avatars) {
-        const email = img.dataset.email;
-        if (email) {
-            const hash = await sha256Hash(email);
-            img.src = gravatarUrl(hash);
-        }
-    }
-}
-
 // --- Main init ---
 
 async function loadComments(container: HTMLElement, slug: string) {
@@ -616,7 +829,6 @@ async function loadComments(container: HTMLElement, slug: string) {
         const data = await fetchComments(slug);
         container.innerHTML = renderCommentList(data);
         bindEvents(container, slug);
-        loadGravatars(container);
     } catch {
         container.innerHTML =
             '<p style="font-size:var(--font-size-sm);color:var(--color-danger)">评论加载失败，请稍后重试</p>';
@@ -630,17 +842,22 @@ async function initCommentSection() {
     const slug = container.dataset.commentSlug;
     if (!slug) return;
 
+    // Show auth error toast if redirected back with an error param
+    const pageUrl = new URL(window.location.href);
+    const authError = pageUrl.searchParams.get("auth_error");
+    if (authError) {
+        const errorEl = document.createElement("p");
+        errorEl.className = "comment-error";
+        errorEl.textContent = "登录失败，请稍后重试";
+        errorEl.style.display = "block";
+        container.insertAdjacentElement("afterbegin", errorEl);
+        pageUrl.searchParams.delete("auth_error");
+        history.replaceState(null, "", pageUrl.toString());
+    }
+
     // Fetch auth state before rendering (auth is integrated into the form)
     currentUser = await fetchCurrentUser();
     loadComments(container, slug);
 }
 
-// Init on load
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initCommentSection, { once: true });
-} else {
-    initCommentSection();
-}
-
-// Re-init on Astro view transitions
-window.addEventListener("astro:after-swap", initCommentSection);
+export { initCommentSection };

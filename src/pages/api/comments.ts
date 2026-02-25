@@ -7,8 +7,17 @@
 
 import type { APIRoute } from "astro";
 import { getSessionUser } from "../../lib/auth";
+import { notifyCommentReply } from "../../lib/email-notify";
 import { notifyNewComment } from "../../lib/telegram-notify";
-import { getClientIP, hashIP, jsonResponse, validateCommentInput } from "../../lib/utils";
+import {
+    COMMENT_LIMITS,
+    getClientIP,
+    hashEmail,
+    hashIP,
+    jsonResponse,
+    validateCommentInput,
+    verifySameOrigin,
+} from "../../lib/utils";
 
 export const prerender = false;
 
@@ -33,7 +42,7 @@ interface CommentRow {
 interface CommentNode {
     id: string;
     author: string;
-    email: string | null;
+    gravatar_hash: string | null;
     website: string | null;
     content: string;
     status: string;
@@ -44,17 +53,22 @@ interface CommentNode {
     replies: CommentNode[];
 }
 
-function buildCommentTree(rows: CommentRow[]): { comments: CommentNode[]; total: number } {
+async function buildCommentTree(
+    rows: CommentRow[],
+): Promise<{ comments: CommentNode[]; total: number }> {
     const topLevel: CommentNode[] = [];
     const repliesByParent = new Map<string, CommentNode[]>();
 
     // Group replies by parent_id
     for (const row of rows) {
         const isDeleted = row.status === "deleted";
+        // Compute gravatar hash server-side; never expose raw email to client
+        const gravatarHash =
+            !isDeleted && !row.user_id && row.email ? await hashEmail(row.email) : null;
         const node: CommentNode = {
             id: row.id,
             author: isDeleted ? "" : row.user_name || row.author,
-            email: isDeleted ? null : row.email,
+            gravatar_hash: gravatarHash,
             website: isDeleted ? null : row.website,
             content: isDeleted ? "" : row.content,
             status: row.status,
@@ -116,7 +130,9 @@ export const GET: APIRoute = async ({ request, locals }) => {
             .bind(slug)
             .all<CommentRow>();
 
-        return jsonResponse(buildCommentTree(results ?? []));
+        return jsonResponse(await buildCommentTree(results ?? []), 200, {
+            "Cache-Control": "public, max-age=0, stale-while-revalidate=30",
+        });
     } catch (error) {
         console.error("Error fetching comments:", error);
         return jsonResponse({ error: "Internal server error" }, 500);
@@ -124,6 +140,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
+    if (!verifySameOrigin(request)) {
+        return jsonResponse({ error: "Origin mismatch" }, 403);
+    }
+
     try {
         const body = (await request.json()) as {
             slug?: string;
@@ -140,6 +160,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }
         if (!body.content || body.content.trim().length === 0) {
             return jsonResponse({ error: "content is required" }, 400);
+        }
+        if (body.content.length > COMMENT_LIMITS.content) {
+            return jsonResponse(
+                { error: `content exceeds ${COMMENT_LIMITS.content} characters` },
+                400,
+            );
         }
 
         const env = locals.runtime?.env;
@@ -192,7 +218,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             const mockComment: CommentNode = {
                 id: crypto.randomUUID(),
                 author,
-                email,
+                gravatar_hash: await hashEmail(email),
                 website,
                 content,
                 status: "visible",
@@ -229,22 +255,35 @@ export const POST: APIRoute = async ({ request, locals }) => {
             )
             .run();
 
+        // Fetch parent comment once for both Telegram and email notifications
+        let parentRow: {
+            author: string;
+            content: string;
+            email: string | null;
+            user_id: string | null;
+            user_name: string | null;
+        } | null = null;
+        if (body.parent_id && db) {
+            parentRow = await db
+                .prepare(
+                    `SELECT c.author, c.content, c.email, c.user_id, u.name AS user_name
+                     FROM comments c LEFT JOIN users u ON c.user_id = u.id
+                     WHERE c.id = ?`,
+                )
+                .bind(body.parent_id)
+                .first<{
+                    author: string;
+                    content: string;
+                    email: string | null;
+                    user_id: string | null;
+                    user_name: string | null;
+                }>();
+        }
+
         // Fire-and-forget: notify Telegram group
         if (env?.TELEGRAM_BOT_TOKEN && env?.TELEGRAM_NOTIFY_CHAT_ID) {
-            let parentAuthor: string | undefined;
-            let parentContent: string | undefined;
-            if (body.parent_id && db) {
-                const parent = await db
-                    .prepare(
-                        `SELECT c.author, c.content, u.name AS user_name FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = ?`,
-                    )
-                    .bind(body.parent_id)
-                    .first<{ author: string; content: string; user_name: string | null }>();
-                if (parent) {
-                    parentAuthor = parent.user_name || parent.author;
-                    parentContent = parent.content;
-                }
-            }
+            const parentAuthor = parentRow ? parentRow.user_name || parentRow.author : undefined;
+            const parentContent = parentRow?.content;
 
             const notifyPromise = notifyNewComment(
                 env.TELEGRAM_BOT_TOKEN,
@@ -269,10 +308,32 @@ export const POST: APIRoute = async ({ request, locals }) => {
             }
         }
 
+        // Email notification for replies
+        if (body.parent_id && env?.EMAIL && parentRow?.email) {
+            const parentName = parentRow.user_name || parentRow.author;
+
+            const emailPromise = notifyCommentReply(env.EMAIL, {
+                recipientEmail: parentRow.email,
+                recipientName: parentName,
+                replyAuthor: author,
+                replyContent: content,
+                parentContent: parentRow.content,
+                postTitle: body.post_title?.trim() || body.slug,
+                postSlug: body.slug,
+            });
+
+            const ctx = locals.runtime?.ctx;
+            if (ctx?.waitUntil) {
+                ctx.waitUntil(emailPromise);
+            } else {
+                await emailPromise;
+            }
+        }
+
         const comment: CommentNode = {
             id,
             author,
-            email,
+            gravatar_hash: await hashEmail(email),
             website,
             content,
             status: "visible",

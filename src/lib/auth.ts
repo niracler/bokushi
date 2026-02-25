@@ -109,6 +109,21 @@ export interface TelegramAuthData {
 }
 
 /**
+ * Constant-time string comparison to prevent timing attacks.
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+    if (a.length !== b.length) return false;
+    const encoder = new TextEncoder();
+    const bufA = encoder.encode(a);
+    const bufB = encoder.encode(b);
+    let result = 0;
+    for (let i = 0; i < bufA.length; i++) {
+        result |= bufA[i] ^ bufB[i];
+    }
+    return result === 0;
+}
+
+/**
  * Verify Telegram Login Widget callback data using HMAC-SHA256.
  * Returns true if signature is valid and auth_date is within 10 minutes.
  */
@@ -142,12 +157,12 @@ export async function verifyTelegramAuth(
     );
     const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(dataCheckString));
 
-    // Compare hex
+    // Compare hex using constant-time comparison to prevent timing attacks
     const computedHash = Array.from(new Uint8Array(signature))
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
 
-    return computedHash === hash;
+    return timingSafeEqual(computedHash, hash);
 }
 
 // --- Helpers ---

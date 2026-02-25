@@ -1,4 +1,10 @@
+import sanitizeHtml from "sanitize-html";
 import { SITE_URL } from "../consts";
+
+/** Strip all HTML tags from a string to prevent injection into Telegram HTML messages. */
+function stripHtml(text: string): string {
+    return sanitizeHtml(text, { allowedTags: [], allowedAttributes: {} });
+}
 
 /** HTML-escape for Telegram HTML parse mode */
 function escapeHtml(text: string): string {
@@ -7,12 +13,6 @@ function escapeHtml(text: string): string {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
-}
-
-/** Truncate text to a maximum length, appending "..." if needed */
-function truncate(text: string, maxLength: number): string {
-    if (text.length <= maxLength) return text;
-    return `${text.substring(0, maxLength)}...`;
 }
 
 export interface NotifyCommentParams {
@@ -26,7 +26,8 @@ export interface NotifyCommentParams {
     postTitle?: string;
 }
 
-const COMMENT_TEXT_LENGTH_LIMIT = 100;
+/** Telegram message limit is 4096 chars. Truncate final message if needed. */
+const TELEGRAM_MSG_LIMIT = 4096;
 
 /**
  * Build notification message in Remark42 style.
@@ -52,17 +53,22 @@ function buildMessage(params: NotifyCommentParams): string {
         msg += ` → <a href="${parentUrl}">${escapeHtml(params.parentAuthor)}</a>`;
     }
 
-    // Comment content
-    msg += `\n\n${escapeHtml(truncate(params.content, COMMENT_TEXT_LENGTH_LIMIT))}`;
+    // Comment content — send full text, no truncation
+    msg += `\n\n${escapeHtml(stripHtml(params.content))}`;
 
     // Parent comment quote
     if (params.parentId && params.parentContent) {
-        msg += `\n\n"<i>${escapeHtml(truncate(params.parentContent, COMMENT_TEXT_LENGTH_LIMIT))}</i>"`;
+        msg += `\n\n"<i>${escapeHtml(stripHtml(params.parentContent))}</i>"`;
     }
 
     // Post title link
     const title = params.postTitle || params.slug;
     msg += `\n\n↦  <a href="${postUrl}">${escapeHtml(title)}</a>`;
+
+    // Telegram enforces 4096 char limit; truncate final message if needed
+    if (msg.length > TELEGRAM_MSG_LIMIT) {
+        msg = `${msg.substring(0, TELEGRAM_MSG_LIMIT - 3)}...`;
+    }
 
     return msg;
 }

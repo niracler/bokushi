@@ -20,7 +20,11 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     const url = new URL(request.url);
-    const redirectUrl = url.searchParams.get("redirect") || "/";
+    const rawRedirect = url.searchParams.get("redirect") || "/";
+    const redirectUrl =
+        rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") && !rawRedirect.includes("://")
+            ? rawRedirect
+            : "/";
 
     const github = new GitHub(
         env.GITHUB_CLIENT_ID,

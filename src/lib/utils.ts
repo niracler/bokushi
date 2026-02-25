@@ -3,6 +3,19 @@
  */
 
 /**
+ * Hash an email address using SHA-256 for Gravatar lookups (privacy-preserving).
+ * Returns empty string if input is falsy.
+ */
+export async function hashEmail(email: string | null | undefined): Promise<string> {
+    if (!email) return "";
+    const encoder = new TextEncoder();
+    const data = encoder.encode(email.trim().toLowerCase());
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/**
  * Hash an IP address using SHA-256 for privacy.
  */
 export async function hashIP(ip: string): Promise<string> {
@@ -59,10 +72,28 @@ export function validateCommentInput(body: {
     if (body.email && body.email.length > COMMENT_LIMITS.email) {
         return `email exceeds ${COMMENT_LIMITS.email} characters`;
     }
+    if (body.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+        return "email format is invalid";
+    }
     if (body.website && body.website.length > COMMENT_LIMITS.website) {
         return `website exceeds ${COMMENT_LIMITS.website} characters`;
     }
+    if (body.website && !/^https?:\/\//i.test(body.website)) {
+        return "website must start with http:// or https://";
+    }
     return null;
+}
+
+/**
+ * Verify the request Origin matches the request URL origin.
+ * Returns true when Origin is absent (non-browser clients like curl).
+ * Returns false when Origin is present but does not match, indicating a cross-origin request.
+ */
+export function verifySameOrigin(request: Request): boolean {
+    const origin = request.headers.get("Origin");
+    if (!origin) return true; // Allow non-browser clients (curl, etc.)
+    const url = new URL(request.url);
+    return origin === url.origin;
 }
 
 /** JSON response helper. */
