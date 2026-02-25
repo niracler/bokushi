@@ -8,6 +8,7 @@ import FormattedDate from "../components/FormattedDate.astro";
 import Header from "../components/Header.astro";
 import Lightbox from "../components/Lightbox.astro";
 import Prose from "../components/Prose.astro";
+import ReadingProgress from "../components/ReadingProgress.astro";
 import RelatedPosts from "../components/RelatedPosts.astro";
 import ShareSidebar from "../components/ShareSidebar.astro";
 import TableOfContents from "../components/TableOfContents.astro";
@@ -85,6 +86,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 	</head>
 
 	<body>
+		<ReadingProgress />
 		<Header />
 		<main id="main-content" class="page-shell max-w-none relative">
 			{/* 文章主体：始终居中 */}
@@ -209,9 +211,24 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 			{showToc && (
 				<aside
 					data-toc-sidebar
-					class="hidden min-[900px]:block fixed w-[220px] min-[1100px]:w-[260px] opacity-0 transition-opacity duration-200"
+					class="hidden min-[900px]:block fixed w-[220px] min-[1100px]:w-[260px] opacity-0 transition-opacity duration-300"
 					style="left: calc(50% + 25rem + 1.5rem); top: 6rem;"
 				>
+					{/* 阅读进度指示器 */}
+					<div class="mb-3 flex items-center gap-2">
+						<div class="h-0.5 flex-1 rounded-full overflow-hidden" style="background: var(--color-border-subtle);">
+							<div
+								data-toc-progress
+								class="h-full rounded-full transition-[width] duration-150"
+								style="width: 0%; background: var(--color-accent); opacity: 0.6;"
+							></div>
+						</div>
+						<span
+							data-toc-progress-label
+							class="text-[10px] tabular-nums"
+							style="color: var(--color-text-muted);"
+						>0%</span>
+					</div>
 					<nav class="toc max-h-[calc(100vh-8rem)] overflow-y-auto">
 						<TableOfContents headings={headings} />
 					</nav>
