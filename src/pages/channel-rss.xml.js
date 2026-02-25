@@ -193,6 +193,7 @@ export async function GET(context) {
             headers: {
                 "Content-Type": "application/xml; charset=utf-8",
                 "x-content-type-options": "nosniff",
+                "Cache-Control": "public, max-age=3600, stale-while-revalidate=600",
             },
         });
     } catch (error) {
@@ -210,6 +211,7 @@ export async function GET(context) {
             headers: {
                 "Content-Type": "application/xml; charset=utf-8",
                 "x-content-type-options": "nosniff",
+                "Cache-Control": "public, max-age=300, stale-while-revalidate=60",
             },
         });
     }

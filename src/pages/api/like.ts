@@ -6,7 +6,7 @@
  */
 
 import type { APIRoute } from "astro";
-import { getClientIP, hashIP } from "../../lib/utils";
+import { getClientIP, hashIP, verifySameOrigin } from "../../lib/utils";
 
 export const prerender = false;
 
@@ -68,6 +68,13 @@ export const GET: APIRoute = async ({ request, locals }) => {
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
+    if (!verifySameOrigin(request)) {
+        return new Response(JSON.stringify({ error: "Origin mismatch" }), {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+        });
+    }
+
     try {
         const body = await request.json();
         const { slug } = body as { slug?: string };

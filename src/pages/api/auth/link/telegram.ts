@@ -8,11 +8,15 @@
 
 import type { APIRoute } from "astro";
 import { getSessionUser, type TelegramAuthData, verifyTelegramAuth } from "../../../../lib/auth";
-import { jsonResponse } from "../../../../lib/utils";
+import { jsonResponse, verifySameOrigin } from "../../../../lib/utils";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
+    if (!verifySameOrigin(request)) {
+        return jsonResponse({ error: "Origin mismatch" }, 403);
+    }
+
     const env = locals.runtime?.env;
     if (!env?.TELEGRAM_BOT_TOKEN || !env?.SESSIONS || !env?.COMMENTS_DB) {
         return jsonResponse({ error: "Not configured" }, 503);

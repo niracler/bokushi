@@ -162,6 +162,9 @@ function handleEmbedIframes() {
 // ============ TOC 目录高亮 ============
 let currentTocCleanup: (() => void) | null = null;
 
+// 固定导航栏高度（用于平滑滚动偏移）
+const HEADER_HEIGHT = 80;
+
 function initTocObserver() {
     // 清理之前的 observer
     if (currentTocCleanup) {
@@ -185,7 +188,7 @@ function initTocObserver() {
     const visibleHeadings = new Set<string>();
 
     const observerOptions = {
-        rootMargin: "-100px 0px -66% 0px",
+        rootMargin: `-${HEADER_HEIGHT + 16}px 0px -66% 0px`,
         threshold: [0, 1],
     };
 
@@ -237,14 +240,23 @@ function initTocObserver() {
     }
 
     // 点击处理器映射，用于清理
-    const clickHandlers = new Map<Element, () => void>();
+    const clickHandlers = new Map<Element, (e: Event) => void>();
 
-    // 添加点击事件处理
+    // 添加点击事件处理（带平滑滚动和 header 偏移）
     for (const link of tocLinks) {
-        const handler = () => {
+        const handler = (e: Event) => {
             const id = link.getAttribute("data-heading-id");
-            if (id) {
+            if (!id) return;
+
+            const target = document.getElementById(id);
+            if (target) {
+                e.preventDefault();
+                const targetTop =
+                    target.getBoundingClientRect().top + window.scrollY - HEADER_HEIGHT - 16;
+                window.scrollTo({ top: targetTop, behavior: "smooth" });
                 setActiveLink(id);
+                // 更新 URL hash（不触发跳转）
+                history.replaceState(null, "", `#${id}`);
             }
         };
         clickHandlers.set(link, handler);
@@ -320,6 +332,37 @@ function initMobileTocDrawer() {
     });
 }
 
+// ============ TOC 阅读进度更新 ============
+let progressRAF: number | null = null;
+
+function updateTocProgress(): void {
+    if (progressRAF !== null) return;
+    progressRAF = requestAnimationFrame(() => {
+        const progressBar = document.querySelector<HTMLElement>("[data-toc-progress]");
+        const progressLabel = document.querySelector<HTMLElement>("[data-toc-progress-label]");
+        if (!progressBar && !progressLabel) {
+            progressRAF = null;
+            return;
+        }
+
+        const article = document.querySelector<HTMLElement>("article");
+        if (!article) {
+            progressRAF = null;
+            return;
+        }
+
+        const articleTop = article.offsetTop;
+        const articleHeight = article.offsetHeight;
+        const scrolled = window.scrollY - articleTop + window.innerHeight * 0.2;
+        const percent = Math.min(100, Math.max(0, Math.round((scrolled / articleHeight) * 100)));
+
+        if (progressBar) progressBar.style.width = `${percent}%`;
+        if (progressLabel) progressLabel.textContent = `${percent}%`;
+
+        progressRAF = null;
+    });
+}
+
 // ============ 侧边栏定位（TOC + 分享栏） ============
 // 动态计算侧边栏起始位置，实现滚动浮动效果
 let sidebarPositionRAF: number | null = null;
@@ -346,11 +389,15 @@ function adjustSidebarPositions(): void {
                     ? minTop + padding
                     : Math.max(minTop + padding, headerBottom + padding);
 
-            // 同时更新 TOC 和分享栏位置
+            // TOC：当文章 header 仍在视口内时淡出，滚出后淡入
+            const tocVisible = headerBottom < minTop;
             if (tocSidebar) {
                 tocSidebar.style.top = `${targetTop}px`;
-                tocSidebar.style.opacity = "1";
+                tocSidebar.style.opacity = tocVisible ? "1" : "0";
+                tocSidebar.style.pointerEvents = tocVisible ? "auto" : "none";
             }
+
+            // 分享栏始终跟随位置更新（不做淡出）
             if (shareSidebar) {
                 shareSidebar.style.top = `${targetTop}px`;
                 shareSidebar.style.opacity = "1";
@@ -390,4 +437,9 @@ export function initBlogInteractive() {
     window.addEventListener("resize", debouncedAdjustSidebarPositions);
     window.addEventListener("scroll", throttledAdjustSidebarPositions, { passive: true });
     window.addEventListener("astro:after-swap", adjustSidebarPositions);
+
+    // 阅读进度
+    updateTocProgress();
+    window.addEventListener("scroll", updateTocProgress, { passive: true });
+    window.addEventListener("astro:after-swap", updateTocProgress);
 }

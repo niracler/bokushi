@@ -55,7 +55,7 @@ const { posts } = Astro.props;
 
 @media (min-width: 640px) {
     .related-posts__grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     }
 }
 

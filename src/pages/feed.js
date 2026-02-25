@@ -3,6 +3,7 @@ export async function GET() {
         status: 301,
         headers: {
             Location: "/rss.xml",
+            "Cache-Control": "public, max-age=86400",
         },
     });
 }

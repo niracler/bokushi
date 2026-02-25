@@ -24,3 +24,7 @@ id = "a2e1f143c0664e6d860930df0927e033"
 binding = "COMMENTS_DB"
 database_name = "bokushi-comments"
 database_id = "f95ebf0a-500e-4096-86fb-9e7edfde7679"
+
+# Email sending binding (requires Email Routing enabled on domain)
+[[send_email]]
+name = "EMAIL"
