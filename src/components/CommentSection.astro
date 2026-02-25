@@ -194,6 +194,54 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
         opacity: 0.5;
     }
 
+    .comment-toolbar {
+        margin-bottom: var(--space-3);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+
+    .comment-count {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+    }
+
+    .comment-sort {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: 2px;
+        border-radius: var(--radius-full);
+        background: var(--color-bg-muted);
+        border: 1px solid var(--color-border-subtle);
+    }
+
+    .comment-sort-btn {
+        border: none;
+        background: transparent;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-xs);
+        line-height: 1;
+        padding: 0.35rem 0.6rem;
+        border-radius: var(--radius-full);
+        cursor: pointer;
+        transition:
+            color var(--transition-base),
+            background-color var(--transition-base);
+    }
+
+    .comment-sort-btn:hover {
+        color: var(--color-text-secondary);
+    }
+
+    .comment-sort-btn--active {
+        color: var(--color-text-primary);
+        background: var(--color-bg-base);
+        box-shadow: var(--shadow-sm);
+    }
+
     @keyframes comment-fade-in {
         from {
             opacity: 0;
@@ -267,6 +315,19 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
         background: color-mix(in srgb, var(--color-accent) 14%, transparent);
         color: var(--color-accent);
         border: 1px solid color-mix(in srgb, var(--color-accent) 24%, transparent);
+    }
+
+    .comment-pin-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 1px var(--space-2);
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-2xs);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        background: color-mix(in srgb, #f59e0b 16%, transparent);
+        color: color-mix(in srgb, #f59e0b 88%, #3b2f05 12%);
+        border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
     }
 
     .comment-time {
@@ -366,7 +427,8 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
     }
 
     .comment-reply-btn,
-    .comment-edit-btn {
+    .comment-edit-btn,
+    .comment-pin-btn {
         border: none;
         background: none;
         padding: var(--space-1) 0;
@@ -377,8 +439,13 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
     }
 
     .comment-reply-btn:hover,
-    .comment-edit-btn:hover {
+    .comment-edit-btn:hover,
+    .comment-pin-btn:hover {
         color: var(--color-accent);
+    }
+
+    .comment-pin-btn {
+        color: color-mix(in srgb, var(--color-accent) 80%, var(--color-text-muted) 20%);
     }
 
     /* Edited indicator */

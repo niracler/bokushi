@@ -12,6 +12,7 @@ interface CommentNode {
     status: string;
     created_at: string;
     updated_at?: string | null;
+    is_pinned: boolean;
     user_id: string | null;
     avatar_url: string | null;
     is_admin: boolean;
@@ -31,9 +32,12 @@ interface AuthUser {
     linkedProviders: string[];
 }
 
+type CommentSort = "latest" | "oldest";
+
 // --- State ---
 
 let currentUser: AuthUser | null = null;
+let currentSort: CommentSort = "latest";
 
 // --- Markdown renderer ---
 
@@ -137,8 +141,10 @@ async function logout(): Promise<boolean> {
 
 // --- API helpers ---
 
-async function fetchComments(slug: string): Promise<CommentsResponse> {
-    const res = await fetch(`/api/comments?slug=${encodeURIComponent(slug)}`);
+async function fetchComments(slug: string, sort: CommentSort): Promise<CommentsResponse> {
+    const res = await fetch(
+        `/api/comments?slug=${encodeURIComponent(slug)}&sort=${encodeURIComponent(sort)}`,
+    );
     if (!res.ok) return { comments: [], total: 0 };
     return res.json();
 }
@@ -162,6 +168,18 @@ async function editComment(
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content }),
+    });
+    return res.json();
+}
+
+async function setCommentPinned(
+    id: string,
+    pinned: boolean,
+): Promise<{ success?: boolean; is_pinned?: boolean; error?: string }> {
+    const res = await fetch(`/api/comments/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "pin", pinned }),
     });
     return res.json();
 }
@@ -248,6 +266,10 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
             : "";
 
     const authorEl = createAuthorEl(comment);
+    const pinBadge =
+        !isReply && comment.is_pinned
+            ? `<span class="comment-pin-badge" title="置顶评论">置顶</span>`
+            : "";
     const time = formatTime(comment.created_at);
     const contentHtml = renderMarkdown(comment.content);
     const avatarClass = isReply ? "comment-avatar--sm" : "comment-avatar--md";
@@ -255,6 +277,8 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 
     const isEditableByCurrentUser =
         currentUser && comment.user_id === currentUser.id && comment.status !== "deleted";
+    const isAdminUser = currentUser?.role === "admin";
+    const isPinEditable = !isReply && Boolean(isAdminUser) && comment.status !== "deleted";
     const editedIndicator = comment.updated_at
         ? `<span class="comment-edited-indicator" title="已于 ${formatTime(comment.updated_at)} 编辑">（已编辑）</span>`
         : "";
@@ -267,6 +291,16 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 							aria-label="编辑评论"
 						>
 							编辑
+						</button>`
+        : "";
+    const pinBtn = isPinEditable
+        ? `<button
+							class="comment-pin-btn"
+							data-pin-id="${comment.id}"
+							data-pin-state="${comment.is_pinned ? "1" : "0"}"
+							aria-label="${comment.is_pinned ? "取消置顶评论" : "置顶评论"}"
+						>
+							${comment.is_pinned ? "取消置顶" : "置顶"}
 						</button>`
         : "";
 
@@ -282,6 +316,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 				<div style="min-width:0;flex:1">
 					<div class="comment-header">
 						${authorEl}
+						${pinBadge}
 						<span class="comment-time-sep" style="color:var(--color-text-muted);opacity:0.4">·</span>
 						<time class="comment-time" datetime="${comment.created_at}">${time}</time>
 						${editedIndicator}
@@ -299,6 +334,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						>
 							回复
 						</button>
+						${pinBtn}
 						${editBtn}
 					</div>
 				</div>
@@ -462,9 +498,24 @@ function renderLoadingSkeleton(): string {
 		</div>`;
 }
 
+function renderSortToolbar(total: number): string {
+    const latestActive = currentSort === "latest" ? " comment-sort-btn--active" : "";
+    const oldestActive = currentSort === "oldest" ? " comment-sort-btn--active" : "";
+
+    return `
+		<div class="comment-toolbar">
+			<div class="comment-count">${total} 条评论</div>
+			<div class="comment-sort" role="group" aria-label="评论排序">
+				<button type="button" class="comment-sort-btn${latestActive}" data-sort="latest">最新</button>
+				<button type="button" class="comment-sort-btn${oldestActive}" data-sort="oldest">最早</button>
+			</div>
+		</div>`;
+}
+
 function renderCommentList(data: CommentsResponse): string {
     if (data.comments.length === 0) {
         return `
+			${renderSortToolbar(data.total)}
 			<div class="comment-empty">
 				<div class="comment-empty-illustration">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -477,7 +528,8 @@ function renderCommentList(data: CommentsResponse): string {
 			${renderCommentForm()}`;
     }
 
-    let html = '<div class="comment-list">';
+    let html = renderSortToolbar(data.total);
+    html += '<div class="comment-list">';
     for (let i = 0; i < data.comments.length; i++) {
         const comment = data.comments[i];
         html += `<div class="comment-thread" style="--thread-index:${i}">`;
@@ -702,15 +754,68 @@ function bindEditEvents(container: HTMLElement) {
     });
 }
 
-function bindEvents(container: HTMLElement, slug: string) {
-    // Reply buttons
-    container.addEventListener("click", (e) => {
-        const target = e.target as HTMLElement;
+function bindModerationEvents(container: HTMLElement, slug: string) {
+    if (container.dataset.moderationEventsBound === "true") {
+        return;
+    }
+    container.dataset.moderationEventsBound = "true";
 
-        if (target.classList.contains("reply-btn")) {
+    container.addEventListener("click", async (e) => {
+        const target = e.target as HTMLElement;
+        const pinBtn = target.closest<HTMLButtonElement>(".comment-pin-btn");
+        if (!pinBtn) {
+            return;
+        }
+
+        e.preventDefault();
+        const commentId = pinBtn.dataset.pinId ?? "";
+        const currentlyPinned = pinBtn.dataset.pinState === "1";
+
+        pinBtn.disabled = true;
+        pinBtn.textContent = currentlyPinned ? "取消中..." : "置顶中...";
+
+        try {
+            const result = await setCommentPinned(commentId, !currentlyPinned);
+            if (result.error) {
+                alert(result.error);
+                pinBtn.disabled = false;
+                pinBtn.textContent = currentlyPinned ? "取消置顶" : "置顶";
+                return;
+            }
+
+            await loadComments(container, slug);
+        } catch {
+            alert("置顶操作失败，请稍后重试");
+            pinBtn.disabled = false;
+            pinBtn.textContent = currentlyPinned ? "取消置顶" : "置顶";
+        }
+    });
+}
+
+function bindEvents(container: HTMLElement, slug: string) {
+    if (container.dataset.eventsBound !== "true") {
+        container.dataset.eventsBound = "true";
+
+        // Reply + sort actions (delegated)
+        container.addEventListener("click", async (e) => {
+            const target = e.target as HTMLElement;
+
+            const sortBtn = target.closest<HTMLButtonElement>(".comment-sort-btn");
+            if (sortBtn) {
+                e.preventDefault();
+                const nextSort = sortBtn.dataset.sort === "oldest" ? "oldest" : "latest";
+                if (nextSort === currentSort) return;
+                currentSort = nextSort;
+                await loadComments(container, slug);
+                return;
+            }
+
+            const replyBtn = target.closest<HTMLButtonElement>(".reply-btn");
+            if (!replyBtn) return;
+
             e.preventDefault();
-            const parentId = target.dataset.replyParent ?? "";
-            const replyAuthor = target.dataset.replyAuthor ?? "";
+            const parentId = replyBtn.dataset.replyParent ?? "";
+            const replyAuthor = replyBtn.dataset.replyAuthor ?? "";
 
             for (const f of container.querySelectorAll(
                 ".comment-form[data-parent-id]:not([data-parent-id=''])",
@@ -718,7 +823,7 @@ function bindEvents(container: HTMLElement, slug: string) {
                 f.remove();
             }
 
-            const card = target.closest(".comment-card");
+            const card = replyBtn.closest(".comment-card");
             if (!card) return;
             const formHtml = renderCommentForm(parentId, replyAuthor);
 
@@ -733,8 +838,8 @@ function bindEvents(container: HTMLElement, slug: string) {
             });
             bindFormSubmit(newForm, slug, container);
             bindFormAuthEvents(newForm);
-        }
-    });
+        });
+    }
 
     // Bind submit + auth events for main form
     const mainForm = container.querySelector<HTMLFormElement>(".comment-form[data-parent-id='']");
@@ -746,6 +851,9 @@ function bindEvents(container: HTMLElement, slug: string) {
     // Bind edit events (only relevant when user is logged in)
     if (currentUser) {
         bindEditEvents(container);
+        if (currentUser.role === "admin") {
+            bindModerationEvents(container, slug);
+        }
     }
 }
 
@@ -831,7 +939,7 @@ async function loadComments(container: HTMLElement, slug: string) {
     container.innerHTML = renderLoadingSkeleton();
 
     try {
-        const data = await fetchComments(slug);
+        const data = await fetchComments(slug, currentSort);
         container.innerHTML = renderCommentList(data);
         bindEvents(container, slug);
     } catch {

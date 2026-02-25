@@ -1,7 +1,7 @@
 /**
  * Comments API
  *
- * GET  /api/comments?slug=xxx  - List comments for a post (tree structure)
+ * GET  /api/comments?slug=xxx&sort=latest|oldest - List comments for a post (tree structure)
  * POST /api/comments           - Create a new comment
  */
 
@@ -33,6 +33,7 @@ interface CommentRow {
     status: string;
     created_at: string;
     updated_at: string | null;
+    is_pinned: number | null;
     user_id: string | null;
     user_name: string | null;
     user_avatar: string | null;
@@ -48,14 +49,27 @@ interface CommentNode {
     status: string;
     created_at: string;
     updated_at: string | null;
+    is_pinned: boolean;
     user_id: string | null;
     avatar_url: string | null;
     is_admin: boolean;
     replies: CommentNode[];
 }
 
+type CommentSortOrder = "latest" | "oldest";
+
+function parseSortOrder(sort: string | null): CommentSortOrder {
+    return sort === "oldest" ? "oldest" : "latest";
+}
+
+function toTimestamp(iso: string): number {
+    const ts = Date.parse(iso);
+    return Number.isFinite(ts) ? ts : 0;
+}
+
 async function buildCommentTree(
     rows: CommentRow[],
+    sortOrder: CommentSortOrder,
 ): Promise<{ comments: CommentNode[]; total: number }> {
     const topLevel: CommentNode[] = [];
     const repliesByParent = new Map<string, CommentNode[]>();
@@ -75,6 +89,7 @@ async function buildCommentTree(
             status: row.status,
             created_at: row.created_at,
             updated_at: row.updated_at,
+            is_pinned: !isDeleted && !row.parent_id && row.is_pinned === 1,
             user_id: isDeleted ? null : row.user_id,
             avatar_url: isDeleted ? null : row.user_avatar,
             is_admin: !isDeleted && row.user_role === "admin",
@@ -94,12 +109,25 @@ async function buildCommentTree(
     const result: CommentNode[] = [];
     for (const parent of topLevel) {
         parent.replies = repliesByParent.get(parent.id) ?? [];
+        parent.replies.sort((a, b) => toTimestamp(a.created_at) - toTimestamp(b.created_at));
         // Skip deleted comments with no replies
         if (parent.status === "deleted" && parent.replies.length === 0) {
             continue;
         }
         result.push(parent);
     }
+
+    result.sort((a, b) => {
+        // Sticky behavior: pinned comments always stay at top.
+        if (a.is_pinned !== b.is_pinned) {
+            return a.is_pinned ? -1 : 1;
+        }
+        const delta = toTimestamp(a.created_at) - toTimestamp(b.created_at);
+        if (delta !== 0) {
+            return sortOrder === "latest" ? -delta : delta;
+        }
+        return a.id.localeCompare(b.id);
+    });
 
     const total = rows.filter((r) => r.status === "visible").length;
     return { comments: result, total };
@@ -108,6 +136,7 @@ async function buildCommentTree(
 export const GET: APIRoute = async ({ request, locals }) => {
     const url = new URL(request.url);
     const slug = url.searchParams.get("slug");
+    const sortOrder = parseSortOrder(url.searchParams.get("sort"));
 
     if (!slug) {
         return jsonResponse({ error: "Missing slug parameter" }, 400);
@@ -132,7 +161,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
             .bind(slug)
             .all<CommentRow>();
 
-        return jsonResponse(await buildCommentTree(results ?? []), 200, {
+        return jsonResponse(await buildCommentTree(results ?? [], sortOrder), 200, {
             "Cache-Control": "public, max-age=0, stale-while-revalidate=30",
         });
     } catch (error) {
@@ -234,6 +263,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 status: "visible",
                 created_at: new Date().toISOString(),
                 updated_at: null,
+                is_pinned: false,
                 user_id: userId,
                 avatar_url: avatarUrl,
                 is_admin: isAdmin,
@@ -343,6 +373,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             status: "visible",
             created_at: now,
             updated_at: null,
+            is_pinned: false,
             user_id: userId,
             avatar_url: avatarUrl,
             is_admin: isAdmin,

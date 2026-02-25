@@ -3,7 +3,7 @@
  *
  * PUT    /api/comments/:id  - Edit comment content (author only, within 15 min)
  * DELETE /api/comments/:id  - Soft delete a comment (admin only, status → deleted)
- * PATCH  /api/comments/:id  - Toggle hidden/visible status (admin only)
+ * PATCH  /api/comments/:id  - Admin update (hidden/visible status or pin/unpin)
  */
 
 import type { APIRoute } from "astro";
@@ -168,7 +168,51 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     }
 
     try {
-        const body = (await request.json()) as { status?: string };
+        const body = (await request.json()) as {
+            status?: string;
+            action?: string;
+            pinned?: boolean;
+            is_pinned?: boolean;
+        };
+
+        const wantsPinUpdate =
+            body.action === "pin" ||
+            typeof body.pinned === "boolean" ||
+            typeof body.is_pinned === "boolean";
+
+        if (wantsPinUpdate) {
+            const pinned =
+                typeof body.pinned === "boolean"
+                    ? body.pinned
+                    : typeof body.is_pinned === "boolean"
+                      ? body.is_pinned
+                      : null;
+
+            if (pinned === null) {
+                return jsonResponse({ error: "Invalid pinned value. Must be boolean" }, 400);
+            }
+
+            const row = await db
+                .prepare("SELECT id, parent_id FROM comments WHERE id = ?")
+                .bind(id)
+                .first<{ id: string; parent_id: string | null }>();
+
+            if (!row) {
+                return jsonResponse({ error: "Comment not found" }, 404);
+            }
+
+            if (row.parent_id) {
+                return jsonResponse({ error: "Only top-level comments can be pinned" }, 400);
+            }
+
+            await db
+                .prepare("UPDATE comments SET is_pinned = ?, updated_at = ? WHERE id = ?")
+                .bind(pinned ? 1 : 0, new Date().toISOString(), id)
+                .run();
+
+            return jsonResponse({ success: true, is_pinned: pinned });
+        }
+
         const newStatus = body.status;
 
         if (newStatus !== "hidden" && newStatus !== "visible") {
