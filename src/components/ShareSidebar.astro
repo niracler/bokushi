@@ -114,7 +114,7 @@ const shareLinks = [
     <!-- 点赞按钮（最上方） -->
     <button
         type="button"
-        class="fixed bottom-30 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md bg-surface/90 border border-border shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus-accent group touch-manipulation"
+        class="fixed bottom-32 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md bg-surface/90 border border-border shadow-md transition-all duration-200 active:scale-95 focus-accent group touch-manipulation"
         aria-label="点赞"
         aria-pressed="false"
         data-like-button
@@ -132,7 +132,7 @@ const shareLinks = [
     <button
         type="button"
         data-share-mobile-toggle
-        class="fixed bottom-[72px] right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md bg-surface/95 border border-border text-secondary shadow-md transition-all duration-300 hover:scale-105 hover:bg-accent-soft hover:text-accent hover:border-accent hover:shadow-[0_8px_24px_rgba(var(--color-accent-rgb),0.28)] active:scale-95 touch-manipulation"
+        class="fixed bottom-[72px] right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md bg-surface/95 border border-border text-secondary shadow-md transition-all duration-300 hover:bg-accent-soft hover:text-accent hover:border-accent hover:shadow-[0_8px_24px_rgba(var(--color-accent-rgb),0.28)] active:scale-95 touch-manipulation"
         aria-label="分享文章"
         aria-expanded="false"
     >
@@ -150,7 +150,7 @@ const shareLinks = [
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
+                class="flex h-11 w-11 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
                 aria-label={link.label}
                 data-share-menu-item
             >
@@ -159,7 +159,7 @@ const shareLinks = [
         ))}
         <button
             type="button"
-            class="flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
+            class="flex h-11 w-11 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
             aria-label="复制链接"
             data-copy-link
             data-url={url}

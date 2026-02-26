@@ -60,7 +60,7 @@ const lastPostId = channelData?.posts?.[channelData.posts.length - 1]?.id;
 
 // Determine if there are more posts
 const hasNewerPosts = cursorType === "before" || cursorType === "after";
-const hasOlderPosts = !cursorType || (channelData?.posts && channelData.posts.length > 0);
+const hasOlderPosts = channelData?.posts && channelData.posts.length > 0;
 
 // Set short cache to avoid re-fetching on every refresh
 Astro.response.headers.set(
@@ -337,11 +337,6 @@ Astro.response.headers.set(
     .channel-layout {
       grid-template-columns: 1fr;
       max-width: none;
-    }
-
-    /* Sidebar moves to top on mobile */
-    .channel-layout > :global(.channel-sidebar) {
-      order: -1;
     }
   }
 

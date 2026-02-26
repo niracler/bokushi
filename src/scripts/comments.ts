@@ -605,10 +605,10 @@ async function handleTelegramLink(telegramData: Record<string, unknown>) {
             window.location.reload();
         } else {
             const data = (await res.json()) as { error?: string };
-            alert(data.error || "关联失败");
+            console.error("Telegram link failed:", data.error || "关联失败");
         }
     } catch {
-        alert("关联失败，请稍后重试");
+        console.error("Telegram link failed");
     }
 }
 
@@ -777,7 +777,7 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
         try {
             const result = await setCommentPinned(commentId, !currentlyPinned);
             if (result.error) {
-                alert(result.error);
+                console.error("Pin failed:", result.error);
                 pinBtn.disabled = false;
                 pinBtn.textContent = currentlyPinned ? "取消置顶" : "置顶";
                 return;
@@ -785,7 +785,7 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
 
             await loadComments(container, slug);
         } catch {
-            alert("置顶操作失败，请稍后重试");
+            console.error("Pin operation failed");
             pinBtn.disabled = false;
             pinBtn.textContent = currentlyPinned ? "取消置顶" : "置顶";
         }
@@ -944,7 +944,13 @@ async function loadComments(container: HTMLElement, slug: string) {
         bindEvents(container, slug);
     } catch {
         container.innerHTML =
-            '<p style="font-size:var(--font-size-sm);color:var(--color-danger)">评论加载失败，请稍后重试</p>';
+            '<div style="text-align:center;padding:var(--space-4)">' +
+            '<p style="font-size:var(--font-size-sm);color:var(--color-danger);margin:0 0 var(--space-3)">评论加载失败</p>' +
+            '<button type="button" class="comment-retry-btn" style="font-size:var(--font-size-sm);padding:var(--space-2) var(--space-4);border:1px solid var(--color-border-soft);border-radius:var(--radius-md);background:var(--color-bg-surface);color:var(--color-text-secondary);cursor:pointer">重新加载</button>' +
+            "</div>";
+        container.querySelector(".comment-retry-btn")?.addEventListener("click", () => {
+            loadComments(container, slug);
+        });
     }
 }
 

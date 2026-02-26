@@ -103,7 +103,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						{
 							(lastModified || updatedDate) && (
 								<p>
-									Last updated on {
+									最近更新于 {
 										lastModifiedCommitUrl ? (
 											<a
 												href={lastModifiedCommitUrl}
@@ -142,7 +142,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						{/* 移动端：浮动按钮 (缩小到 2/3 尺寸) */}
 						<button
 							data-toc-mobile-toggle
-							class="min-[960px]:hidden fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md bg-[rgb(var(--color-accent-rgb))] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_6px_24px_rgba(var(--color-accent-rgb),0.35)] transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_32px_rgba(var(--color-accent-rgb),0.45)] active:scale-95 touch-manipulation"
+							class="min-[960px]:hidden fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md bg-[rgb(var(--color-accent-rgb))] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_6px_24px_rgba(var(--color-accent-rgb),0.35)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(var(--color-accent-rgb),0.45)] active:scale-95 touch-manipulation"
 							aria-label="打开目录"
 						>
 							<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
