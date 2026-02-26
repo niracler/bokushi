@@ -29,7 +29,7 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 ### 博客 DNA
 
 - **暖色调**：拒绝冷色，浅色暖白、深色夜棕
-- **极简交互**：hover 只调颜色/边框，不位移
+- **极简交互**：hover 只调颜色/边框，不位移（入场动画如 fadeIn、slideDown 不受此限制）
 - **内容为王**：排版和组件都服务于阅读体验
 
 ### 技术栈概述
@@ -92,9 +92,9 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 | ------- | ------------------ |
 | 正文    | `17px` (1.0625rem) |
 | 小字    | `15px` (0.9375rem) |
-| 标题 h1 | `30px` (1.875rem)  |
-| 标题 h2 | `24px` (1.5rem)    |
-| 标题 h3 | `20px` (1.25rem)   |
+| 标题 h1 | `36px` (2.25rem)   |
+| 标题 h2 | `30px` (1.875rem)  |
+| 标题 h3 | `24px` (1.5rem)    |
 
 #### 行高与字距
 
@@ -116,7 +116,7 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 
 | 原语             | 用途                                                  |
 | ---------------- | ----------------------------------------------------- |
-| `.page-shell`    | 页面容器，最大宽度 `max-w-5xl` (1024px)，响应式内边距 |
+| `.page-shell`    | 页面容器，最大宽度 `72rem` (1152px)，各页面通过 `max-w-*` 覆盖 |
 | `.section-stack` | 纵向节奏，使用 `clamp()` 实现响应式间距               |
 | `.measure`       | 正文行长 `68ch`，符合可读性推荐（60-80 字符）         |
 

@@ -5,20 +5,37 @@
 <span
     class="spoiler inline-block cursor-pointer select-none rounded px-1 transition-colors"
     style="background: var(--color-text-primary); color: var(--color-text-primary);"
+    role="button"
+    tabindex="0"
+    aria-expanded="false"
+    aria-label="点击显示隐藏内容"
 >
-    <slot />
+    <span aria-hidden="true"><slot /></span>
 </span>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".spoiler").forEach((spoiler) => {
-            spoiler.addEventListener("click", (event) => {
-                const target = event.currentTarget as HTMLElement;
-                target.classList.toggle("revealed");
-                target.style.color = target.classList.contains("revealed")
+            function toggle() {
+                const el = spoiler as HTMLElement;
+                el.classList.toggle("revealed");
+                const isRevealed = el.classList.contains("revealed");
+                el.style.color = isRevealed
                     ? "var(--color-bg-surface)"
                     : "var(--color-text-primary)";
+                el.setAttribute("aria-expanded", String(isRevealed));
+                const content = el.querySelector("[aria-hidden]");
+                if (content) content.setAttribute("aria-hidden", String(!isRevealed));
+            }
+
+            spoiler.addEventListener("click", toggle);
+            spoiler.addEventListener("keydown", (e) => {
+                const event = e as KeyboardEvent;
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    toggle();
+                }
             });
         });
     });
-</script> 
+</script>

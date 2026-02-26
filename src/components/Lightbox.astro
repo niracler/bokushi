@@ -205,8 +205,11 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 				loader.src = shot.src;
 			};
 
+			let lastFocusedElement = null;
+
 			const open = (index) => {
 				if (!shots.length) return;
+				lastFocusedElement = document.activeElement;
 				current = ((index % shots.length) + shots.length) % shots.length;
 				showImage(current);
 				dialog.showModal();
@@ -218,6 +221,9 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 				dialog.close();
 				dialog.classList.remove("is-open");
 				document.body.classList.remove("scroll-locked");
+				if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+					lastFocusedElement.focus();
+				}
 			};
 
 			const step = (delta) => {
