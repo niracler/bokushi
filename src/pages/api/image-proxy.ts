@@ -14,10 +14,10 @@ export const prerender = false;
 
 // Allowlist of trusted image source hostnames
 const ALLOWED_HOSTS = new Set([
-    "cdn4.telegra.ph",
-    "cdn5.telegra.ph",
-    "cdn4.telegram-cdn.org",
-    "cdn5.cdn-telegram.org",
+    "telegra.ph",
+    "telegram-cdn.org",
+    "cdn-telegram.org",
+    "telesco.pe",
     "t.me",
     "telegram.org",
 ]);
