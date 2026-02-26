@@ -4,6 +4,13 @@
 
 import { SITE_URL } from "../consts";
 
+/** Encode a UTF-8 string to base64 without the deprecated `unescape`. */
+function utf8ToBase64(str: string): string {
+    const bytes = new TextEncoder().encode(str);
+    const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join("");
+    return btoa(binString);
+}
+
 interface NotifyReplyOptions {
     recipientEmail: string;
     recipientName: string;
@@ -138,14 +145,14 @@ export async function notifyCommentReply(
 
     // Build raw MIME email
     const rawEmail = [
-        `From: =?UTF-8?B?${btoa(unescape(encodeURIComponent("博客评论通知")))}?= <noreply@niracler.com>`,
+        `From: =?UTF-8?B?${utf8ToBase64("博客评论通知")}?= <noreply@niracler.com>`,
         `To: ${recipientEmail}`,
-        `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+        `Subject: =?UTF-8?B?${utf8ToBase64(subject)}?=`,
         `MIME-Version: 1.0`,
         `Content-Type: text/html; charset=utf-8`,
         `Content-Transfer-Encoding: base64`,
         ``,
-        btoa(unescape(encodeURIComponent(htmlBody))),
+        utf8ToBase64(htmlBody),
     ].join("\r\n");
 
     try {
