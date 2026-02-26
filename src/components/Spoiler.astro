@@ -13,29 +13,28 @@
     <span aria-hidden="true"><slot /></span>
 </span>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".spoiler").forEach((spoiler) => {
-            function toggle() {
-                const el = spoiler as HTMLElement;
-                el.classList.toggle("revealed");
-                const isRevealed = el.classList.contains("revealed");
-                el.style.color = isRevealed
-                    ? "var(--color-bg-surface)"
-                    : "var(--color-text-primary)";
-                el.setAttribute("aria-expanded", String(isRevealed));
-                const content = el.querySelector("[aria-hidden]");
-                if (content) content.setAttribute("aria-hidden", String(!isRevealed));
-            }
+<script is:inline>
+    document.querySelectorAll(".spoiler").forEach(function(spoiler) {
+        if (spoiler.dataset.spoilerBound) return;
+        spoiler.dataset.spoilerBound = "1";
 
-            spoiler.addEventListener("click", toggle);
-            spoiler.addEventListener("keydown", (e) => {
-                const event = e as KeyboardEvent;
-                if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    toggle();
-                }
-            });
+        function toggle() {
+            spoiler.classList.toggle("revealed");
+            var isRevealed = spoiler.classList.contains("revealed");
+            spoiler.style.color = isRevealed
+                ? "var(--color-bg-surface)"
+                : "var(--color-text-primary)";
+            spoiler.setAttribute("aria-expanded", String(isRevealed));
+            var content = spoiler.querySelector("[aria-hidden]");
+            if (content) content.setAttribute("aria-hidden", String(!isRevealed));
+        }
+
+        spoiler.addEventListener("click", toggle);
+        spoiler.addEventListener("keydown", function(e) {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggle();
+            }
         });
     });
 </script>
