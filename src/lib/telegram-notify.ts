@@ -37,7 +37,7 @@ const TELEGRAM_MSG_LIMIT = 4096;
  *
  *   Comment text...
  *
- *   "Parent comment text..."
+ *   <blockquote>Parent comment text...</blockquote>
  *
  *   ↦  <a href="postUrl">Post Title</a>
  */
@@ -58,7 +58,7 @@ function buildMessage(params: NotifyCommentParams): string {
 
     // Parent comment quote
     if (params.parentId && params.parentContent) {
-        msg += `\n\n"<i>${escapeHtml(stripHtml(params.parentContent))}</i>"`;
+        msg += `\n\n<blockquote>${escapeHtml(stripHtml(params.parentContent))}</blockquote>`;
     }
 
     // Post title link
