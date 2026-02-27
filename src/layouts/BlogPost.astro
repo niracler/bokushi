@@ -17,6 +17,7 @@ import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
 import { t } from "../i18n/ui";
 import { extractDescription } from "../utils/extractDescription";
 import type { Locale } from "../utils/i18n";
+import { localePath } from "../utils/i18n";
 import { estimateReadingTime } from "../utils/readingTime";
 
 type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
@@ -144,7 +145,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						<div class="flex flex-wrap justify-center gap-2">
 							{tags.map((tag: string) => (
 								<a
-									href={`/tags/${tag}`}
+									href={localePath(`/tags/${tag}`, locale)}
 									class="pill"
 									data-tone="accent"
 								>

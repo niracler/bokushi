@@ -1,21 +1,29 @@
 ---
 import { getLocale, t } from "../i18n/ui";
+import { localePath } from "../utils/i18n";
 import HeaderLink from "./HeaderLink.astro";
 import SearchModal from "./SearchModal.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 
 const locale = getLocale(Astro.currentLocale);
+const homeHref = localePath("/", locale);
 
-const navLinks = [
-    { href: "/", label: t(locale, "nav.home") },
-    { href: "/blog", label: t(locale, "nav.blog") },
-    { href: "/tags", label: t(locale, "nav.tags") },
-    { href: "/channel", label: t(locale, "nav.channel") },
-    { href: "/mangashots", label: t(locale, "nav.mangashots") },
-    { href: "/friends", label: t(locale, "nav.friends") },
-    { href: "/plrom", label: t(locale, "nav.plrom") },
-    { href: "/about", label: t(locale, "nav.about") },
-];
+const navLinks =
+    locale === "zh"
+        ? [
+              { href: "/", label: t(locale, "nav.home") },
+              { href: "/blog", label: t(locale, "nav.blog") },
+              { href: "/tags", label: t(locale, "nav.tags") },
+              { href: "/channel", label: t(locale, "nav.channel") },
+              { href: "/mangashots", label: t(locale, "nav.mangashots") },
+              { href: "/friends", label: t(locale, "nav.friends") },
+              { href: "/plrom", label: t(locale, "nav.plrom") },
+              { href: "/about", label: t(locale, "nav.about") },
+          ]
+        : [
+              { href: localePath("/blog", locale), label: t(locale, "nav.blog") },
+              { href: localePath("/tags", locale), label: t(locale, "nav.tags") },
+          ];
 
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, "");
 const firstSegment = pathname.match(/^[^/]+/)?.[0] || "";
@@ -36,7 +44,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
             class="text-[1.05rem] font-semibold tracking-tight text-primary sm:text-[1.1rem]"
         >
             <a
-                href="/"
+                href={homeHref}
                 class="transition-interactive hover:text-accent focus-accent"
             >
                 {t(locale, "site.title")}

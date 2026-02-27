@@ -19,6 +19,11 @@ export function parsePostId(id: string): { locale: Locale; slug: string } {
     return { locale: DEFAULT_LOCALE, slug: id };
 }
 
+/** Build a locale-prefixed path. zh (default) gets no prefix; en gets `/en`. */
+export function localePath(path: string, locale: Locale): string {
+    return locale === DEFAULT_LOCALE ? path : `/${locale}${path}`;
+}
+
 /** Build URL path for a post given its collection ID. */
 export function postUrl(id: string): string {
     const { locale, slug } = parsePostId(id);
