@@ -3,13 +3,13 @@ import BaseHead from "../../../components/BaseHead.astro";
 import Footer from "../../../components/Footer.astro";
 import Header from "../../../components/Header.astro";
 import PostList from "../../../components/PostList.astro";
-import { SITE_TITLE } from "../../../consts";
+import { t } from "../../../i18n/ui";
 ---
 
 <!doctype html>
 <html lang="en">
     <head>
-        <BaseHead title={`Blog - ${SITE_TITLE}`} description="Blog posts in English" />
+        <BaseHead title={`Blog - ${t("en", "site.title")}`} description="Blog posts in English" />
     </head>
     <body>
         <Header />

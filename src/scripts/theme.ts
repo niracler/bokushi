@@ -17,6 +17,31 @@ let hasResolvedState = false;
 let currentPreference: ThemePreference = DEFAULT_PREFERENCE;
 let currentTheme: ThemeName = "light";
 
+function getThemeLocale(): "zh" | "en" {
+    return document.documentElement.lang === "en" ? "en" : "zh";
+}
+
+const themeLabels: Record<"zh" | "en", Record<string, string>> = {
+    zh: {
+        light: "浅色模式",
+        dark: "夜间模式",
+        system: "跟随系统",
+        systemCurrent: "{pref}（当前{active}）",
+        currentDark: "夜间",
+        currentLight: "浅色",
+        statusTemplate: "当前主题：{current}。点击切换为{next}",
+    },
+    en: {
+        light: "Light mode",
+        dark: "Dark mode",
+        system: "Follow system",
+        systemCurrent: "{pref} (currently {active})",
+        currentDark: "dark",
+        currentLight: "light",
+        statusTemplate: "Current: {current}. Click to switch to {next}",
+    },
+};
+
 const isPreference = (value: unknown): value is ThemePreference =>
     value === "light" || value === "dark" || value === "system";
 
@@ -166,23 +191,32 @@ const cyclePreference = (preference: ThemePreference): ThemePreference => {
     }
 };
 
-const preferenceLabel = {
-    light: "浅色模式",
-    dark: "夜间模式",
-    system: "跟随系统",
-} satisfies Record<ThemePreference, string>;
+const getPreferenceLabel = (): Record<ThemePreference, string> => {
+    const labels = themeLabels[getThemeLocale()];
+    return {
+        light: labels.light,
+        dark: labels.dark,
+        system: labels.system,
+    };
+};
 
 const describeState = (state: ThemeState) => {
     const { preference, theme } = state;
     const nextPreference = cyclePreference(preference);
+    const labels = themeLabels[getThemeLocale()];
+    const preferenceLabel = getPreferenceLabel();
     const currentLabel =
         preference === "system"
-            ? `${preferenceLabel.system}（当前${theme === "dark" ? "夜间" : "浅色"}）`
+            ? labels.systemCurrent
+                  .replace("{pref}", preferenceLabel.system)
+                  .replace("{active}", theme === "dark" ? labels.currentDark : labels.currentLight)
             : preferenceLabel[preference];
 
     return {
         nextPreference,
-        message: `当前主题：${currentLabel}。点击切换为${preferenceLabel[nextPreference]}`,
+        message: labels.statusTemplate
+            .replace("{current}", currentLabel)
+            .replace("{next}", preferenceLabel[nextPreference]),
     };
 };
 

@@ -6,6 +6,12 @@ import PostPreviewSetup from "./PostPreviewSetup.astro";
 const today = new Date();
 const iconButtonClass = "icon-btn icon-btn--md icon-btn--round focus-accent";
 const iconClass = "h-7 w-7";
+
+const locale = Astro.currentLocale === "en" ? "en" : "zh";
+const ccTitle =
+    locale === "en"
+        ? "Content licensed under CC BY-NC-SA 4.0"
+        : "本站内容采用 CC BY-NC-SA 4.0 国际许可协议";
 ---
 
 <footer class="bg-page py-12 text-center text-sm text-secondary">
@@ -95,7 +101,7 @@ const iconClass = "h-7 w-7";
                 target="_blank"
                 rel="license noopener noreferrer"
                 class="inline-flex items-center gap-2 transition-colors hover:text-accent"
-                title="本站内容采用 CC BY-NC-SA 4.0 国际许可协议"
+                title={ccTitle}
             >
                 <span>CC BY-NC-SA 4.0</span>
                 <span class="inline-flex items-center gap-1 text-base text-secondary">

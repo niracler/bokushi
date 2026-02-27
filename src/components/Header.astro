@@ -1,5 +1,4 @@
 ---
-import { SITE_TITLE } from "../consts";
 import { getLocale, t } from "../i18n/ui";
 import HeaderLink from "./HeaderLink.astro";
 import SearchModal from "./SearchModal.astro";
@@ -40,7 +39,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
                 href="/"
                 class="transition-interactive hover:text-accent focus-accent"
             >
-                {SITE_TITLE}
+                {t(locale, "site.title")}
             </a>
         </h2>
         <SearchModal />
@@ -133,7 +132,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
     <link
         rel="alternate"
         type="application/rss+xml"
-        title="Niracler's 博物志"
+        title={t(locale, "site.title")}
         href={new URL("rss.xml", Astro.site)}
     />
 </header>

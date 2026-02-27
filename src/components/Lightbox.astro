@@ -24,12 +24,21 @@ interface Props {
 }
 
 const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = Astro.props;
+
+// Locale detection for i18n
+const locale = Astro.currentLocale === "en" ? "en" : "zh";
+const lightboxLabels = {
+    viewImage: locale === "en" ? "View image" : "查看大图",
+    close: locale === "en" ? "Close" : "关闭",
+    prev: locale === "en" ? "Previous" : "上一张",
+    next: locale === "en" ? "Next" : "下一张",
+};
 ---
 
 <dialog
 	id={id}
 	class="lightbox"
-	aria-label="查看大图"
+	aria-label={lightboxLabels.viewImage}
 	data-lightbox
 	data-selector={selector}
 	data-can-load-more={canLoadMore ? "" : undefined}
@@ -39,7 +48,7 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		<button
 			class="lightbox__close"
 			type="button"
-			aria-label="关闭"
+			aria-label={lightboxLabels.close}
 			data-lightbox-close
 		>
 			<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -55,7 +64,7 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		<button
 			class="lightbox__nav lightbox__nav--prev"
 			type="button"
-			aria-label="上一张"
+			aria-label={lightboxLabels.prev}
 			data-lightbox-prev
 		>
 			<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -76,7 +85,7 @@ const { id = "lightbox", selector, showCounter = true, canLoadMore = false } = A
 		<button
 			class="lightbox__nav lightbox__nav--next"
 			type="button"
-			aria-label="下一张"
+			aria-label={lightboxLabels.next}
 			data-lightbox-next
 		>
 			<svg viewBox="0 0 24 24" aria-hidden="true">
