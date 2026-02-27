@@ -13,5 +13,3 @@ tags: ["philosophy", "lifestyle", "self-discipline"]
 1. **Adequate sleep (8h/day)**: No electronic devices in bed. Separate sleeping and working rooms.
 2. **Exercise (3.5h/week)**: Strength training 3 times per week, maintaining ~140 BPM average.
 3. **Posture correction**: Complement strength training with physical therapy guidance.
-
-This is a test English translation for i18n route verification.

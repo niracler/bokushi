@@ -50,9 +50,11 @@ if (translationEntry) {
 const translationUrl = translationEntry ? postUrl(translationEntry.id) : undefined;
 const translationLocale = translationEntry ? parsePostId(translationEntry.id).locale : undefined;
 
-// Compute related posts by tag similarity
+// Compute related posts by tag similarity (same locale only)
 const currentTags = post.data.tags ?? [];
-const otherPosts = allPosts.filter((p) => p.id !== post.id && !p.data.hidden);
+const otherPosts = allPosts.filter(
+    (p) => p.id !== post.id && !p.data.hidden && parsePostId(p.id).locale === locale,
+);
 
 // Only show posts that actually share tags (no fallback to "most recent")
 let relatedPosts: BlogEntry[] = [];

@@ -5,7 +5,7 @@ import Footer from "../../components/Footer.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
 import Header from "../../components/Header.astro";
 import { SITE_TITLE } from "../../consts";
-import { postUrl } from "../../utils/i18n";
+import { parsePostId, postUrl } from "../../utils/i18n";
 
 export const prerender = true;
 
@@ -16,7 +16,7 @@ export async function getStaticPaths() {
         getCollection("til"),
     ]);
     const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter(
-        (post) => !post.data.hidden,
+        (post) => !post.data.hidden && parsePostId(post.id).locale === "zh",
     );
     const uniqueTags = [...new Set(allPosts.flatMap((post) => post.data.tags || []))];
 
