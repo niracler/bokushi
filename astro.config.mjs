@@ -23,7 +23,15 @@ export default defineConfig({
     output: "static", // 静态模式：全部预渲染（动态页面需要单独配置 prerender: false）
     integrations: [
         mdx(),
-        sitemap(),
+        sitemap({
+            i18n: {
+                defaultLocale: "zh",
+                locales: {
+                    zh: "zh-CN",
+                    en: "en-US",
+                },
+            },
+        }),
         icon({
             include: {
                 // Only include icons we actually use to reduce bundle size
@@ -91,6 +99,14 @@ export default defineConfig({
             [rehypeImgSize, { dir: "./public" }],
             rehypeFigure,
         ],
+    },
+
+    i18n: {
+        defaultLocale: "zh",
+        locales: ["zh", "en"],
+        routing: {
+            prefixDefaultLocale: false,
+        },
     },
 
     vite: {

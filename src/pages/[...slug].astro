@@ -1,6 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import BlogPost from "../layouts/BlogPost.astro";
+import { parsePostId } from "../utils/i18n";
 
 export const prerender = true;
 
@@ -11,10 +12,15 @@ export async function getStaticPaths() {
         getCollection("til"),
     ]);
     const posts = [...blogPosts, ...monthlyPosts, ...tilPosts];
-    return posts.map((post) => ({
-        params: { slug: post.id },
-        props: { post, allPosts: posts },
-    }));
+    return posts.map((post) => {
+        const { locale, slug } = parsePostId(post.id);
+        // Default locale (zh) → /slug, other locales → /en/slug
+        const urlSlug = locale === "zh" ? slug : `${locale}/${slug}`;
+        return {
+            params: { slug: urlSlug },
+            props: { post, allPosts: posts },
+        };
+    });
 }
 type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
 type Props = { post: BlogEntry; allPosts: BlogEntry[] };

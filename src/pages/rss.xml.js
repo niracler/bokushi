@@ -3,6 +3,7 @@ import rss from "@astrojs/rss";
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import { postUrl } from "../utils/i18n";
 
 const parser = new MarkdownIt();
 
@@ -22,7 +23,7 @@ export async function GET(context) {
             title: post.data.title,
             description: post.data.description,
             pubDate: post.data.pubDate,
-            link: `/${post.id}`,
+            link: postUrl(post.id),
             categories: post.data.tags,
             content: sanitizeHtml(parser.render(post.body), {
                 allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),

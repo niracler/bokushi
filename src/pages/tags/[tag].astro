@@ -5,6 +5,7 @@ import Footer from "../../components/Footer.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
 import Header from "../../components/Header.astro";
 import { SITE_TITLE } from "../../consts";
+import { postUrl } from "../../utils/i18n";
 
 export const prerender = true;
 
@@ -75,7 +76,7 @@ const sortedPosts = posts
 								<div class="group flex items-baseline gap-4 px-3 py-2 transition duration-150 sm:px-4 sm:py-2.5">
 									<h4 class="flex-1 text-base font-semibold tracking-tight text-primary transition duration-150 group-hover:text-accent sm:text-lg">
 										<a
-											href={`/${post.id}`}
+											href={postUrl(post.id)}
 											class="no-underline text-primary transition hover:text-accent focus-visible:outline-none focus-visible:text-accent focus-visible:underline"
 											data-post-id={post.id}
 										>
