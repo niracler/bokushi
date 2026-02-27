@@ -19,7 +19,7 @@ import { remarkModifiedTime } from "./remark-modified-time.mjs";
 // https://astro.build/config
 export default defineConfig({
     site: "https://niracler.com",
-    trailingSlash: "never",
+    trailingSlash: "ignore",
     output: "static", // 静态模式：全部预渲染（动态页面需要单独配置 prerender: false）
     integrations: [
         mdx(),
