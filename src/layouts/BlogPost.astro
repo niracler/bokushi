@@ -6,6 +6,7 @@ import CommentSection from "../components/CommentSection.astro";
 import Footer from "../components/Footer.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import Header from "../components/Header.astro";
+import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import Lightbox from "../components/Lightbox.astro";
 import Prose from "../components/Prose.astro";
 import ReadingProgress from "../components/ReadingProgress.astro";
@@ -13,7 +14,10 @@ import RelatedPosts from "../components/RelatedPosts.astro";
 import ShareSidebar from "../components/ShareSidebar.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
+import { t } from "../i18n/ui";
 import { extractDescription } from "../utils/extractDescription";
+import type { Locale } from "../utils/i18n";
+import { localePath } from "../utils/i18n";
 import { estimateReadingTime } from "../utils/readingTime";
 
 type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
@@ -24,14 +28,21 @@ type EntryData =
     | CollectionEntry<"til">["data"];
 
 type Props = EntryData & {
+    locale?: Locale;
+    postId?: string;
     body?: string;
     headings?: MarkdownHeading[];
     lastModified?: string;
     lastModifiedCommitUrl?: string | null;
     relatedPosts?: BlogEntry[];
+    hreflangAlternates?: { locale: string; url: string }[];
+    translationUrl?: string;
+    translationLocale?: string;
 };
 
 const {
+    locale = "zh",
+    postId,
     title,
     description: providedDescription,
     pubDate,
@@ -43,9 +54,18 @@ const {
     lastModified,
     lastModifiedCommitUrl,
     relatedPosts = [],
+    hreflangAlternates = [],
+    translationUrl,
+    translationLocale,
 } = Astro.props;
 
-const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
+const htmlLang = locale === "en" ? "en" : "zh-CN";
+
+const description =
+    providedDescription ||
+    (body
+        ? extractDescription(body, 80, t(locale, "misc.noDescription"))
+        : t(locale, "misc.noDescription"));
 const readingTime = estimateReadingTime(body);
 
 const imageSrc = socialImage || DEFAULT_POST_SOCIAL_IMAGE;
@@ -57,9 +77,9 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
 const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;
 ---
 
-<html lang="zh-CN">
+<html lang={htmlLang}>
 	<head>
-		<BaseHead title={title} description={description} image={imageSrc} type="article" />
+		<BaseHead title={title} description={description} image={imageSrc} type="article" hreflangAlternates={hreflangAlternates} />
 		<script is:inline type="application/ld+json" set:html={JSON.stringify({
 			"@context": "https://schema.org",
 			"@type": "BlogPosting",
@@ -98,12 +118,12 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						<p>
 							<FormattedDate date={pubDate} />
 							<span class="mx-1">·</span>
-							<span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">约 {readingTime} 分钟</span>
+							<span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">{t(locale, "post.readingTime", { minutes: readingTime })}</span>
 						</p>
 						{
 							(lastModified || updatedDate) && (
 								<p>
-									最近更新于 {
+									{t(locale, "post.lastUpdated")} {
 										lastModifiedCommitUrl ? (
 											<a
 												href={lastModifiedCommitUrl}
@@ -125,13 +145,18 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						<div class="flex flex-wrap justify-center gap-2">
 							{tags.map((tag: string) => (
 								<a
-									href={`/tags/${tag}`}
+									href={localePath(`/tags/${tag}`, locale)}
 									class="pill"
 									data-tone="accent"
 								>
 									{tag}
 								</a>
 							))}
+						</div>
+					)}
+					{translationUrl && (
+						<div class="pt-2">
+							<LanguageSwitcher translationUrl={translationUrl} translationLocale={translationLocale} />
 						</div>
 					)}
 				</div>
@@ -143,7 +168,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 						<button
 							data-toc-mobile-toggle
 							class="min-[960px]:hidden fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md bg-[rgb(var(--color-accent-rgb))] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_6px_24px_rgba(var(--color-accent-rgb),0.35)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(var(--color-accent-rgb),0.45)] active:scale-95 touch-manipulation"
-							aria-label="打开目录"
+							aria-label={t(locale, "post.openToc")}
 						>
 							<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 								<path d="M3 4h18M3 12h18M3 20h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -170,11 +195,11 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 								<div class="flex h-full flex-col">
 									{/* 头部 */}
 									<div class="flex items-center justify-between border-b border-border-subtle px-6 py-4">
-										<h2 class="text-lg font-semibold text-primary">目录</h2>
+										<h2 class="text-lg font-semibold text-primary">{t(locale, "post.toc")}</h2>
 										<button
 											data-toc-mobile-close
 											class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors"
-											aria-label="关闭目录"
+											aria-label={t(locale, "post.closeToc")}
 										>
 											<svg class="h-5 w-5 text-muted" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 												<path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -244,7 +269,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 				data-back-to-top
 				class="fixed z-40 flex items-center justify-center rounded-[var(--radius-md)] border opacity-0 pointer-events-none transition-opacity duration-300 bottom-6 left-6 h-11 w-11 min-[900px]:bottom-6 min-[900px]:right-6 min-[900px]:left-auto min-[900px]:h-10 min-[900px]:w-10 text-muted hover:text-secondary touch-manipulation"
 				style="background: var(--color-bg-surface); border-color: var(--color-border-soft); box-shadow: var(--shadow-soft);"
-				aria-label="回到顶部"
+				aria-label={t(locale, "post.backToTop")}
 			>
 				<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 					<path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />

@@ -1,6 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import BlogPost from "../layouts/BlogPost.astro";
+import { parsePostId, postUrl } from "../utils/i18n";
 
 export const prerender = true;
 
@@ -11,20 +12,49 @@ export async function getStaticPaths() {
         getCollection("til"),
     ]);
     const posts = [...blogPosts, ...monthlyPosts, ...tilPosts];
-    return posts.map((post) => ({
-        params: { slug: post.id },
-        props: { post, allPosts: posts },
-    }));
+    return posts.map((post) => {
+        const { locale, slug } = parsePostId(post.id);
+        // Default locale (zh) → /slug, other locales → /en/slug
+        const urlSlug = locale === "zh" ? slug : `${locale}/${slug}`;
+        return {
+            params: { slug: urlSlug },
+            props: { post, allPosts: posts },
+        };
+    });
 }
 type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
 type Props = { post: BlogEntry; allPosts: BlogEntry[] };
 
 const { post, allPosts } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(post);
+const { locale, slug: baseSlug } = parsePostId(post.id);
 
-// Compute related posts by tag similarity
+// Build hreflang alternates for SEO (only when a translation exists)
+const siteUrl = Astro.site?.toString().replace(/\/$/, "") ?? "";
+const blogPosts = allPosts.filter((p): p is CollectionEntry<"blog"> => p.collection === "blog");
+const translationEntry = blogPosts.find((p) => {
+    const parsed = parsePostId(p.id);
+    return parsed.slug === baseSlug && parsed.locale !== locale;
+});
+const hreflangAlternates: { locale: string; url: string }[] = [];
+if (translationEntry) {
+    // Both directions + x-default pointing to zh
+    hreflangAlternates.push(
+        { locale: "zh", url: `${siteUrl}/${baseSlug}` },
+        { locale: "en", url: `${siteUrl}/en/${baseSlug}` },
+        { locale: "x-default", url: `${siteUrl}/${baseSlug}` },
+    );
+}
+
+// Translation link data for LanguageSwitcher (reuse translationEntry from above)
+const translationUrl = translationEntry ? postUrl(translationEntry.id) : undefined;
+const translationLocale = translationEntry ? parsePostId(translationEntry.id).locale : undefined;
+
+// Compute related posts by tag similarity (same locale only)
 const currentTags = post.data.tags ?? [];
-const otherPosts = allPosts.filter((p) => p.id !== post.id && !p.data.hidden);
+const otherPosts = allPosts.filter(
+    (p) => p.id !== post.id && !p.data.hidden && parsePostId(p.id).locale === locale,
+);
 
 // Only show posts that actually share tags (no fallback to "most recent")
 let relatedPosts: BlogEntry[] = [];
@@ -47,11 +77,16 @@ if (currentTags.length > 0) {
 
 <BlogPost
     {...post.data}
+    locale={locale}
+    postId={post.id}
     body={post.body}
     headings={headings}
     lastModified={remarkPluginFrontmatter?.lastModified}
     lastModifiedCommitUrl={remarkPluginFrontmatter?.lastModifiedCommitUrl}
     relatedPosts={relatedPosts}
+    hreflangAlternates={hreflangAlternates}
+    translationUrl={translationUrl}
+    translationLocale={translationLocale}
 >
     <Content />
 </BlogPost>

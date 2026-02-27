@@ -4,7 +4,11 @@
  * @param maxLength - 最大长度（默认 160 字符）
  * @returns 提取的描述文本
  */
-export function extractDescription(content: string, maxLength: number = 80): string {
+export function extractDescription(
+    content: string,
+    maxLength: number = 80,
+    fallback: string = "暂无描述",
+): string {
     // 移除 frontmatter
     const contentWithoutFrontmatter = content.replace(/^---[\s\S]*?---\s*/m, "");
 
@@ -37,7 +41,7 @@ export function extractDescription(content: string, maxLength: number = 80): str
 
     // 如果内容为空，返回默认描述
     if (!plainText) {
-        return "暂无描述";
+        return fallback;
     }
 
     // 截取指定长度

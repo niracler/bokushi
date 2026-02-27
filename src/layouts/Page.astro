@@ -5,7 +5,7 @@ import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import Lightbox from "../components/Lightbox.astro";
 import Prose from "../components/Prose.astro";
-import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import { getLocale, t } from "../i18n/ui";
 
 const { frontmatter = {} } = Astro.props as { frontmatter?: Record<string, unknown> };
 const {
@@ -17,8 +17,11 @@ const {
     description?: string;
     title?: string;
 };
-const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
-const description = pageDescription || SITE_DESCRIPTION;
+const locale = getLocale(Astro.currentLocale);
+const siteTitle = t(locale, "site.title");
+const siteDescription = t(locale, "site.description");
+const pageTitle = title ? `${title} · ${siteTitle}` : siteTitle;
+const description = pageDescription || siteDescription;
 ---
 
 <!doctype html>

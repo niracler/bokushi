@@ -13,6 +13,18 @@ interface Props {
 
 const { title, description, tags = [], url = Astro.url.href, slug } = Astro.props;
 
+// Locale detection for i18n
+const locale = Astro.currentLocale === "en" ? "en" : "zh";
+const shareLabels = {
+    twitter: locale === "en" ? "Share on Twitter" : "分享到 Twitter",
+    telegram: locale === "en" ? "Share on Telegram" : "分享到 Telegram",
+    shareArticle: locale === "en" ? "Share article" : "分享文章",
+    copyLink: locale === "en" ? "Copy link" : "复制链接",
+    like: locale === "en" ? "Like" : "点赞",
+    unlike: locale === "en" ? "Unlike" : "取消点赞",
+    copied: locale === "en" ? "Link copied" : "链接已复制",
+};
+
 // Twitter: hashtags as comma-separated (without #), max 3 tags
 const twitterHashtags = tags.slice(0, 3).join(",");
 
@@ -51,13 +63,13 @@ const encodedUrl = encodeURIComponent(url);
 const shareLinks = [
     {
         name: "Twitter",
-        label: "分享到 Twitter",
+        label: shareLabels.twitter,
         icon: "ri:twitter-fill",
         href: `https://twitter.com/intent/tweet?${twitterParams.toString()}`,
     },
     {
         name: "Telegram",
-        label: "分享到 Telegram",
+        label: shareLabels.telegram,
         icon: "ri:telegram-fill",
         href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTelegramText}`,
     },
@@ -69,7 +81,7 @@ const shareLinks = [
     data-share-sidebar
     class="hidden min-[900px]:flex fixed flex-col gap-3 opacity-0 transition-opacity duration-200 mt-[5px]"
     style="right: calc(50% + 25rem + 2rem); top: 6rem;"
-    aria-label="分享文章"
+    aria-label={shareLabels.shareArticle}
 >
     {shareLinks.map((link) => (
         <a
@@ -85,20 +97,22 @@ const shareLinks = [
     <button
         type="button"
         class="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:text-accent hover:shadow-md focus-accent"
-        aria-label="复制链接"
+        aria-label={shareLabels.copyLink}
         data-copy-link
         data-url={url}
     >
         <Icon name="ri:link" class="h-6 w-6" aria-hidden="true" />
     </button>
-    <!-- 点赞按钮 -->
+    <!-- Like button -->
     <button
         type="button"
         class="relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:shadow-md focus-accent group"
-        aria-label="点赞"
+        aria-label={shareLabels.like}
         aria-pressed="false"
         data-like-button
         data-slug={slug}
+        data-label-like={shareLabels.like}
+        data-label-unlike={shareLabels.unlike}
     >
         <Icon name="ri:heart-line" class="h-6 w-6 group-data-[liked]:hidden" aria-hidden="true" />
         <Icon name="ri:heart-fill" class="h-6 w-6 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
@@ -109,16 +123,18 @@ const shareLinks = [
     </button>
 </aside>
 
-<!-- Mobile: Floating action buttons (统一 40px 尺寸，8px 间距) -->
+<!-- Mobile: Floating action buttons -->
 <div class="min-[900px]:hidden transition-opacity duration-200" data-mobile-floating-buttons>
-    <!-- 点赞按钮（最上方） -->
+    <!-- Like button (top) -->
     <button
         type="button"
         class="fixed bottom-32 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md bg-surface/90 border border-border shadow-md transition-all duration-200 active:scale-95 focus-accent group touch-manipulation"
-        aria-label="点赞"
+        aria-label={shareLabels.like}
         aria-pressed="false"
         data-like-button
         data-slug={slug}
+        data-label-like={shareLabels.like}
+        data-label-unlike={shareLabels.unlike}
     >
         <Icon name="ri:heart-line" class="h-5 w-5 text-secondary group-data-[liked]:hidden" aria-hidden="true" />
         <Icon name="ri:heart-fill" class="h-5 w-5 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
@@ -128,12 +144,12 @@ const shareLinks = [
         ></span>
     </button>
 
-    <!-- 分享按钮（中间）- z-50 确保在菜单上方可点击 -->
+    <!-- Share button (middle) - z-50 ensures clickable above menu -->
     <button
         type="button"
         data-share-mobile-toggle
         class="fixed bottom-[72px] right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md bg-surface/95 border border-border text-secondary shadow-md transition-all duration-300 hover:bg-accent-soft hover:text-accent hover:border-accent hover:shadow-[0_8px_24px_rgba(var(--color-accent-rgb),0.28)] active:scale-95 touch-manipulation"
-        aria-label="分享文章"
+        aria-label={shareLabels.shareArticle}
         aria-expanded="false"
     >
         <Icon name="ri:share-line" class="h-5 w-5" aria-hidden="true" />
@@ -160,7 +176,7 @@ const shareLinks = [
         <button
             type="button"
             class="flex h-11 w-11 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
-            aria-label="复制链接"
+            aria-label={shareLabels.copyLink}
             data-copy-link
             data-url={url}
             data-share-menu-item
@@ -178,11 +194,11 @@ const shareLinks = [
     aria-live="polite"
 >
     <Icon name="ri:check-line" class="h-5 w-5 text-accent" aria-hidden="true" />
-    <span class="text-sm text-primary">链接已复制</span>
+    <span class="text-sm text-primary">{shareLabels.copied}</span>
 </div>
 
 <style>
-    /* 点赞动画 */
+    /* Like animation */
     @keyframes pop {
         0% { transform: scale(1); }
         50% { transform: scale(1.2); }
@@ -196,7 +212,7 @@ const shareLinks = [
     .animate-pop { animation: pop 0.2s ease-out; }
     .animate-shake { animation: shake 0.3s ease-out; }
 
-    /* 尊重用户的动画偏好设置 */
+    /* Respect user's reduced-motion preference */
     @media (prefers-reduced-motion: reduce) {
         .animate-pop,
         .animate-shake {
@@ -204,7 +220,7 @@ const shareLinks = [
         }
     }
 
-    /* 点满后的金色效果 */
+    /* Golden effect when max likes reached */
     [data-like-button][data-max-reached] {
         border-color: var(--color-warning) !important;
     }
@@ -270,11 +286,11 @@ const shareLinks = [
         }, 2000);
     }
 
-    // ============ 点赞功能（支持多次点赞，最多 16 次）============
+    // ============ Like feature (supports multiple likes, up to 16) ============
     const LIKE_STORAGE_KEY = "bokushi_likes_v2";
     const MAX_LIKES = 16;
 
-    // 获取 localStorage 中的点赞记录 { slug: userLikes }
+    // Get like records from localStorage { slug: userLikes }
     function getLikeData() {
         try {
             return JSON.parse(localStorage.getItem(LIKE_STORAGE_KEY) || "{}");
@@ -283,16 +299,16 @@ const shareLinks = [
         }
     }
 
-    // 保存点赞记录到 localStorage
+    // Save like records to localStorage
     function saveLikeData(data) {
         localStorage.setItem(LIKE_STORAGE_KEY, JSON.stringify(data));
     }
 
-    // 更新所有点赞按钮的 UI
+    // Update all like button UIs
     function updateLikeUI(count, userLikes, maxReached) {
         const isLiked = userLikes > 0;
         likeButtons.forEach((btn) => {
-            // 更新 data 属性
+            // Update data attributes
             if (isLiked) {
                 btn.setAttribute("data-liked", "");
             } else {
@@ -303,18 +319,18 @@ const shareLinks = [
             } else {
                 btn.removeAttribute("data-max-reached");
             }
-            // 更新无障碍属性
+            // Update accessibility attributes
             btn.setAttribute("aria-pressed", String(isLiked));
-            btn.setAttribute("aria-label", isLiked ? "取消点赞" : "点赞");
+            btn.setAttribute("aria-label", isLiked ? (btn.dataset.labelUnlike || "Unlike") : (btn.dataset.labelLike || "Like"));
         });
         likeCountElements.forEach((el) => {
             el.textContent = count > 0 ? String(count) : "";
         });
     }
 
-    // 获取点赞状态
+    // Fetch like status
     async function fetchLikeStatus(slug) {
-        // 先用 localStorage 显示
+        // Display from localStorage first
         const localData = getLikeData();
         const localUserLikes = localData[slug] || 0;
         updateLikeUI(localUserLikes, localUserLikes, localUserLikes >= MAX_LIKES);
@@ -323,10 +339,10 @@ const shareLinks = [
             const res = await fetch(`/api/like?slug=${encodeURIComponent(slug)}`);
             if (res.ok) {
                 const data = await res.json();
-                // 用服务端数据更新（更准确）
+                // Update with server data (more accurate)
                 const userLikes = Math.max(data.userLikes, localUserLikes);
                 updateLikeUI(data.count, userLikes, userLikes >= MAX_LIKES);
-                // 同步到 localStorage
+                // Sync to localStorage
                 if (userLikes !== localUserLikes) {
                     localData[slug] = userLikes;
                     saveLikeData(localData);
@@ -337,14 +353,14 @@ const shareLinks = [
         }
     }
 
-    // 添加点赞（每次 +1）
+    // Add a like (+1 each time)
     async function addLike(slug) {
         const localData = getLikeData();
         const currentLikes = localData[slug] || 0;
 
-        // 已达上限
+        // Max reached
         if (currentLikes >= MAX_LIKES) {
-            // 添加一个小动画提示已满
+            // Small shake animation to indicate max reached
             likeButtons.forEach((btn) => {
                 btn.classList.add("animate-shake");
                 setTimeout(() => btn.classList.remove("animate-shake"), 300);
@@ -352,14 +368,14 @@ const shareLinks = [
             return;
         }
 
-        // 乐观更新 UI
+        // Optimistic UI update
         const newLikes = currentLikes + 1;
         localData[slug] = newLikes;
         saveLikeData(localData);
 
         likeButtons.forEach((btn) => {
             btn.setAttribute("data-liked", "");
-            // 点击动画
+            // Click animation
             btn.classList.add("animate-pop");
             setTimeout(() => btn.classList.remove("animate-pop"), 200);
         });
@@ -373,7 +389,7 @@ const shareLinks = [
             if (res.ok) {
                 const data = await res.json();
                 updateLikeUI(data.count, data.userLikes, data.userLikes >= MAX_LIKES);
-                // 同步 localStorage
+                // Sync localStorage
                 localData[slug] = data.userLikes;
                 saveLikeData(localData);
             }
@@ -384,8 +400,8 @@ const shareLinks = [
 
     // Event listeners
     mobileToggle?.addEventListener("click", (e) => {
-        e.stopPropagation(); // 阻止冒泡，避免触发 document click
-        // 直接从 DOM 读取当前状态，避免闭包变量不同步
+        e.stopPropagation(); // Prevent bubbling to document click handler
+        // Read current state from DOM to avoid stale closure variable
         const isCurrentlyOpen = mobileToggle.getAttribute("aria-expanded") === "true";
         setMenuOpen(!isCurrentlyOpen);
     });
@@ -417,7 +433,7 @@ const shareLinks = [
         });
     });
 
-    // Like buttons (点赞按钮在菜单外，不需要关闭菜单)
+    // Like buttons (outside menu, no need to close menu)
     likeButtons.forEach((btn) => {
         const slug = btn.dataset.slug;
         if (slug) {
@@ -425,7 +441,7 @@ const shareLinks = [
         }
     });
 
-    // 页面加载时获取点赞状态
+    // Fetch like status on page load
     const firstLikeButton = likeButtons[0];
     if (firstLikeButton) {
         const slug = firstLikeButton.dataset.slug;

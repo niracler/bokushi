@@ -1,5 +1,7 @@
 ---
 // Spoiler component - reveals hidden text on click
+const locale = Astro.currentLocale === "en" ? "en" : "zh";
+const spoilerLabel = locale === "en" ? "Click to reveal hidden content" : "点击显示隐藏内容";
 ---
 
 <span
@@ -8,7 +10,7 @@
     role="button"
     tabindex="0"
     aria-expanded="false"
-    aria-label="点击显示隐藏内容"
+    aria-label={spoilerLabel}
 >
     <span aria-hidden="true"><slot /></span>
 </span>

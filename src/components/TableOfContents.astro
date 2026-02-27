@@ -44,11 +44,14 @@ function buildNestedHeadings(headings: Heading[]): NestedHeading[] {
 }
 
 const nestedHeadings = buildNestedHeadings(filteredHeadings);
+
+const locale = Astro.currentLocale === "en" ? "en" : "zh";
+const tocHeading = locale === "en" ? "Contents" : "目录";
 ---
 
 {nestedHeadings.length > 0 && (
 	<nav class="toc" data-no-preview aria-label="Table of Contents">
-		<h2 class="toc-title">目录</h2>
+		<h2 class="toc-title">{tocHeading}</h2>
 		<ol class="toc-list">
 			{nestedHeadings.map((heading, index) => (
 				<li>

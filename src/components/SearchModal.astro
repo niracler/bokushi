@@ -1,13 +1,16 @@
 ---
 // SearchModal.astro - Full-screen search modal with Pagefind integration
 // Follows Vercel Design Guidelines: keyboard accessible, focus visible, 44px touch targets
+import { getLocale, t } from "../i18n/ui";
+
+const locale = getLocale(Astro.currentLocale);
 ---
 
 <!-- Search trigger button for Header -->
 <button
     type="button"
     class="icon-btn icon-btn--sm icon-btn--square icon-btn--bordered focus-accent"
-    aria-label="搜索 (Cmd+K)"
+    aria-label={t(locale, "search.trigger")}
     data-search-trigger
 >
     <svg
@@ -33,19 +36,21 @@
     data-search-state="closed"
     role="dialog"
     aria-modal="true"
-    aria-label="站内搜索"
+    aria-label={t(locale, "search.dialog")}
 >
     <!-- Backdrop close button -->
     <button
         type="button"
         class="absolute inset-0 h-full w-full cursor-default"
         data-search-close
-        aria-label="关闭搜索"
+        aria-label={t(locale, "search.close")}
     ></button>
 
     <!-- Search Container -->
     <div
         data-search-container
+        data-result-count-template={t(locale, "search.resultCount")}
+        data-show-more-text={t(locale, "search.showMore")}
         class="relative z-10 mt-[10vh] w-full max-w-2xl translate-y-4 rounded-xl border border-border bg-surface p-4 shadow-2xl transition-transform duration-200 mx-4 sm:mx-6"
     >
         <!-- Search Header -->
@@ -64,11 +69,12 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.3-4.3"></path>
             </svg>
-            <label for="search-input" class="sr-only">搜索文章</label>
+            <label for="search-input" class="sr-only">{t(locale, "search.label")}</label>
             <input
                 id="search-input"
                 type="search"
-                placeholder="搜索文章..."
+                placeholder={t(locale, "search.placeholder")}
+                data-placeholder={t(locale, "search.placeholder")}
                 class="w-full bg-transparent text-lg text-primary placeholder:text-muted focus-accent rounded"
                 data-search-input
                 autocomplete="off"
@@ -83,7 +89,7 @@
                 type="button"
                 class="icon-btn icon-btn--sm icon-btn--square focus-accent sm:hidden"
                 data-search-close
-                aria-label="关闭搜索"
+                aria-label={t(locale, "search.close")}
             >
                 <span aria-hidden="true" class="text-xl leading-none">&times;</span>
             </button>
@@ -96,16 +102,16 @@
         >
             <!-- Empty state -->
             <div data-search-empty class="py-8 text-center text-muted">
-                <p>输入关键词开始搜索</p>
-                <p class="mt-2 text-sm">支持搜索所有文章、TIL 和月度总结</p>
+                <p>{t(locale, "search.emptyHint")}</p>
+                <p class="mt-2 text-sm">{t(locale, "search.emptyDetail")}</p>
             </div>
             <!-- No results state (hidden by default) -->
             <div data-search-no-results class="hidden py-8 text-center text-muted">
-                <p>未找到相关内容</p>
-                <p class="mt-2 text-sm">请尝试其他关键词</p>
+                <p>{t(locale, "search.noResults")}</p>
+                <p class="mt-2 text-sm">{t(locale, "search.noResultsHint")}</p>
             </div>
             <!-- Results list -->
-            <ul data-search-list class="hidden space-y-2" role="listbox" aria-label="搜索结果">
+            <ul data-search-list class="hidden space-y-2" role="listbox" aria-label={t(locale, "search.resultList")}>
             </ul>
         </div>
 
@@ -113,9 +119,9 @@
         <div class="flex items-center justify-between border-t border-subtle pt-3 text-xs text-muted">
             <span>
                 <kbd class="rounded border border-subtle bg-page px-1.5 py-0.5">↵</kbd>
-                选择
+                {t(locale, "search.select")}
                 <kbd class="ml-2 rounded border border-subtle bg-page px-1.5 py-0.5">↑↓</kbd>
-                导航
+                {t(locale, "search.navigate")}
             </span>
             <span class="flex items-center gap-1">
                 <span>Powered by</span>
@@ -270,7 +276,8 @@
             countLi.setAttribute("role", "presentation");
             const countText = document.createElement("p");
             countText.className = "pt-2 text-center text-sm text-muted";
-            countText.textContent = "显示 " + shownCount + " / " + totalCount + " 条结果";
+            var tpl = searchContainer.dataset.resultCountTemplate || "Showing {shown} of {total} results";
+            countText.textContent = tpl.replace("{shown}", shownCount).replace("{total}", totalCount);
             countLi.appendChild(countText);
             searchList.appendChild(countLi);
 
@@ -281,7 +288,7 @@
                 const btn = document.createElement("button");
                 btn.type = "button";
                 btn.className = "mt-2 w-full rounded-lg border border-subtle py-2 text-sm text-secondary transition-colors hover:bg-accent-tint-8 hover:text-accent focus:bg-accent-tint-8 focus:outline-none focus-accent";
-                btn.textContent = "显示更多";
+                btn.textContent = searchContainer.dataset.showMoreText || "Show more";
                 btn.addEventListener("click", function () {
                     showMoreResults();
                 });

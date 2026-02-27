@@ -1,9 +1,11 @@
 ---
 const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
+const locale = Astro.currentLocale === "en" ? "en" : "zh";
+const heading = locale === "en" ? "Comments" : "评论";
 ---
 
 <div class="mt-12 border-t border-border-subtle pt-6">
-  <h2 class="mb-6 text-xl font-semibold text-primary">评论</h2>
+  <h2 class="mb-6 text-xl font-semibold text-primary">{heading}</h2>
   <div
     id="comment-section"
     data-comment-slug={slug}

@@ -5,8 +5,11 @@ interface Props {
     variant?: "header" | "mobile";
 }
 
+const locale = Astro.currentLocale === "en" ? "en" : "zh";
+const defaultLabel = locale === "en" ? "Toggle theme" : "切换主题模式";
+
 const {
-    label = "切换主题模式",
+    label = defaultLabel,
     class: className = "",
     variant = "header",
 } = (Astro.props as Props) ?? {};
@@ -27,7 +30,7 @@ const {
 	>
 		<span class="sr-only" data-theme-toggle-label>{label}</span>
 		<span aria-hidden="true" class="icon-container">
-			<!-- System: Lucide sun-moon 图标 -->
+			<!-- System: Lucide sun-moon icon -->
 			<svg
 				data-icon="system"
 				class="theme-icon"
@@ -45,7 +48,7 @@ const {
 				<path d="M20 12h2" />
 			</svg>
 
-			<!-- Light: Lucide sun 图标 -->
+			<!-- Light: Lucide sun icon -->
 			<svg
 				data-icon="light"
 				class="theme-icon"
@@ -67,7 +70,7 @@ const {
 				<path d="m19.07 4.93-1.41 1.41" />
 			</svg>
 
-			<!-- Dark: Lucide moon 图标 -->
+			<!-- Dark: Lucide moon icon -->
 			<svg
 				data-icon="dark"
 				class="theme-icon"

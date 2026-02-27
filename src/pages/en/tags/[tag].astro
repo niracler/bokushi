@@ -1,11 +1,11 @@
 ---
 import { getCollection } from "astro:content";
-import BaseHead from "../../components/BaseHead.astro";
-import Footer from "../../components/Footer.astro";
-import FormattedDate from "../../components/FormattedDate.astro";
-import Header from "../../components/Header.astro";
-import { SITE_TITLE } from "../../consts";
-import { parsePostId, postUrl } from "../../utils/i18n";
+import BaseHead from "../../../components/BaseHead.astro";
+import Footer from "../../../components/Footer.astro";
+import FormattedDate from "../../../components/FormattedDate.astro";
+import Header from "../../../components/Header.astro";
+import { t } from "../../../i18n/ui";
+import { localePath, parsePostId, postUrl } from "../../../utils/i18n";
 
 export const prerender = true;
 
@@ -15,9 +15,11 @@ export async function getStaticPaths() {
         getCollection("monthly"),
         getCollection("til"),
     ]);
-    const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter(
-        (post) => !post.data.hidden && parsePostId(post.id).locale === "zh",
-    );
+    const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts].filter((post) => {
+        if (post.data.hidden) return false;
+        const { locale } = parsePostId(post.id);
+        return locale === "en";
+    });
     const uniqueTags = [...new Set(allPosts.flatMap((post) => post.data.tags || []))];
 
     return uniqueTags.map((tag) => {
@@ -32,17 +34,19 @@ export async function getStaticPaths() {
 const { tag } = Astro.params;
 const { posts } = Astro.props;
 
+const siteTitle = t("en", "site.title");
+
 const sortedPosts = posts
     .filter((post) => !post.data.hidden)
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 	<head>
 		<BaseHead
-			title={`标签: ${tag} | ${SITE_TITLE}`}
-			description={`所有标记为 "${tag}" 的文章`}
+			title={`Tag: ${tag} | ${siteTitle}`}
+			description={`All posts tagged "${tag}"`}
 		/>
 	</head>
 	<body>
@@ -50,10 +54,10 @@ const sortedPosts = posts
 		<main id="main-content" class="page-shell max-w-5xl section-stack">
 			<nav class="text-sm text-secondary">
 				<a
-					href="/tags"
+					href={localePath("/tags", "en")}
 					class="inline-flex items-center gap-2 transition hover:text-accent"
 				>
-					<span aria-hidden="true">←</span> 返回标签索引
+					<span aria-hidden="true">←</span> Back to tag index
 				</a>
 			</nav>
 			<header class="space-y-2">

@@ -1,0 +1,38 @@
+---
+type Props = {
+    /** URL of the translated version */
+    translationUrl?: string;
+    /** Locale of the translated version (e.g. "en" or "zh") */
+    translationLocale?: string;
+};
+
+const { translationUrl, translationLocale } = Astro.props;
+const label = translationLocale === "en" ? "Read in English" : "中文版";
+---
+
+{translationUrl && (
+    <a
+        href={translationUrl}
+        class="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent"
+    >
+        <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+        >
+            <path
+                d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                stroke="currentColor"
+                stroke-width="1.5"
+            />
+            <path
+                d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"
+                stroke="currentColor"
+                stroke-width="1.5"
+            />
+        </svg>
+        {label}
+    </a>
+)}

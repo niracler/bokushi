@@ -1,6 +1,143 @@
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
 
+// --- Client-side i18n ---
+
+type CommentLocale = "zh" | "en";
+
+function getCommentLocale(): CommentLocale {
+    const lang = document.documentElement.lang;
+    return lang === "en" ? "en" : "zh";
+}
+
+const commentUi: Record<CommentLocale, Record<string, string>> = {
+    zh: {
+        justNow: "刚刚",
+        minutesAgo: "{n} 分钟前",
+        hoursAgo: "{n} 小时前",
+        daysAgo: "{n} 天前",
+        adminBadge: "博主",
+        deleted: "该评论已删除",
+        pinnedComment: "置顶评论",
+        pinBadge: "置顶",
+        pinAction: "置顶",
+        unpinAction: "取消置顶",
+        editedAt: "已于 {time} 编辑",
+        edited: "（已编辑）",
+        editComment: "编辑评论",
+        edit: "编辑",
+        unpinComment: "取消置顶评论",
+        pinComment: "置顶评论",
+        replyTo: "回复 {name}",
+        reply: "回复",
+        editTimeRemaining: "剩余 {n} 分钟可编辑",
+        editWindowClosed: "编辑窗口已关闭",
+        editContent: "编辑评论内容",
+        cancel: "取消",
+        save: "保存",
+        replyPlaceholder: "回复 {name}...",
+        commentPlaceholder: "写下你的评论... 支持 Markdown",
+        linkTelegram: "关联 Telegram",
+        linkGitHub: "关联 GitHub",
+        logout: "登出",
+        namePlaceholder: "昵称 *",
+        emailPlaceholder: "邮箱（选填，用于头像）",
+        websitePlaceholder: "网站（选填）",
+        or: "或",
+        login: "登录",
+        markdownSupported: "支持 Markdown 语法",
+        submitReply: "回复",
+        submitComment: "发表评论",
+        commentCount: "{n} 条评论",
+        sortLabel: "评论排序",
+        sortLatest: "最新",
+        sortOldest: "最早",
+        emptyTitle: "还没有评论",
+        emptySubtitle: "来发表第一条吧",
+        contentEmpty: "内容不能为空",
+        saving: "保存中...",
+        saveFailed: "保存失败，请稍后重试",
+        unpinning: "取消中...",
+        pinning: "置顶中...",
+        fillContent: "请填写评论内容",
+        deletedCannotReply: "该评论已被删除，无法回复",
+        fillNameAndContent: "请填写昵称和评论内容",
+        submitting: "提交中...",
+        submitFailed: "提交失败，请稍后重试",
+        loadFailed: "评论加载失败",
+        reload: "重新加载",
+        loginFailed: "登录失败，请稍后重试",
+    },
+    en: {
+        justNow: "just now",
+        minutesAgo: "{n}m ago",
+        hoursAgo: "{n}h ago",
+        daysAgo: "{n}d ago",
+        adminBadge: "Author",
+        deleted: "This comment has been deleted",
+        pinnedComment: "Pinned comment",
+        pinBadge: "Pinned",
+        pinAction: "Pin",
+        unpinAction: "Unpin",
+        editedAt: "Edited {time}",
+        edited: "(edited)",
+        editComment: "Edit comment",
+        edit: "Edit",
+        unpinComment: "Unpin comment",
+        pinComment: "Pin comment",
+        replyTo: "Reply to {name}",
+        reply: "Reply",
+        editTimeRemaining: "{n} min left to edit",
+        editWindowClosed: "Edit window closed",
+        editContent: "Edit comment content",
+        cancel: "Cancel",
+        save: "Save",
+        replyPlaceholder: "Reply to {name}...",
+        commentPlaceholder: "Write a comment... Markdown supported",
+        linkTelegram: "Link Telegram",
+        linkGitHub: "Link GitHub",
+        logout: "Log out",
+        namePlaceholder: "Name *",
+        emailPlaceholder: "Email (optional, for avatar)",
+        websitePlaceholder: "Website (optional)",
+        or: "or",
+        login: "Log in",
+        markdownSupported: "Markdown supported",
+        submitReply: "Reply",
+        submitComment: "Post comment",
+        commentCount: "{n} comments",
+        sortLabel: "Sort comments",
+        sortLatest: "Latest",
+        sortOldest: "Oldest",
+        emptyTitle: "No comments yet",
+        emptySubtitle: "Be the first to comment",
+        contentEmpty: "Content cannot be empty",
+        saving: "Saving...",
+        saveFailed: "Save failed, please try again",
+        unpinning: "Unpinning...",
+        pinning: "Pinning...",
+        fillContent: "Please enter a comment",
+        deletedCannotReply: "This comment has been deleted and cannot be replied to",
+        fillNameAndContent: "Please enter your name and comment",
+        submitting: "Submitting...",
+        submitFailed: "Submit failed, please try again",
+        loadFailed: "Failed to load comments",
+        reload: "Reload",
+        loginFailed: "Login failed, please try again",
+    },
+};
+
+function ct(key: string, values?: Record<string, string | number>): string {
+    const locale = getCommentLocale();
+    let str = commentUi[locale][key] ?? commentUi.zh[key] ?? key;
+    if (values) {
+        for (const [k, v] of Object.entries(values)) {
+            str = str.replace(`{${k}}`, String(v));
+        }
+    }
+    return str;
+}
+
 // --- Types ---
 
 interface CommentNode {
@@ -194,12 +331,13 @@ function formatTime(iso: string): string {
     const diffHour = Math.floor(diffMs / 3600000);
     const diffDay = Math.floor(diffMs / 86400000);
 
-    if (diffMin < 1) return "刚刚";
-    if (diffMin < 60) return `${diffMin} 分钟前`;
-    if (diffHour < 24) return `${diffHour} 小时前`;
-    if (diffDay < 30) return `${diffDay} 天前`;
+    if (diffMin < 1) return ct("justNow");
+    if (diffMin < 60) return ct("minutesAgo", { n: diffMin });
+    if (diffHour < 24) return ct("hoursAgo", { n: diffHour });
+    if (diffDay < 30) return ct("daysAgo", { n: diffDay });
 
-    return date.toLocaleDateString("zh-CN", {
+    const dateLocale = getCommentLocale() === "en" ? "en-US" : "zh-CN";
+    return date.toLocaleDateString(dateLocale, {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -212,7 +350,9 @@ const CONTAINER_SELECTOR = "#comment-section";
 
 function createAuthorEl(comment: CommentNode): string {
     const name = escapeHtml(comment.author);
-    const adminBadge = comment.is_admin ? ` <span class="comment-badge">博主</span>` : "";
+    const adminBadge = comment.is_admin
+        ? ` <span class="comment-badge">${ct("adminBadge")}</span>`
+        : "";
 
     if (comment.website && !comment.user_id) {
         const href = escapeHtml(comment.website);
@@ -233,7 +373,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
     if (comment.status === "deleted") {
         return `
 			<div class="comment-card comment-card--deleted${replyClass}">
-				<p style="font-style:italic;font-size:var(--font-size-sm);color:var(--color-text-muted)">该评论已删除</p>
+				<p style="font-style:italic;font-size:var(--font-size-sm);color:var(--color-text-muted)">${ct("deleted")}</p>
 			</div>`;
     }
 
@@ -268,7 +408,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
     const authorEl = createAuthorEl(comment);
     const pinBadge =
         !isReply && comment.is_pinned
-            ? `<span class="comment-pin-badge" title="置顶评论">置顶</span>`
+            ? `<span class="comment-pin-badge" title="${ct("pinnedComment")}">${ct("pinBadge")}</span>`
             : "";
     const time = formatTime(comment.created_at);
     const contentHtml = renderMarkdown(comment.content);
@@ -280,7 +420,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
     const isAdminUser = currentUser?.role === "admin";
     const isPinEditable = !isReply && Boolean(isAdminUser) && comment.status !== "deleted";
     const editedIndicator = comment.updated_at
-        ? `<span class="comment-edited-indicator" title="已于 ${formatTime(comment.updated_at)} 编辑">（已编辑）</span>`
+        ? `<span class="comment-edited-indicator" title="${ct("editedAt", { time: formatTime(comment.updated_at) })}">${ct("edited")}</span>`
         : "";
     const editBtn = isEditableByCurrentUser
         ? `<button
@@ -288,9 +428,9 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 							data-edit-id="${comment.id}"
 							data-edit-content="${escapeHtml(comment.content)}"
 							data-created-at="${comment.created_at}"
-							aria-label="编辑评论"
+							aria-label="${ct("editComment")}"
 						>
-							编辑
+							${ct("edit")}
 						</button>`
         : "";
     const pinBtn = isPinEditable
@@ -298,9 +438,9 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 							class="comment-pin-btn"
 							data-pin-id="${comment.id}"
 							data-pin-state="${comment.is_pinned ? "1" : "0"}"
-							aria-label="${comment.is_pinned ? "取消置顶评论" : "置顶评论"}"
+							aria-label="${comment.is_pinned ? ct("unpinComment") : ct("pinComment")}"
 						>
-							${comment.is_pinned ? "取消置顶" : "置顶"}
+							${comment.is_pinned ? ct("unpinAction") : ct("pinAction")}
 						</button>`
         : "";
 
@@ -330,9 +470,9 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 							data-reply-to="${comment.id}"
 							data-reply-author="${escapeHtml(comment.author)}"
 							data-reply-parent="${replyParent}"
-							aria-label="回复 ${escapeHtml(comment.author)}"
+							aria-label="${ct("replyTo", { name: escapeHtml(comment.author) })}"
 						>
-							回复
+							${ct("reply")}
 						</button>
 						${pinBtn}
 						${editBtn}
@@ -347,7 +487,8 @@ const EDIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 function renderEditForm(commentId: string, originalContent: string, createdAt: string): string {
     const remaining = Math.max(0, EDIT_WINDOW_MS - (Date.now() - new Date(createdAt).getTime()));
     const remainingMin = Math.ceil(remaining / 60000);
-    const timeHint = remaining > 0 ? `剩余 ${remainingMin} 分钟可编辑` : "编辑窗口已关闭";
+    const timeHint =
+        remaining > 0 ? ct("editTimeRemaining", { n: remainingMin }) : ct("editWindowClosed");
 
     return `
 		<div class="comment-edit-form" data-edit-form="${commentId}">
@@ -355,13 +496,13 @@ function renderEditForm(commentId: string, originalContent: string, createdAt: s
 				class="comment-input comment-edit-textarea"
 				rows="4"
 				maxlength="5000"
-				aria-label="编辑评论内容"
+				aria-label="${ct("editContent")}"
 			>${escapeHtml(originalContent)}</textarea>
 			<div class="comment-edit-footer">
 				<span class="comment-form-hint">${timeHint}</span>
 				<div class="comment-form-actions">
-					<button type="button" class="comment-cancel-btn comment-edit-cancel" data-edit-id="${commentId}">取消</button>
-					<button type="button" class="comment-submit-btn comment-edit-save" data-edit-id="${commentId}">保存</button>
+					<button type="button" class="comment-cancel-btn comment-edit-cancel" data-edit-id="${commentId}">${ct("cancel")}</button>
+					<button type="button" class="comment-submit-btn comment-edit-save" data-edit-id="${commentId}">${ct("save")}</button>
 				</div>
 			</div>
 			<p class="comment-error comment-edit-error" role="alert" style="display:none"></p>
@@ -373,10 +514,12 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
     const prefix = replyAuthor ? `@${replyAuthor} ` : "";
     const formClass = parentId ? "comment-form comment-form--reply" : "comment-form";
     const cancelBtn = parentId
-        ? `<button type="button" class="cancel-reply-btn comment-cancel-btn">取消</button>`
+        ? `<button type="button" class="cancel-reply-btn comment-cancel-btn">${ct("cancel")}</button>`
         : "";
 
-    const placeholder = parentId ? `回复 ${replyAuthor || ""}...` : "写下你的评论... 支持 Markdown";
+    const placeholder = parentId
+        ? ct("replyPlaceholder", { name: replyAuthor || "" })
+        : ct("commentPlaceholder");
 
     // Logged-in: show user bar above textarea
     // Not logged in: show identity fields + login links in footer
@@ -394,12 +537,12 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
         const linkButtons: string[] = [];
         if (!currentUser.linkedProviders.includes("telegram")) {
             linkButtons.push(
-                `<button class="link-telegram-btn comment-inline-action">关联 Telegram</button>`,
+                `<button class="link-telegram-btn comment-inline-action">${ct("linkTelegram")}</button>`,
             );
         }
         if (!currentUser.linkedProviders.includes("github")) {
             linkButtons.push(
-                `<a href="/api/auth/github?redirect=${encodeURIComponent(window.location.pathname)}" class="comment-inline-action">关联 GitHub</a>`,
+                `<a href="/api/auth/github?redirect=${encodeURIComponent(window.location.pathname)}" class="comment-inline-action">${ct("linkGitHub")}</a>`,
             );
         }
         const linkSection =
@@ -414,23 +557,23 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
                     <span class="user-name">${escapeHtml(currentUser.name)}</span>
                     ${adminBadge}
                     <span class="comment-inline-sep">·</span>
-                    <button class="logout-btn comment-inline-action comment-inline-action--danger">登出</button>
+                    <button class="logout-btn comment-inline-action comment-inline-action--danger">${ct("logout")}</button>
                     ${linkSection}
                 </div>
             </div>`;
     } else {
         identityFields = `
             <div class="comment-form-fields">
-                <input type="text" name="author" placeholder="昵称 *" required maxlength="50" class="comment-input" />
-                <input type="email" name="email" placeholder="邮箱（选填，用于头像）" maxlength="200" class="comment-input" />
-                <input type="url" name="website" placeholder="网站（选填）" maxlength="200" class="comment-input" />
+                <input type="text" name="author" placeholder="${ct("namePlaceholder")}" required maxlength="50" class="comment-input" />
+                <input type="email" name="email" placeholder="${ct("emailPlaceholder")}" maxlength="200" class="comment-input" />
+                <input type="url" name="website" placeholder="${ct("websitePlaceholder")}" maxlength="200" class="comment-input" />
             </div>`;
 
         // Small inline login links in the footer
         const redirect = encodeURIComponent(window.location.pathname);
         loginHint = `
             <span class="comment-login-hint">
-                <span class="comment-login-hint-text">或</span>
+                <span class="comment-login-hint-text">${ct("or")}</span>
                 <a href="/api/auth/github?redirect=${redirect}" class="comment-login-link">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                     GitHub
@@ -441,7 +584,7 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
                         Telegram
                     </button>
                 </div>
-                <span class="comment-login-hint-text">登录</span>
+                <span class="comment-login-hint-text">${ct("login")}</span>
             </span>`;
     }
 
@@ -459,11 +602,11 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 				style="margin-top:var(--space-3)"
 			>${prefix}</textarea>
 			<div class="comment-form-footer">
-				<span class="comment-form-hint">支持 Markdown 语法</span>
+				<span class="comment-form-hint">${ct("markdownSupported")}</span>
 				<div class="comment-form-actions">
 					${loginHint}
 					${cancelBtn}
-					<button type="submit" class="submit-btn comment-submit-btn">${parentId ? "回复" : "发表评论"}</button>
+					<button type="submit" class="submit-btn comment-submit-btn">${parentId ? ct("submitReply") : ct("submitComment")}</button>
 				</div>
 			</div>
 			<p class="form-error comment-error" role="alert" style="display:none"></p>
@@ -504,10 +647,10 @@ function renderSortToolbar(total: number): string {
 
     return `
 		<div class="comment-toolbar">
-			<div class="comment-count">${total} 条评论</div>
-			<div class="comment-sort" role="group" aria-label="评论排序">
-				<button type="button" class="comment-sort-btn${latestActive}" data-sort="latest">最新</button>
-				<button type="button" class="comment-sort-btn${oldestActive}" data-sort="oldest">最早</button>
+			<div class="comment-count">${ct("commentCount", { n: total })}</div>
+			<div class="comment-sort" role="group" aria-label="${ct("sortLabel")}">
+				<button type="button" class="comment-sort-btn${latestActive}" data-sort="latest">${ct("sortLatest")}</button>
+				<button type="button" class="comment-sort-btn${oldestActive}" data-sort="oldest">${ct("sortOldest")}</button>
 			</div>
 		</div>`;
 }
@@ -522,8 +665,8 @@ function renderCommentList(data: CommentsResponse): string {
 						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
 					</svg>
 				</div>
-				<p class="comment-empty-title">还没有评论</p>
-				<p class="comment-empty-subtitle">来发表第一条吧</p>
+				<p class="comment-empty-title">${ct("emptyTitle")}</p>
+				<p class="comment-empty-subtitle">${ct("emptySubtitle")}</p>
 			</div>
 			${renderCommentForm()}`;
     }
@@ -694,13 +837,13 @@ function bindEditEvents(container: HTMLElement) {
 
             const newContent = textarea.value.trim();
             if (!newContent) {
-                errorEl.textContent = "内容不能为空";
+                errorEl.textContent = ct("contentEmpty");
                 errorEl.style.display = "block";
                 return;
             }
 
             saveBtn.disabled = true;
-            saveBtn.textContent = "保存中...";
+            saveBtn.textContent = ct("saving");
             errorEl.style.display = "none";
 
             try {
@@ -709,7 +852,7 @@ function bindEditEvents(container: HTMLElement) {
                     errorEl.textContent = result.error;
                     errorEl.style.display = "block";
                     saveBtn.disabled = false;
-                    saveBtn.textContent = "保存";
+                    saveBtn.textContent = ct("save");
                     return;
                 }
 
@@ -731,7 +874,7 @@ function bindEditEvents(container: HTMLElement) {
                 const card = container.querySelector(`[data-comment-id="${commentId}"]`);
                 if (card && result.updated_at) {
                     const existing = card.querySelector(".comment-edited-indicator");
-                    const indicator = `<span class="comment-edited-indicator" title="已于 ${formatTime(result.updated_at)} 编辑">（已编辑）</span>`;
+                    const indicator = `<span class="comment-edited-indicator" title="${ct("editedAt", { time: formatTime(result.updated_at) })}">${ct("edited")}</span>`;
                     if (existing) {
                         existing.outerHTML = indicator;
                     } else {
@@ -745,10 +888,10 @@ function bindEditEvents(container: HTMLElement) {
                 // Remove edit form
                 form.remove();
             } catch {
-                errorEl.textContent = "保存失败，请稍后重试";
+                errorEl.textContent = ct("saveFailed");
                 errorEl.style.display = "block";
                 saveBtn.disabled = false;
-                saveBtn.textContent = "保存";
+                saveBtn.textContent = ct("save");
             }
         }
     });
@@ -772,14 +915,14 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
         const currentlyPinned = pinBtn.dataset.pinState === "1";
 
         pinBtn.disabled = true;
-        pinBtn.textContent = currentlyPinned ? "取消中..." : "置顶中...";
+        pinBtn.textContent = currentlyPinned ? ct("unpinning") : ct("pinning");
 
         try {
             const result = await setCommentPinned(commentId, !currentlyPinned);
             if (result.error) {
                 console.error("Pin failed:", result.error);
                 pinBtn.disabled = false;
-                pinBtn.textContent = currentlyPinned ? "取消置顶" : "置顶";
+                pinBtn.textContent = currentlyPinned ? ct("unpinAction") : ct("pinAction");
                 return;
             }
 
@@ -787,7 +930,7 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
         } catch {
             console.error("Pin operation failed");
             pinBtn.disabled = false;
-            pinBtn.textContent = currentlyPinned ? "取消置顶" : "置顶";
+            pinBtn.textContent = currentlyPinned ? ct("unpinAction") : ct("pinAction");
         }
     });
 }
@@ -870,14 +1013,14 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
         const parentId = form.dataset.parentId || null;
 
         if (!content) {
-            showError(errorEl, "请填写评论内容");
+            showError(errorEl, ct("fillContent"));
             return;
         }
 
         if (parentId) {
             const parentCard = container.querySelector(`[data-comment-id="${parentId}"]`);
             if (!parentCard) {
-                showError(errorEl, "该评论已被删除，无法回复");
+                showError(errorEl, ct("deletedCannotReply"));
                 return;
             }
         }
@@ -892,7 +1035,7 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
         if (!currentUser) {
             const author = (formData.get("author") as string)?.trim();
             if (!author) {
-                showError(errorEl, "请填写昵称和评论内容");
+                showError(errorEl, ct("fillNameAndContent"));
                 return;
             }
             postData.author = author;
@@ -901,7 +1044,7 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = "提交中...";
+        submitBtn.textContent = ct("submitting");
         hideError(errorEl);
 
         try {
@@ -910,15 +1053,15 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
             if (result.error) {
                 showError(errorEl, result.error);
                 submitBtn.disabled = false;
-                submitBtn.textContent = parentId ? "回复" : "发表评论";
+                submitBtn.textContent = parentId ? ct("submitReply") : ct("submitComment");
                 return;
             }
 
             await loadComments(container, slug);
         } catch {
-            showError(errorEl, "提交失败，请稍后重试");
+            showError(errorEl, ct("submitFailed"));
             submitBtn.disabled = false;
-            submitBtn.textContent = parentId ? "回复" : "发表评论";
+            submitBtn.textContent = parentId ? ct("submitReply") : ct("submitComment");
         }
     });
 }
@@ -945,8 +1088,8 @@ async function loadComments(container: HTMLElement, slug: string) {
     } catch {
         container.innerHTML =
             '<div style="text-align:center;padding:var(--space-4)">' +
-            '<p style="font-size:var(--font-size-sm);color:var(--color-danger);margin:0 0 var(--space-3)">评论加载失败</p>' +
-            '<button type="button" class="comment-retry-btn" style="font-size:var(--font-size-sm);padding:var(--space-2) var(--space-4);border:1px solid var(--color-border-soft);border-radius:var(--radius-md);background:var(--color-bg-surface);color:var(--color-text-secondary);cursor:pointer">重新加载</button>' +
+            `<p style="font-size:var(--font-size-sm);color:var(--color-danger);margin:0 0 var(--space-3)">${ct("loadFailed")}</p>` +
+            `<button type="button" class="comment-retry-btn" style="font-size:var(--font-size-sm);padding:var(--space-2) var(--space-4);border:1px solid var(--color-border-soft);border-radius:var(--radius-md);background:var(--color-bg-surface);color:var(--color-text-secondary);cursor:pointer">${ct("reload")}</button>` +
             "</div>";
         container.querySelector(".comment-retry-btn")?.addEventListener("click", () => {
             loadComments(container, slug);
@@ -967,7 +1110,7 @@ async function initCommentSection() {
     if (authError) {
         const errorEl = document.createElement("p");
         errorEl.className = "comment-error";
-        errorEl.textContent = "登录失败，请稍后重试";
+        errorEl.textContent = ct("loginFailed");
         errorEl.style.display = "block";
         container.insertAdjacentElement("afterbegin", errorEl);
         pageUrl.searchParams.delete("auth_error");
