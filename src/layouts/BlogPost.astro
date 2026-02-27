@@ -14,6 +14,7 @@ import ShareSidebar from "../components/ShareSidebar.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
 import { extractDescription } from "../utils/extractDescription";
+import type { Locale } from "../utils/i18n";
 import { estimateReadingTime } from "../utils/readingTime";
 
 type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
@@ -24,6 +25,7 @@ type EntryData =
     | CollectionEntry<"til">["data"];
 
 type Props = EntryData & {
+    locale?: Locale;
     body?: string;
     headings?: MarkdownHeading[];
     lastModified?: string;
@@ -32,6 +34,7 @@ type Props = EntryData & {
 };
 
 const {
+    locale = "zh",
     title,
     description: providedDescription,
     pubDate,
@@ -45,6 +48,8 @@ const {
     relatedPosts = [],
 } = Astro.props;
 
+const htmlLang = locale === "en" ? "en" : "zh-CN";
+
 const description = providedDescription || (body ? extractDescription(body) : "暂无描述");
 const readingTime = estimateReadingTime(body);
 
@@ -57,7 +62,7 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
 const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;
 ---
 
-<html lang="zh-CN">
+<html lang={htmlLang}>
 	<head>
 		<BaseHead title={title} description={description} image={imageSrc} type="article" />
 		<script is:inline type="application/ld+json" set:html={JSON.stringify({

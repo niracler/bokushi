@@ -27,6 +27,7 @@ type Props = { post: BlogEntry; allPosts: BlogEntry[] };
 
 const { post, allPosts } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(post);
+const { locale } = parsePostId(post.id);
 
 // Compute related posts by tag similarity
 const currentTags = post.data.tags ?? [];
@@ -53,6 +54,7 @@ if (currentTags.length > 0) {
 
 <BlogPost
     {...post.data}
+    locale={locale}
     body={post.body}
     headings={headings}
     lastModified={remarkPluginFrontmatter?.lastModified}

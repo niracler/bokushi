@@ -1,7 +1,14 @@
 ---
 import { getCollection } from "astro:content";
-import { postUrl } from "../utils/i18n";
+import type { Locale } from "../utils/i18n";
+import { parsePostId, postUrl } from "../utils/i18n";
 import FormattedDate from "./FormattedDate.astro";
+
+interface Props {
+    locale?: Locale;
+}
+
+const { locale } = Astro.props;
 
 // 使用 Promise.all 并行获取所有集合数据
 const [blogPosts, monthlyPosts, tilPosts] = await Promise.all([
@@ -11,7 +18,14 @@ const [blogPosts, monthlyPosts, tilPosts] = await Promise.all([
 ]);
 
 const posts = [...blogPosts, ...monthlyPosts, ...tilPosts]
-    .filter((post) => !post.data.hidden)
+    .filter((post) => {
+        if (post.data.hidden) return false;
+        if (locale) {
+            const { locale: postLocale } = parsePostId(post.id);
+            return postLocale === locale;
+        }
+        return true;
+    })
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const postsByYear = posts.reduce((acc, post) => {
