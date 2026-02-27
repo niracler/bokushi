@@ -27,7 +27,24 @@ type Props = { post: BlogEntry; allPosts: BlogEntry[] };
 
 const { post, allPosts } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(post);
-const { locale } = parsePostId(post.id);
+const { locale, slug: baseSlug } = parsePostId(post.id);
+
+// Build hreflang alternates for SEO (only when a translation exists)
+const siteUrl = Astro.site?.toString().replace(/\/$/, "") ?? "";
+const blogPosts = allPosts.filter((p): p is CollectionEntry<"blog"> => p.collection === "blog");
+const translationEntry = blogPosts.find((p) => {
+    const parsed = parsePostId(p.id);
+    return parsed.slug === baseSlug && parsed.locale !== locale;
+});
+const hreflangAlternates: { locale: string; url: string }[] = [];
+if (translationEntry) {
+    // Both directions + x-default pointing to zh
+    hreflangAlternates.push(
+        { locale: "zh", url: `${siteUrl}/${baseSlug}` },
+        { locale: "en", url: `${siteUrl}/en/${baseSlug}` },
+        { locale: "x-default", url: `${siteUrl}/${baseSlug}` },
+    );
+}
 
 // Compute related posts by tag similarity
 const currentTags = post.data.tags ?? [];
@@ -55,11 +72,13 @@ if (currentTags.length > 0) {
 <BlogPost
     {...post.data}
     locale={locale}
+    postId={post.id}
     body={post.body}
     headings={headings}
     lastModified={remarkPluginFrontmatter?.lastModified}
     lastModifiedCommitUrl={remarkPluginFrontmatter?.lastModifiedCommitUrl}
     relatedPosts={relatedPosts}
+    hreflangAlternates={hreflangAlternates}
 >
     <Content />
 </BlogPost>

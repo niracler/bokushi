@@ -6,6 +6,7 @@ import CommentSection from "../components/CommentSection.astro";
 import Footer from "../components/Footer.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import Header from "../components/Header.astro";
+import LanguageSwitcher from "../components/LanguageSwitcher.astro";
 import Lightbox from "../components/Lightbox.astro";
 import Prose from "../components/Prose.astro";
 import ReadingProgress from "../components/ReadingProgress.astro";
@@ -26,15 +27,18 @@ type EntryData =
 
 type Props = EntryData & {
     locale?: Locale;
+    postId?: string;
     body?: string;
     headings?: MarkdownHeading[];
     lastModified?: string;
     lastModifiedCommitUrl?: string | null;
     relatedPosts?: BlogEntry[];
+    hreflangAlternates?: { locale: string; url: string }[];
 };
 
 const {
     locale = "zh",
+    postId,
     title,
     description: providedDescription,
     pubDate,
@@ -46,6 +50,7 @@ const {
     lastModified,
     lastModifiedCommitUrl,
     relatedPosts = [],
+    hreflangAlternates = [],
 } = Astro.props;
 
 const htmlLang = locale === "en" ? "en" : "zh-CN";
@@ -64,7 +69,7 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 
 <html lang={htmlLang}>
 	<head>
-		<BaseHead title={title} description={description} image={imageSrc} type="article" />
+		<BaseHead title={title} description={description} image={imageSrc} type="article" hreflangAlternates={hreflangAlternates} />
 		<script is:inline type="application/ld+json" set:html={JSON.stringify({
 			"@context": "https://schema.org",
 			"@type": "BlogPosting",
@@ -137,6 +142,11 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 									{tag}
 								</a>
 							))}
+						</div>
+					)}
+					{postId && (
+						<div class="pt-2">
+							<LanguageSwitcher postId={postId} />
 						</div>
 					)}
 				</div>
