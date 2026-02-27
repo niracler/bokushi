@@ -1,0 +1,283 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Footer from "../../components/Footer.astro";
+import Header from "../../components/Header.astro";
+import { t } from "../../i18n/ui";
+
+const siteTitle = t("en", "site.title");
+const siteDescription = t("en", "site.description");
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={siteTitle} description={siteDescription} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": siteTitle,
+      "description": siteDescription,
+      "url": Astro.site?.toString()
+    })} />
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.95;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .quote-container {
+        animation: fadeIn 1s ease-out;
+        position: relative;
+        width: 100%;
+      }
+
+      .quote-text {
+        color: var(--color-text-secondary);
+        line-height: 1.8;
+        font-size: clamp(1.25rem, 4.5vw, 1.5rem);
+      }
+
+      .quote-ghost {
+        visibility: hidden;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .quote-actual {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        opacity: 0;
+        transition: opacity var(--transition-slow);
+      }
+
+      .quote-actual.is-ready {
+        opacity: 1;
+      }
+
+      .quote-emphasis {
+        display: inline-block;
+        font-size: clamp(1.75rem, 6.5vw, 2.25rem);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: var(--color-link);
+        margin: clamp(0.75rem, 2.5vw, 1rem) 0;
+        animation: breathe 4s ease-in-out infinite;
+      }
+
+      .quote-source {
+        transition: all var(--transition-slower);
+        opacity: 0;
+      }
+
+      .quote-source.is-visible {
+        opacity: 1;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .quote-container,
+        .quote-source {
+          animation: none;
+        }
+        .quote-emphasis {
+          animation: none;
+        }
+      }
+
+      .quote-source:hover {
+        color: var(--color-text-secondary);
+      }
+
+      .quote-source a {
+        position: relative;
+        text-decoration: none;
+        transition: color var(--transition-slow);
+      }
+
+      .quote-source a::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--color-accent);
+        transition: width var(--transition-slow);
+      }
+
+      .quote-source a:hover::after {
+        width: 100%;
+      }
+
+      .typewriter-cursor {
+        display: inline-block;
+        width: 1.5px;
+        height: 1.2em;
+        background-color: var(--color-accent);
+        margin-left: 2px;
+        animation: blink 0.75s step-end infinite;
+        vertical-align: middle;
+        position: relative;
+        top: -0.05em;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main
+      id="main-content"
+      class="page-shell flex min-h-[calc(100vh-18rem)] items-center justify-center"
+    >
+      <section
+        class="quote-container mx-auto max-w-3xl space-y-6 sm:space-y-8 text-center px-4"
+      >
+        <!-- Ghost placeholder: reserves height and stabilizes vertical centering -->
+        <blockquote
+          class="quote-text quote-ghost space-y-4 sm:space-y-6 leading-relaxed"
+          aria-hidden="true"
+        >
+          <p>
+            <span class="block sm:inline">Perhaps everyone is trying to prove their existence,</span>
+            <span class="block sm:inline">longing to be perceived by others.</span>
+          </p>
+          <p>
+            <span class="block sm:inline">Behind every action,</span>
+            <span class="block sm:inline">there is but one simple yet sorrowful message:</span>
+          </p>
+          <p class="quote-emphasis">"Don't forget me."</p>
+        </blockquote>
+
+        <!-- Actual typewriter blockquote -->
+        <blockquote
+          class="quote-text quote-actual space-y-4 sm:space-y-6 leading-relaxed"
+          id="typewriter-quote"
+        >
+          <p>
+            <span class="block sm:inline">Perhaps everyone is trying to prove their existence,</span>
+            <span class="block sm:inline">longing to be perceived by others.</span>
+          </p>
+          <p>
+            <span class="block sm:inline">Behind every action,</span>
+            <span class="block sm:inline">there is but one simple yet sorrowful message:</span>
+          </p>
+          <p class="quote-emphasis">"Don't forget me."</p>
+        </blockquote>
+        <p
+          class="quote-source text-right text-base text-muted"
+          id="quote-source"
+        >
+          — <a
+            href="https://t.me/tomoko_channel/7"
+            class="text-secondary hover:text-accent">The Melancholy of Haruhi Suzumiya</a
+          >
+        </p>
+      </section>
+    </main>
+    <Footer />
+    <script>
+      interface TypeTask {
+        node: Node;
+        text: string;
+        parent: HTMLElement;
+      }
+
+      const quoteElement = document.getElementById("typewriter-quote");
+      const sourceElement = document.getElementById("quote-source");
+
+      if (quoteElement && sourceElement) {
+        const tasks: TypeTask[] = [];
+        const walker = document.createTreeWalker(
+          quoteElement,
+          NodeFilter.SHOW_TEXT,
+          null
+        );
+
+        const cursor = document.createElement("span");
+        cursor.className = "typewriter-cursor";
+
+        let node: Node | null;
+        while ((node = walker.nextNode())) {
+          if (node.parentNode instanceof HTMLElement) {
+            tasks.push({
+              node: node,
+              text: node.nodeValue || "",
+              parent: node.parentNode,
+            });
+            node.nodeValue = "\u200B";
+          }
+        }
+
+        quoteElement.classList.add("is-ready");
+
+        let currentTaskIndex = 0;
+        let currentCharIndex = 0;
+
+        const type = () => {
+          if (currentTaskIndex < tasks.length) {
+            const { node, text, parent } = tasks[currentTaskIndex];
+
+            if (currentCharIndex < text.length) {
+              const char = text.charAt(currentCharIndex);
+
+              if (node.nodeValue === "\u200B") {
+                node.nodeValue = "";
+                parent.appendChild(cursor);
+              }
+
+              node.nodeValue += char;
+              (node as unknown as ChildNode).after(cursor);
+              currentCharIndex++;
+
+              let delay = 30 + Math.random() * 15;
+
+              if (text.includes("Don't forget me")) {
+                delay = 60;
+              }
+
+              if (char === ",") {
+                delay = 120;
+              } else if (char === "." || char === "!" || char === "?") {
+                delay = 250;
+              }
+
+              setTimeout(type, delay);
+            } else {
+              currentTaskIndex++;
+              currentCharIndex = 0;
+              setTimeout(type, 100);
+            }
+          } else if (sourceElement) {
+            cursor.remove();
+            sourceElement.classList.add("is-visible");
+          }
+        };
+
+        setTimeout(type, 600);
+      }
+    </script>
+  </body>
+</html>
