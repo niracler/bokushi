@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 import BlogPost from "../layouts/BlogPost.astro";
-import { parsePostId } from "../utils/i18n";
+import { parsePostId, postUrl } from "../utils/i18n";
 
 export const prerender = true;
 
@@ -46,6 +46,10 @@ if (translationEntry) {
     );
 }
 
+// Translation link data for LanguageSwitcher (reuse translationEntry from above)
+const translationUrl = translationEntry ? postUrl(translationEntry.id) : undefined;
+const translationLocale = translationEntry ? parsePostId(translationEntry.id).locale : undefined;
+
 // Compute related posts by tag similarity
 const currentTags = post.data.tags ?? [];
 const otherPosts = allPosts.filter((p) => p.id !== post.id && !p.data.hidden);
@@ -79,6 +83,8 @@ if (currentTags.length > 0) {
     lastModifiedCommitUrl={remarkPluginFrontmatter?.lastModifiedCommitUrl}
     relatedPosts={relatedPosts}
     hreflangAlternates={hreflangAlternates}
+    translationUrl={translationUrl}
+    translationLocale={translationLocale}
 >
     <Content />
 </BlogPost>

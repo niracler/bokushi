@@ -1,35 +1,19 @@
 ---
-import { getCollection } from "astro:content";
-import type { Locale } from "../utils/i18n";
-import { parsePostId, postUrl } from "../utils/i18n";
-
 type Props = {
-    /** The content collection ID of the current post (e.g. "zh/elegant") */
-    postId: string;
+    /** URL of the translated version */
+    translationUrl?: string;
+    /** Locale of the translated version (e.g. "en" or "zh") */
+    translationLocale?: string;
 };
 
-const { postId } = Astro.props;
-const { locale, slug } = parsePostId(postId);
-
-// Find the translation counterpart by matching base slug in the other locale
-const targetLocale: Locale = locale === "zh" ? "en" : "zh";
-const allBlogPosts = await getCollection("blog");
-
-const translationEntry = allBlogPosts.find((p) => {
-    const parsed = parsePostId(p.id);
-    return parsed.slug === slug && parsed.locale === targetLocale;
-});
-
-const label = targetLocale === "en" ? "Read in English" : "中文版";
+const { translationUrl, translationLocale } = Astro.props;
+const label = translationLocale === "en" ? "Read in English" : "中文版";
 ---
 
-{translationEntry && (
+{translationUrl && (
     <a
-        href={postUrl(translationEntry.id)}
-        class="inline-flex items-center gap-1.5 text-sm transition-colors"
-        style="color: var(--color-text-muted);"
-        onmouseover="this.style.color='var(--color-accent)'"
-        onmouseout="this.style.color='var(--color-text-muted)'"
+        href={translationUrl}
+        class="inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent"
     >
         <svg
             class="h-4 w-4"

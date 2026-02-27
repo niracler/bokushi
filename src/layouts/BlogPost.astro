@@ -34,6 +34,8 @@ type Props = EntryData & {
     lastModifiedCommitUrl?: string | null;
     relatedPosts?: BlogEntry[];
     hreflangAlternates?: { locale: string; url: string }[];
+    translationUrl?: string;
+    translationLocale?: string;
 };
 
 const {
@@ -51,6 +53,8 @@ const {
     lastModifiedCommitUrl,
     relatedPosts = [],
     hreflangAlternates = [],
+    translationUrl,
+    translationLocale,
 } = Astro.props;
 
 const htmlLang = locale === "en" ? "en" : "zh-CN";
@@ -144,9 +148,9 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 							))}
 						</div>
 					)}
-					{postId && (
+					{translationUrl && (
 						<div class="pt-2">
-							<LanguageSwitcher postId={postId} />
+							<LanguageSwitcher translationUrl={translationUrl} translationLocale={translationLocale} />
 						</div>
 					)}
 				</div>
