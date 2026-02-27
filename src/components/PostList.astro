@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { getLocale, t } from "../i18n/ui";
 import type { Locale } from "../utils/i18n";
 import { parsePostId, postUrl } from "../utils/i18n";
 import FormattedDate from "./FormattedDate.astro";
@@ -8,7 +9,7 @@ interface Props {
     locale?: Locale;
 }
 
-const { locale } = Astro.props;
+const locale = Astro.props.locale ?? getLocale(Astro.currentLocale) ?? "zh";
 
 // 使用 Promise.all 并行获取所有集合数据
 const [blogPosts, monthlyPosts, tilPosts] = await Promise.all([
@@ -40,7 +41,7 @@ const postsByYear = posts.reduce((acc, post) => {
 const groupedPosts = Array.from(postsByYear.entries());
 ---
 
-<section class="section-stack">
+<section class="section-stack" data-no-match-text={t(locale, "postList.noMatchingPosts")}>
 	<div class="flex items-center justify-end">
 		<label class="inline-flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-2 text-sm text-muted transition-colors hover:bg-accent-tint-6">
 			<input
@@ -49,7 +50,7 @@ const groupedPosts = Array.from(postsByYear.entries());
 				class="deepsearch-checkbox"
 				checked
 			/>
-			<span>隐藏 DeepSearch 文章</span>
+			<span>{t(locale, "postList.hideDeepSearch")}</span>
 		</label>
 	</div>
 	{
@@ -94,6 +95,8 @@ const groupedPosts = Array.from(postsByYear.entries());
 
 <script is:inline>
 	document.addEventListener('DOMContentLoaded', function() {
+		var section = document.querySelector('section[data-no-match-text]');
+		var noMatchText = section ? section.dataset.noMatchText : '(No matching posts)';
 		const yearGroups = document.querySelectorAll('[data-year-group]');
 		const filterCheckbox = document.getElementById('filter-deepsearch');
 
@@ -124,7 +127,7 @@ const groupedPosts = Array.from(postsByYear.entries());
 				} else if (visibleCount === 0) {
 					const emptyState = document.createElement('p');
 					emptyState.className = 'no-posts text-sm text-[color-mix(in srgb, var(--color-text-muted) 70%, transparent)] italic';
-					emptyState.textContent = '（暂无符合条件的文章）';
+					emptyState.textContent = noMatchText;
 					group.querySelector('ul')?.appendChild(emptyState);
 				}
 			});

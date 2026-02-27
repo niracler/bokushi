@@ -1,18 +1,21 @@
 ---
 import { SITE_TITLE } from "../consts";
+import { getLocale, t } from "../i18n/ui";
 import HeaderLink from "./HeaderLink.astro";
 import SearchModal from "./SearchModal.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 
+const locale = getLocale(Astro.currentLocale);
+
 const navLinks = [
-    { href: "/", label: "首页" },
-    { href: "/blog", label: "文章" },
-    { href: "/tags", label: "标签" },
-    { href: "/channel", label: "动态" },
-    { href: "/mangashots", label: "表情包" },
-    { href: "/friends", label: "友链" },
-    { href: "/plrom", label: "心头好" },
-    { href: "/about", label: "关于" },
+    { href: "/", label: t(locale, "nav.home") },
+    { href: "/blog", label: t(locale, "nav.blog") },
+    { href: "/tags", label: t(locale, "nav.tags") },
+    { href: "/channel", label: t(locale, "nav.channel") },
+    { href: "/mangashots", label: t(locale, "nav.mangashots") },
+    { href: "/friends", label: t(locale, "nav.friends") },
+    { href: "/plrom", label: t(locale, "nav.plrom") },
+    { href: "/about", label: t(locale, "nav.about") },
 ];
 
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, "");
@@ -24,10 +27,10 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
     class="bg-surface border-b border-border"
 >
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-surface focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-primary focus:border focus:border-border">
-        跳转到主要内容
+        {t(locale, "nav.skipToContent")}
     </a>
     <nav
-        aria-label="主导航"
+        aria-label={t(locale, "nav.mainNav")}
         class="mx-auto flex w-full max-w-5xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6"
     >
         <h2
@@ -46,9 +49,11 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
             <button
                 type="button"
                 class="icon-btn icon-btn--sm icon-btn--square icon-btn--bordered focus-accent md:hidden"
-                aria-label="打开导航菜单"
+                aria-label={t(locale, "nav.openMenu")}
                 aria-expanded="false"
                 data-nav-toggle
+                data-label-open={t(locale, "nav.openMenu")}
+                data-label-close={t(locale, "nav.closeMenu")}
             >
                 <span
                     aria-hidden="true"
@@ -83,7 +88,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
             type="button"
             class="absolute inset-0 h-full w-full cursor-default"
             data-nav-close
-            aria-label="关闭导航菜单"></button>
+            aria-label={t(locale, "nav.closeMenu")}></button>
         <div
             data-nav-drawer
             class="relative z-10 flex h-full w-72 max-w-[80vw] translate-x-full flex-col gap-6 border-l border-border bg-surface p-6 text-primary shadow-xl transition-transform duration-300 ease-out"
@@ -98,14 +103,14 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
                     type="button"
                     class="icon-btn icon-btn--sm icon-btn--square focus-accent"
                     data-nav-close
-                    aria-label="关闭导航菜单"
+                    aria-label={t(locale, "nav.closeMenu")}
                 >
                     <span aria-hidden="true" class="text-xl leading-none"
                         >×</span
                     >
                 </button>
             </div>
-            <nav aria-label="移动端导航" class="flex flex-col gap-2 text-base" data-no-preview>
+            <nav aria-label={t(locale, "nav.mobileNav")} class="flex flex-col gap-2 text-base" data-no-preview>
                 {
                     navLinks.map((link) => (
                         <a
@@ -156,7 +161,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
 
         overlay.dataset.navState = open ? "open" : "closed";
         toggleButton?.setAttribute("aria-expanded", String(open));
-        toggleButton?.setAttribute("aria-label", open ? "关闭导航菜单" : "打开导航菜单");
+        toggleButton?.setAttribute("aria-label", open ? (toggleButton.dataset.labelClose || "Close") : (toggleButton.dataset.labelOpen || "Open"));
 
         if (open) {
             lastFocusedElement = document.activeElement;

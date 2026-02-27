@@ -6,6 +6,16 @@ type PostMeta = {
 
 type PostMetaMap = Record<string, PostMeta>;
 
+function getClientLocale(): "zh" | "en" {
+    const lang = document.documentElement.lang;
+    return lang === "en" ? "en" : "zh";
+}
+
+const clientUi = {
+    zh: { noPreview: "暂无预览图", loading: "加载中..." },
+    en: { noPreview: "No preview", loading: "Loading..." },
+};
+
 const CARD_ID = "post-preview-card";
 
 function parsePostIdFromHref(href: string): string | null {
@@ -31,7 +41,7 @@ function ensurePreviewCard(): HTMLElement {
 		<div class="h-40 w-full bg-muted-bg">
 			<img id="${CARD_ID}-image" class="h-full w-full object-cover hidden" alt="" />
 			<div id="${CARD_ID}-no-image" class="hidden h-full flex items-center justify-center text-xs text-muted">
-				暂无预览图
+				${clientUi[getClientLocale()].noPreview}
 			</div>
 		</div>
 		<div class="space-y-2 p-4 text-sm">
@@ -84,7 +94,7 @@ function updatePreviewContent(card: HTMLElement, meta: PostMeta) {
             // Show loading state while image loads
             imageEl.classList.add("hidden");
             noImageEl.classList.remove("hidden");
-            noImageEl.textContent = "加载中...";
+            noImageEl.textContent = clientUi[getClientLocale()].loading;
 
             preloadImage(imageSrc)
                 .then(() => {
@@ -94,13 +104,13 @@ function updatePreviewContent(card: HTMLElement, meta: PostMeta) {
                     noImageEl.classList.add("hidden");
                 })
                 .catch(() => {
-                    noImageEl.textContent = "暂无预览图";
+                    noImageEl.textContent = clientUi[getClientLocale()].noPreview;
                 });
         }
     } else if (imageEl && noImageEl) {
         imageEl.classList.add("hidden");
         noImageEl.classList.remove("hidden");
-        noImageEl.textContent = "暂无预览图";
+        noImageEl.textContent = clientUi[getClientLocale()].noPreview;
     }
 }
 
