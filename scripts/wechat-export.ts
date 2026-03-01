@@ -263,8 +263,9 @@ function rehypeWechatCode(stats: ExportStats, theme: Theme) {
             }
         });
 
-        // Process code blocks with shiki
-        for (const block of codeBlocks) {
+        // Process code blocks with shiki (reverse order to preserve indices)
+        for (let i = codeBlocks.length - 1; i >= 0; i--) {
+            const block = codeBlocks[i];
             if (block.lang === "mermaid") {
                 // Mermaid → placeholder
                 const placeholderStyle = theme["mermaid-placeholder"] || {};
