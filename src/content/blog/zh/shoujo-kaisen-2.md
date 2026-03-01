@@ -3,6 +3,7 @@ pubDate: "Aug 8, 2023"
 description: 该文章没有经过排版也不会进行排版，观感体验应该很差，主要是那半年的节选记录（抽取了一小部分出来）
 tags: [ "游戏", "随笔" ]
 title: 关于 shoujo kaisen -- 不想动了，被超过就超过吧～～
+socialImage: "https://image.niracler.com/2025/06/a1c115f73c257e3d8638b44b9c66ec49.png"
 ---
 
 > 该文章没有经过排版也不会进行排版，观感体验应该很差，主要是那半年的节选记录（抽取了一小部分出来）
@@ -228,5 +229,3 @@ title: 关于 shoujo kaisen -- 不想动了，被超过就超过吧～～
 ![参考资料截图4](https://image.niracler.com/2025/06/1a2ecbe97f755c7bb478152dffb0ba7c.jpeg)
 
 ![参考资料截图5](https://image.niracler.com/2025/06/99d52947354d96ae0e7eee8a6c1de3e1.png)
-
-![参考资料截图6](https://image.niracler.com/2025/06/a1c115f73c257e3d8638b44b9c66ec49.png)

@@ -1,0 +1,163 @@
+---
+title: "用三分钟对你个人电脑上的 SSH 私钥进行加密吧- v1.0"
+description: "本文介绍了在使用 SSH Key 时的安全问题，强调了加密私钥的重要性以及如何使用 ssh-agent"
+pubDate: "Jul 31, 2023"
+tags: ["CyberSecurity", "Linux", "SSH", "TIL"]
+socialImage: "https://image.niracler.com/2026/03/0723713fd19ff74bd4abe9227b516b48.png"
+---
+
+import Spoiler from '../../../components/Spoiler.astro'
+
+## 背景 - 为什么要使用 SSH 密钥并对其加密 ？
+
+> 先来抛出三个理由， 若不想看的可以直接跳到操作步骤。（不需 2 分钟就能操作完）
+
+### 第一点 - 应该使用 SSH 密钥而不是密码
+
+在日常的工作中，我们频繁地与 `git`、`rsync` 和 `ssh` 等工具打交道，传统的密码身份验证方式可能会变得麻烦且容易受到攻击。可能会有以下问题：
+
+- **被窥探风险**：传统的密码输入方式可能会被窥视者观察到，从而导致安全性问题。而使用 SSH 密钥则无需输入密码，大大减少了窥探风险。
+- **密码管理的复杂性**：在多台远程服务器上使用不同密码，可能会导致密码的混淆和遗忘。而使用 SSH 密钥，你只需要管理少数几个密钥对，大大简化了密码管理的复杂性。
+- **远程服务器的安全性**：使用密码登录远程服务器存在被恶意攻击者轻易攻击的风险，而 SSH 密钥的使用使得攻击者更难伪造身份进行访问，提高了远程服务器的安全性。
+
+### 第二点 -  任何情况下 SSH 私钥都要加密
+
+即使使用 SSH 密钥，仍然需要注意私钥的保护。不要贪方便不给 SSH 私钥加密～～（很多人都是这样吧？）
+
+- **私钥是身份验证的核心**：它等同于你系统和数据的主门钥匙。如果私钥暴露，恶意方可能通过伪造你的身份来访问系统、窃取敏感信息，甚至进行未授权的操作。
+- **私钥可能会在非安全环境中存在**：如在本地计算机、移动设备还是通过网络传输，这些环境都是不安全的。通过加密私钥，即使私钥在未经授权的情况下被访问，也不会立即暴露你的数据和系统。
+- **若设备遭到盗窃、丢失或被他人访问**：加密的私钥会提供额外的安全层。即使恶意者能够获得私钥文件，其加密状态仍将阻碍其直接使用。
+- **恶意软件和病毒**：可能会扫描你的系统以寻找未加密的私钥文件。例如大家电脑上总会有几个盗版软件吧？如果私钥加密，它们无法轻易获取到敏感信息，从而减少了受到攻击的风险。
+
+> 有时候甚至有人贪方便将明文私钥用 QQ 还是什么的来传输到另外的电脑，这其实是很危险的行为。这可是明文的私钥～～
+
+### 第三点 -  使用 SSH-Agent 减少输入密码的次数
+
+单纯使用加密的私钥其实并不能真正解决输入密码的问题，它只是将你所有的密码扭成用同一个密码而已。而且我们也不可能每一次 `git pull` 代码都输入一次私钥的密码吧。所以为了解决频繁输入密码的繁琐性以及密码泄露的风险，我们此处引入 SSH-Agent。
+
+它能够 **暂存储解密的私钥**，使得用户只需在会话开始时输入一次密码，之后的连接将自动使用已解密的私钥。从而大幅**减少密码输入次数**，避免了密码被窥视或截获的可能性。同时也对于需要频繁与多个远程服务器交互的用户，SSH-Agent 可以**显著提高工作效率**。
+
+> BOSS语录: agent 本质是把 key 加载到内存了，内存泄漏 key 的可能性是有，但是需要非常复杂的方式和漏洞，也要一定的权限，而且现在 os 都有内存地址随机化来抵抗了
+
+
+## 操作步骤
+
+### 对本地私钥进行加密
+
+假设你本地已经有现成的 SSH 密钥对了。(使用 GitHub 的大家应该都是有的，没有的话可以使用 `ssh-keygen` 生成，或者看文末的 SSH 相关的文章)
+
+下面这个就是**对本地私钥进行加密的命令**（`<id_rsa_path>` 是你本地的 ssh 私钥的路径，一般为 `~/.ssh/id_rsa`）
+
+```bash
+ssh-keygen -p -f <id_rsa_path>
+```
+
+好了，这就完成加密了。下一步就是启动 ssh-agent。
+
+### 使用 SSH-Agent 管理解密的私钥
+
+这就是简易的 启动 `ssh-agent` 并将你电脑上的默认的密钥对加载到 agent 里面的 Shell 代码:
+
+```bash
+if [ -z "$SSH_AUTH_SOCK" ] ; then
+    eval `ssh-agent`
+    ssh-add # <id_rsa_path>，不加就是用默认值
+fi
+```
+
+但这种方式是有很多问题的，你重新开一个 Shell 的会话 agent 就要重新开了，并且你前面的会话结束的时候要是没有关 agent ，那么该 agent 会一直存活在你电脑的进程里面。
+
+### 持久化 SSH-Agent 设置以实现便利和安全
+
+**⚠️⚠️⚠️ 注意：该方案仅仅适合于个人电脑 ⚠️⚠️⚠️**
+
+要解决上述问题，我们建议将 SSH-Agent 的启动设置添加到你的 shell 配置文件中，以便每次开启终端会话时都能自动启动 SSH-Agent 并加载你的私钥。这将提供更大的便利性和安全性。
+
+**下面是示例代码**，请将它添加到添加到你的 `~/.bashrc` 或 `~/.bash_profile` 文件中（ zsh 则是 `~/.zshrc` 或 `~/.zprofile`，我个人是推荐放 rc 文件里面的，毕竟很多情况下是触发不了 login shell 的机制的）：
+
+<details>
+<summary> fish 版本请看这里</summary>
+
+请加到这个文件里面 `~/.config/fish/config.fish`
+
+```bash
+set SSH_ENV_FILE "$HOME/.ssh/agent-environment"
+set SSH_TIMEOUT 86400 # 24 hours in seconds
+
+function ssh_start_agent
+    ssh-agent -c -t "$SSH_TIMEOUT" > "$SSH_ENV_FILE"
+    chmod 600 "$SSH_ENV_FILE"
+    source "$SSH_ENV_FILE"
+    ssh-add # [<id_rsa_path>] Change to your path
+end
+
+if test -f "$SSH_ENV_FILE"
+    source "$SSH_ENV_FILE"
+    if not ps -p "$SSH_AGENT_PID" > /dev/null
+        ssh_start_agent
+    end
+else
+    ssh_start_agent
+end
+```
+
+</details>
+
+
+```bash
+SSH_ENV_FILE="$HOME/.ssh/agent-environment"
+SSH_TIMEOUT=86400 # 24 hours in seconds
+
+ssh_start_agent(){
+    ssh-agent -t $SSH_TIMEOUT | sed 's/^echo/#echo/' > "${SSH_ENV_FILE}"
+    echo "Initialising new SSH agent succeeded"
+    chmod 600 "${SSH_ENV_FILE}"
+    . "${SSH_ENV_FILE}"
+    ssh-add # [<id_rsa_path>] Change to your path
+}
+
+if [ -f "${SSH_ENV_FILE}" ]; then
+    . "${SSH_ENV_FILE}"
+    if ! ps -p "$SSH_AGENT_PID" > /dev/null; then
+        start_ssh_agent
+    fi
+else
+    ssh_start_agent
+fi
+```
+
+(这就是 stackoverflow 里面的高分例子，稍微微调了一下有效时间，电脑一直不关机的话，一天需要打一次密码。虽然会在 ssh forward 情况下存在问题，但个人电脑用是绰绰有余了)
+
+这段代码将在每次开启 shell 会话时检查 SSH-Agent 是否已运行。如果没有运行，它将自动启动并加载你的私钥。通过这种方式，你将始终享受到 SSH-Agent 带来的便利和安全性。（<Spoiler>真看不懂可以找找 ChatGPT， 其实关键就在于用文件存起来了 SSH-Agent 的 `SSH_AUTH_SOCK` 等信息，让其他的 shell 的会话也可以读的到</Spoiler>）
+
+> 好了，其实操作就上面那么多
+
+## 使用 ssh-agent 的注意事项
+
+当然，使用 ssh-agent 其实也不是说就真的特别安全然后没有后顾之忧了， 其实使用 ssh-agent 还是会有很多问题的。以下就是使用 ssh-agent 的一些注意事项：
+
+1. **切勿在其他人拥有 root 权限的计算机上运行 `ssh-agent`**: 如果在受信任程度较低的计算机上运行 `ssh-agent`，恶意用户可能通过 `ssh-agent` 访问你的私密数据，从而危及你的安全。(日常不使用电脑的时候也要进行锁屏，共用的电脑也不要运行)
+2. **代理连接转发的谨慎使用**：`ssh-agent` 可以允许代理连接转发，这在某些情况下非常方便。然而，只应该将代理连接转发到你信任的计算机上，以防止你的私密数据被不可信的主机获取。
+3. **注销时卸载密钥和代理**：在你注销计算机或退出 shell 会话时，请确保已卸载密钥和 `ssh-agent` 以避免无授权的访问。这可以通过使用 `ssh-agent -k` 命令来实现。
+
+使用 `ssh-agent` 时，请遵循以上注意事项以确保你的私密数据和系统安全。
+
+## 后记
+
+其实管理 ssh 密钥的方案不单单是 ssh-agent ， 还可以试一下用 1password 的 cli ， 虽然说我没怎么用过。
+
+这篇文章，怎么说呢，其实也就只是我本人的一些安全记录而已，很有可能是在班门弄斧。这一个后面应该会写成一个系列吧，CyberSecurity 系列，尽量就是将我生活当中的一些网络安全的知识给用上。
+
+> 注意：本文所述内容仅代表个人观点和经验分享，并非绝对准确的安全建议。如需更详细和专业的安全建议，请咨询安全专家或相关文献资料。
+
+## 参考资料
+
+1. [SSH 教程 - 网道](https://wangdoc.com/ssh/): 关于 ssh 的基础知识可以看阮一峰的这个教程
+2. [使用 ssh-agent，和如何安全地只输入一次ssh密码](https://rabexc.org/posts/using-ssh-agent)：里面有提到了 ssh-agent 在堡垒机的转发的场景，我这边没有对应的使用场景，于是我文章里面就不提了
+3. [使用 ssh-agent 的陷阱，和如何安全使用代理](https://rabexc.org/posts/pitfalls-of-ssh-agents)：与上面文章是同一个作者，说到了一些使用 ssh-agent 的注意事项。
+
+## 更新
+
+- 2023-08-17 19:11 v0.7 添加 fish 版本的代码
+- 2023-08-22 22:17 v0.8 被同事吐槽说是加粗的部分太多了，以至于文章看上去非常花里胡哨， 影响观感体验。顾改之。
+- 2023-08-22 23:05 v1.0 微调移除了一点废话，基本能有及格分数了。
