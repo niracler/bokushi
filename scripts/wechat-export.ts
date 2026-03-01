@@ -21,7 +21,8 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { codeToHast } from "shiki";
 import { unified } from "unified";
-import { visit } from "unist-util-visit";
+import { EXIT, visit } from "unist-util-visit";
+import { SITE_URL } from "../src/consts";
 
 // ─── Paths ──────────────────────────────────────────────────────────
 
@@ -30,7 +31,6 @@ const PROJECT_ROOT = join(SCRIPT_DIR, "..");
 const CONTENT_DIR = join(PROJECT_ROOT, "src/content/blog/zh");
 const OUTPUT_DIR = join(PROJECT_ROOT, "dist/wechat");
 const THEMES_DIR = join(SCRIPT_DIR, "wechat-themes");
-const SITE_URL = "https://niracler.com";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -53,7 +53,13 @@ function loadTheme(name: string): Theme {
         console.error(`Available themes: ${listThemes().join(", ")}`);
         process.exit(1);
     }
-    return JSON.parse(readFileSync(themePath, "utf-8"));
+    try {
+        return JSON.parse(readFileSync(themePath, "utf-8"));
+    } catch (err) {
+        console.error(`Failed to parse theme: ${themePath}`);
+        console.error((err as Error).message);
+        process.exit(1);
+    }
 }
 
 function listThemes(): string[] {
@@ -73,6 +79,10 @@ function styleString(styles: Record<string, string>): string {
 function stripFrontmatter(content: string): string {
     const match = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n([\s\S]*)$/);
     return match ? match[1] : content;
+}
+
+function stripMdxImports(content: string): string {
+    return content.replace(/^import\s+.+from\s+['"].+['"]\s*;?\s*$/gm, "").trimStart();
 }
 
 // ─── rehypeWechatLinks: convert links to footnotes ──────────────────
@@ -162,7 +172,7 @@ function rehypeWechatLinks(stats: ExportStats, theme: Theme) {
                         margin: "12px 0 8px",
                     }),
                 },
-                children: [{ type: "text", value: "References" }],
+                children: [{ type: "text", value: "参考链接" }],
             };
             const items: Element[] = stats.footnotes.map((fn) => ({
                 type: "element",
@@ -298,7 +308,7 @@ function rehypeWechatCode(stats: ExportStats, theme: Theme) {
                     const existingStyle = (preNode.properties?.style as string) || "";
                     preNode.properties = {
                         ...preNode.properties,
-                        style: `${existingStyle};${styleString(blockStyle)}`,
+                        style: [existingStyle, styleString(blockStyle)].filter(Boolean).join(";"),
                     };
                     block.parent.children.splice(block.index, 1, preNode);
                 }
@@ -360,8 +370,9 @@ function textContent(node: Element | Text): string {
 function findElement(tree: unknown, tagName: string): Element | null {
     let found: Element | null = null;
     visit(tree as Root, "element", (node: Element) => {
-        if (node.tagName === tagName && !found) {
+        if (node.tagName === tagName) {
             found = node;
+            return EXIT;
         }
     });
     return found;
@@ -375,7 +386,11 @@ function parseArgs(): { slug: string; themeName: string } {
     let themeName = "default";
 
     for (let i = 0; i < args.length; i++) {
-        if (args[i] === "--theme" && args[i + 1]) {
+        if (args[i] === "--theme") {
+            if (!args[i + 1] || args[i + 1].startsWith("-")) {
+                console.error("Error: --theme requires a value");
+                process.exit(1);
+            }
             themeName = args[i + 1];
             i++;
         } else if (!args[i].startsWith("-")) {
@@ -416,9 +431,13 @@ async function main() {
     console.log(`Source: ${srcPath}`);
     console.log();
 
-    // Read and strip frontmatter
+    // Read and strip frontmatter (and MDX imports if applicable)
     const source = readFileSync(srcPath, "utf-8");
-    const body = stripFrontmatter(source);
+    let body = stripFrontmatter(source);
+    if (ext === ".mdx") {
+        body = stripMdxImports(body);
+        console.log("Note: MDX components will be omitted from export.");
+    }
 
     // Build conversion pipeline
     const stats: ExportStats = {
