@@ -3,6 +3,7 @@ title: "优雅的哲学-v1"
 pubDate: "Jun 25, 2021"
 tags: ["制约和誓约"]
 hidden: true
+socialImage: "https://image.niracler.com/2026/03/3c56351eaaf5d229de5b76ac1fa1d42a.jpeg"
 ---
 
 ## 生活习惯方面
@@ -39,5 +40,3 @@ hidden: true
 5. All in English when I use Telegram, Twitter, Github, Coding and so on.
 
 I think I should no more daily tasks but weekly tasks, which benefit me to focus. I sure hope you know what you are doing.
-
-![题图](https://image.niracler.com/2026/03/3c56351eaaf5d229de5b76ac1fa1d42a.jpeg)

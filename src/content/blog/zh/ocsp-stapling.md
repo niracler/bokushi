@@ -2,6 +2,7 @@
 title: "优化网站的 TLS 性能：在 Node.js 的 HTTP Server 中通过 OCSP Stapling 解决证书验证问题"
 pubDate: "Nov 16, 2023"
 tags: ["ocsp", "TLS", "CyberSecurity", "typescript", "node"]
+socialImage: "https://image.niracler.com/2026/03/0ecc5c140caa5ec74d17cc65ba5269e4.jpeg"
 ---
 
 > 总感觉有更好的办法，就作为抛砖引玉发出来吧。欢迎多多吐槽。
@@ -104,5 +105,3 @@ server.on('OCSPRequest', (cert, issuer, cb) => {
 
 - [提升 TLS 性能30%？谈谈在 Node.JS 上的 OSCP Stapling 实践](https://segmentfault.com/a/1190000004045710) - 写得很好的一篇文章，思想是没有过时的，但是 ocsp 这个库已经不维护了。
 - [How to enable ocsp?](https://github.com/indutny/ocsp/issues/14) - 我一直在想，是因为外国人的网络环境比较好，所以他们不会遇到这个问题吗？资料是真的少，又没有这个相关的库。
-
-![题图](https://image.niracler.com/2026/03/0ecc5c140caa5ec74d17cc65ba5269e4.jpeg)

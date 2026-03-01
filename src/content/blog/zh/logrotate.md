@@ -2,6 +2,7 @@
 title: "使用 logrotate 做日志轮换以及自动归档"
 pubDate: "Nov 21, 2023"
 tags: ["TIL", "Linux", "Shell", "Log"]
+socialImage: "https://image.niracler.com/2026/03/a88fc825f1bfd0aab80902683e356ad3.jpeg"
 ---
 
 logrotate 可以对日志文件进行轮换、压缩并删除旧日志文件，在大多数的 Linux 发行版中都默认安装了 logrotate，而且自动每天执行。
@@ -65,5 +66,3 @@ $ tree
 
 - [Linux 日志切割神器 logrotate 原理介绍和配置详解](https://wsgzao.gitapp.io/post/logrotate/) - 写的很好的一篇文章，里面有讲到 logrotate 的原理。
 - [logrotate(8) - Linux man page](https://linux.die.net/man/8/logrotate) - logrotate 的官方文档，用于查看 logrotate 的详细配置。
-
-![题图](https://image.niracler.com/2026/03/a88fc825f1bfd0aab80902683e356ad3.jpeg)

@@ -3,6 +3,7 @@ title: "简单易懂的 Telegram to xLog Shorts 机器人部署方案 - v1.0"
 description: ">-"
 pubDate: "Jan 21, 2024"
 tags: ["telegram", "cloudflare", "auto_sync", "周记"]
+socialImage: "https://image.niracler.com/2026/03/a6b1742d23ab0b79f92c73416932e724.png"
 ---
 
 > 或许，挺不简明易懂的，估计需要 30min 才能操作完。
@@ -292,5 +293,3 @@ ALLOW_USER_IDS = [ "******" ]
 ![干杯](https://image.niracler.com/2026/03/a6b1742d23ab0b79f92c73416932e724.png)
 
 </details>
-
-![题图](https://image.niracler.com/2026/03/a6b1742d23ab0b79f92c73416932e724.png)
