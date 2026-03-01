@@ -9,7 +9,8 @@
         "astro": "astro",
         "format": "biome format --write .",
         "lint": "biome check .",
-        "prepare": "husky"
+        "prepare": "husky",
+        "translate": "npx tsx scripts/translate.ts"
     },
     "dependencies": {
         "@astrojs/cloudflare": "^12.6.12",
