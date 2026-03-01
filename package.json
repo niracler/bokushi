@@ -10,7 +10,8 @@
         "format": "biome format --write .",
         "lint": "biome check .",
         "prepare": "husky",
-        "translate": "npx tsx scripts/translate.ts"
+        "translate": "npx tsx scripts/translate.ts",
+        "wechat-export": "npx tsx scripts/wechat-export.ts"
     },
     "dependencies": {
         "@astrojs/cloudflare": "^12.6.12",
@@ -41,11 +42,19 @@
         "@astrojs/check": "^0.9.6",
         "@biomejs/biome": "^2.3.2",
         "@iconify-json/simple-icons": "^1.2.66",
+        "@types/hast": "^3.0.4",
         "@types/markdown-it": "^14.1.2",
         "@types/sanitize-html": "^2.16.0",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.7",
         "playwright": "^1.55.1",
+        "rehype-stringify": "^10.0.1",
+        "remark-gfm": "^4.0.1",
+        "remark-parse": "^11.0.0",
+        "remark-rehype": "^11.1.2",
+        "shiki": "^3.21.0",
+        "unified": "^11.0.5",
+        "unist-util-visit": "^5.1.0",
         "wrangler": "^4.68.1"
     },
     "pnpm": {
