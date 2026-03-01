@@ -94,6 +94,10 @@
         "font-size": "14px",
         "color": "#666"
     },
+    "footnote-ref": {
+        "color": "#1a73e8",
+        "font-size": "12px"
+    },
     "image-placeholder": {
         "text-align": "center",
         "color": "#999",

@@ -13,7 +13,7 @@
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Element, Root, Text } from "hast";
+import type { Element, ElementContent, Root, Text } from "hast";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
 import { remarkAlert } from "remark-github-blockquote-alert";
@@ -71,7 +71,7 @@ function styleString(styles: Record<string, string>): string {
 // ─── Frontmatter parsing ────────────────────────────────────────────
 
 function stripFrontmatter(content: string): string {
-    const match = content.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/);
+    const match = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n([\s\S]*)$/);
     return match ? match[1] : content;
 }
 
@@ -80,7 +80,14 @@ function stripFrontmatter(content: string): string {
 function rehypeWechatLinks(stats: ExportStats, theme: Theme) {
     return () => (tree: Root) => {
         const urlToIndex = new Map<string, number>();
+        const replacements: Array<{
+            parent: Element;
+            index: number;
+            children: ElementContent[];
+            sup: Element;
+        }> = [];
 
+        // Collect all link nodes first to avoid index shifting during splice
         visit(tree, "element", (node: Element, index, parent) => {
             if (node.tagName !== "a" || !parent || index === undefined) return;
 
@@ -104,17 +111,33 @@ function rehypeWechatLinks(stats: ExportStats, theme: Theme) {
                 urlToIndex.set(href, footnoteIndex);
             }
 
-            // Replace <a href="...">text</a> with text<sup>[N]</sup>
-            const children = [...node.children];
+            const supStyle = theme["footnote-ref"] || {};
             const sup: Element = {
                 type: "element",
                 tagName: "sup",
-                properties: { style: "color:#1a73e8;font-size:12px" },
+                properties: {
+                    style: styleString(
+                        Object.keys(supStyle).length > 0
+                            ? supStyle
+                            : { color: "#1a73e8", "font-size": "12px" },
+                    ),
+                },
                 children: [{ type: "text", value: `[${footnoteIndex}]` }],
             };
 
-            parent.children.splice(index, 1, ...children, sup);
+            replacements.push({
+                parent: parent as Element,
+                index,
+                children: [...node.children],
+                sup,
+            });
         });
+
+        // Apply replacements in reverse order to preserve indices
+        for (let i = replacements.length - 1; i >= 0; i--) {
+            const { parent, index, children, sup } = replacements[i];
+            parent.children.splice(index, 1, ...children, sup);
+        }
 
         // Append footnote list at end of document
         if (stats.footnotes.length > 0) {
@@ -162,6 +185,12 @@ function rehypeWechatLinks(stats: ExportStats, theme: Theme) {
 
 function rehypeWechatImages(stats: ExportStats, theme: Theme) {
     return () => (tree: Root) => {
+        const replacements: Array<{
+            parent: Element;
+            index: number;
+            placeholder: Element;
+        }> = [];
+
         visit(tree, "element", (node: Element, index, parent) => {
             if (node.tagName !== "img" || !parent || index === undefined) return;
 
@@ -183,8 +212,14 @@ function rehypeWechatImages(stats: ExportStats, theme: Theme) {
                 ],
             };
 
-            parent.children.splice(index, 1, placeholder);
+            replacements.push({ parent: parent as Element, index, placeholder });
         });
+
+        // Apply in reverse to preserve indices
+        for (let i = replacements.length - 1; i >= 0; i--) {
+            const { parent, index, placeholder } = replacements[i];
+            parent.children.splice(index, 1, placeholder);
+        }
     };
 }
 
@@ -281,30 +316,20 @@ function rehypeWechatCode(stats: ExportStats, theme: Theme) {
 // ─── rehypeWechatStyle: inject inline CSS from theme ────────────────
 
 function rehypeWechatStyle(theme: Theme) {
+    // Keys handled by other plugins or used for non-element purposes
+    const SPECIAL_KEYS = new Set([
+        "body",
+        "code-inline",
+        "code-block",
+        "footnote",
+        "footnote-ref",
+        "image-placeholder",
+        "mermaid-placeholder",
+    ]);
+
     const elementMap: Record<string, string> = {};
     for (const [key, styles] of Object.entries(theme)) {
-        // Skip non-element keys
-        if (
-            key.includes("-") &&
-            key !== "code-inline" &&
-            key !== "code-block" &&
-            key !== "image-placeholder" &&
-            key !== "mermaid-placeholder"
-        ) {
-            continue;
-        }
-        if (
-            [
-                "body",
-                "code-inline",
-                "code-block",
-                "footnote",
-                "image-placeholder",
-                "mermaid-placeholder",
-            ].includes(key)
-        ) {
-            continue;
-        }
+        if (SPECIAL_KEYS.has(key)) continue;
         elementMap[key] = styleString(styles);
     }
 
