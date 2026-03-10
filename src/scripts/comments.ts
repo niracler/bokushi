@@ -5,9 +5,12 @@ import sanitizeHtml from "sanitize-html";
 
 type CommentLocale = "zh" | "en";
 
+let _cachedLocale: CommentLocale | null = null;
 function getCommentLocale(): CommentLocale {
+    if (_cachedLocale) return _cachedLocale;
     const lang = document.documentElement.lang;
-    return lang === "en" ? "en" : "zh";
+    _cachedLocale = lang === "en" ? "en" : "zh";
+    return _cachedLocale;
 }
 
 const commentUi: Record<CommentLocale, Record<string, string>> = {
@@ -361,10 +364,10 @@ function createAuthorEl(comment: CommentNode): string {
     return `<span class="comment-author">${name}</span>${adminBadge}`;
 }
 
+const _escapeDiv = document.createElement("div");
 function escapeHtml(str: string): string {
-    const div = document.createElement("div");
-    div.textContent = str;
-    return div.innerHTML;
+    _escapeDiv.textContent = str;
+    return _escapeDiv.innerHTML;
 }
 
 function renderCommentCard(comment: CommentNode, isReply = false, parentOverride?: string): string {

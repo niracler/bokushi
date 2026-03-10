@@ -144,37 +144,8 @@ function initCodeBlocks(): void {
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initCodeBlocks);
 } else {
-    // DOM already loaded
     initCodeBlocks();
 }
 
-// Also observe for dynamically added code blocks (e.g., from view transitions)
-const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-            if (node instanceof HTMLElement) {
-                // Check if the added node itself is a prose container
-                if (node.classList.contains("prose")) {
-                    const codeBlocks = node.querySelectorAll("pre:has(code)");
-                    codeBlocks.forEach((pre) => {
-                        enhanceCodeBlock(pre as HTMLElement);
-                    });
-                }
-                // Check for prose containers within the added node
-                const proseContainers = node.querySelectorAll(".prose");
-                proseContainers.forEach((prose) => {
-                    const codeBlocks = prose.querySelectorAll("pre:has(code)");
-                    codeBlocks.forEach((pre) => {
-                        enhanceCodeBlock(pre as HTMLElement);
-                    });
-                });
-            }
-        });
-    });
-});
-
-// Start observing
-observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-});
+// Re-initialize after Astro view transitions swap in new content
+document.addEventListener("astro:after-swap", initCodeBlocks);

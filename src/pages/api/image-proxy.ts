@@ -30,9 +30,12 @@ function isAllowedUrl(raw: string): boolean {
         return false;
     }
     if (parsed.protocol !== "https:") return false;
-    return [...ALLOWED_HOSTS].some(
-        (host) => parsed.hostname === host || parsed.hostname.endsWith(`.${host}`),
-    );
+    for (const host of ALLOWED_HOSTS) {
+        if (parsed.hostname === host || parsed.hostname.endsWith(`.${host}`)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 export const GET: APIRoute = async ({ request }) => {
@@ -63,9 +66,7 @@ export const GET: APIRoute = async ({ request }) => {
             return new Response("Remote resource is not an image", { status: 400 });
         }
 
-        const imageData = await response.arrayBuffer();
-
-        return new Response(imageData, {
+        return new Response(response.body, {
             status: 200,
             headers: {
                 "Content-Type": contentType,

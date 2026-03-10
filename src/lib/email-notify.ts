@@ -3,6 +3,7 @@
  */
 
 import { SITE_URL } from "../consts";
+import { escapeHtml as escapeHtmlBase } from "./utils";
 
 /** Encode a UTF-8 string to base64 without the deprecated `unescape`. */
 function utf8ToBase64(str: string): string {
@@ -36,13 +37,7 @@ function buildEmailHtml({
     postTitle: string;
     postUrl: string;
 }): string {
-    const escapeHtml = (str: string) =>
-        str
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+    const escapeHtml = (str: string) => escapeHtmlBase(str).replace(/'/g, "&#039;");
 
     return `<!DOCTYPE html>
 <html lang="zh">

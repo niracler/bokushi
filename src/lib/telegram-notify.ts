@@ -1,18 +1,10 @@
 import sanitizeHtml from "sanitize-html";
 import { SITE_URL } from "../consts";
+import { escapeHtml } from "./utils";
 
 /** Strip all HTML tags from a string to prevent injection into Telegram HTML messages. */
 function stripHtml(text: string): string {
     return sanitizeHtml(text, { allowedTags: [], allowedAttributes: {} });
-}
-
-/** HTML-escape for Telegram HTML parse mode */
-function escapeHtml(text: string): string {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
 }
 
 export interface NotifyCommentParams {

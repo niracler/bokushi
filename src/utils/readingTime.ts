@@ -16,7 +16,7 @@ const CJK_REGEX =
 const CJK_CHARS_PER_MINUTE = 300;
 const WORDS_PER_MINUTE = 200;
 
-function stripMarkdown(text: string): string {
+export function stripMarkdown(text: string): string {
     return (
         text
             // Remove frontmatter

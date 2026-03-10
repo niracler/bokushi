@@ -1,4 +1,5 @@
 import { z } from "astro/zod";
+import { jsonResponse } from "../../lib/utils";
 
 export const prerender = false; // 这个 endpoint 在服务端运行,不预渲染
 
@@ -51,12 +52,7 @@ export const GET = async ({ url }: { url: URL }) => {
         const response = await fetch(workerUrl);
 
         if (!response.ok) {
-            return new Response(JSON.stringify({ error: "Failed to fetch mangashots" }), {
-                status: response.status,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            return jsonResponse({ error: "Failed to fetch mangashots" }, response.status);
         }
 
         const rawData = await response.json();
@@ -65,36 +61,17 @@ export const GET = async ({ url }: { url: URL }) => {
         const parseResult = MangashotsResponseSchema.safeParse(rawData);
         if (!parseResult.success) {
             console.error("Invalid response from worker:", parseResult.error);
-            return new Response(
-                JSON.stringify({ error: "Invalid data format from external API" }),
-                {
-                    status: 502,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
+            return jsonResponse({ error: "Invalid data format from external API" }, 502);
         }
 
-        const data = parseResult.data;
-
-        return new Response(JSON.stringify(data), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                // 搜索结果缓存短一些,CDN缓存更长
-                "Cache-Control": titleTerm
-                    ? "public, max-age=300, s-maxage=600"
-                    : "public, max-age=3600, s-maxage=7200",
-            },
+        return jsonResponse(parseResult.data, 200, {
+            // 搜索结果缓存短一些,CDN缓存更长
+            "Cache-Control": titleTerm
+                ? "public, max-age=300, s-maxage=600"
+                : "public, max-age=3600, s-maxage=7200",
         });
     } catch (error) {
         console.error("Error fetching mangashots:", error);
-        return new Response(JSON.stringify({ error: "Internal server error" }), {
-            status: 500,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        return jsonResponse({ error: "Internal server error" }, 500);
     }
 };

@@ -6,7 +6,7 @@
  */
 
 import type { APIRoute } from "astro";
-import { getClientIP, hashIP, verifySameOrigin } from "../../lib/utils";
+import { getClientIP, hashIP, jsonResponse, verifySameOrigin } from "../../lib/utils";
 
 export const prerender = false;
 
@@ -24,10 +24,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const slug = url.searchParams.get("slug");
 
     if (!slug) {
-        return new Response(JSON.stringify({ error: "Missing slug parameter" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-        });
+        return jsonResponse({ error: "Missing slug parameter" }, 400);
     }
 
     try {
@@ -35,13 +32,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
         // 本地开发环境没有 KV，返回模拟数据
         if (!kv) {
-            return new Response(
-                JSON.stringify({ count: 0, userLikes: 0, maxLikes: MAX_LIKES_PER_USER }),
-                {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                },
-            );
+            return jsonResponse({ count: 0, userLikes: 0, maxLikes: MAX_LIKES_PER_USER });
         }
 
         const data = await kv.get<LikeData>(`like:${slug}`, "json");
@@ -51,28 +42,18 @@ export const GET: APIRoute = async ({ request, locals }) => {
         const count = data?.count ?? 0;
         const userLikes = data?.likes?.[ipHash] ?? 0;
 
-        return new Response(JSON.stringify({ count, userLikes, maxLikes: MAX_LIKES_PER_USER }), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                "Cache-Control": "no-cache",
-            },
+        return jsonResponse({ count, userLikes, maxLikes: MAX_LIKES_PER_USER }, 200, {
+            "Cache-Control": "no-cache",
         });
     } catch (error) {
         console.error("Error getting like data:", error);
-        return new Response(JSON.stringify({ error: "Internal server error" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
+        return jsonResponse({ error: "Internal server error" }, 500);
     }
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
     if (!verifySameOrigin(request)) {
-        return new Response(JSON.stringify({ error: "Origin mismatch" }), {
-            status: 403,
-            headers: { "Content-Type": "application/json" },
-        });
+        return jsonResponse({ error: "Origin mismatch" }, 403);
     }
 
     try {
@@ -80,23 +61,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const { slug } = body as { slug?: string };
 
         if (!slug) {
-            return new Response(JSON.stringify({ error: "Missing slug" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" },
-            });
+            return jsonResponse({ error: "Missing slug" }, 400);
         }
 
         const kv = locals.runtime?.env?.LIKES;
 
         // 本地开发环境没有 KV，返回模拟数据
         if (!kv) {
-            return new Response(
-                JSON.stringify({ count: 1, userLikes: 1, maxLikes: MAX_LIKES_PER_USER }),
-                {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                },
-            );
+            return jsonResponse({ count: 1, userLikes: 1, maxLikes: MAX_LIKES_PER_USER });
         }
 
         const clientIP = getClientIP(request);
@@ -112,20 +84,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
         // 检查是否已达到上限
         if (currentUserLikes >= MAX_LIKES_PER_USER) {
-            return new Response(
-                JSON.stringify({
+            return jsonResponse(
+                {
                     count: data.count,
                     userLikes: currentUserLikes,
                     maxLikes: MAX_LIKES_PER_USER,
                     maxReached: true,
-                }),
-                {
-                    status: 200,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Cache-Control": "no-cache",
-                    },
                 },
+                200,
+                { "Cache-Control": "no-cache" },
             );
         }
 
@@ -136,25 +103,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
         // 保存数据
         await kv.put(`like:${slug}`, JSON.stringify(data));
 
-        return new Response(
-            JSON.stringify({
+        return jsonResponse(
+            {
                 count: data.count,
                 userLikes: data.likes[ipHash],
                 maxLikes: MAX_LIKES_PER_USER,
-            }),
-            {
-                status: 200,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-cache",
-                },
             },
+            200,
+            { "Cache-Control": "no-cache" },
         );
     } catch (error) {
         console.error("Error processing like:", error);
-        return new Response(JSON.stringify({ error: "Internal server error" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
+        return jsonResponse({ error: "Internal server error" }, 500);
     }
 };

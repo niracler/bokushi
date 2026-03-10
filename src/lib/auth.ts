@@ -2,6 +2,8 @@
  * Authentication utilities for OAuth login and session management.
  */
 
+import { bufferToHex } from "./utils";
+
 // Minimal Cloudflare binding types (avoids @cloudflare/workers-types DOM conflicts)
 interface KVNamespace {
     put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
@@ -158,9 +160,7 @@ export async function verifyTelegramAuth(
     const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(dataCheckString));
 
     // Compare hex using constant-time comparison to prevent timing attacks
-    const computedHash = Array.from(new Uint8Array(signature))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
+    const computedHash = bufferToHex(signature);
 
     return timingSafeEqual(computedHash, hash);
 }

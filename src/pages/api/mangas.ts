@@ -1,4 +1,5 @@
 import { z } from "astro/zod";
+import { jsonResponse } from "../../lib/utils";
 
 export const prerender = false;
 
@@ -17,12 +18,7 @@ export const GET = async () => {
         const response = await fetch("https://mangashot2bot.cloud-1e0.workers.dev/api/mangas");
 
         if (!response.ok) {
-            return new Response(JSON.stringify({ error: "Failed to fetch mangas" }), {
-                status: response.status,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            return jsonResponse({ error: "Failed to fetch mangas" }, response.status);
         }
 
         const rawData = await response.json();
@@ -31,33 +27,14 @@ export const GET = async () => {
         const parseResult = MangasResponseSchema.safeParse(rawData);
         if (!parseResult.success) {
             console.error("Invalid response from worker:", parseResult.error);
-            return new Response(
-                JSON.stringify({ error: "Invalid data format from external API" }),
-                {
-                    status: 502,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
+            return jsonResponse({ error: "Invalid data format from external API" }, 502);
         }
 
-        const data = parseResult.data;
-
-        return new Response(JSON.stringify(data), {
-            status: 200,
-            headers: {
-                "Content-Type": "application/json",
-                "Cache-Control": "public, max-age=3600, s-maxage=7200",
-            },
+        return jsonResponse(parseResult.data, 200, {
+            "Cache-Control": "public, max-age=3600, s-maxage=7200",
         });
     } catch (error) {
         console.error("Error fetching mangas:", error);
-        return new Response(JSON.stringify({ error: "Internal server error" }), {
-            status: 500,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        return jsonResponse({ error: "Internal server error" }, 500);
     }
 };

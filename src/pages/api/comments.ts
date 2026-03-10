@@ -74,12 +74,20 @@ async function buildCommentTree(
     const topLevel: CommentNode[] = [];
     const repliesByParent = new Map<string, CommentNode[]>();
 
+    // Pre-compute all gravatar hashes in parallel
+    const gravatarHashes = await Promise.all(
+        rows.map((row) =>
+            row.status !== "deleted" && !row.user_id && row.email
+                ? hashEmail(row.email)
+                : Promise.resolve(null),
+        ),
+    );
+
     // Group replies by parent_id
-    for (const row of rows) {
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
         const isDeleted = row.status === "deleted";
-        // Compute gravatar hash server-side; never expose raw email to client
-        const gravatarHash =
-            !isDeleted && !row.user_id && row.email ? await hashEmail(row.email) : null;
+        const gravatarHash = gravatarHashes[i];
         const node: CommentNode = {
             id: row.id,
             author: isDeleted ? "" : row.user_name || row.author,

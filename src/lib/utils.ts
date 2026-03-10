@@ -2,28 +2,42 @@
  * Shared utility functions for API routes.
  */
 
+/** Convert an ArrayBuffer to a lowercase hex string. */
+export function bufferToHex(buffer: ArrayBuffer): string {
+    return Array.from(new Uint8Array(buffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+/** Compute SHA-256 hex digest of a string. */
+export async function sha256Hex(input: string): Promise<string> {
+    const data = new TextEncoder().encode(input);
+    return bufferToHex(await crypto.subtle.digest("SHA-256", data));
+}
+
 /**
  * Hash an email address using SHA-256 for Gravatar lookups (privacy-preserving).
  * Returns empty string if input is falsy.
  */
 export async function hashEmail(email: string | null | undefined): Promise<string> {
     if (!email) return "";
-    const encoder = new TextEncoder();
-    const data = encoder.encode(email.trim().toLowerCase());
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    return sha256Hex(email.trim().toLowerCase());
 }
 
 /**
  * Hash an IP address using SHA-256 for privacy.
  */
 export async function hashIP(ip: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(ip);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    return sha256Hex(ip);
+}
+
+/** HTML-escape for safe embedding in HTML contexts (server-side). */
+export function escapeHtml(text: string): string {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 }
 
 /**
