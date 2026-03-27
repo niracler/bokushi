@@ -296,6 +296,11 @@
         content: counter(h2);
     }
 
+    .prose .footnotes h2 > .anchor-link::before {
+        counter-increment: none;
+        content: none;
+    }
+
     .prose h3 > .anchor-link::before {
         counter-increment: h3;
         content: counter(h2) "." counter(h3);
@@ -858,6 +863,18 @@
         box-shadow: var(--shadow-soft);
         color: var(--color-text-secondary);
         font-size: var(--font-size-sm);
+    }
+
+    .prose .footnotes > h2 {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
     }
 
     .prose .footnotes ol,
