@@ -11,8 +11,10 @@ export interface Props {
 
 const { headings } = Astro.props;
 
-// 只显示 h2 和 h3，过滤掉 h1
-const filteredHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+// 只显示 h2 和 h3，过滤掉 h1 和自动生成的脚注标题
+const filteredHeadings = headings.filter(
+    (h) => h.depth >= 2 && h.depth <= 3 && h.slug !== "footnote-label",
+);
 
 // 构建嵌套结构
 interface NestedHeading extends Heading {

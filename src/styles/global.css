@@ -92,8 +92,8 @@
         letter-spacing: 0.01em;
     }
 
-    strong,
-    b {
+    .prose strong,
+    .prose b {
         color: var(--color-accent);
         font-weight: 600;
     }
@@ -863,6 +863,8 @@
         box-shadow: var(--shadow-soft);
         color: var(--color-text-secondary);
         font-size: var(--font-size-sm);
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     .prose .footnotes > h2 {
