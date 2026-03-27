@@ -235,8 +235,8 @@ const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth
 			{showToc && (
 				<aside
 					data-toc-sidebar
-					class="hidden min-[900px]:block fixed w-[220px] min-[1100px]:w-[260px] opacity-0 transition-opacity duration-300"
-					style="left: calc(50% + 25rem + 1.5rem); top: 6rem;"
+					class="hidden min-[960px]:block fixed w-[200px] min-[1100px]:w-[240px] min-[1280px]:w-[260px] opacity-0 transition-opacity duration-300"
+					style="left: calc(50% + 25rem + 1.5rem); top: 6rem; max-width: calc(50vw - 25rem - 3rem);"
 				>
 					{/* 阅读进度指示器 */}
 					<div class="mb-3 flex items-center gap-2">

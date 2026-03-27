@@ -209,6 +209,11 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
       const sourceElement = document.getElementById("quote-source");
 
       if (quoteElement && sourceElement) {
+        // Skip typewriter for users who prefer reduced motion
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          quoteElement.classList.add("is-ready");
+          sourceElement.classList.add("is-visible");
+        } else {
         const tasks: TypeTask[] = [];
         const walker = document.createTreeWalker(
           quoteElement,
@@ -282,6 +287,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 
         // 适中启动速度
         setTimeout(type, 600);
+        } // end else (reduced motion)
       }
     </script>
   </body>
