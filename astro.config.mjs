@@ -68,7 +68,7 @@ export default defineConfig({
             // 双主题配置：通过 CSS 变量控制，无需 !important
             themes: {
                 light: "github-light",
-                dark: "dracula",
+                dark: "catppuccin-mocha",
             },
             // 禁用默认颜色，让 CSS 完全控制主题切换
             defaultColor: false,

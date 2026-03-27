@@ -199,8 +199,8 @@
     /* Interactive state */
     --shadow-button-hover: 0 6px 20px rgba(251, 159, 116, 0.35);
 
-    /* Code block colors */
-    --color-code-bg: #282a36;
+    /* Code block colors — catppuccin-mocha base */
+    --color-code-bg: #1e1e2e;
 
     /* Mermaid diagram theme */
     --mermaid-primary-color: color-mix(in srgb, var(--color-accent) 46%, var(--color-bg-surface));
