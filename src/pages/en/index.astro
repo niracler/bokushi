@@ -205,10 +205,24 @@ const siteDescription = t("en", "site.description");
         parent: HTMLElement;
       }
 
-      const quoteElement = document.getElementById("typewriter-quote");
-      const sourceElement = document.getElementById("quote-source");
+      function initTypewriter() {
+        const quoteElement = document.getElementById("typewriter-quote");
+        const sourceElement = document.getElementById("quote-source");
+        const ghostElement = document.querySelector(".quote-ghost");
 
-      if (quoteElement && sourceElement) {
+        if (!quoteElement || !sourceElement || !ghostElement) return;
+
+        // Reset state (handles bfcache restore)
+        quoteElement.classList.remove("is-ready");
+        sourceElement.classList.remove("is-visible");
+        quoteElement.innerHTML = ghostElement.innerHTML;
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          quoteElement.classList.add("is-ready");
+          sourceElement.classList.add("is-visible");
+          return;
+        }
+
         const tasks: TypeTask[] = [];
         const walker = document.createTreeWalker(
           quoteElement,
@@ -278,6 +292,16 @@ const siteDescription = t("en", "site.description");
 
         setTimeout(type, 600);
       }
+
+      // Initial run
+      initTypewriter();
+
+      // Re-run on bfcache restore
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+          initTypewriter();
+        }
+      });
     </script>
   </body>
 </html>
