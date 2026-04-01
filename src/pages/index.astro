@@ -205,15 +205,25 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
         parent: HTMLElement;
       }
 
-      const quoteElement = document.getElementById("typewriter-quote");
-      const sourceElement = document.getElementById("quote-source");
+      function initTypewriter() {
+        const quoteElement = document.getElementById("typewriter-quote");
+        const sourceElement = document.getElementById("quote-source");
+        const ghostElement = document.querySelector(".quote-ghost");
 
-      if (quoteElement && sourceElement) {
+        if (!quoteElement || !sourceElement || !ghostElement) return;
+
+        // 重置状态（处理 bfcache 恢复的情况）
+        quoteElement.classList.remove("is-ready");
+        sourceElement.classList.remove("is-visible");
+        quoteElement.innerHTML = ghostElement.innerHTML;
+
         // Skip typewriter for users who prefer reduced motion
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           quoteElement.classList.add("is-ready");
           sourceElement.classList.add("is-visible");
-        } else {
+          return;
+        }
+
         const tasks: TypeTask[] = [];
         const walker = document.createTreeWalker(
           quoteElement,
@@ -258,7 +268,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
               (node as unknown as ChildNode).after(cursor);
               currentCharIndex++;
 
-              // 业界级“流式自然”节奏
+              // 业界级"流式自然"节奏
               let delay = 60 + Math.random() * 15; // 稳定流速 (35ms-50ms)
 
               // 重点词一字一顿策略
@@ -287,8 +297,17 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 
         // 适中启动速度
         setTimeout(type, 600);
-        } // end else (reduced motion)
       }
+
+      // 首次加载
+      initTypewriter();
+
+      // bfcache 恢复时重新播放打字机效果
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+          initTypewriter();
+        }
+      });
     </script>
   </body>
 </html>
