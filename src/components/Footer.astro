@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import { SOCIAL_LINKS } from "../consts";
+import { getSiteStats } from "../utils/site-stats";
 import PostPreviewSetup from "./PostPreviewSetup.astro";
 
 const today = new Date();
@@ -12,6 +13,12 @@ const ccTitle =
     locale === "en"
         ? "Content licensed under CC BY-NC-SA 4.0"
         : "本站内容采用 CC BY-NC-SA 4.0 国际许可协议";
+
+const { totalChars, totalMinutes, totalArticles } = await getSiteStats();
+const charsDisplay = totalChars >= 1000 ? `${Math.round(totalChars / 1000)}k` : String(totalChars);
+const hours = Math.floor(totalMinutes / 60);
+const mins = totalMinutes % 60;
+const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
 ---
 
 <footer class="bg-page py-12 text-center text-sm text-secondary">
@@ -93,6 +100,24 @@ const ccTitle =
                 <span class="sr-only">Subscribe to RSS Feed</span>
                 <Icon name="ri:rss-fill" class={iconClass} aria-hidden="true" />
             </a>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-6 text-muted text-sm">
+            <span class="inline-flex items-center gap-2 opacity-75 transition-opacity hover:opacity-100">
+                <Icon name="ri:file-text-line" class="h-4 w-4" aria-hidden="true" />
+                <span class="font-medium">{charsDisplay}</span>
+                <span class="text-xs">字</span>
+            </span>
+            <span class="h-4 w-px bg-border-subtle"></span>
+            <span class="inline-flex items-center gap-2 opacity-75 transition-opacity hover:opacity-100" title={locale === "en" ? "Estimated total reading time" : "预计总阅读时长"}>
+                <Icon name="ri:time-line" class="h-4 w-4" aria-hidden="true" />
+                <span class="font-medium">{timeDisplay}</span>
+            </span>
+            <span class="h-4 w-px bg-border-subtle"></span>
+            <span class="inline-flex items-center gap-2 opacity-75 transition-opacity hover:opacity-100">
+                <Icon name="ri:article-line" class="h-4 w-4" aria-hidden="true" />
+                <span class="font-medium">{totalArticles}</span>
+                <span class="text-xs">篇</span>
+            </span>
         </div>
         <div class="text-muted">
             &copy; {today.getFullYear()} Niracler.

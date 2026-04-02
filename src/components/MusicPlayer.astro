@@ -1,0 +1,447 @@
+---
+import "../styles/music-player.css";
+import { METING_API_BASE } from "../consts";
+
+interface Props {
+    /** Song or playlist ID */
+    id?: string;
+    /** Music source */
+    server?: string;
+    /** "song" (comma-separated IDs) or "playlist" (single playlist ID) */
+    type?: string;
+    /** Manual song title */
+    title?: string;
+    /** Manual artist */
+    artist?: string;
+    /** Manual cover URL */
+    cover?: string;
+    /** Manual audio URL (skips Meting) */
+    src?: string;
+    /** Manual LRC URL */
+    lrc?: string;
+}
+
+const { id, server = "netease", type = "song", title, artist, cover, src, lrc } = Astro.props;
+const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<div
+    class="music-player not-prose"
+    id={playerId}
+    data-id={id}
+    data-server={server}
+    data-type={type}
+    data-title={title}
+    data-artist={artist}
+    data-cover={cover}
+    data-src={src}
+    data-lrc={lrc}
+    data-api={METING_API_BASE}
+>
+    {/* Row 1: disc (left) + song info + controls (right) */}
+    <div class="music-player-disc-area">
+        <div class="music-player-disc-wrapper">
+            <div class="music-player-disc">
+                <img class="music-player-cover" src="" alt="" draggable="false" />
+            </div>
+            <div class="music-player-needle">
+                <div class="music-player-needle-arm">
+                    <div class="music-player-needle-head"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="music-player-header">
+        <div class="music-player-info">
+            <div class="music-player-song-name">Loading...</div>
+            <div class="music-player-artist"></div>
+        </div>
+        <div class="music-player-actions">
+            <button class="music-player-btn" data-action="prev" aria-label="Previous">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4a1 1 0 0 1 1 1v6.333l10.223-6.815a.5.5 0 0 1 .777.416v14.132a.5.5 0 0 1-.777.416L8 12.667V19a1 1 0 1 1-2 0V5a1 1 0 0 1 1-1m10 3.737L10.606 12L17 16.263z"/></svg>
+            </button>
+            <button data-action="play" class="music-player-btn-play" aria-label="Play">
+                <svg viewBox="0 0 24 24"><path fill="#fff" d="M6 20.196V3.804a1 1 0 0 1 1.53-.848l13.113 8.196a1 1 0 0 1 0 1.696L7.53 21.044A1 1 0 0 1 6 20.196"/></svg>
+            </button>
+            <button class="music-player-btn" data-action="next" aria-label="Next">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 12.667L5.777 19.482A.5.5 0 0 1 5 19.066V4.934a.5.5 0 0 1 .777-.416L16 11.333V5a1 1 0 1 1 2 0v14a1 1 0 1 1-2 0zm-9-4.93v8.526L13.394 12z"/></svg>
+            </button>
+            <div class="music-player-volume-group">
+                <button class="music-player-btn" data-action="mute" aria-label="Mute">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.603 10L10 7.22v9.56L6.603 14H3v-4zM2 16h3.889l5.294 4.332a.5.5 0 0 0 .817-.387V4.055a.5.5 0 0 0-.817-.387L5.89 8H2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1m21-4c0 3.292-1.446 6.246-3.738 8.262l-1.418-1.418A8.98 8.98 0 0 0 21 12a8.98 8.98 0 0 0-3.155-6.844l1.417-1.418A10.97 10.97 0 0 1 23 12m-5 0a5.99 5.99 0 0 0-2.287-4.713l-1.429 1.429A4 4 0 0 1 16 12c0 1.36-.679 2.561-1.716 3.284l1.43 1.43A5.99 5.99 0 0 0 18 12"/></svg>
+                </button>
+                <input class="music-player-volume" type="range" min="0" max="1" step="0.05" value="0.7" aria-label="Volume" />
+            </div>
+        </div>
+    </div>
+    {/* Row 2: lyrics (left) + playlist (right), disc spans both rows */}
+    <div class="music-player-body">
+        <div class="music-player-lrc">
+            <div class="music-player-lrc-inner"></div>
+        </div>
+        <div class="music-player-playlist">
+            <div class="music-player-song-list"></div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Note: song titles and artist names come from the Meting API which returns
+    // music metadata (not user input). The playlist is rendered using textContent
+    // for song titles/artists to avoid XSS, with only structural HTML being static.
+
+    const playerInstances = new Map<HTMLElement, MusicPlayerController>();
+
+    class MusicPlayerController {
+        private el: HTMLElement;
+        private audio: HTMLAudioElement;
+        private songs: Array<{ title: string; artist: string; cover: string; url: string; lrc: string }>;
+        private currentIndex: number;
+        private lrcLines: Array<{ time: number; text: string }>;
+
+        private disc: HTMLElement;
+        private needle: HTMLElement;
+        private coverImg: HTMLImageElement;
+        private songName: HTMLElement;
+        private artistEl: HTMLElement;
+        private btnPlay: HTMLButtonElement;
+        private btnPrev: HTMLElement;
+        private btnNext: HTMLElement;
+        private btnMute: HTMLElement;
+        private lrcInner: HTMLElement;
+        private volumeInput: HTMLInputElement;
+        private songList: HTMLElement;
+
+        private playlistItems: HTMLElement[] = [];
+        private lrcElements: HTMLParagraphElement[] = [];
+        private lastActiveLrc = -1;
+
+        // Named event handlers (arrow functions bound to this)
+        private handleTimeUpdate = () => {
+            if (!this.audio.duration) return;
+            this.updateLrc();
+            this.updateSongProgress();
+        };
+        private handleEnded = () => this.next();
+        private handlePlay = () => this.setPlayingUI(true);
+        private handlePause = () => this.setPlayingUI(false);
+        private handlePrevClick = () => this.prev();
+        private handleNextClick = () => this.next();
+        private handlePlayClick = () => this.togglePlay();
+        private handleMuteClick = () => { this.audio.muted = !this.audio.muted; };
+        private handleVolumeInput = () => { this.audio.volume = parseFloat(this.volumeInput.value); };
+
+        constructor(el: HTMLElement) {
+            this.el = el;
+            this.audio = new Audio();
+            this.audio.volume = 0.7;
+            this.songs = [];
+            this.currentIndex = 0;
+            this.lrcLines = [];
+
+            this.disc = el.querySelector(".music-player-disc")!;
+            this.needle = el.querySelector(".music-player-needle")!;
+            this.coverImg = el.querySelector(".music-player-cover")! as HTMLImageElement;
+            this.songName = el.querySelector(".music-player-song-name")!;
+            this.artistEl = el.querySelector(".music-player-artist")!;
+            this.btnPlay = el.querySelector(".music-player-btn-play")! as HTMLButtonElement;
+            this.btnPrev = el.querySelector('[data-action="prev"]')!;
+            this.btnNext = el.querySelector('[data-action="next"]')!;
+            this.btnMute = el.querySelector('[data-action="mute"]')!;
+            this.lrcInner = el.querySelector(".music-player-lrc-inner")!;
+            this.volumeInput = el.querySelector(".music-player-volume")! as HTMLInputElement;
+            this.songList = el.querySelector(".music-player-song-list")!;
+
+            this.bindEvents();
+            this.init();
+        }
+
+        private async init() {
+            const dataSrc = this.el.dataset.src;
+            const dataId = this.el.dataset.id;
+            const api = this.el.dataset.api || "";
+            const server = this.el.dataset.server || "netease";
+
+            const dataType = this.el.dataset.type || "song";
+
+            if (dataSrc) {
+                this.songs = [{
+                    title: this.el.dataset.title || "Unknown",
+                    artist: this.el.dataset.artist || "",
+                    cover: this.el.dataset.cover || "",
+                    url: dataSrc,
+                    lrc: this.el.dataset.lrc || "",
+                }];
+            } else if (dataId && dataType === "playlist") {
+                this.songs = await this.fetchPlaylist(api, server, dataId);
+            } else if (dataId) {
+                const ids = dataId.split(",").map((s) => s.trim()).filter(Boolean);
+                const results = await Promise.all(ids.map((id) => this.fetchSong(api, server, id)));
+                this.songs = results.filter((s): s is NonNullable<typeof s> => s !== null);
+            }
+
+            if (this.songs.length > 0) {
+                this.loadSong(0);
+                this.renderPlaylist();
+            } else {
+                this.songName.textContent = "No songs found";
+            }
+        }
+
+        private async fetchSong(api: string, server: string, id: string) {
+            try {
+                const res = await fetch(`${api}?server=${server}&type=song&id=${id}`);
+                const data = await res.json();
+                const info = Array.isArray(data) ? data[0] : data;
+                if (!info) return null;
+                return {
+                    title: info.title || info.name || "Unknown",
+                    artist: info.artist || info.author || "",
+                    cover: info.pic || info.cover || "",
+                    url: info.url || `${api}?server=${server}&type=url&id=${id}`,
+                    lrc: info.lrc || `${api}?server=${server}&type=lrc&id=${id}`,
+                };
+            } catch { return null; }
+        }
+
+        private async fetchPlaylist(api: string, server: string, id: string) {
+            try {
+                const res = await fetch(`${api}?server=${server}&type=playlist&id=${id}`);
+                const data = await res.json();
+                if (!Array.isArray(data)) return [];
+                return data.map((s: Record<string, string>) => ({
+                    title: s.title || s.name || "Unknown",
+                    artist: s.artist || s.author || "",
+                    cover: s.pic || s.cover || "",
+                    url: s.url || "",
+                    lrc: s.lrc || "",
+                })).filter((s: { url: string }) => s.url);
+            } catch { return []; }
+        }
+
+        private loadSong(index: number) {
+            // Reset previous song's progress bar
+            const prev = this.playlistItems[this.currentIndex];
+            if (prev) {
+                const bar = prev.querySelector<HTMLElement>(".music-player-song-progress-bg");
+                if (bar) bar.style.width = "0%";
+                const timeEl = prev.querySelector(".music-player-song-time");
+                if (timeEl) timeEl.textContent = "";
+            }
+            this.currentIndex = index;
+            const song = this.songs[index];
+            if (!song) return;
+            this.audio.src = song.url;
+            this.songName.textContent = song.title;
+            this.artistEl.textContent = song.artist;
+            this.coverImg.src = song.cover;
+            this.lrcLines = [];
+            this.lrcElements = [];
+            this.lastActiveLrc = -1;
+            this.lrcInner.textContent = "";
+            if (song.lrc) this.loadLrc(song.lrc);
+            this.updatePlaylistUI();
+        }
+
+        private bindEvents() {
+            this.btnPlay.addEventListener("click", this.handlePlayClick);
+            this.btnPrev.addEventListener("click", this.handlePrevClick);
+            this.btnNext.addEventListener("click", this.handleNextClick);
+            this.volumeInput.addEventListener("input", this.handleVolumeInput);
+            this.btnMute.addEventListener("click", this.handleMuteClick);
+            this.audio.addEventListener("timeupdate", this.handleTimeUpdate);
+            this.audio.addEventListener("ended", this.handleEnded);
+            this.audio.addEventListener("play", this.handlePlay);
+            this.audio.addEventListener("pause", this.handlePause);
+        }
+
+        public destroy() {
+            this.audio.pause();
+            this.audio.src = "";
+
+            this.btnPlay.removeEventListener("click", this.handlePlayClick);
+            this.btnPrev.removeEventListener("click", this.handlePrevClick);
+            this.btnNext.removeEventListener("click", this.handleNextClick);
+            this.volumeInput.removeEventListener("input", this.handleVolumeInput);
+            this.btnMute.removeEventListener("click", this.handleMuteClick);
+            this.audio.removeEventListener("timeupdate", this.handleTimeUpdate);
+            this.audio.removeEventListener("ended", this.handleEnded);
+            this.audio.removeEventListener("play", this.handlePlay);
+            this.audio.removeEventListener("pause", this.handlePause);
+
+            this.songs = [];
+            this.lrcLines = [];
+            this.playlistItems = [];
+            this.lrcElements = [];
+            delete this.el.dataset.initialized;
+        }
+
+        private playAudio() {
+            this.audio.play().catch(() => {});
+        }
+
+        private togglePlay() {
+            if (this.audio.paused) this.playAudio(); else this.audio.pause();
+        }
+
+        private setPlayingUI(playing: boolean) {
+            this.disc.classList.toggle("spinning", playing);
+            this.needle.classList.toggle("playing", playing);
+            const icon = playing
+                ? '<path fill="#fff" d="M6 5h2v14H6zm10 0h2v14h-2z"/>'
+                : '<path fill="#fff" d="M6 20.196V3.804a1 1 0 0 1 1.53-.848l13.113 8.196a1 1 0 0 1 0 1.696L7.53 21.044A1 1 0 0 1 6 20.196"/>';
+            const svg = this.btnPlay.querySelector("svg");
+            if (svg) svg.replaceChildren();
+            if (svg) { const t = document.createElement("template"); t.innerHTML = icon; svg.append(t.content); }
+        }
+
+        private prev() {
+            this.loadSong(this.currentIndex <= 0 ? this.songs.length - 1 : this.currentIndex - 1);
+            this.playAudio();
+        }
+
+        private next() {
+            this.loadSong(this.currentIndex >= this.songs.length - 1 ? 0 : this.currentIndex + 1);
+            this.playAudio();
+        }
+
+        private renderPlaylist() {
+            if (this.songs.length <= 1) {
+                const playlist = this.songList.closest(".music-player-playlist") as HTMLElement;
+                if (playlist) playlist.style.display = "none";
+                return;
+            }
+            this.songList.replaceChildren();
+            this.songs.forEach((song, i) => {
+                const btn = document.createElement("button");
+                btn.className = "music-player-song-item";
+                btn.dataset.songIndex = String(i);
+                btn.setAttribute("aria-label", "Play " + song.title + " by " + song.artist);
+
+                const progressBg = document.createElement("div");
+                progressBg.className = "music-player-song-progress-bg";
+
+                const idx = document.createElement("span");
+                idx.className = "music-player-song-index";
+                idx.textContent = String(i + 1);
+
+                const title = document.createElement("span");
+                title.className = "music-player-song-title";
+                title.textContent = song.title;
+
+                const artist = document.createElement("span");
+                artist.className = "music-player-song-artist";
+                artist.textContent = song.artist;
+
+                const time = document.createElement("span");
+                time.className = "music-player-song-time";
+
+                btn.append(progressBg, idx, title, artist, time);
+                btn.addEventListener("click", () => { this.loadSong(i); this.playAudio(); });
+                this.songList.append(btn);
+            });
+            this.playlistItems = Array.from(this.songList.querySelectorAll(".music-player-song-item")) as HTMLElement[];
+            this.updatePlaylistUI();
+        }
+
+        private updatePlaylistUI() {
+            this.playlistItems.forEach((item, i) => {
+                item.classList.toggle("current", i === this.currentIndex);
+                const idx = item.querySelector(".music-player-song-index");
+                if (idx) idx.textContent = i === this.currentIndex ? "\u25B6" : String(i + 1);
+            });
+        }
+
+        private async loadLrc(source: string) {
+            let text = source;
+            if (source.startsWith("http")) {
+                try { const res = await fetch(source); text = await res.text(); } catch { return; }
+            }
+
+            // For instrumental tracks, show a placeholder
+            if (text.includes("纯音乐") && (text.match(/\[/g) || []).length <= 2) {
+                this.lrcInner.replaceChildren();
+                const p = document.createElement("p");
+                p.className = "music-player-lrc-placeholder";
+                p.textContent = "♪ 纯音乐，请欣赏";
+                this.lrcInner.append(p);
+                return;
+            }
+
+            this.lrcLines = [];
+            const regex = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\](.*)/g;
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                const lineText = match[4].trim();
+                if (!lineText || lineText.startsWith("作词") || lineText.startsWith("作曲") || lineText.startsWith("编曲")) continue;
+                const time = parseInt(match[1]) * 60 + parseInt(match[2]) + (match[3] ? parseInt(match[3].padEnd(3, "0")) / 1000 : 0);
+                this.lrcLines.push({ time, text: lineText });
+            }
+            this.lrcLines.sort((a, b) => a.time - b.time);
+            this.lrcInner.replaceChildren();
+            for (const line of this.lrcLines) {
+                const p = document.createElement("p");
+                p.textContent = line.text;
+                this.lrcInner.append(p);
+            }
+            this.lrcElements = Array.from(this.lrcInner.querySelectorAll("p"));
+            this.lastActiveLrc = -1;
+        }
+
+        private updateLrc() {
+            if (!this.lrcLines.length || !this.lrcElements.length) return;
+            const t = this.audio.currentTime;
+            let active = -1;
+            for (let i = this.lrcLines.length - 1; i >= 0; i--) {
+                if (t >= this.lrcLines[i].time) { active = i; break; }
+            }
+            if (active === -1 || active === this.lastActiveLrc) return;
+            if (this.lastActiveLrc >= 0 && this.lastActiveLrc < this.lrcElements.length) {
+                this.lrcElements[this.lastActiveLrc].classList.remove("current");
+            }
+            this.lrcElements[active].classList.add("current");
+            this.lastActiveLrc = active;
+            const lineH = this.lrcElements[0]?.offsetHeight || 24;
+            this.lrcInner.style.transform = `translateY(${-active * lineH + lineH}px)`;
+        }
+
+        private updateSongProgress() {
+            const item = this.playlistItems[this.currentIndex];
+            if (!item) return;
+            const bar = item.querySelector(".music-player-song-progress-bg") as HTMLElement | null;
+            const timeEl = item.querySelector(".music-player-song-time");
+            if (this.audio.duration) {
+                const pct = (this.audio.currentTime / this.audio.duration) * 100;
+                if (bar) bar.style.width = `${pct}%`;
+                if (timeEl) timeEl.textContent = `${fmt(this.audio.currentTime)} / ${fmt(this.audio.duration)}`;
+            }
+        }
+    }
+
+    function fmt(sec: number): string {
+        const m = Math.floor(sec / 60);
+        return `${m}:${Math.floor(sec % 60).toString().padStart(2, "0")}`;
+    }
+
+    function destroyAllPlayers() {
+        playerInstances.forEach((controller) => controller.destroy());
+        playerInstances.clear();
+    }
+
+    function initMusicPlayers() {
+        document.querySelectorAll<HTMLElement>(".music-player:not([data-initialized])").forEach((el) => {
+            el.dataset.initialized = "true";
+            const controller = new MusicPlayerController(el);
+            playerInstances.set(el, controller);
+        });
+    }
+
+    document.addEventListener("astro:before-swap", destroyAllPlayers);
+    document.addEventListener("astro:page-load", initMusicPlayers);
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initMusicPlayers, { once: true });
+    } else {
+        initMusicPlayers();
+    }
+</script>
