@@ -91,6 +91,8 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
     // music metadata (not user input). The playlist is rendered using textContent
     // for song titles/artists to avoid XSS, with only structural HTML being static.
 
+    const playerInstances = new Map<HTMLElement, MusicPlayerController>();
+
     class MusicPlayerController {
         private el: HTMLElement;
         private audio: HTMLAudioElement;
@@ -104,9 +106,31 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
         private songName: HTMLElement;
         private artistEl: HTMLElement;
         private btnPlay: HTMLButtonElement;
+        private btnPrev: HTMLElement;
+        private btnNext: HTMLElement;
+        private btnMute: HTMLElement;
         private lrcInner: HTMLElement;
         private volumeInput: HTMLInputElement;
         private songList: HTMLElement;
+
+        private playlistItems: HTMLElement[] = [];
+        private lrcElements: HTMLParagraphElement[] = [];
+        private lastActiveLrc = -1;
+
+        // Named event handlers (arrow functions bound to this)
+        private handleTimeUpdate = () => {
+            if (!this.audio.duration) return;
+            this.updateLrc();
+            this.updateSongProgress();
+        };
+        private handleEnded = () => this.next();
+        private handlePlay = () => this.setPlayingUI(true);
+        private handlePause = () => this.setPlayingUI(false);
+        private handlePrevClick = () => this.prev();
+        private handleNextClick = () => this.next();
+        private handlePlayClick = () => this.togglePlay();
+        private handleMuteClick = () => { this.audio.muted = !this.audio.muted; };
+        private handleVolumeInput = () => { this.audio.volume = parseFloat(this.volumeInput.value); };
 
         constructor(el: HTMLElement) {
             this.el = el;
@@ -122,6 +146,9 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
             this.songName = el.querySelector(".music-player-song-name")!;
             this.artistEl = el.querySelector(".music-player-artist")!;
             this.btnPlay = el.querySelector(".music-player-btn-play")! as HTMLButtonElement;
+            this.btnPrev = el.querySelector('[data-action="prev"]')!;
+            this.btnNext = el.querySelector('[data-action="next"]')!;
+            this.btnMute = el.querySelector('[data-action="mute"]')!;
             this.lrcInner = el.querySelector(".music-player-lrc-inner")!;
             this.volumeInput = el.querySelector(".music-player-volume")! as HTMLInputElement;
             this.songList = el.querySelector(".music-player-song-list")!;
@@ -202,33 +229,52 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
             this.artistEl.textContent = song.artist;
             this.coverImg.src = song.cover;
             this.lrcLines = [];
+            this.lrcElements = [];
+            this.lastActiveLrc = -1;
             this.lrcInner.textContent = "";
             if (song.lrc) this.loadLrc(song.lrc);
             this.updatePlaylistUI();
         }
 
         private bindEvents() {
-            this.btnPlay.addEventListener("click", () => this.togglePlay());
-            this.el.querySelector('[data-action="prev"]')!.addEventListener("click", () => this.prev());
-            this.el.querySelector('[data-action="next"]')!.addEventListener("click", () => this.next());
-            this.volumeInput.addEventListener("input", () => {
-                this.audio.volume = parseFloat(this.volumeInput.value);
-            });
-            this.el.querySelector('[data-action="mute"]')!.addEventListener("click", () => {
-                this.audio.muted = !this.audio.muted;
-            });
-            this.audio.addEventListener("timeupdate", () => {
-                if (!this.audio.duration) return;
-                this.updateLrc();
-                this.updateSongProgress();
-            });
-            this.audio.addEventListener("ended", () => this.next());
-            this.audio.addEventListener("play", () => this.setPlayingUI(true));
-            this.audio.addEventListener("pause", () => this.setPlayingUI(false));
+            this.btnPlay.addEventListener("click", this.handlePlayClick);
+            this.btnPrev.addEventListener("click", this.handlePrevClick);
+            this.btnNext.addEventListener("click", this.handleNextClick);
+            this.volumeInput.addEventListener("input", this.handleVolumeInput);
+            this.btnMute.addEventListener("click", this.handleMuteClick);
+            this.audio.addEventListener("timeupdate", this.handleTimeUpdate);
+            this.audio.addEventListener("ended", this.handleEnded);
+            this.audio.addEventListener("play", this.handlePlay);
+            this.audio.addEventListener("pause", this.handlePause);
+        }
+
+        public destroy() {
+            this.audio.pause();
+            this.audio.src = "";
+
+            this.btnPlay.removeEventListener("click", this.handlePlayClick);
+            this.btnPrev.removeEventListener("click", this.handlePrevClick);
+            this.btnNext.removeEventListener("click", this.handleNextClick);
+            this.volumeInput.removeEventListener("input", this.handleVolumeInput);
+            this.btnMute.removeEventListener("click", this.handleMuteClick);
+            this.audio.removeEventListener("timeupdate", this.handleTimeUpdate);
+            this.audio.removeEventListener("ended", this.handleEnded);
+            this.audio.removeEventListener("play", this.handlePlay);
+            this.audio.removeEventListener("pause", this.handlePause);
+
+            this.songs = [];
+            this.lrcLines = [];
+            this.playlistItems = [];
+            this.lrcElements = [];
+            delete this.el.dataset.initialized;
+        }
+
+        private playAudio() {
+            this.audio.play().catch(() => {});
         }
 
         private togglePlay() {
-            if (this.audio.paused) this.audio.play(); else this.audio.pause();
+            if (this.audio.paused) this.playAudio(); else this.audio.pause();
         }
 
         private setPlayingUI(playing: boolean) {
@@ -244,12 +290,12 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
 
         private prev() {
             this.loadSong(this.currentIndex <= 0 ? this.songs.length - 1 : this.currentIndex - 1);
-            this.audio.play();
+            this.playAudio();
         }
 
         private next() {
             this.loadSong(this.currentIndex >= this.songs.length - 1 ? 0 : this.currentIndex + 1);
-            this.audio.play();
+            this.playAudio();
         }
 
         private renderPlaylist() {
@@ -263,6 +309,7 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
                 const btn = document.createElement("button");
                 btn.className = "music-player-song-item";
                 btn.dataset.songIndex = String(i);
+                btn.setAttribute("aria-label", "Play " + song.title + " by " + song.artist);
 
                 const progressBg = document.createElement("div");
                 progressBg.className = "music-player-song-progress-bg";
@@ -283,14 +330,15 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
                 time.className = "music-player-song-time";
 
                 btn.append(progressBg, idx, title, artist, time);
-                btn.addEventListener("click", () => { this.loadSong(i); this.audio.play(); });
+                btn.addEventListener("click", () => { this.loadSong(i); this.playAudio(); });
                 this.songList.append(btn);
             });
+            this.playlistItems = Array.from(this.songList.querySelectorAll(".music-player-song-item")) as HTMLElement[];
             this.updatePlaylistUI();
         }
 
         private updatePlaylistUI() {
-            this.songList.querySelectorAll(".music-player-song-item").forEach((item, i) => {
+            this.playlistItems.forEach((item, i) => {
                 item.classList.toggle("current", i === this.currentIndex);
                 const idx = item.querySelector(".music-player-song-index");
                 if (idx) idx.textContent = i === this.currentIndex ? "\u25B6" : String(i + 1);
@@ -329,35 +377,37 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
                 p.textContent = line.text;
                 this.lrcInner.append(p);
             }
+            this.lrcElements = Array.from(this.lrcInner.querySelectorAll("p"));
+            this.lastActiveLrc = -1;
         }
 
         private updateLrc() {
-            if (!this.lrcLines.length) return;
+            if (!this.lrcLines.length || !this.lrcElements.length) return;
             const t = this.audio.currentTime;
             let active = 0;
             for (let i = this.lrcLines.length - 1; i >= 0; i--) {
                 if (t >= this.lrcLines[i].time) { active = i; break; }
             }
-            const ps = this.lrcInner.querySelectorAll("p");
-            ps.forEach((p, i) => p.classList.toggle("current", i === active));
-            const lineH = (ps[0] as HTMLElement)?.offsetHeight || 24;
+            if (active === this.lastActiveLrc) return;
+            if (this.lastActiveLrc >= 0 && this.lastActiveLrc < this.lrcElements.length) {
+                this.lrcElements[this.lastActiveLrc].classList.remove("current");
+            }
+            this.lrcElements[active].classList.add("current");
+            this.lastActiveLrc = active;
+            const lineH = this.lrcElements[0]?.offsetHeight || 24;
             this.lrcInner.style.transform = `translateY(${-active * lineH + lineH}px)`;
         }
 
         private updateSongProgress() {
-            const items = this.songList.querySelectorAll(".music-player-song-item");
-            items.forEach((item, i) => {
-                const bar = item.querySelector(".music-player-song-progress-bg") as HTMLElement | null;
-                const timeEl = item.querySelector(".music-player-song-time");
-                if (i === this.currentIndex && this.audio.duration) {
-                    const pct = (this.audio.currentTime / this.audio.duration) * 100;
-                    if (bar) bar.style.width = `${pct}%`;
-                    if (timeEl) timeEl.textContent = `${fmt(this.audio.currentTime)} / ${fmt(this.audio.duration)}`;
-                } else {
-                    if (bar) bar.style.width = "0%";
-                    if (timeEl) timeEl.textContent = "";
-                }
-            });
+            const item = this.playlistItems[this.currentIndex];
+            if (!item) return;
+            const bar = item.querySelector(".music-player-song-progress-bg") as HTMLElement | null;
+            const timeEl = item.querySelector(".music-player-song-time");
+            if (this.audio.duration) {
+                const pct = (this.audio.currentTime / this.audio.duration) * 100;
+                if (bar) bar.style.width = `${pct}%`;
+                if (timeEl) timeEl.textContent = `${fmt(this.audio.currentTime)} / ${fmt(this.audio.duration)}`;
+            }
         }
     }
 
@@ -366,13 +416,20 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
         return `${m}:${Math.floor(sec % 60).toString().padStart(2, "0")}`;
     }
 
+    function destroyAllPlayers() {
+        playerInstances.forEach((controller) => controller.destroy());
+        playerInstances.clear();
+    }
+
     function initMusicPlayers() {
         document.querySelectorAll<HTMLElement>(".music-player:not([data-initialized])").forEach((el) => {
             el.dataset.initialized = "true";
-            new MusicPlayerController(el);
+            const controller = new MusicPlayerController(el);
+            playerInstances.set(el, controller);
         });
     }
 
+    document.addEventListener("astro:before-swap", destroyAllPlayers);
     document.addEventListener("astro:page-load", initMusicPlayers);
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", initMusicPlayers, { once: true });
