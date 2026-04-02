@@ -1,8 +1,7 @@
 ---
-import { getCollection } from "astro:content";
 import { Icon } from "astro-icon/components";
 import { SOCIAL_LINKS } from "../consts";
-import { stripMarkdown } from "../utils/readingTime";
+import { getSiteStats } from "../utils/siteStats";
 import PostPreviewSetup from "./PostPreviewSetup.astro";
 
 const today = new Date();
@@ -15,27 +14,7 @@ const ccTitle =
         ? "Content licensed under CC BY-NC-SA 4.0"
         : "本站内容采用 CC BY-NC-SA 4.0 国际许可协议";
 
-// Site stats
-const [blogPosts, monthlyPosts, tilPosts] = await Promise.all([
-    getCollection("blog"),
-    getCollection("monthly"),
-    getCollection("til"),
-]);
-const allPosts = [...blogPosts, ...monthlyPosts, ...tilPosts];
-const totalArticles = allPosts.length;
-
-const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g;
-let totalChars = 0;
-let totalMinutes = 0;
-
-for (const post of allPosts) {
-    const plain = stripMarkdown(post.body || "");
-    const cjk = (plain.match(CJK_RE) || []).length;
-    const latin = plain.replace(CJK_RE, " ").trim().split(/\s+/).filter(Boolean).length;
-    totalChars += cjk + latin;
-    totalMinutes += Math.max(1, Math.ceil(cjk / 300 + latin / 200));
-}
-
+const { totalChars, totalMinutes, totalArticles } = await getSiteStats();
 const charsDisplay = totalChars >= 1000 ? `${Math.round(totalChars / 1000)}k` : String(totalChars);
 const hours = Math.floor(totalMinutes / 60);
 const mins = totalMinutes % 60;
