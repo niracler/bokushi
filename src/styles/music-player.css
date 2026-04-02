@@ -31,6 +31,18 @@
     border-color: rgba(var(--mp-highlight-rgb) / 0.2);
 }
 
+/* --- Reset .prose styles that bleed into the player --- */
+.music-player p {
+    margin: 0;
+    margin-top: 0;
+}
+
+.music-player img {
+    border-radius: 0;
+    box-shadow: none;
+    cursor: default;
+}
+
 /* --- Disc area: spans full height, vertically centered --- */
 .music-player-disc-area {
     grid-row: 1 / -1;
@@ -150,6 +162,12 @@
 }
 
 .music-player-volume-group:hover .music-player-volume {
+    opacity: 1;
+    width: 50px;
+    margin-left: 4px;
+}
+
+.music-player-volume-group:focus-within .music-player-volume {
     opacity: 1;
     width: 50px;
     margin-left: 4px;
@@ -349,12 +367,16 @@
     border-radius: 50%;
     background: #111;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-    animation: music-disc-spin 20s linear infinite paused;
+    animation-name: music-disc-spin;
+    animation-duration: 6s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-play-state: paused;
     will-change: transform;
 }
 
 .music-player-disc.spinning {
-    animation: music-disc-spin 6s linear infinite running;
+    animation-play-state: running;
 }
 
 .music-player-disc::before {
@@ -490,7 +512,7 @@
 }
 
 /* --- Mobile: keep grid, shrink disc --- */
-@media (max-width: 540px) {
+@media (max-width: 639px) {
     .music-player-disc-area {
         padding: 0.5em;
         padding-right: 0.25em;
