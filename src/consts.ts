@@ -22,3 +22,6 @@ export const SOCIAL_LINKS = {
     folo: "https://app.folo.is/share/users/niracler",
     rss: "/rss.xml",
 };
+
+// Meting API base URL (用于音乐播放器自动获取歌曲信息)
+export const METING_API_BASE = "https://api.baka.plus/meting/";
