@@ -221,6 +221,14 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
         }
 
         private loadSong(index: number) {
+            // Reset previous song's progress bar
+            const prev = this.playlistItems[this.currentIndex];
+            if (prev) {
+                const bar = prev.querySelector<HTMLElement>(".music-player-song-progress-bg");
+                if (bar) bar.style.width = "0%";
+                const timeEl = prev.querySelector(".music-player-song-time");
+                if (timeEl) timeEl.textContent = "";
+            }
             this.currentIndex = index;
             const song = this.songs[index];
             if (!song) return;
@@ -384,11 +392,11 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
         private updateLrc() {
             if (!this.lrcLines.length || !this.lrcElements.length) return;
             const t = this.audio.currentTime;
-            let active = 0;
+            let active = -1;
             for (let i = this.lrcLines.length - 1; i >= 0; i--) {
                 if (t >= this.lrcLines[i].time) { active = i; break; }
             }
-            if (active === this.lastActiveLrc) return;
+            if (active === -1 || active === this.lastActiveLrc) return;
             if (this.lastActiveLrc >= 0 && this.lastActiveLrc < this.lrcElements.length) {
                 this.lrcElements[this.lastActiveLrc].classList.remove("current");
             }

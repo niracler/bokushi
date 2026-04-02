@@ -1,7 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import { SOCIAL_LINKS } from "../consts";
-import { getSiteStats } from "../utils/siteStats";
+import { getSiteStats } from "../utils/site-stats";
 import PostPreviewSetup from "./PostPreviewSetup.astro";
 
 const today = new Date();
@@ -108,7 +108,7 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                 <span class="text-xs">字</span>
             </span>
             <span class="h-4 w-px bg-border-subtle"></span>
-            <span class="inline-flex items-center gap-2 opacity-75 transition-opacity hover:opacity-100">
+            <span class="inline-flex items-center gap-2 opacity-75 transition-opacity hover:opacity-100" title={locale === "en" ? "Estimated total reading time" : "预计总阅读时长"}>
                 <Icon name="ri:time-line" class="h-4 w-4" aria-hidden="true" />
                 <span class="font-medium">{timeDisplay}</span>
             </span>

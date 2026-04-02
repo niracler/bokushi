@@ -24,4 +24,6 @@ export const SOCIAL_LINKS = {
 };
 
 // Meting API base URL (用于音乐播放器自动获取歌曲信息)
-export const METING_API_BASE = "https://api.baka.plus/meting/";
+// Override via PUBLIC_METING_API_BASE env var for self-hosted instances
+export const METING_API_BASE =
+    import.meta.env.PUBLIC_METING_API_BASE || "https://api.baka.plus/meting/";
