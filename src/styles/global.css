@@ -849,7 +849,7 @@
     .prose figcaption {
         color: var(--color-text-muted);
         font-size: var(--font-size-sm);
-        font-style: italic;
+        font-style: normal;
         line-height: var(--line-height-relaxed);
         text-align: center;
     }
