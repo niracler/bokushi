@@ -25,6 +25,7 @@ binding = "COMMENTS_DB"
 database_name = "bokushi-comments"
 database_id = "f95ebf0a-500e-4096-86fb-9e7edfde7679"
 
-# Email sending binding (requires Email Routing enabled on domain)
-[[send_email]]
-name = "EMAIL"
+# Email notifications use Fastmail JMAP API (no Cloudflare Email Routing needed).
+# Set these secrets in Cloudflare Pages environment variables:
+#   FASTMAIL_API_TOKEN  - Fastmail app password with mail + submission scope
+#   NOTIFY_FROM_EMAIL   - (optional) sender address, must be a configured Fastmail identity

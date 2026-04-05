@@ -368,10 +368,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
         // Email notification for replies (fallback to users.email for OAuth users)
         const recipientEmail = parentRow?.email || parentRow?.user_email;
-        if (parentId && env?.EMAIL && parentRow && recipientEmail) {
+        if (parentId && env?.FASTMAIL_API_TOKEN && parentRow && recipientEmail) {
             const parentName = parentRow.user_name || parentRow.author;
+            const jmapConfig = {
+                token: env.FASTMAIL_API_TOKEN,
+                from: env.NOTIFY_FROM_EMAIL || "noreply@niracler.com",
+            };
 
-            const emailPromise = notifyCommentReply(env.EMAIL, {
+            const emailPromise = notifyCommentReply(jmapConfig, {
                 recipientEmail,
                 recipientName: parentName,
                 replyAuthor: author,

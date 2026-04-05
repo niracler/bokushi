@@ -1,15 +1,18 @@
 /**
- * Email notification for comment replies using Cloudflare Email Workers.
+ * Email notification for comment replies via Fastmail JMAP API.
+ *
+ * Uses JMAP (RFC 8620/8621) to create and send emails through Fastmail.
+ * Requires a Fastmail API token with mail + submission scopes.
  */
 
 import { SITE_URL } from "../consts";
 import { escapeHtml as escapeHtmlBase } from "./utils";
 
-/** Encode a UTF-8 string to base64 without the deprecated `unescape`. */
-function utf8ToBase64(str: string): string {
-    const bytes = new TextEncoder().encode(str);
-    const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join("");
-    return btoa(binString);
+const JMAP_SESSION_URL = "https://api.fastmail.com/jmap/session";
+
+interface JmapConfig {
+    token: string;
+    from: string;
 }
 
 interface NotifyReplyOptions {
@@ -20,6 +23,147 @@ interface NotifyReplyOptions {
     parentContent: string;
     postTitle: string;
     postSlug: string;
+}
+
+interface JmapSession {
+    primaryAccounts: Record<string, string>;
+    apiUrl: string;
+}
+
+/** Fetch JMAP session to get accountId and API endpoint. */
+async function getJmapSession(token: string): Promise<JmapSession> {
+    const res = await fetch(JMAP_SESSION_URL, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+        throw new Error(`JMAP session failed: ${res.status} ${res.statusText}`);
+    }
+    return res.json() as Promise<JmapSession>;
+}
+
+/** Get the primary mail account ID and the identityId for the from address. */
+async function getAccountAndIdentity(
+    token: string,
+    apiUrl: string,
+    accountId: string,
+    fromEmail: string,
+): Promise<{ accountId: string; identityId: string }> {
+    const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            using: ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:submission"],
+            methodCalls: [["Identity/get", { accountId }, "id0"]],
+        }),
+    });
+
+    if (!res.ok) {
+        throw new Error(`JMAP Identity/get failed: ${res.status}`);
+    }
+
+    const data = (await res.json()) as {
+        methodResponses: [string, { list?: { id: string; email: string }[] }, string][];
+    };
+    const identities = data.methodResponses?.[0]?.[1]?.list ?? [];
+
+    // Find identity matching the from address, or fall back to first
+    const match = identities.find((i) => i.email === fromEmail) ?? identities[0];
+    if (!match) {
+        throw new Error(`No JMAP identity found for ${fromEmail}`);
+    }
+
+    return { accountId, identityId: match.id };
+}
+
+/** Send an email via JMAP: Email/set + EmailSubmission/set in one request. */
+async function sendViaJmap(
+    config: JmapConfig,
+    to: { name: string; email: string },
+    subject: string,
+    htmlBody: string,
+): Promise<void> {
+    const session = await getJmapSession(config.token);
+    const accountId = session.primaryAccounts["urn:ietf:params:jmap:mail"];
+    if (!accountId) {
+        throw new Error("No primary mail account in JMAP session");
+    }
+
+    const { identityId } = await getAccountAndIdentity(
+        config.token,
+        session.apiUrl,
+        accountId,
+        config.from,
+    );
+
+    const res = await fetch(session.apiUrl, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${config.token}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            using: [
+                "urn:ietf:params:jmap:core",
+                "urn:ietf:params:jmap:mail",
+                "urn:ietf:params:jmap:submission",
+            ],
+            methodCalls: [
+                // 1. Create draft email
+                [
+                    "Email/set",
+                    {
+                        accountId,
+                        create: {
+                            draft: {
+                                from: [{ name: "博客评论通知", email: config.from }],
+                                to: [to],
+                                subject,
+                                htmlBody: [{ partId: "body", type: "text/html" }],
+                                bodyValues: { body: { value: htmlBody } },
+                                keywords: { $draft: true },
+                            },
+                        },
+                    },
+                    "email0",
+                ],
+                // 2. Submit (send) the draft
+                [
+                    "EmailSubmission/set",
+                    {
+                        accountId,
+                        create: {
+                            send: {
+                                emailId: "#draft",
+                                identityId,
+                            },
+                        },
+                        // Auto-delete draft after sending
+                        onSuccessDestroyEmail: ["#send"],
+                    },
+                    "submit0",
+                ],
+            ],
+        }),
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`JMAP send failed: ${res.status} ${text}`);
+    }
+
+    const data = (await res.json()) as {
+        methodResponses: [string, { notCreated?: Record<string, unknown> }, string][];
+    };
+
+    // Check for creation errors
+    for (const [method, result] of data.methodResponses) {
+        if (result.notCreated && Object.keys(result.notCreated).length > 0) {
+            throw new Error(`JMAP ${method} failed: ${JSON.stringify(result.notCreated)}`);
+        }
+    }
 }
 
 function buildEmailHtml({
@@ -113,7 +257,7 @@ function buildEmailHtml({
 }
 
 export async function notifyCommentReply(
-    emailBinding: SendEmail,
+    config: JmapConfig,
     options: NotifyReplyOptions,
 ): Promise<void> {
     const {
@@ -138,25 +282,13 @@ export async function notifyCommentReply(
         postUrl,
     });
 
-    // Build raw MIME email
-    const rawEmail = [
-        `From: =?UTF-8?B?${utf8ToBase64("博客评论通知")}?= <noreply@niracler.com>`,
-        `To: ${recipientEmail}`,
-        `Subject: =?UTF-8?B?${utf8ToBase64(subject)}?=`,
-        `MIME-Version: 1.0`,
-        `Content-Type: text/html; charset=utf-8`,
-        `Content-Transfer-Encoding: base64`,
-        ``,
-        utf8ToBase64(htmlBody),
-    ].join("\r\n");
-
     try {
-        const msg = new EmailMessage(
-            "noreply@niracler.com",
-            recipientEmail,
-            new TextEncoder().encode(rawEmail),
+        await sendViaJmap(
+            config,
+            { name: recipientName, email: recipientEmail },
+            subject,
+            htmlBody,
         );
-        await emailBinding.send(msg);
     } catch (error) {
         console.error("Failed to send email notification:", error);
     }
