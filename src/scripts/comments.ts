@@ -70,6 +70,12 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         loadFailed: "评论加载失败",
         reload: "重新加载",
         loginFailed: "登录失败，请稍后重试",
+        setEmail: "设置邮箱",
+        editEmail: "修改邮箱",
+        emailLabel: "通知邮箱",
+        emailSaving: "保存中...",
+        emailSaveFailed: "保存失败",
+        emailPlaceholderNotify: "用于回复通知的邮箱",
     },
     en: {
         justNow: "just now",
@@ -127,6 +133,12 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         loadFailed: "Failed to load comments",
         reload: "Reload",
         loginFailed: "Login failed, please try again",
+        setEmail: "Set email",
+        editEmail: "Edit email",
+        emailLabel: "Notify email",
+        emailSaving: "Saving...",
+        emailSaveFailed: "Save failed",
+        emailPlaceholderNotify: "Email for reply notifications",
     },
 };
 
@@ -156,6 +168,7 @@ interface CommentNode {
     user_id: string | null;
     avatar_url: string | null;
     is_admin: boolean;
+    user_email?: string | null;
     replies: CommentNode[];
 }
 
@@ -324,6 +337,18 @@ async function setCommentPinned(
     return res.json();
 }
 
+async function setUserEmail(
+    userId: string,
+    email: string | null,
+): Promise<{ success?: boolean; email?: string | null; error?: string }> {
+    const res = await fetch(`/api/users/${encodeURIComponent(userId)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+    });
+    return res.json();
+}
+
 // --- Time formatting ---
 
 function formatTime(iso: string): string {
@@ -447,6 +472,14 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						</button>`
         : "";
 
+    // Admin-only: email management for OAuth users
+    const isEmailEditable = Boolean(isAdminUser) && comment.user_id && comment.status !== "deleted";
+    const emailDisplay = isEmailEditable
+        ? comment.user_email
+            ? `<span class="comment-email-display" title="${ct("emailLabel")}">📧 ${escapeHtml(comment.user_email)}</span> <button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${ct("editEmail")}</button>`
+            : `<button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="">${ct("setEmail")}</button>`
+        : "";
+
     return `
 		<div class="comment-card${replyClass}" data-comment-id="${comment.id}">
 			<div style="display:flex;gap:0.75rem">
@@ -479,6 +512,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						</button>
 						${pinBtn}
 						${editBtn}
+						${emailDisplay}
 					</div>
 				</div>
 			</div>
@@ -908,32 +942,85 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
 
     container.addEventListener("click", async (e) => {
         const target = e.target as HTMLElement;
+
+        // Handle pin button
         const pinBtn = target.closest<HTMLButtonElement>(".comment-pin-btn");
-        if (!pinBtn) {
+        if (pinBtn) {
+            e.preventDefault();
+            const commentId = pinBtn.dataset.pinId ?? "";
+            const currentlyPinned = pinBtn.dataset.pinState === "1";
+
+            pinBtn.disabled = true;
+            pinBtn.textContent = currentlyPinned ? ct("unpinning") : ct("pinning");
+
+            try {
+                const result = await setCommentPinned(commentId, !currentlyPinned);
+                if (result.error) {
+                    console.error("Pin failed:", result.error);
+                    pinBtn.disabled = false;
+                    pinBtn.textContent = currentlyPinned ? ct("unpinAction") : ct("pinAction");
+                    return;
+                }
+
+                await loadComments(container, slug);
+            } catch {
+                console.error("Pin operation failed");
+                pinBtn.disabled = false;
+                pinBtn.textContent = currentlyPinned ? ct("unpinAction") : ct("pinAction");
+            }
             return;
         }
 
-        e.preventDefault();
-        const commentId = pinBtn.dataset.pinId ?? "";
-        const currentlyPinned = pinBtn.dataset.pinState === "1";
+        // Handle email button — toggle inline email input
+        const emailBtn = target.closest<HTMLButtonElement>(".comment-email-btn");
+        if (emailBtn) {
+            e.preventDefault();
+            const userId = emailBtn.dataset.emailUser ?? "";
+            const currentEmail = emailBtn.dataset.emailCurrent ?? "";
+            const actionsDiv = emailBtn.closest(".comment-actions");
+            if (!actionsDiv) return;
 
-        pinBtn.disabled = true;
-        pinBtn.textContent = currentlyPinned ? ct("unpinning") : ct("pinning");
+            // Remove any existing email form
+            actionsDiv.querySelector(".comment-email-form")?.remove();
 
-        try {
-            const result = await setCommentPinned(commentId, !currentlyPinned);
-            if (result.error) {
-                console.error("Pin failed:", result.error);
-                pinBtn.disabled = false;
-                pinBtn.textContent = currentlyPinned ? ct("unpinAction") : ct("pinAction");
-                return;
-            }
+            const formHtml = `<div class="comment-email-form" style="display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;width:100%">
+                <input type="email" class="comment-email-input" value="${currentEmail}" placeholder="${ct("emailPlaceholderNotify")}" style="flex:1;padding:4px 8px;border:1px solid var(--color-border);border-radius:4px;font-size:13px;background:var(--color-bg-surface);color:var(--color-text-primary)">
+                <button class="comment-email-save" style="padding:4px 12px;font-size:13px;border-radius:4px;background:var(--color-text-primary);color:var(--color-bg-surface);border:none;cursor:pointer">${ct("save")}</button>
+                <button class="comment-email-cancel" style="padding:4px 8px;font-size:13px;cursor:pointer;background:none;border:none;color:var(--color-text-muted)">${ct("cancel")}</button>
+            </div>`;
+            actionsDiv.insertAdjacentHTML("beforeend", formHtml);
 
-            await loadComments(container, slug);
-        } catch {
-            console.error("Pin operation failed");
-            pinBtn.disabled = false;
-            pinBtn.textContent = currentlyPinned ? ct("unpinAction") : ct("pinAction");
+            const input = actionsDiv.querySelector<HTMLInputElement>(".comment-email-input");
+            input?.focus();
+
+            // Save handler
+            const saveBtn = actionsDiv.querySelector<HTMLButtonElement>(".comment-email-save");
+            saveBtn?.addEventListener("click", async () => {
+                const email = input?.value.trim() || null;
+                saveBtn.disabled = true;
+                saveBtn.textContent = ct("emailSaving");
+
+                try {
+                    const result = await setUserEmail(userId, email);
+                    if (result.error) {
+                        console.error("Email save failed:", result.error);
+                        saveBtn.textContent = ct("emailSaveFailed");
+                        saveBtn.disabled = false;
+                        return;
+                    }
+                    await loadComments(container, slug);
+                } catch {
+                    saveBtn.textContent = ct("emailSaveFailed");
+                    saveBtn.disabled = false;
+                }
+            });
+
+            // Cancel handler
+            actionsDiv.querySelector(".comment-email-cancel")?.addEventListener("click", () => {
+                actionsDiv.querySelector(".comment-email-form")?.remove();
+            });
+
+            return;
         }
     });
 }

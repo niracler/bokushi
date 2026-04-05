@@ -38,6 +38,7 @@ interface CommentRow {
     user_name: string | null;
     user_avatar: string | null;
     user_role: string | null;
+    user_email: string | null;
 }
 
 interface CommentNode {
@@ -53,6 +54,7 @@ interface CommentNode {
     user_id: string | null;
     avatar_url: string | null;
     is_admin: boolean;
+    user_email?: string | null;
     replies: CommentNode[];
 }
 
@@ -70,6 +72,7 @@ function toTimestamp(iso: string): number {
 async function buildCommentTree(
     rows: CommentRow[],
     sortOrder: CommentSortOrder,
+    isAdminRequest = false,
 ): Promise<{ comments: CommentNode[]; total: number }> {
     const topLevel: CommentNode[] = [];
     const repliesByParent = new Map<string, CommentNode[]>();
@@ -101,6 +104,7 @@ async function buildCommentTree(
             user_id: isDeleted ? null : row.user_id,
             avatar_url: isDeleted ? null : row.user_avatar,
             is_admin: !isDeleted && row.user_role === "admin",
+            ...(isAdminRequest && row.user_id && !isDeleted ? { user_email: row.user_email } : {}),
             replies: [],
         };
 
@@ -150,17 +154,26 @@ export const GET: APIRoute = async ({ request, locals }) => {
         return jsonResponse({ error: "Missing slug parameter" }, 400);
     }
 
-    const db = locals.runtime?.env?.COMMENTS_DB;
+    const env = locals.runtime?.env;
+    const db = env?.COMMENTS_DB;
 
     // Mock fallback for local dev without D1
     if (!db) {
         return jsonResponse({ comments: [], total: 0 });
     }
 
+    // Check if requester is admin (optional, for user_email visibility)
+    let isAdminRequest = false;
+    if (env?.SESSIONS) {
+        const sessionUser = await getSessionUser(db, env.SESSIONS, request);
+        isAdminRequest = sessionUser?.role === "admin";
+    }
+
     try {
         const { results } = await db
             .prepare(
-                `SELECT c.*, u.name AS user_name, u.avatar_url AS user_avatar, u.role AS user_role
+                `SELECT c.*, u.name AS user_name, u.avatar_url AS user_avatar,
+                        u.role AS user_role, u.email AS user_email
 				 FROM comments c
 				 LEFT JOIN users u ON c.user_id = u.id
 				 WHERE c.slug = ? AND c.status IN ('visible', 'deleted')
@@ -169,7 +182,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
             .bind(slug)
             .all<CommentRow>();
 
-        return jsonResponse(await buildCommentTree(results ?? [], sortOrder), 200, {
+        return jsonResponse(await buildCommentTree(results ?? [], sortOrder, isAdminRequest), 200, {
             "Cache-Control": "public, max-age=0, stale-while-revalidate=30",
         });
     } catch (error) {
@@ -287,11 +300,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
             email: string | null;
             user_id: string | null;
             user_name: string | null;
+            user_email: string | null;
         } | null = null;
         if (parentId) {
             parentRow = await db
                 .prepare(
-                    `SELECT c.author, c.content, c.email, c.user_id, u.name AS user_name
+                    `SELECT c.author, c.content, c.email, c.user_id,
+                            u.name AS user_name, u.email AS user_email
                      FROM comments c LEFT JOIN users u ON c.user_id = u.id
                      WHERE c.id = ? AND c.slug = ? AND c.status = 'visible'`,
                 )
@@ -302,6 +317,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                     email: string | null;
                     user_id: string | null;
                     user_name: string | null;
+                    user_email: string | null;
                 }>();
 
             if (!parentRow) {
@@ -350,12 +366,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
             }
         }
 
-        // Email notification for replies
-        if (parentId && env?.EMAIL && parentRow?.email) {
+        // Email notification for replies (fallback to users.email for OAuth users)
+        const recipientEmail = parentRow?.email || parentRow?.user_email;
+        if (parentId && env?.EMAIL && parentRow && recipientEmail) {
             const parentName = parentRow.user_name || parentRow.author;
 
             const emailPromise = notifyCommentReply(env.EMAIL, {
-                recipientEmail: parentRow.email,
+                recipientEmail,
                 recipientName: parentName,
                 replyAuthor: author,
                 replyContent: content,

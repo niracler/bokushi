@@ -430,7 +430,8 @@ const heading = locale === "en" ? "Comments" : "评论";
 
     .comment-reply-btn,
     .comment-edit-btn,
-    .comment-pin-btn {
+    .comment-pin-btn,
+    .comment-email-btn {
         border: none;
         background: none;
         padding: var(--space-1) 0;
@@ -442,12 +443,28 @@ const heading = locale === "en" ? "Comments" : "评论";
 
     .comment-reply-btn:hover,
     .comment-edit-btn:hover,
-    .comment-pin-btn:hover {
+    .comment-pin-btn:hover,
+    .comment-email-btn:hover {
         color: var(--color-accent);
     }
 
     .comment-pin-btn {
         color: color-mix(in srgb, var(--color-accent) 80%, var(--color-text-muted) 20%);
+    }
+
+    /* Email display (admin only) */
+    .comment-email-display {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+        opacity: 0.7;
+    }
+
+    .comment-email-btn {
+        color: color-mix(in srgb, var(--color-accent) 60%, var(--color-text-muted) 40%);
+    }
+
+    .comment-actions {
+        flex-wrap: wrap;
     }
 
     /* Edited indicator */
