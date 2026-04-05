@@ -168,6 +168,7 @@ interface CommentNode {
     user_id: string | null;
     avatar_url: string | null;
     is_admin: boolean;
+    email?: string | null;
     user_email?: string | null;
     replies: CommentNode[];
 }
@@ -349,6 +350,19 @@ async function setUserEmail(
     return res.json();
 }
 
+async function setAnonEmail(
+    author: string,
+    website: string | null,
+    email: string | null,
+): Promise<{ success?: boolean; updated?: number; error?: string }> {
+    const res = await fetch("/api/comments/email-batch", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ author, website: website || null, email }),
+    });
+    return res.json();
+}
+
 // --- Time formatting ---
 
 function formatTime(iso: string): string {
@@ -472,13 +486,29 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						</button>`
         : "";
 
-    // Admin-only: email management for OAuth users
-    const isEmailEditable = Boolean(isAdminUser) && comment.user_id && comment.status !== "deleted";
-    const emailDisplay = isEmailEditable
-        ? comment.user_email
-            ? `<span class="comment-email-display" title="${ct("emailLabel")}">📧 ${escapeHtml(comment.user_email)}</span> <button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${ct("editEmail")}</button>`
-            : `<button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="">${ct("setEmail")}</button>`
-        : "";
+    // Admin-only: email management for OAuth users (excluding self) and anonymous commenters
+    const isOAuthOther = comment.user_id && comment.user_id !== currentUser?.id;
+    const isAnonWithoutEmail = !comment.user_id && !comment.email;
+    const isEmailEditable =
+        Boolean(isAdminUser) &&
+        (isOAuthOther || isAnonWithoutEmail) &&
+        comment.status !== "deleted";
+
+    let emailDisplay = "";
+    if (isEmailEditable) {
+        if (comment.user_id) {
+            // OAuth user: show/set users.email
+            emailDisplay = comment.user_email
+                ? `<span class="comment-email-display" title="${ct("emailLabel")}">📧 ${escapeHtml(comment.user_email)}</span> <button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${ct("editEmail")}</button>`
+                : `<button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="">${ct("setEmail")}</button>`;
+        } else {
+            // Anonymous: batch set comments.email by author+website
+            emailDisplay = `<button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="">${ct("setEmail")}</button>`;
+        }
+    } else if (Boolean(isAdminUser) && !comment.user_id && comment.email) {
+        // Anonymous with email already set: show indicator
+        emailDisplay = `<span class="comment-email-display" title="${ct("emailLabel")}">📧</span>`;
+    }
 
     return `
 		<div class="comment-card${replyClass}" data-comment-id="${comment.id}">
@@ -971,11 +1001,14 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
             return;
         }
 
-        // Handle email button — toggle inline email input
+        // Handle email button — toggle inline email input (OAuth or anonymous)
         const emailBtn = target.closest<HTMLButtonElement>(".comment-email-btn");
         if (emailBtn) {
             e.preventDefault();
+            const isAnon = emailBtn.dataset.emailAnon === "1";
             const userId = emailBtn.dataset.emailUser ?? "";
+            const anonAuthor = emailBtn.dataset.emailAuthor ?? "";
+            const anonWebsite = emailBtn.dataset.emailWebsite ?? "";
             const currentEmail = emailBtn.dataset.emailCurrent ?? "";
             const actionsDiv = emailBtn.closest(".comment-actions");
             if (!actionsDiv) return;
@@ -993,7 +1026,7 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
             const input = actionsDiv.querySelector<HTMLInputElement>(".comment-email-input");
             input?.focus();
 
-            // Save handler
+            // Save handler — dispatch to the right API
             const saveBtn = actionsDiv.querySelector<HTMLButtonElement>(".comment-email-save");
             saveBtn?.addEventListener("click", async () => {
                 const email = input?.value.trim() || null;
@@ -1001,7 +1034,9 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
                 saveBtn.textContent = ct("emailSaving");
 
                 try {
-                    const result = await setUserEmail(userId, email);
+                    const result = isAnon
+                        ? await setAnonEmail(anonAuthor, anonWebsite || null, email)
+                        : await setUserEmail(userId, email);
                     if (result.error) {
                         console.error("Email save failed:", result.error);
                         saveBtn.textContent = ct("emailSaveFailed");

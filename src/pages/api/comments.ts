@@ -104,7 +104,12 @@ async function buildCommentTree(
             user_id: isDeleted ? null : row.user_id,
             avatar_url: isDeleted ? null : row.user_avatar,
             is_admin: !isDeleted && row.user_role === "admin",
-            ...(isAdminRequest && row.user_id && !isDeleted ? { user_email: row.user_email } : {}),
+            ...(isAdminRequest && !isDeleted
+                ? {
+                      ...(row.user_id ? { user_email: row.user_email } : {}),
+                      ...(!row.user_id ? { email: row.email } : {}),
+                  }
+                : {}),
             replies: [],
         };
 
