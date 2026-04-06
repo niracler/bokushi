@@ -231,9 +231,15 @@ function renderMarkdown(raw: string): string {
 
 // --- Avatar helpers ---
 
+/** Route external image through /api/image-proxy for CDN caching. */
+function proxied(url: string): string {
+    if (!url) return "";
+    return `/api/image-proxy?url=${encodeURIComponent(url)}`;
+}
+
 function gravatarUrl(hash: string | null): string {
     if (!hash) return "";
-    return `https://www.gravatar.com/avatar/${hash}?d=404&s=48`;
+    return proxied(`https://www.gravatar.com/avatar/${hash}?d=404&s=48`);
 }
 
 /** Mask email for display: "lowbee.icu@outlook.com" → "low***@outlook.com" */
@@ -245,14 +251,16 @@ function maskEmail(email: string): string {
 }
 
 function dicebearUrl(name: string): string {
-    return `https://api.dicebear.com/9.x/bottts-neutral/svg?seed=${encodeURIComponent(name)}`;
+    return proxied(
+        `https://api.dicebear.com/9.x/bottts-neutral/svg?seed=${encodeURIComponent(name)}`,
+    );
 }
 
 function faviconUrl(website: string | null): string {
     if (!website) return "";
     try {
         const { hostname } = new URL(website);
-        return `https://www.google.com/s2/favicons?domain=${hostname}&sz=48`;
+        return proxied(`https://www.google.com/s2/favicons?domain=${hostname}&sz=48`);
     } catch {
         return "";
     }
@@ -437,7 +445,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 
     if (comment.avatar_url) {
         // OAuth user
-        avatarSrc = comment.avatar_url;
+        avatarSrc = proxied(comment.avatar_url);
         fallbacks = [dicebearUrl(comment.author)];
     } else if (comment.gravatar_hash) {
         // Anonymous with email
@@ -608,8 +616,8 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 
     if (currentUser) {
         const avatarSrc = currentUser.avatar_url
-            ? escapeHtml(currentUser.avatar_url)
-            : "https://www.gravatar.com/avatar/?d=mp&s=48";
+            ? escapeHtml(proxied(currentUser.avatar_url))
+            : proxied("https://www.gravatar.com/avatar/?d=mp&s=48");
         const adminBadge =
             currentUser.role === "admin" ? ` <span class="comment-badge">Admin</span>` : "";
 

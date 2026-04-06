@@ -20,6 +20,11 @@ const ALLOWED_HOSTS = new Set([
     "telesco.pe",
     "t.me",
     "telegram.org",
+    // Avatar providers for comment section
+    "www.gravatar.com",
+    "api.dicebear.com",
+    "avatars.githubusercontent.com",
+    "www.google.com",
 ]);
 
 function isAllowedUrl(raw: string): boolean {
