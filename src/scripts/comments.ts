@@ -78,6 +78,11 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         emailPlaceholderNotify: "用于回复通知的邮箱",
         emailSent: "已通知",
         emailFailed: "通知失败",
+        restore: "恢复",
+        restoring: "恢复中...",
+        deletedAdmin: "已删除",
+        deleteComment: "删除",
+        deleting: "删除中...",
     },
     en: {
         justNow: "just now",
@@ -143,6 +148,11 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         emailPlaceholderNotify: "Email for reply notifications",
         emailSent: "Notified",
         emailFailed: "Notify failed",
+        restore: "Restore",
+        restoring: "Restoring...",
+        deletedAdmin: "Deleted",
+        deleteComment: "Delete",
+        deleting: "Deleting...",
     },
 };
 
@@ -434,9 +444,34 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
     const replyClass = isReply ? " comment-card--reply" : "";
 
     if (comment.status === "deleted") {
+        const isAdminUser = currentUser?.role === "admin";
+        if (!isAdminUser || !comment.content) {
+            // Non-admin or no content: show placeholder
+            return `
+				<div class="comment-card comment-card--deleted${replyClass}">
+					<p style="font-style:italic;font-size:var(--font-size-sm);color:var(--color-text-muted)">${ct("deleted")}</p>
+				</div>`;
+        }
+        // Admin: show full content with restore option
+        const deletedContent = renderMarkdown(comment.content);
+        const authorEl = createAuthorEl(comment);
+        const time = formatTime(comment.created_at);
         return `
-			<div class="comment-card comment-card--deleted${replyClass}">
-				<p style="font-style:italic;font-size:var(--font-size-sm);color:var(--color-text-muted)">${ct("deleted")}</p>
+			<div class="comment-card comment-card--deleted-admin${replyClass}" data-comment-id="${comment.id}">
+				<div style="display:flex;gap:0.75rem">
+					<div style="min-width:0;flex:1">
+						<div class="comment-header">
+							${authorEl}
+							<span class="comment-badge" style="background:color-mix(in srgb, #ef4444 14%, transparent);color:#ef4444">${ct("deletedAdmin")}</span>
+							<span class="comment-time-sep" style="color:var(--color-text-muted);opacity:0.4">·</span>
+							<time class="comment-time" datetime="${comment.created_at}">${time}</time>
+						</div>
+						<div class="comment-body" style="opacity:0.5">${deletedContent}</div>
+						<div class="comment-actions">
+							<button class="comment-restore-btn" data-restore-id="${comment.id}">${ct("restore")}</button>
+						</div>
+					</div>
+				</div>
 			</div>`;
     }
 
@@ -507,6 +542,11 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						</button>`
         : "";
 
+    const deleteBtn =
+        Boolean(isAdminUser) && comment.status !== "deleted"
+            ? `<button class="comment-delete-btn" data-delete-id="${comment.id}">${ct("deleteComment")}</button>`
+            : "";
+
     // Admin-only: email management for OAuth users (excluding self) and anonymous commenters
     const isOAuthOther = comment.user_id && comment.user_id !== currentUser?.id;
     const isAnon = !comment.user_id;
@@ -563,6 +603,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						${pinBtn}
 						${editBtn}
 						${emailBtn}
+						${deleteBtn}
 					</div>
 				</div>
 			</div>
@@ -1075,6 +1116,56 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
                 actionsDiv.querySelector(".comment-email-form")?.remove();
             });
 
+            return;
+        }
+
+        // Handle delete button (soft delete)
+        const deleteBtn = target.closest<HTMLButtonElement>(".comment-delete-btn");
+        if (deleteBtn) {
+            e.preventDefault();
+            const commentId = deleteBtn.dataset.deleteId ?? "";
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = ct("deleting");
+
+            try {
+                const res = await fetch(`/api/comments/${commentId}`, { method: "DELETE" });
+                if (res.ok) {
+                    await loadComments(container, slug);
+                } else {
+                    deleteBtn.disabled = false;
+                    deleteBtn.textContent = ct("deleteComment");
+                }
+            } catch {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = ct("deleteComment");
+            }
+            return;
+        }
+
+        // Handle restore button (un-delete)
+        const restoreBtn = target.closest<HTMLButtonElement>(".comment-restore-btn");
+        if (restoreBtn) {
+            e.preventDefault();
+            const commentId = restoreBtn.dataset.restoreId ?? "";
+            restoreBtn.disabled = true;
+            restoreBtn.textContent = ct("restoring");
+
+            try {
+                const res = await fetch(`/api/comments/${commentId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status: "visible" }),
+                });
+                if (res.ok) {
+                    await loadComments(container, slug);
+                } else {
+                    restoreBtn.disabled = false;
+                    restoreBtn.textContent = ct("restore");
+                }
+            } catch {
+                restoreBtn.disabled = false;
+                restoreBtn.textContent = ct("restore");
+            }
             return;
         }
     });

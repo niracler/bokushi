@@ -475,6 +475,19 @@ const heading = locale === "en" ? "Comments" : "评论";
         color: color-mix(in srgb, var(--color-accent) 60%, var(--color-text-muted) 40%);
     }
 
+    .comment-card--deleted-admin {
+        border-left: 2px solid color-mix(in srgb, #ef4444 30%, transparent);
+        padding-left: var(--space-3);
+    }
+
+    .comment-delete-btn {
+        color: color-mix(in srgb, #ef4444 60%, var(--color-text-muted) 40%);
+    }
+
+    .comment-restore-btn {
+        color: color-mix(in srgb, #22c55e 70%, var(--color-text-muted) 30%);
+    }
+
     .comment-email-sent {
         font-size: var(--font-size-2xs);
         color: #22c55e;

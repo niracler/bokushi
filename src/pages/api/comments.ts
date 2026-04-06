@@ -92,21 +92,23 @@ async function buildCommentTree(
     for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         const isDeleted = row.status === "deleted";
+        // Admin can see full content of deleted comments for moderation
+        const hideContent = isDeleted && !isAdminRequest;
         const gravatarHash = gravatarHashes[i];
         const node: CommentNode = {
             id: row.id,
-            author: isDeleted ? "" : row.user_name || row.author,
+            author: hideContent ? "" : row.user_name || row.author,
             gravatar_hash: gravatarHash,
-            website: isDeleted ? null : row.website,
-            content: isDeleted ? "" : row.content,
+            website: hideContent ? null : row.website,
+            content: hideContent ? "" : row.content,
             status: row.status,
             created_at: row.created_at,
             updated_at: row.updated_at,
             is_pinned: !isDeleted && !row.parent_id && row.is_pinned === 1,
-            user_id: isDeleted ? null : row.user_id,
-            avatar_url: isDeleted ? null : row.user_avatar,
+            user_id: hideContent ? null : row.user_id,
+            avatar_url: hideContent ? null : row.user_avatar,
             is_admin: !isDeleted && row.user_role === "admin",
-            ...(isAdminRequest && !isDeleted
+            ...(isAdminRequest && !hideContent
                 ? {
                       ...(row.user_id ? { user_email: row.user_email } : {}),
                       ...(!row.user_id ? { email: row.email } : {}),
