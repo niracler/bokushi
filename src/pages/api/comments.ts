@@ -208,6 +208,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const body = (await request.json()) as {
             slug?: string;
             parent_id?: string | null;
+            reply_to?: string | null;
             author?: string;
             email?: string;
             website?: string;
@@ -279,6 +280,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const parentId =
             typeof body.parent_id === "string" && body.parent_id.trim().length > 0
                 ? body.parent_id.trim()
+                : null;
+        // reply_to: the actual comment being replied to (may differ from parent_id for nested replies)
+        const replyTo =
+            typeof body.reply_to === "string" && body.reply_to.trim().length > 0
+                ? body.reply_to.trim()
                 : null;
 
         // Mock fallback for local dev
@@ -374,10 +380,32 @@ export const POST: APIRoute = async ({ request, locals }) => {
             }
         }
 
-        // Email notification for replies (fallback to users.email for OAuth users)
-        const recipientEmail = parentRow?.email || parentRow?.user_email;
-        if (parentId && env?.FASTMAIL_API_TOKEN && parentRow && recipientEmail) {
-            const parentName = parentRow.user_name || parentRow.author;
+        // Email notification: notify the actual reply target (reply_to or parent)
+        // For nested replies, reply_to points to the specific comment being replied to,
+        // while parent_id always points to the top-level comment (flat tree structure).
+        const notifyTargetId = replyTo || parentId;
+        let notifyRow = notifyTargetId === parentId ? parentRow : null;
+        if (notifyTargetId && notifyTargetId !== parentId && db) {
+            notifyRow = await db
+                .prepare(
+                    `SELECT c.author, c.content, c.email, c.user_id,
+                            u.name AS user_name, u.email AS user_email
+                     FROM comments c LEFT JOIN users u ON c.user_id = u.id
+                     WHERE c.id = ? AND c.slug = ? AND c.status = 'visible'`,
+                )
+                .bind(notifyTargetId, slug)
+                .first<{
+                    author: string;
+                    content: string;
+                    email: string | null;
+                    user_id: string | null;
+                    user_name: string | null;
+                    user_email: string | null;
+                }>();
+        }
+        const recipientEmail = notifyRow?.email || notifyRow?.user_email;
+        if (notifyTargetId && env?.FASTMAIL_API_TOKEN && notifyRow && recipientEmail) {
+            const targetName = notifyRow.user_name || notifyRow.author;
             const jmapConfig = {
                 token: env.FASTMAIL_API_TOKEN,
                 from: env.NOTIFY_FROM_EMAIL || "noreply@niracler.com",
@@ -386,10 +414,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
             // Send email then update delivery status in DB
             const emailAndTrack = notifyCommentReply(jmapConfig, {
                 recipientEmail,
-                recipientName: parentName,
+                recipientName: targetName,
                 replyAuthor: author,
                 replyContent: content,
-                parentContent: parentRow.content,
+                parentContent: notifyRow.content,
                 postTitle: body.post_title?.trim() || slug,
                 postSlug: slug,
             })

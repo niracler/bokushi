@@ -1103,6 +1103,7 @@ function bindEvents(container: HTMLElement, slug: string) {
 
             e.preventDefault();
             const parentId = replyBtn.dataset.replyParent ?? "";
+            const replyTo = replyBtn.dataset.replyTo ?? "";
             const replyAuthor = replyBtn.dataset.replyAuthor ?? "";
 
             for (const f of container.querySelectorAll(
@@ -1118,6 +1119,12 @@ function bindEvents(container: HTMLElement, slug: string) {
             const thread = card.closest(".comment-thread");
             const insertTarget = thread || card;
             insertTarget.insertAdjacentHTML("afterend", formHtml);
+
+            // Store the actual reply target (may differ from parent_id for nested replies)
+            const newFormEl = insertTarget.nextElementSibling as HTMLFormElement;
+            if (newFormEl && replyTo !== parentId) {
+                newFormEl.dataset.replyTo = replyTo;
+            }
 
             const newForm = insertTarget.nextElementSibling as HTMLFormElement;
             newForm?.querySelector("textarea")?.focus();
@@ -1170,11 +1177,13 @@ function bindFormSubmit(form: HTMLFormElement, slug: string, container: HTMLElem
             }
         }
 
+        const replyTo = form.dataset.replyTo || null;
         const postData: Record<string, string | null> = {
             slug,
             parent_id: parentId,
             content,
             post_title: document.title,
+            ...(replyTo ? { reply_to: replyTo } : {}),
         };
 
         if (!currentUser) {
