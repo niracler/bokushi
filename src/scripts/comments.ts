@@ -231,6 +231,14 @@ function gravatarUrl(hash: string | null): string {
     return `https://www.gravatar.com/avatar/${hash}?d=404&s=48`;
 }
 
+/** Mask email for display: "lowbee.icu@outlook.com" → "low***@outlook.com" */
+function maskEmail(email: string): string {
+    const [local, domain] = email.split("@");
+    if (!domain) return "***";
+    const visible = local.slice(0, Math.min(3, local.length));
+    return `${visible}***@${domain}`;
+}
+
 function dicebearUrl(name: string): string {
     return `https://api.dicebear.com/9.x/bottts-neutral/svg?seed=${encodeURIComponent(name)}`;
 }
@@ -497,12 +505,12 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
         if (comment.user_id) {
             // OAuth user: show/set users.email
             emailDisplay = comment.user_email
-                ? `<span class="comment-email-display" title="${ct("emailLabel")}">${escapeHtml(comment.user_email)}</span> <button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${ct("editEmail")}</button>`
+                ? `<span class="comment-email-display" title="${ct("emailLabel")}">${maskEmail(comment.user_email)}</span> <button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${ct("editEmail")}</button>`
                 : `<button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="">${ct("setEmail")}</button>`;
         } else {
             // Anonymous: batch set comments.email by author+website
             emailDisplay = comment.email
-                ? `<span class="comment-email-display" title="${ct("emailLabel")}">${escapeHtml(comment.email)}</span> <button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="${escapeHtml(comment.email || "")}">${ct("editEmail")}</button>`
+                ? `<span class="comment-email-display" title="${ct("emailLabel")}">${maskEmail(comment.email)}</span> <button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="${escapeHtml(comment.email || "")}">${ct("editEmail")}</button>`
                 : `<button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="">${ct("setEmail")}</button>`;
         }
     }
