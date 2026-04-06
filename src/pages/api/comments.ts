@@ -39,6 +39,7 @@ interface CommentRow {
     user_avatar: string | null;
     user_role: string | null;
     user_email: string | null;
+    email_notified: string | null;
 }
 
 interface CommentNode {
@@ -55,6 +56,7 @@ interface CommentNode {
     avatar_url: string | null;
     is_admin: boolean;
     user_email?: string | null;
+    email_notified?: string | null;
     replies: CommentNode[];
 }
 
@@ -108,6 +110,7 @@ async function buildCommentTree(
                 ? {
                       ...(row.user_id ? { user_email: row.user_email } : {}),
                       ...(!row.user_id ? { email: row.email } : {}),
+                      ...(row.email_notified ? { email_notified: row.email_notified } : {}),
                   }
                 : {}),
             replies: [],
@@ -380,7 +383,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 from: env.NOTIFY_FROM_EMAIL || "noreply@niracler.com",
             };
 
-            const emailPromise = notifyCommentReply(jmapConfig, {
+            // Send email then update delivery status in DB
+            const emailAndTrack = notifyCommentReply(jmapConfig, {
                 recipientEmail,
                 recipientName: parentName,
                 replyAuthor: author,
@@ -388,13 +392,26 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 parentContent: parentRow.content,
                 postTitle: body.post_title?.trim() || slug,
                 postSlug: slug,
-            });
+            })
+                .then(() =>
+                    db
+                        .prepare("UPDATE comments SET email_notified = 'sent' WHERE id = ?")
+                        .bind(id)
+                        .run(),
+                )
+                .catch(async (err) => {
+                    console.error("Email notification failed:", err);
+                    await db
+                        .prepare("UPDATE comments SET email_notified = 'failed' WHERE id = ?")
+                        .bind(id)
+                        .run();
+                });
 
             const ctx = locals.runtime?.ctx;
             if (ctx?.waitUntil) {
-                ctx.waitUntil(emailPromise);
+                ctx.waitUntil(emailAndTrack);
             } else {
-                await emailPromise;
+                await emailAndTrack;
             }
         }
 

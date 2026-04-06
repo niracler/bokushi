@@ -76,6 +76,8 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         emailSaving: "保存中...",
         emailSaveFailed: "保存失败",
         emailPlaceholderNotify: "用于回复通知的邮箱",
+        emailSent: "已通知",
+        emailFailed: "通知失败",
     },
     en: {
         justNow: "just now",
@@ -139,6 +141,8 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         emailSaving: "Saving...",
         emailSaveFailed: "Save failed",
         emailPlaceholderNotify: "Email for reply notifications",
+        emailSent: "Notified",
+        emailFailed: "Notify failed",
     },
 };
 
@@ -170,6 +174,7 @@ interface CommentNode {
     is_admin: boolean;
     email?: string | null;
     user_email?: string | null;
+    email_notified?: string | null;
     replies: CommentNode[];
 }
 
@@ -532,6 +537,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						<span class="comment-time-sep" style="color:var(--color-text-muted);opacity:0.4">·</span>
 						<time class="comment-time" datetime="${comment.created_at}">${time}</time>
 						${editedIndicator}
+						${comment.email_notified === "sent" ? `<span class="comment-email-sent" title="${ct("emailSent")}">✉</span>` : ""}${comment.email_notified === "failed" ? `<span class="comment-email-failed" title="${ct("emailFailed")}">✉</span>` : ""}
 					</div>
 					<div class="comment-body" data-comment-body="${comment.id}">
 						${contentHtml}
