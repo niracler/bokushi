@@ -488,26 +488,23 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 
     // Admin-only: email management for OAuth users (excluding self) and anonymous commenters
     const isOAuthOther = comment.user_id && comment.user_id !== currentUser?.id;
-    const isAnonWithoutEmail = !comment.user_id && !comment.email;
+    const isAnon = !comment.user_id;
     const isEmailEditable =
-        Boolean(isAdminUser) &&
-        (isOAuthOther || isAnonWithoutEmail) &&
-        comment.status !== "deleted";
+        Boolean(isAdminUser) && (isOAuthOther || isAnon) && comment.status !== "deleted";
 
     let emailDisplay = "";
     if (isEmailEditable) {
         if (comment.user_id) {
             // OAuth user: show/set users.email
             emailDisplay = comment.user_email
-                ? `<span class="comment-email-display" title="${ct("emailLabel")}">📧 ${escapeHtml(comment.user_email)}</span> <button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${ct("editEmail")}</button>`
+                ? `<span class="comment-email-display" title="${ct("emailLabel")}">${escapeHtml(comment.user_email)}</span> <button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${ct("editEmail")}</button>`
                 : `<button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="">${ct("setEmail")}</button>`;
         } else {
             // Anonymous: batch set comments.email by author+website
-            emailDisplay = `<button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="">${ct("setEmail")}</button>`;
+            emailDisplay = comment.email
+                ? `<span class="comment-email-display" title="${ct("emailLabel")}">${escapeHtml(comment.email)}</span> <button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="${escapeHtml(comment.email || "")}">${ct("editEmail")}</button>`
+                : `<button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="">${ct("setEmail")}</button>`;
         }
-    } else if (Boolean(isAdminUser) && !comment.user_id && comment.email) {
-        // Anonymous with email already set: show indicator
-        emailDisplay = `<span class="comment-email-display" title="${ct("emailLabel")}">📧</span>`;
     }
 
     return `
