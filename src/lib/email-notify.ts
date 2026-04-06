@@ -78,7 +78,7 @@ async function getAccountAndIdentity(
     return { accountId, identityId: match.id };
 }
 
-/** Send an email via JMAP: Email/set + EmailSubmission/set in one request. */
+/** Send an email via JMAP: two requests — (1) find Drafts mailbox, (2) create + submit. */
 async function sendViaJmap(
     config: JmapConfig,
     to: { name: string; email: string },
@@ -98,6 +98,30 @@ async function sendViaJmap(
         config.from,
     );
 
+    // Step 1: Find the Drafts mailbox ID (JMAP requires mailboxIds on Email/set)
+    const mboxRes = await fetch(session.apiUrl, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${config.token}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            using: ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:mail"],
+            methodCalls: [["Mailbox/query", { accountId, filter: { role: "drafts" } }, "mbox0"]],
+        }),
+    });
+    if (!mboxRes.ok) {
+        throw new Error(`JMAP Mailbox/query failed: ${mboxRes.status}`);
+    }
+    const mboxData = (await mboxRes.json()) as {
+        methodResponses: [string, { ids?: string[] }, string][];
+    };
+    const draftsId = mboxData.methodResponses?.[0]?.[1]?.ids?.[0];
+    if (!draftsId) {
+        throw new Error("Drafts mailbox not found");
+    }
+
+    // Step 2: Create email in Drafts + submit it in one request
     const res = await fetch(session.apiUrl, {
         method: "POST",
         headers: {
@@ -111,13 +135,13 @@ async function sendViaJmap(
                 "urn:ietf:params:jmap:submission",
             ],
             methodCalls: [
-                // 1. Create draft email
                 [
                     "Email/set",
                     {
                         accountId,
                         create: {
                             draft: {
+                                mailboxIds: { [draftsId]: true },
                                 from: [{ name: "博客评论通知", email: config.from }],
                                 to: [to],
                                 subject,
@@ -129,7 +153,6 @@ async function sendViaJmap(
                     },
                     "email0",
                 ],
-                // 2. Submit (send) the draft
                 [
                     "EmailSubmission/set",
                     {
@@ -140,7 +163,6 @@ async function sendViaJmap(
                                 identityId,
                             },
                         },
-                        // Auto-delete draft after sending
                         onSuccessDestroyEmail: ["#send"],
                     },
                     "submit0",
