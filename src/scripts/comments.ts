@@ -82,6 +82,7 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         restoring: "恢复中...",
         deletedAdmin: "已删除",
         deleteComment: "删除",
+        deleteConfirm: "确定要删除这条评论吗？（可以恢复）",
         deleting: "删除中...",
     },
     en: {
@@ -152,6 +153,7 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         restoring: "Restoring...",
         deletedAdmin: "Deleted",
         deleteComment: "Delete",
+        deleteConfirm: "Delete this comment? (can be restored)",
         deleting: "Deleting...",
     },
 };
@@ -1123,6 +1125,7 @@ function bindModerationEvents(container: HTMLElement, slug: string) {
         const deleteBtn = target.closest<HTMLButtonElement>(".comment-delete-btn");
         if (deleteBtn) {
             e.preventDefault();
+            if (!confirm(ct("deleteConfirm"))) return;
             const commentId = deleteBtn.dataset.deleteId ?? "";
             deleteBtn.disabled = true;
             deleteBtn.textContent = ct("deleting");
