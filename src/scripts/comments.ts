@@ -500,18 +500,18 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
     const isEmailEditable =
         Boolean(isAdminUser) && (isOAuthOther || isAnon) && comment.status !== "deleted";
 
-    let emailDisplay = "";
+    // Admin email: split into header badge (masked address) and action button
+    let emailBadge = "";
+    let emailBtn = "";
     if (isEmailEditable) {
+        const hasEmail = comment.user_id ? comment.user_email : comment.email;
+        if (hasEmail) {
+            emailBadge = `<span class="comment-email-display" title="${ct("emailLabel")}">${maskEmail(hasEmail)}</span>`;
+        }
         if (comment.user_id) {
-            // OAuth user: show/set users.email
-            emailDisplay = comment.user_email
-                ? `<span class="comment-email-display" title="${ct("emailLabel")}">${maskEmail(comment.user_email)}</span> <button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${ct("editEmail")}</button>`
-                : `<button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="">${ct("setEmail")}</button>`;
+            emailBtn = `<button class="comment-email-btn" data-email-user="${comment.user_id}" data-email-current="${escapeHtml(comment.user_email || "")}">${hasEmail ? ct("editEmail") : ct("setEmail")}</button>`;
         } else {
-            // Anonymous: batch set comments.email by author+website
-            emailDisplay = comment.email
-                ? `<span class="comment-email-display" title="${ct("emailLabel")}">${maskEmail(comment.email)}</span> <button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="${escapeHtml(comment.email || "")}">${ct("editEmail")}</button>`
-                : `<button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="">${ct("setEmail")}</button>`;
+            emailBtn = `<button class="comment-email-btn" data-email-anon="1" data-email-author="${escapeHtml(comment.author)}" data-email-website="${escapeHtml(comment.website || "")}" data-email-current="${escapeHtml(comment.email || "")}">${hasEmail ? ct("editEmail") : ct("setEmail")}</button>`;
         }
     }
 
@@ -528,6 +528,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 					<div class="comment-header">
 						${authorEl}
 						${pinBadge}
+						${emailBadge ? `<span class="comment-time-sep" style="color:var(--color-text-muted);opacity:0.4">·</span>${emailBadge}` : ""}
 						<span class="comment-time-sep" style="color:var(--color-text-muted);opacity:0.4">·</span>
 						<time class="comment-time" datetime="${comment.created_at}">${time}</time>
 						${editedIndicator}
@@ -547,7 +548,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 						</button>
 						${pinBtn}
 						${editBtn}
-						${emailDisplay}
+						${emailBtn}
 					</div>
 				</div>
 			</div>
