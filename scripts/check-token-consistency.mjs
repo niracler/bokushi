@@ -192,7 +192,7 @@ function checkMdxPost(filePath, tokens) {
                 const darkToken = tokens.get(darkKey);
                 if (darkToken && normalizeValue(darkToken.value) !== normalizeValue(darkVal)) {
                     mismatches.push({
-                        file: "design-primitives.mdx",
+                        file: "design.mdx",
                         token: token.name,
                         theme: "dark",
                         expected: darkToken.value,
@@ -217,7 +217,7 @@ function normalizeValue(val) {
 const tokensPath = resolve(ROOT, "src/styles/tokens.css");
 const designMdPath = resolve(ROOT, "DESIGN.md");
 const componentsDir = resolve(ROOT, "src/components/design");
-const mdxPath = resolve(ROOT, "src/content/blog/zh/design-primitives.mdx");
+const mdxPath = resolve(ROOT, "src/content/blog/zh/design.mdx");
 
 if (!existsSync(tokensPath)) {
     console.error("Error: tokens.css not found at", tokensPath);

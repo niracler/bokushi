@@ -38,7 +38,7 @@
 ## Design Reference
 
 - **Agent design spec**: `DESIGN.md` (root) — standardized 9-section format with all tokens, components, and usage guidelines. Read this first for any visual/styling work.
-- **Human design doc**: `src/content/blog/zh/design-primitives.md` — narrative design system article following Apple HIG structure.
+- **Human design doc**: `src/content/blog/zh/design.mdx` — narrative design system article following Apple HIG structure.
 - **Token source of truth**: `src/styles/tokens.css` — all CSS variables defined here.
 - Card components use `.surface-card` and its variants (`--soft`, `--flat`, `--compact`, `--hover-border`, `--hover-none`) defined in `src/styles/global.css`.
 - Hover effects should use color/border changes only; avoid `translateY` lift animations.
@@ -48,7 +48,7 @@
 - `check-font-coverage.py`: validates font subsetting
 - `astro check`: TypeScript/MDX type checking
 - `lint-staged`: Biome formatting and linting
-- `check-token-consistency.mjs`: **runs only when `tokens.css` is staged** — verifies that hardcoded hex values in `DESIGN.md`, showcase components (`src/components/design/*.astro`), and `design-primitives.mdx` match `tokens.css`. If it fails, update the stale values before committing.
+- `check-token-consistency.mjs`: **runs only when `tokens.css` is staged** — verifies that hardcoded hex values in `DESIGN.md`, showcase components (`src/components/design/*.astro`), and `design.mdx` match `tokens.css`. If it fails, update the stale values before committing.
 
 ## Configuration & Security Notes
 
