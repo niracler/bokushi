@@ -17,6 +17,7 @@ export const GET: APIRoute = async ({ request }) => {
     const params = new URL(request.url).searchParams;
     const type = params.get("type");
     const id = params.get("id");
+    const format = params.get("format");
 
     if (!type || !id || !VALID_TYPES.has(type)) {
         return new Response(JSON.stringify({ error: "Missing or invalid type/id parameter" }), {
@@ -43,9 +44,21 @@ export const GET: APIRoute = async ({ request }) => {
             case "url":
                 data = [{ url: await getSongUrl(id) }];
                 break;
-            case "lrc":
-                data = [{ lrc: await getSongLrc(id) }];
+            case "lrc": {
+                const lrcText = await getSongLrc(id);
+                if (format === "text") {
+                    return new Response(lrcText, {
+                        status: 200,
+                        headers: {
+                            "Content-Type": "text/plain; charset=utf-8",
+                            "Cache-Control": `public, max-age=${CACHE_TTL.lrc}`,
+                            "Access-Control-Allow-Origin": SITE_URL,
+                        },
+                    });
+                }
+                data = [{ lrc: lrcText }];
                 break;
+            }
         }
 
         return new Response(JSON.stringify(data), {

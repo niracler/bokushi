@@ -158,6 +158,6 @@ export async function getPlaylistDetail(id: string): Promise<MetingSong[]> {
         artist: track.ar.map((a) => a.name).join(" / "),
         pic: track.al.picUrl ?? "",
         url: urlMap[track.id] ?? "",
-        lrc: "",
+        lrc: `/api/meting?type=lrc&id=${track.id}&format=text`,
     }));
 }

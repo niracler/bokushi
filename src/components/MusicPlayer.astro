@@ -355,7 +355,7 @@ const playerId = `mp-${Math.random().toString(36).slice(2, 9)}`;
 
         private async loadLrc(source: string) {
             let text = source;
-            if (source.startsWith("http")) {
+            if (source.startsWith("http") || source.startsWith("/")) {
                 try { const res = await fetch(source); text = await res.text(); } catch { return; }
             }
 
