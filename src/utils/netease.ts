@@ -13,6 +13,10 @@ export interface MetingSong {
     lrc: string;
 }
 
+function httpsify(url: string): string {
+    return url.replace(/^http:\/\//, "https://");
+}
+
 // LinuxAPI AES key: hex "7246674226682325323F5E6544673A51" = "rFgB&h#%2?^eDg:Q"
 const LINUX_API_KEY = [
     0x72, 0x46, 0x67, 0x42, 0x26, 0x68, 0x23, 0x25, 0x32, 0x3f, 0x5e, 0x65, 0x44, 0x67, 0x3a, 0x51,
@@ -126,7 +130,7 @@ export async function getSongDetail(ids: string[]): Promise<MetingSong[]> {
     return songs.map((song, i) => ({
         title: song.name,
         artist: song.ar.map((a) => a.name).join(" / "),
-        pic: song.al.picUrl ?? "",
+        pic: httpsify(song.al.picUrl ?? ""),
         url: urlMap[song.id] ?? "",
         lrc: lyrics[i] ?? "",
     }));
@@ -156,7 +160,7 @@ export async function getPlaylistDetail(id: string): Promise<MetingSong[]> {
     return tracks.map((track) => ({
         title: track.name,
         artist: track.ar.map((a) => a.name).join(" / "),
-        pic: track.al.picUrl ?? "",
+        pic: httpsify(track.al.picUrl ?? ""),
         url: urlMap[track.id] ?? "",
         lrc: `/api/meting?type=lrc&id=${track.id}&format=text`,
     }));
