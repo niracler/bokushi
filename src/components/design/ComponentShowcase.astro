@@ -47,7 +47,7 @@ const spacingScale = [
 ];
 ---
 
-<section class="component-showcase">
+<section class="component-showcase not-prose">
     <h3>Surface Card Variants</h3>
     <div class="card-grid">
         <div class="surface-card" style="padding: var(--space-4);">
@@ -147,6 +147,12 @@ const spacingScale = [
 </section>
 
 <style>
+    .component-showcase {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
     .component-showcase h3 {
         margin: var(--space-6) 0 var(--space-3);
         font-size: var(--font-size-xl);

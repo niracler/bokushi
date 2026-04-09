@@ -1,147 +1,167 @@
 ---
 /**
- * ColorPalette — renders color swatches for the design system.
- * Background uses live CSS variables (always accurate).
- * Hex labels are hardcoded for human reference (checked by pre-commit hook).
+ * ColorPalette — design system color showcase.
+ * Uses live CSS variables — automatically matches current theme.
  */
 
-const lightColors = [
-    { name: "--color-bg-page", value: "#fffaf4", role: "Page background" },
-    { name: "--color-bg-surface", value: "#ffffff", role: "Card / panel" },
-    { name: "--color-bg-muted", value: "#f8efe4", role: "Secondary background" },
-    { name: "--color-text-primary", value: "#2a1c17", role: "Headings" },
-    { name: "--color-text-secondary", value: "#46342a", role: "Body text" },
-    { name: "--color-text-muted", value: "#5f4d42", role: "Captions" },
-    { name: "--color-accent", value: "#fb8f68", role: "Primary accent" },
-    { name: "--color-accent-dark", value: "#d67046", role: "Deep accent" },
-    { name: "--color-accent-soft", value: "#ffe7dc", role: "Accent tint" },
-    { name: "--color-link", value: "#c05c3e", role: "Link" },
-    { name: "--color-link-hover", value: "#9a472f", role: "Link hover" },
-    { name: "--color-border", value: "#dcc9ba", role: "Border" },
-    { name: "--color-border-strong", value: "#cbb69d", role: "Strong border" },
-    { name: "--color-success", value: "#4f8b63", role: "Success" },
-    { name: "--color-warning", value: "#d8871d", role: "Warning" },
-    { name: "--color-danger", value: "#c84c3a", role: "Danger" },
-    { name: "--color-note", value: "#8d7bd6", role: "Note" },
-    { name: "--color-code-bg", value: "#f6f8fa", role: "Code block bg" },
+const groups = [
+    {
+        label: "Background",
+        colors: [
+            { name: "--color-bg-page", friendlyName: "Page", desc: "Primary page background" },
+            { name: "--color-bg-surface", friendlyName: "Surface", desc: "Card / panel" },
+            { name: "--color-bg-muted", friendlyName: "Muted", desc: "Secondary background" },
+        ],
+    },
+    {
+        label: "Text",
+        colors: [
+            { name: "--color-text-primary", friendlyName: "Primary", desc: "Headings, emphasis" },
+            { name: "--color-text-secondary", friendlyName: "Secondary", desc: "Body text" },
+            { name: "--color-text-muted", friendlyName: "Muted", desc: "Captions, metadata" },
+        ],
+    },
+    {
+        label: "Accent",
+        colors: [
+            {
+                name: "--color-accent",
+                friendlyName: "Accent",
+                desc: "Primary accent (Padparadscha)",
+            },
+            {
+                name: "--color-accent-dark",
+                friendlyName: "Deep Accent",
+                desc: "Links, hover states",
+            },
+            { name: "--color-accent-soft", friendlyName: "Accent Tint", desc: "Subtle highlights" },
+        ],
+    },
+    {
+        label: "Border & Semantic",
+        colors: [
+            { name: "--color-border", friendlyName: "Border", desc: "Dividers, card edges" },
+            { name: "--color-success", friendlyName: "Success", desc: "Positive states" },
+            { name: "--color-warning", friendlyName: "Warning", desc: "Caution states" },
+            { name: "--color-danger", friendlyName: "Danger", desc: "Error states" },
+            { name: "--color-note", friendlyName: "Note", desc: "Info callouts" },
+        ],
+    },
 ];
-
-const darkColors = [
-    { name: "--color-bg-page", value: "#140e0b", role: "Page background" },
-    { name: "--color-bg-surface", value: "#1b140f", role: "Card / panel" },
-    { name: "--color-bg-muted", value: "#241914", role: "Secondary background" },
-    { name: "--color-text-primary", value: "#f8ede1", role: "Headings" },
-    { name: "--color-text-secondary", value: "#d7c6b8", role: "Body text" },
-    { name: "--color-text-muted", value: "#b8a090", role: "Captions" },
-    { name: "--color-accent", value: "#fb9f74", role: "Primary accent" },
-    { name: "--color-accent-dark", value: "#f77342", role: "Deep accent" },
-    { name: "--color-accent-soft", value: "rgba(251,159,116,0.16)", role: "Accent tint" },
-    { name: "--color-link", value: "#ffb088", role: "Link" },
-    { name: "--color-link-hover", value: "#ffcfb3", role: "Link hover" },
-    { name: "--color-border", value: "#3b2b22", role: "Border" },
-    { name: "--color-border-strong", value: "#4b372d", role: "Strong border" },
-    { name: "--color-success", value: "#8bcaa0", role: "Success" },
-    { name: "--color-warning", value: "#f3b05b", role: "Warning" },
-    { name: "--color-danger", value: "#f18879", role: "Danger" },
-    { name: "--color-note", value: "#a79fe6", role: "Note" },
-    { name: "--color-code-bg", value: "#1e1e2e", role: "Code block bg" },
-];
-
-function isLightColor(hex: string): boolean {
-    if (hex.startsWith("rgba")) return false;
-    const c = hex.replace("#", "");
-    const r = parseInt(c.substring(0, 2), 16);
-    const g = parseInt(c.substring(2, 4), 16);
-    const b = parseInt(c.substring(4, 6), 16);
-    return (r * 299 + g * 587 + b * 114) / 1000 > 160;
-}
 ---
 
-<section class="color-palette">
-    <h3>Light Theme</h3>
-    <div class="swatch-grid">
-        {lightColors.map((c) => (
-            <div class="swatch">
-                <div
-                    class="swatch-block"
-                    style={`background: var(${c.name}); color: ${isLightColor(c.value) ? "#2a1c17" : "#fef9f0"}`}
-                >
-                    <span class="swatch-value">{c.value}</span>
-                </div>
-                <div class="swatch-info">
-                    <code>{c.name}</code>
-                    <span class="swatch-role">{c.role}</span>
-                </div>
+<section class="color-palette not-prose">
+    {groups.map((group) => (
+        <div class="color-group">
+            <h4 class="group-label">{group.label}</h4>
+            <div class="swatch-grid">
+                {group.colors.map((c) => (
+                    <div class="swatch">
+                        <div class="swatch-block" style={`background: var(${c.name})`}>
+                            <span class="swatch-hex" data-color-var={c.name}></span>
+                        </div>
+                        <div class="swatch-info">
+                            <span class="swatch-name">{c.friendlyName}</span>
+                            <span class="swatch-desc">{c.desc}</span>
+                        </div>
+                    </div>
+                ))}
             </div>
-        ))}
-    </div>
-
-    <h3>Dark Theme</h3>
-    <div class="swatch-grid" data-theme-preview="dark">
-        {darkColors.map((c) => (
-            <div class="swatch">
-                <div
-                    class="swatch-block"
-                    style={`background: ${c.value}; color: ${isLightColor(c.value) ? "#2a1c17" : "#f8ede1"}`}
-                >
-                    <span class="swatch-value">{c.value}</span>
-                </div>
-                <div class="swatch-info">
-                    <code>{c.name}</code>
-                    <span class="swatch-role">{c.role}</span>
-                </div>
-            </div>
-        ))}
-    </div>
+        </div>
+    ))}
 </section>
 
+<script>
+    function updateHexLabels() {
+        const root = document.documentElement;
+        document.querySelectorAll("[data-color-var]").forEach((el) => {
+            const varName = (el as HTMLElement).dataset.colorVar!;
+            const resolved = getComputedStyle(root).getPropertyValue(varName).trim();
+            (el as HTMLElement).textContent = resolved;
+
+            const canvas = document.createElement("canvas");
+            canvas.width = canvas.height = 1;
+            const ctx = canvas.getContext("2d")!;
+            ctx.fillStyle = resolved;
+            ctx.fillRect(0, 0, 1, 1);
+            const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+            const luma = (r * 299 + g * 587 + b * 114) / 1000;
+            (el as HTMLElement).style.color = luma > 160 ? "#2a1c17" : "#f8ede1";
+        });
+    }
+
+    updateHexLabels();
+    const observer = new MutationObserver(updateHexLabels);
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-theme"],
+    });
+</script>
+
 <style>
-    .color-palette h3 {
-        margin: var(--space-6) 0 var(--space-3);
-        font-size: var(--font-size-xl);
-        font-weight: 700;
-        color: var(--color-text-primary);
+    .color-palette {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .color-group {
+        margin-bottom: var(--space-6);
+    }
+
+    .color-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .group-label {
+        font-size: var(--font-size-xs);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-text-muted);
+        margin: 0 0 var(--space-3);
     }
 
     .swatch-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
         gap: var(--space-3);
     }
 
     .swatch {
-        border: 1px solid var(--color-border-soft);
+        border: 1px solid var(--color-border);
         border-radius: var(--radius-md);
         overflow: hidden;
+        background: var(--color-bg-surface);
     }
 
     .swatch-block {
         display: flex;
         align-items: flex-end;
         justify-content: flex-start;
-        height: 4.5rem;
+        height: 5rem;
         padding: var(--space-2);
     }
 
-    .swatch-value {
+    .swatch-hex {
         font-family: "Fira Code", monospace;
         font-size: var(--font-size-2xs);
         font-weight: 500;
+        opacity: 0.85;
     }
 
     .swatch-info {
-        padding: var(--space-2);
-        background: var(--color-bg-surface);
+        padding: var(--space-2) var(--space-2) var(--space-3);
     }
 
-    .swatch-info code {
+    .swatch-name {
         display: block;
-        font-size: var(--font-size-2xs);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
         color: var(--color-text-primary);
-        word-break: break-all;
     }
 
-    .swatch-role {
+    .swatch-desc {
         display: block;
         margin-top: 2px;
         font-size: var(--font-size-2xs);

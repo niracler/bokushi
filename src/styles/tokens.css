@@ -45,13 +45,6 @@
 
     /* Overlay tokens - theme-invariant */
     --color-overlay-dark-35: rgba(0, 0, 0, 0.35);
-    --color-overlay-dark-40: rgba(0, 0, 0, 0.4);
-    --color-overlay-dark-60: rgba(0, 0, 0, 0.6);
-    --color-overlay-light-25: rgba(255, 255, 255, 0.25);
-    --color-overlay-light-35: rgba(255, 255, 255, 0.35);
-    --color-overlay-light-50: rgba(255, 255, 255, 0.5);
-    --color-overlay-light-80: rgba(255, 255, 255, 0.8);
-    --color-overlay-light-90: rgba(255, 255, 255, 0.9);
 }
 
 /* =============================================
@@ -72,9 +65,7 @@
 
     /* Border tokens */
     --color-border: #dcc9ba;
-    --color-border-soft: rgba(var(--color-text-primary-rgb), 0.08);
-    --color-border-subtle: rgba(var(--color-text-primary-rgb), 0.12);
-    --color-border-strong: #cbb69d;
+    --color-border-soft: rgba(var(--color-text-primary-rgb), 0.10);
 
     /* Accent + interactive colors */
     --color-accent: #fb8f68;
@@ -82,18 +73,8 @@
     --color-accent-soft: #ffe7dc;
     --color-accent-rgb: 251 143 104;
     --color-accent-tint: rgba(var(--color-accent-rgb), 0.16);
-    --color-accent-tint-6: color-mix(in srgb, var(--color-accent) 6%, transparent);
-    --color-accent-tint-8: color-mix(in srgb, var(--color-accent) 8%, transparent);
-    --color-accent-tint-12: color-mix(in srgb, var(--color-accent) 12%, transparent);
-    --color-accent-tint-18: color-mix(in srgb, var(--color-accent) 18%, transparent);
-    --color-link: #c05c3e;
-    --color-link-hover: #9a472f;
 
     /* State colors */
-    --color-state-success-bg: #e5f7ee;
-    --color-state-success-text: #2e7d50;
-    --color-state-info-bg: #fff4d9;
-    --color-state-info-text: #8c6a1e;
     --color-success: #4f8b63;
     --color-warning: #d8871d;
     --color-danger: #c84c3a;
@@ -161,28 +142,16 @@
 
     /* Border tokens */
     --color-border: #3b2b22;
-    --color-border-soft: rgba(var(--color-text-primary-rgb), 0.08);
-    --color-border-subtle: rgba(var(--color-text-primary-rgb), 0.16);
-    --color-border-strong: #4b372d;
+    --color-border-soft: rgba(var(--color-text-primary-rgb), 0.12);
 
-    /* Accent + interactive colors */
-    --color-accent: #fb9f74;
-    --color-accent-dark: #f77342;
-    --color-accent-soft: rgba(251, 159, 116, 0.16);
-    --color-accent-rgb: 251 159 116;
+    /* Accent + interactive colors — #fb8f68 is identity color, same in both themes */
+    --color-accent: #fb8f68;
+    --color-accent-dark: #d67046;
+    --color-accent-soft: rgba(251, 143, 104, 0.16);
+    --color-accent-rgb: 251 143 104;
     --color-accent-tint: rgba(var(--color-accent-rgb), 0.22);
-    --color-accent-tint-6: color-mix(in srgb, var(--color-accent) 6%, transparent);
-    --color-accent-tint-8: color-mix(in srgb, var(--color-accent) 8%, transparent);
-    --color-accent-tint-12: color-mix(in srgb, var(--color-accent) 12%, transparent);
-    --color-accent-tint-18: color-mix(in srgb, var(--color-accent) 18%, transparent);
-    --color-link: #ffb088;
-    --color-link-hover: #ffcfb3;
 
     /* State colors */
-    --color-state-success-bg: rgba(93, 161, 118, 0.16);
-    --color-state-success-text: #9dd8b2;
-    --color-state-info-bg: rgba(237, 189, 104, 0.16);
-    --color-state-info-text: #f2d39a;
     --color-success: #8bcaa0;
     --color-warning: #f3b05b;
     --color-danger: #f18879;

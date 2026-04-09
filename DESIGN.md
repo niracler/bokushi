@@ -52,9 +52,9 @@ The blog uses a warm earth-tone palette with terracotta accents. Dark mode deepe
 | `--color-text-secondary` | `#d7c6b8` | Body text |
 | `--color-text-muted` | `#b8a090` | Captions, metadata |
 | `--color-text-inverse` | `#1b120c` | Text on light surfaces |
-| `--color-accent` | `#fb9f74` | Slightly lighter terracotta |
-| `--color-accent-dark` | `#f77342` | Vivid accent |
-| `--color-accent-soft` | rgba(251, 159, 116, 0.16) | Transparent tint |
+| `--color-accent` | `#fb8f68` | Same accent in both themes |
+| `--color-accent-dark` | `#d67046` | Deep accent / link |
+| `--color-accent-soft` | rgba(251, 143, 104, 0.16) | Transparent tint |
 | `--color-link` | `#ffb088` | Warmer link for dark bg |
 | `--color-link-hover` | `#ffcfb3` | Link hover |
 | `--color-border` | `#3b2b22` | Border |

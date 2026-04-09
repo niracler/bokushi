@@ -1,172 +1,119 @@
 ---
 /**
- * TypographyScale — renders font size samples at each scale level.
- * Uses live CSS variables for actual rendering.
- * Size labels are hardcoded for reference (checked by pre-commit hook).
+ * TypographyScale — renders live typography samples at each scale level.
+ * Inspired by getdesign.md's typography showcase pattern.
  */
 
-const fontSizes = [
-    { name: "--font-size-2xs", value: "0.6875rem", pixels: "11px", use: "TOC numbers, fine print" },
+const typeSamples = [
     {
-        name: "--font-size-xs",
-        value: "0.8125rem",
-        pixels: "13px",
-        use: "Pills, captions, code-block lang",
+        sample: "博物志 Bokushi",
+        meta: "H1 — 36px / 700 / 1.22",
+        style: "font-size: var(--font-size-3xl); font-weight: 700; line-height: var(--line-height-tight);",
     },
-    { name: "--font-size-sm", value: "0.9375rem", pixels: "15px", use: "Figcaptions, footnotes" },
-    { name: "--font-size-base", value: "1.0625rem", pixels: "17px", use: "Body text (default)" },
-    { name: "--font-size-lg", value: "1.25rem", pixels: "20px", use: "H4" },
-    { name: "--font-size-xl", value: "1.5rem", pixels: "24px", use: "H3" },
-    { name: "--font-size-2xl", value: "1.875rem", pixels: "30px", use: "H2" },
-    { name: "--font-size-3xl", value: "2.25rem", pixels: "36px", use: "H1" },
-];
-
-const lineHeights = [
-    { name: "--line-height-base", value: "1.75", use: "Body text, lists" },
-    { name: "--line-height-relaxed", value: "1.65", use: "Figcaptions" },
-    { name: "--line-height-tight", value: "1.22", use: "Headings" },
+    {
+        sample: "设计基础 Design Foundations",
+        meta: "H2 — 30px / 800 / 1.22 / -0.02em",
+        style: "font-size: var(--font-size-2xl); font-weight: 800; line-height: var(--line-height-tight); letter-spacing: -0.02em;",
+    },
+    {
+        sample: "色彩系统 Color System",
+        meta: "H3 — 24px / 700 / 1.22 / -0.01em",
+        style: "font-size: var(--font-size-xl); font-weight: 700; line-height: var(--line-height-tight); letter-spacing: -0.01em;",
+    },
+    {
+        sample: "浅色主题 Light Theme",
+        meta: "H4 — 20px / 700 / 1.22",
+        style: "font-size: var(--font-size-lg); font-weight: 700; line-height: var(--line-height-tight);",
+    },
+    {
+        sample: "正文排版服务于长时间阅读，行高宽松，字距微调。The quick brown fox jumps over the lazy dog. 粉圓體赋予页面温暖手写感。",
+        meta: "Body — 17px / 400 / 1.75 — jf-openhuninn-2.0",
+        style: "font-size: var(--font-size-base); font-weight: 400; line-height: var(--line-height-base); max-width: 60ch;",
+    },
+    {
+        sample: "图片说明、脚注和次要信息",
+        meta: "Small — 15px / 400 / 1.65",
+        style: "font-size: var(--font-size-sm); font-weight: 400; line-height: var(--line-height-relaxed);",
+    },
+    {
+        sample: "标签 · 日期 · 元数据",
+        meta: "Caption — 13px / 400 / 1.75",
+        style: "font-size: var(--font-size-xs); font-weight: 400; line-height: var(--line-height-base);",
+    },
+    {
+        sample: "const design = await vibe.coding()",
+        meta: "Code — 11px / 500 — Fira Code",
+        style: "font-size: var(--font-size-2xs); font-weight: 500; font-family: 'Fira Code', monospace;",
+    },
 ];
 ---
 
-<section class="typography-scale">
-    <h3>Font Size Scale</h3>
-    <div class="type-samples">
-        {fontSizes.map((f) => (
-            <div class="type-row">
-                <div class="type-meta">
-                    <code>{f.name}</code>
-                    <span class="type-detail">{f.value} ({f.pixels})</span>
-                </div>
-                <p class="type-sample" style={`font-size: var(${f.name})`}>
-                    汉字 Latin 123 — {f.use}
-                </p>
+<section class="typography-scale not-prose">
+    <div class="type-list">
+        {typeSamples.map((t) => (
+            <div class="type-card">
+                <p class="type-sample" style={t.style}>{t.sample}</p>
+                <span class="type-meta">{t.meta}</span>
             </div>
         ))}
     </div>
 
-    <h3>Line Heights</h3>
-    <div class="line-height-samples">
-        {lineHeights.map((lh) => (
-            <div class="lh-row">
-                <div class="type-meta">
-                    <code>{lh.name}</code>
-                    <span class="type-detail">{lh.value} — {lh.use}</span>
-                </div>
-                <p class="lh-sample" style={`line-height: var(${lh.name})`}>
-                    这是一段示例文字，用来展示行高效果。The quick brown fox jumps over the lazy dog.
-                    行高影响阅读的舒适度和文字的呼吸感。
-                </p>
-            </div>
-        ))}
+    <div class="bold-demo">
+        <p>
+            在正文中，<strong>粗体会以强调色渲染</strong>，而非普通的黑色加粗。这是一个<strong>有意为之的设计选择</strong>，用于视觉强调。
+        </p>
     </div>
-
-    <h3>Heading Styles</h3>
-    <div class="heading-samples">
-        <div class="heading-row">
-            <span class="heading-label">H1 — 2.25rem / 700</span>
-            <p style="font-size: var(--font-size-3xl); font-weight: 700; line-height: var(--line-height-tight); color: var(--color-text-primary);">
-                博物志 Bokushi
-            </p>
-        </div>
-        <div class="heading-row">
-            <span class="heading-label">H2 — 1.875rem / 800 / -0.02em</span>
-            <p style="font-size: var(--font-size-2xl); font-weight: 800; line-height: var(--line-height-tight); letter-spacing: -0.02em; color: var(--color-text-primary);">
-                设计基础 Design Foundations
-            </p>
-        </div>
-        <div class="heading-row">
-            <span class="heading-label">H3 — 1.5rem / 700 / -0.01em</span>
-            <p style="font-size: var(--font-size-xl); font-weight: 700; line-height: var(--line-height-tight); letter-spacing: -0.01em; color: var(--color-text-primary);">
-                色彩系统 Color System
-            </p>
-        </div>
-        <div class="heading-row">
-            <span class="heading-label">H4 — 1.25rem / 700</span>
-            <p style="font-size: var(--font-size-lg); font-weight: 700; line-height: var(--line-height-tight); color: var(--color-text-primary);">
-                浅色主题 Light Theme
-            </p>
-        </div>
-    </div>
-
-    <h3>Bold / Strong Convention</h3>
-    <p class="bold-demo">
-        In prose content, <strong>bold text renders in accent color</strong> (terracotta) rather than
-        standard black bold. This is a <strong>deliberate design choice</strong> for visual emphasis.
-    </p>
 </section>
 
 <style>
-    .typography-scale h3 {
-        margin: var(--space-6) 0 var(--space-3);
-        font-size: var(--font-size-xl);
-        font-weight: 700;
-        color: var(--color-text-primary);
+    .typography-scale {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
     }
 
-    .type-samples,
-    .line-height-samples,
-    .heading-samples {
+    .type-list {
         display: grid;
-        gap: var(--space-4);
+        gap: 0;
     }
 
-    .type-row,
-    .lh-row,
-    .heading-row {
-        padding: var(--space-3);
-        border: 1px solid var(--color-border-soft);
-        border-radius: var(--radius-md);
-        background: var(--color-bg-surface);
+    .type-card {
+        padding: var(--space-4) 0;
+        border-bottom: 1px solid var(--color-border-soft);
     }
 
-    .type-meta {
-        display: flex;
-        align-items: baseline;
-        gap: var(--space-2);
-        margin-bottom: var(--space-2);
+    .type-card:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
     }
 
-    .type-meta code {
-        font-size: var(--font-size-xs);
-        color: var(--color-accent);
-    }
-
-    .type-detail {
-        font-size: var(--font-size-2xs);
-        color: var(--color-text-muted);
+    .type-card:first-child {
+        padding-top: 0;
     }
 
     .type-sample {
         margin: 0;
         color: var(--color-text-primary);
-        line-height: var(--line-height-base);
     }
 
-    .lh-sample {
-        margin: 0;
-        font-size: var(--font-size-base);
-        color: var(--color-text-secondary);
-        max-width: 60ch;
-    }
-
-    .heading-label {
+    .type-meta {
         display: block;
-        margin-bottom: var(--space-1);
+        margin-top: var(--space-2);
+        font-family: "Fira Code", monospace;
         font-size: var(--font-size-2xs);
         color: var(--color-text-muted);
-        font-family: "Fira Code", monospace;
-    }
-
-    .heading-row p {
-        margin: 0;
     }
 
     .bold-demo {
-        padding: var(--space-4);
-        border-radius: var(--radius-md);
-        background: var(--color-bg-surface);
-        border: 1px solid var(--color-border-soft);
+        margin-top: var(--space-4);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--color-border-soft);
+    }
+
+    .bold-demo p {
+        margin: 0;
         color: var(--color-text-secondary);
+        font-size: var(--font-size-base);
         line-height: var(--line-height-base);
     }
 

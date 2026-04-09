@@ -1,0 +1,62 @@
+---
+/**
+ * ButtonShowcase — renders icon button variants.
+ */
+---
+
+<div class="button-showcase not-prose">
+    <div class="btn-grid">
+        <div class="btn-cell">
+            <button class="icon-btn icon-btn--xs icon-btn--round" aria-label="Like">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+        </div>
+        <div class="btn-cell">
+            <button class="icon-btn icon-btn--sm icon-btn--round icon-btn--bordered" aria-label="Like">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+        </div>
+        <div class="btn-cell">
+            <button class="icon-btn icon-btn--md icon-btn--square" aria-label="Like">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+        </div>
+        <div class="btn-cell">
+            <button class="icon-btn icon-btn--md icon-btn--square icon-btn--bordered" aria-label="Like">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </button>
+        </div>
+        <span class="btn-label">XS round</span>
+        <span class="btn-label">SM round bordered</span>
+        <span class="btn-label">MD square</span>
+        <span class="btn-label">MD square bordered</span>
+    </div>
+</div>
+
+<style>
+    .button-showcase {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .btn-grid {
+        display: grid;
+        grid-template-columns: repeat(4, auto);
+        gap: var(--space-2) var(--space-6);
+        justify-items: center;
+        justify-content: start;
+    }
+
+    .btn-cell {
+        display: flex;
+        align-items: flex-end;
+        min-height: 3rem;
+    }
+
+    .btn-label {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+        text-align: center;
+    }
+</style>

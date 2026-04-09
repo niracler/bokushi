@@ -1,0 +1,62 @@
+---
+/**
+ * CardShowcase — renders surface card variants.
+ */
+---
+
+<div class="card-showcase not-prose">
+    <div class="card-grid">
+        <div class="surface-card" style="padding: var(--space-4);">
+            <span class="eyebrow">Default</span>
+            <p class="card-desc">.surface-card</p>
+            <p class="card-detail">White bg, soft border, soft shadow</p>
+        </div>
+        <div class="surface-card surface-card--soft" style="padding: var(--space-4);">
+            <span class="eyebrow">Soft</span>
+            <p class="card-desc">.surface-card--soft</p>
+            <p class="card-detail">No shadow, muted bg blend</p>
+        </div>
+        <div class="surface-card surface-card--flat" style="padding: var(--space-4);">
+            <span class="eyebrow">Flat</span>
+            <p class="card-desc">.surface-card--flat</p>
+            <p class="card-detail">No shadow, subtle border</p>
+        </div>
+        <div class="surface-card surface-card--compact" style="padding: var(--space-3);">
+            <span class="eyebrow">Compact</span>
+            <p class="card-desc">.surface-card--compact</p>
+            <p class="card-detail">Smaller radius (md)</p>
+        </div>
+        <div class="surface-card surface-card--hover-border" style="padding: var(--space-4);">
+            <span class="eyebrow">Hover: border</span>
+            <p class="card-desc">.surface-card--hover-border</p>
+            <p class="card-detail">Hover to see border change</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-showcase {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+        gap: var(--space-3);
+    }
+
+    .card-desc {
+        margin: var(--space-2) 0 0;
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+
+    .card-detail {
+        margin: var(--space-1) 0 0;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+    }
+</style>

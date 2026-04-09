@@ -1,0 +1,29 @@
+---
+/**
+ * PillShowcase — renders pill/tag variants.
+ */
+---
+
+<div class="pill-showcase not-prose">
+    <div class="pills-row">
+        <span class="pill">Default pill</span>
+        <span class="pill" data-tone="accent">Accent pill</span>
+        <a href="#" class="pill pill--clickable">Clickable pill</a>
+        <a href="#" class="pill pill--clickable" data-tone="accent">Accent clickable</a>
+    </div>
+</div>
+
+<style>
+    .pill-showcase {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .pills-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        align-items: center;
+    }
+</style>
