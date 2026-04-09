@@ -1,3 +1,7 @@
+/**
+ * Netease Cloud Music API client using LinuxAPI encryption.
+ * Requires nodejs_compat flag and compatibility_date >= 2024-09-23.
+ */
 import crypto from "node:crypto";
 
 export interface MetingSong {
