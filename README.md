@@ -12,6 +12,14 @@ Niracler 的个人博客，记录一个话唠的技术与生活。
 - **动态频道** — Telegram 频道同步，日常碎碎念
 - **漫画表情包库** — 从漫画里截的表情包收藏（Cloudflare D1 驱动）
 
+## 设计预览
+
+| Light | Dark |
+|-------|------|
+| ![Light theme](assets/design-preview-light.png) | ![Dark theme](assets/design-preview-dark.png) |
+
+完整设计系统预览: [niracler.com/design-preview](https://niracler.com/design-preview)
+
 ## 技术栈
 
 [Astro](https://astro.build/) + [Tailwind CSS](https://tailwindcss.com/) + [Cloudflare Pages](https://pages.cloudflare.com/)

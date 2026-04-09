@@ -1,0 +1,75 @@
+---
+/**
+ * Design Preview — publicly deployed design system overview.
+ * Composes showcase components from Phase 2.
+ * Not linked from navigation — access via /design-preview URL.
+ */
+import BaseHead from "../components/BaseHead.astro";
+import ColorPalette from "../components/design/ColorPalette.astro";
+import ComponentShowcase from "../components/design/ComponentShowcase.astro";
+import TypographyScale from "../components/design/TypographyScale.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <BaseHead
+            title="Design Preview · 博物志"
+            description="博物志设计系统预览 — 色彩、字体、组件一览"
+        />
+        <meta name="robots" content="noindex" />
+    </head>
+    <body>
+        <Header />
+        <main id="main-content" class="page-shell max-w-5xl section-stack">
+            <header class="preview-header">
+                <h1>博物志 Design System</h1>
+                <p>
+                    设计系统预览页面，展示博客的色彩、字体和组件体系。
+                    <br />
+                    Design tokens defined in
+                    <code>src/styles/tokens.css</code>, components in
+                    <code>src/styles/global.css</code>.
+                </p>
+            </header>
+
+            <ColorPalette />
+            <TypographyScale />
+            <ComponentShowcase />
+        </main>
+        <Footer />
+    </body>
+</html>
+
+<style>
+    .preview-header {
+        padding-bottom: var(--space-4);
+        border-bottom: 1px solid var(--color-border-soft);
+    }
+
+    .preview-header h1 {
+        font-size: var(--font-size-3xl);
+        font-weight: 800;
+        color: var(--color-text-primary);
+        line-height: var(--line-height-tight);
+        margin: 0;
+    }
+
+    .preview-header p {
+        margin-top: var(--space-2);
+        color: var(--color-text-secondary);
+        line-height: var(--line-height-base);
+    }
+
+    .preview-header code {
+        padding: 0.1em 0.4em;
+        border-radius: var(--radius-sm);
+        background: color-mix(in srgb, var(--color-text-muted) 15%, var(--color-bg-page));
+        font-family: "Fira Code", monospace;
+        font-size: 0.95em;
+    }
+</style>

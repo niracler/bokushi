@@ -1,0 +1,150 @@
+---
+/**
+ * ColorPalette — renders color swatches for the design system.
+ * Background uses live CSS variables (always accurate).
+ * Hex labels are hardcoded for human reference (checked by pre-commit hook).
+ */
+
+const lightColors = [
+    { name: "--color-bg-page", value: "#fffaf4", role: "Page background" },
+    { name: "--color-bg-surface", value: "#ffffff", role: "Card / panel" },
+    { name: "--color-bg-muted", value: "#f8efe4", role: "Secondary background" },
+    { name: "--color-text-primary", value: "#2a1c17", role: "Headings" },
+    { name: "--color-text-secondary", value: "#46342a", role: "Body text" },
+    { name: "--color-text-muted", value: "#5f4d42", role: "Captions" },
+    { name: "--color-accent", value: "#fb8f68", role: "Primary accent" },
+    { name: "--color-accent-dark", value: "#d67046", role: "Deep accent" },
+    { name: "--color-accent-soft", value: "#ffe7dc", role: "Accent tint" },
+    { name: "--color-link", value: "#c05c3e", role: "Link" },
+    { name: "--color-link-hover", value: "#9a472f", role: "Link hover" },
+    { name: "--color-border", value: "#dcc9ba", role: "Border" },
+    { name: "--color-border-strong", value: "#cbb69d", role: "Strong border" },
+    { name: "--color-success", value: "#4f8b63", role: "Success" },
+    { name: "--color-warning", value: "#d8871d", role: "Warning" },
+    { name: "--color-danger", value: "#c84c3a", role: "Danger" },
+    { name: "--color-note", value: "#8d7bd6", role: "Note" },
+    { name: "--color-code-bg", value: "#f6f8fa", role: "Code block bg" },
+];
+
+const darkColors = [
+    { name: "--color-bg-page", value: "#140e0b", role: "Page background" },
+    { name: "--color-bg-surface", value: "#1b140f", role: "Card / panel" },
+    { name: "--color-bg-muted", value: "#241914", role: "Secondary background" },
+    { name: "--color-text-primary", value: "#f8ede1", role: "Headings" },
+    { name: "--color-text-secondary", value: "#d7c6b8", role: "Body text" },
+    { name: "--color-text-muted", value: "#b8a090", role: "Captions" },
+    { name: "--color-accent", value: "#fb9f74", role: "Primary accent" },
+    { name: "--color-accent-dark", value: "#f77342", role: "Deep accent" },
+    { name: "--color-accent-soft", value: "rgba(251,159,116,0.16)", role: "Accent tint" },
+    { name: "--color-link", value: "#ffb088", role: "Link" },
+    { name: "--color-link-hover", value: "#ffcfb3", role: "Link hover" },
+    { name: "--color-border", value: "#3b2b22", role: "Border" },
+    { name: "--color-border-strong", value: "#4b372d", role: "Strong border" },
+    { name: "--color-success", value: "#8bcaa0", role: "Success" },
+    { name: "--color-warning", value: "#f3b05b", role: "Warning" },
+    { name: "--color-danger", value: "#f18879", role: "Danger" },
+    { name: "--color-note", value: "#a79fe6", role: "Note" },
+    { name: "--color-code-bg", value: "#1e1e2e", role: "Code block bg" },
+];
+
+function isLightColor(hex: string): boolean {
+    if (hex.startsWith("rgba")) return false;
+    const c = hex.replace("#", "");
+    const r = parseInt(c.substring(0, 2), 16);
+    const g = parseInt(c.substring(2, 4), 16);
+    const b = parseInt(c.substring(4, 6), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000 > 160;
+}
+---
+
+<section class="color-palette">
+    <h3>Light Theme</h3>
+    <div class="swatch-grid">
+        {lightColors.map((c) => (
+            <div class="swatch">
+                <div
+                    class="swatch-block"
+                    style={`background: var(${c.name}); color: ${isLightColor(c.value) ? "#2a1c17" : "#fef9f0"}`}
+                >
+                    <span class="swatch-value">{c.value}</span>
+                </div>
+                <div class="swatch-info">
+                    <code>{c.name}</code>
+                    <span class="swatch-role">{c.role}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+
+    <h3>Dark Theme</h3>
+    <div class="swatch-grid" data-theme-preview="dark">
+        {darkColors.map((c) => (
+            <div class="swatch">
+                <div
+                    class="swatch-block"
+                    style={`background: ${c.value}; color: ${isLightColor(c.value) ? "#2a1c17" : "#f8ede1"}`}
+                >
+                    <span class="swatch-value">{c.value}</span>
+                </div>
+                <div class="swatch-info">
+                    <code>{c.name}</code>
+                    <span class="swatch-role">{c.role}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+</section>
+
+<style>
+    .color-palette h3 {
+        margin: var(--space-6) 0 var(--space-3);
+        font-size: var(--font-size-xl);
+        font-weight: 700;
+        color: var(--color-text-primary);
+    }
+
+    .swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+        gap: var(--space-3);
+    }
+
+    .swatch {
+        border: 1px solid var(--color-border-soft);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+
+    .swatch-block {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-start;
+        height: 4.5rem;
+        padding: var(--space-2);
+    }
+
+    .swatch-value {
+        font-family: "Fira Code", monospace;
+        font-size: var(--font-size-2xs);
+        font-weight: 500;
+    }
+
+    .swatch-info {
+        padding: var(--space-2);
+        background: var(--color-bg-surface);
+    }
+
+    .swatch-info code {
+        display: block;
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-primary);
+        word-break: break-all;
+    }
+
+    .swatch-role {
+        display: block;
+        margin-top: 2px;
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+    }
+</style>

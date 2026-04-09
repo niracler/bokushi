@@ -1,3 +1,8 @@
 python3 scripts/check-font-coverage.py
 pnpm astro check
 pnpm lint-staged
+
+# Check token consistency when tokens.css is staged
+if git diff --cached --name-only | grep -q 'src/styles/tokens.css'; then
+    node scripts/check-token-consistency.mjs
+fi

@@ -6,6 +6,10 @@ tags: ["设计", "博客", "Astro", "前端", "DeepSearch"]
 socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a.png
 ---
 
+import ColorPalette from "../../../components/design/ColorPalette.astro";
+import TypographyScale from "../../../components/design/TypographyScale.astro";
+import ComponentShowcase from "../../../components/design/ComponentShowcase.astro";
+
 > **注**：本文主要由 AI（Claude）协助撰写整理，属于 DeepSearch 系列。内容基于实际代码库分析和设计决策记录。
 
 这是一份设计说明书。博客完全通过 **vibe-coding** 搭建——没有前端经验，靠着直觉、Claude 的帮助和不断试错，一点点把想法变成现实。
@@ -66,6 +70,10 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 
 > **博客变体**：配色起点来自 [Obsidian Shiba Inu 主题](https://github.com/faroukx/Obsidian-shiba-inu-theme)，经调整形成"旧书页+琥珀"风格。
 
+#### 色彩预览
+
+<ColorPalette />
+
 #### Tailwind 集成
 
 色彩 token 通过 `@theme inline` 映射到 Tailwind utilities：
@@ -107,6 +115,10 @@ socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a
 > **博客变体**：使用 `jf-openhuninn-2.0`（粉圓體）而非系统字体，增加温暖手写感。
 
 **粗体特殊处理**：所有 `<strong>` 自动应用强调色，而非仅加粗。
+
+#### 字体预览
+
+<TypographyScale />
 
 ### Spacing & Layout
 
@@ -248,6 +260,10 @@ body.scroll-locked {
 
 ## Components
 
+### 组件预览
+
+<ComponentShowcase />
+
 ### Cards
 
 > HIG: A card displays a set of related information in a compact format, providing easy access to the actions and details the card presents.
@@ -267,6 +283,64 @@ body.scroll-locked {
 
 - `.surface-card--hover-border`：hover 时边框颜色加深
 - `.surface-card--hover-none`：禁用 hover 效果
+
+### Buttons
+
+> HIG: Buttons initiate app-specific actions, have customizable backgrounds, and can include a title or an icon.
+
+#### Icon Button 体系
+
+博客使用 `.icon-btn` 统一所有图标按钮样式。按钮没有文字，仅包含图标：
+
+| 尺寸 | Class | 尺寸 | 用途 |
+| ---- | ----- | ---- | ---- |
+| XS | `.icon-btn--xs` | 32px | 行内操作 |
+| SM | `.icon-btn--sm` | 44px | 标准操作（满足 44pt 触控目标） |
+| MD | `.icon-btn--md` | 48px | 突出操作 |
+
+形状变体：
+
+- `.icon-btn--round`：圆形（`radius-full`）
+- `.icon-btn--square`：方形（`radius-md`）
+- `.icon-btn--bordered`：加 1px `border-soft` 边框
+
+Hover 行为：文字颜色从 `text-secondary` 变为 `accent`，无位移或缩放。
+
+### Shadow / Elevation
+
+> HIG: Depth cues help people understand the hierarchy and relationships between different layers of content.
+
+#### 阴影层级
+
+| Token | 浅色 | 深色 | 用途 |
+| ----- | ---- | ---- | ---- |
+| `--shadow-soft` | `0 6px 18px rgba(47,37,25, 0.08)` | `0 10px 28px rgba(0,0,0, 0.32)` | 卡片、表格、图片 |
+| `--shadow-strong` | `0 16px 36px rgba(47,37,25, 0.14)` | `0 24px 42px rgba(0,0,0, 0.44)` | （暂未使用） |
+| `--shadow-lightbox` | `0 20px 60px rgba(0,0,0, 0.4)` | `0 20px 60px rgba(0,0,0, 0.6)` | 灯箱 |
+| `--shadow-button-hover` | `0 6px 20px rgba(251,143,104, 0.3)` | `0 6px 20px rgba(251,159,116, 0.35)` | 按钮 hover |
+
+深色模式下阴影透明度更高（更"厚重"），因为深色背景需要更强的阴影才能感知到深度。
+
+### Responsive Breakpoints
+
+> HIG: Adaptivity means that your interface looks good and works well in all sizes.
+
+#### 断点定义
+
+| 断点 | 宽度 | 关键变化 |
+| ---- | ---- | -------- |
+| 默认 | < 640px | `padding-inline: space-4` (16px)，单栏 |
+| SM | ≥ 640px | `padding-inline: space-6` (24px) |
+| MD | ≥ 768px (48rem) | 表格从 card-mode 恢复为标准表格 |
+
+#### Table-to-Card 模式
+
+窄屏下，带有 `data-card-mode="cards"` 的表格自动变为堆叠卡片布局：
+
+- 表头隐藏
+- 每行变成独立卡片（`radius-md` + `shadow-soft`）
+- 每个单元格渲染为"标签: 值"对
+- 标签取自 `data-label` 属性
 
 ### Comment Section
 
@@ -326,6 +400,26 @@ body.scroll-locked {
 - Alt/Caption 文本展示
 - 支持动态内容（事件委托模式）
 - 边界事件（可触发加载更多）
+
+## Do's and Don'ts
+
+### Do ✓
+
+- 所有颜色使用 CSS 变量（`var(--color-*)`），不在组件中硬编码 hex
+- 使用语义化 Tailwind token（`text-secondary`、`bg-surface`），不用原始值
+- Hover 效果仅限颜色/边框变化
+- 使用 `--transition-base` (0.2s) 作为标准交互过渡时间
+- Prose 中 `<strong>` 用强调色渲染
+- 使用 `.surface-card` 变体，不自定义卡片样式
+- 尊重 `prefers-reduced-motion`
+
+### Don't ✗
+
+- 不要在 hover 时使用 `translateY` 位移动画
+- 不要新增阴影层级——只用 `shadow-soft` 和 `shadow-strong`
+- 不要引入新字体或更改 17px 基础字号
+- 不要绕过三态主题切换（system/light/dark）
+- 不要使用 `!important`（Mermaid 图表覆写除外）
 
 ## Accessibility
 
