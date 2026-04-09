@@ -94,7 +94,7 @@ async function getSongUrls(ids: number[]): Promise<Record<number, string>> {
     });
     const map: Record<number, string> = {};
     for (const item of result.data ?? []) {
-        if (item.url) map[item.id] = item.url;
+        if (item.url) map[item.id] = httpsify(item.url);
     }
     return map;
 }
