@@ -1,9 +1,9 @@
 ---
-title: "博物志 - 一份设计说明书"
-description: "以 Apple Human Interface Guidelines 为参考框架，记录博客的设计系统与设计决策。"
+title: "博物志的设计说明书"
+description: "就好像『写了一份像模像样的设计说明书，可是整个博客就是跟 AI 一轮轮 vibe coding 出来的，设计术语都是边做边补的，而且还有好多 bug』耶！"
 pubDate: "Apr 9, 2026"
 tags: ["设计", "博客", "Astro", "前端"]
-socialImage: https://image.niracler.com/2025/11/fdef54252bd0dcd89d03da4f6916d06a.png
+socialImage: https://image.niracler.com/2026/04/865c1a7fb940711d71cf692094096b0c.jpeg
 ---
 
 import ColorPalette from "../../../components/design/ColorPalette.astro";
@@ -20,7 +20,7 @@ import MusicPlayer from "../../../components/MusicPlayer.astro";
 
 ## Overview（概述）
 
-本文采用 Apple Human Interface Guidelines (HIG) [^1] 的分类方式组织，从基础到具体：Foundations → Patterns → Components。设计系统的展示方式参考了 awesome-design-md [^9] 项目，机器可读的 DESIGN.md 原文可通过 [/design.md](/design.md) 访问（很奇妙吧，加个 .md 就可以了）。
+本文采用 Apple Human Interface Guidelines (HIG) [^1] 的分类方式组织，从基础到具体：Foundations → Patterns → Components。设计元素的取舍受《写给大家看的设计书》[^10] 启发，展示方式参考了 awesome-design-md [^9] 项目，机器可读的 DESIGN.md 原文可通过 [/design.md](/design.md) 访问（很奇妙吧，加个 .md 就可以了）。
 
 | HIG 原则    | 博客体现                                          |
 | ----------- | ------------------------------------------------- |
@@ -197,11 +197,12 @@ Don't:
 ## References（参考资料）
 
 [^1]: [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines) - Apple 官方设计规范，涵盖 Clarity、Consistency、Deference 三大原则以及色彩、排版、无障碍等全部设计领域。本文的章节结构（Foundations → Patterns → Components）直接参考了 HIG 的组织方式。
-[^2]: [Obsidian Shiba Inu 主题](https://github.com/faroukx/Obsidian-shiba-inu-theme) - 一款暖色调 Obsidian 主题，博客配色的起点。最初让 Claude 模仿这套配色，后来逐渐走偏成了当前的「旧书页+琥珀」风格。
+[^2]: [Obsidian Shiba Inu 主题](https://github.com/faroukx/Obsidian-shiba-inu-theme) - 一款暖色调 Obsidian 主题，开源可自行安装体验。
 [^3]: [莲花刚玉 | 萌娘百科](https://zh.moegirl.org.cn/%E5%AE%9D%E7%9F%B3%E4%B9%8B%E5%9B%BD:%E8%8E%B2%E8%8A%B1%E5%88%9A%E7%8E%89) - 《宝石之国》中的角色，博客强调色 #FB8F68 的灵感来源。
-[^4]: [open 粉圓 | justfont](https://justfont.com/huninn/) - 台湾字型团队 justfont 的开源圆体字体，笔画圆润温暖，中英文都能用。
-[^5]: [帶你認識「字型設計師」！ft. justfont | YouTube](https://www.youtube.com/watch?v=6ZxsXCtW2mU&t=80s) - 好客室播客第 83 期，介绍台湾字体设计师的工作和 justfont 团队的故事，第一次知道 justfont 就是通过这期节目。
+[^4]: [open 粉圓 | justfont](https://justfont.com/huninn/) - justfont 的开源圆体字体，可免费下载使用。
+[^5]: [帶你認識「字型設計師」！ft. justfont | YouTube](https://www.youtube.com/watch?v=6ZxsXCtW2mU&t=80s) - 好客室播客第 83 期，聊台湾字体设计师的工作日常。
 [^6]: [WCAG 2.1 Understanding Docs](https://www.w3.org/WAI/WCAG21/Understanding/) - W3C 的无障碍标准解读文档，逐条解释每个成功准则的含义和达标方法。博客的对比度（4.5:1+）和触控目标（44px）等要求均来源于此。
 [^7]: [Astro Documentation](https://docs.astro.build) - 博客使用的静态站点框架，支持 MDX、内容集合、Island 架构。文档写得非常清晰，基本上遇到的问题都能在这里找到答案。
 [^8]: [Tailwind CSS Documentation](https://tailwindcss.com/docs) - 博客的样式系统基础，v4 开始支持 `@theme inline` 直接映射 CSS 变量为 utility class，省去了大量配置。
 [^9]: [awesome-design-md](https://github.com/VoltAgent/awesome-design-md) - 从知名网站提取设计系统的开源项目，提供标准化的 DESIGN.md 格式和可视化预览。本文的组件展示方式受其启发。
+[^10]: [写给大家看的设计书（第4版）](https://book.douban.com/subject/26664522/) - 亲密性、对齐、对比、重复。对于完全没有设计感的人来说，具象化了这四个名词，让跟 AI 聊博客设计的时候方便了不少。
