@@ -66,12 +66,22 @@ interface SongLrcResponse {
     };
 }
 
-export async function getSongUrl(id: string): Promise<string> {
+async function getSongUrls(ids: number[]): Promise<Record<number, string>> {
+    if (ids.length === 0) return {};
     const result = await linuxApiRequest<SongUrlResponse>("/api/song/enhance/player/url", {
-        ids: [Number(id)],
+        ids,
         br: 320000,
     });
-    return result.data?.[0]?.url ?? "";
+    const map: Record<number, string> = {};
+    for (const item of result.data ?? []) {
+        if (item.url) map[item.id] = item.url;
+    }
+    return map;
+}
+
+export async function getSongUrl(id: string): Promise<string> {
+    const urls = await getSongUrls([Number(id)]);
+    return urls[Number(id)] ?? "";
 }
 
 export async function getSongLrc(id: string): Promise<string> {
@@ -91,8 +101,9 @@ export async function getSongDetail(ids: string[]): Promise<MetingSong[]> {
 
     const songs = detail.songs ?? [];
 
-    const [urls, lyrics] = await Promise.all([
-        Promise.all(ids.map((id) => getSongUrl(id))),
+    const numericIds = songs.map((s) => s.id);
+    const [urlMap, lyrics] = await Promise.all([
+        getSongUrls(numericIds),
         Promise.all(ids.map((id) => getSongLrc(id))),
     ]);
 
@@ -100,7 +111,7 @@ export async function getSongDetail(ids: string[]): Promise<MetingSong[]> {
         title: song.name,
         artist: song.ar.map((a) => a.name).join(" / "),
         pic: song.al.picUrl ?? "",
-        url: urls[i] ?? "",
+        url: urlMap[song.id] ?? "",
         lrc: lyrics[i] ?? "",
     }));
 }
@@ -123,15 +134,14 @@ export async function getPlaylistDetail(id: string): Promise<MetingSong[]> {
     });
 
     const tracks = detail.playlist?.tracks ?? [];
-    const trackIds = tracks.map((t) => String(t.id));
+    const numericIds = tracks.map((t) => t.id);
+    const urlMap = await getSongUrls(numericIds);
 
-    const urls = await Promise.all(trackIds.map((tid) => getSongUrl(tid)));
-
-    return tracks.map((track, i) => ({
+    return tracks.map((track) => ({
         title: track.name,
         artist: track.ar.map((a) => a.name).join(" / "),
         pic: track.al.picUrl ?? "",
-        url: urls[i] ?? "",
+        url: urlMap[track.id] ?? "",
         lrc: "",
     }));
 }
