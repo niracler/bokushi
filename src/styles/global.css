@@ -28,7 +28,6 @@
 
     /* Overlay colors */
     --color-overlay-dark-35: var(--color-overlay-dark-35);
-
 }
 
 @layer base {

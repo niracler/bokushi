@@ -57,10 +57,14 @@ export const GET: APIRoute = async ({ request }) => {
             },
         });
     } catch (error) {
-        console.error("Meting API error:", error);
-        return new Response(JSON.stringify({ error: "Failed to fetch from Netease" }), {
-            status: 502,
-            headers: { "Content-Type": "application/json" },
-        });
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("Meting API error:", message, error);
+        return new Response(
+            JSON.stringify({ error: "Failed to fetch from Netease", detail: message }),
+            {
+                status: 502,
+                headers: { "Content-Type": "application/json" },
+            },
+        );
     }
 };

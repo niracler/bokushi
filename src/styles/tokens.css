@@ -65,7 +65,7 @@
 
     /* Border tokens */
     --color-border: #dcc9ba;
-    --color-border-soft: rgba(var(--color-text-primary-rgb), 0.10);
+    --color-border-soft: rgba(var(--color-text-primary-rgb), 0.1);
 
     /* Accent + interactive colors */
     --color-accent: #fb8f68;

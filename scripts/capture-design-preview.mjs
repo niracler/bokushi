@@ -33,10 +33,7 @@ async function capture(theme, filename) {
     const page = await context.newPage();
     await page.goto(URL, { waitUntil: "networkidle" });
 
-    await page.evaluate(
-        (t) => document.documentElement.setAttribute("data-theme", t),
-        theme,
-    );
+    await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
 
     await page.waitForTimeout(500);
     const output = resolve(ASSETS, filename);
