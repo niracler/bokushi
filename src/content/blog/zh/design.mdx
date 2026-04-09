@@ -18,9 +18,9 @@ import Spoiler from "../../../components/Spoiler.astro";
 import ThemeToggle from "../../../components/ThemeToggle.astro";
 import MusicPlayer from "../../../components/MusicPlayer.astro";
 
-## Overview
+## Overview（概述）
 
-本文采用 Apple Human Interface Guidelines (HIG) [^1] 的分类方式组织，从基础到具体：Foundations → Patterns → Components。
+本文采用 Apple Human Interface Guidelines (HIG) [^1] 的分类方式组织，从基础到具体：Foundations → Patterns → Components。设计系统的展示方式参考了 awesome-design-md [^9] 项目，机器可读的 DESIGN.md 原文可通过 [/design.md](/design.md) 访问（很奇妙吧，加个 .md 就可以了）。
 
 | HIG 原则    | 博客体现                                          |
 | ----------- | ------------------------------------------------- |
@@ -28,9 +28,9 @@ import MusicPlayer from "../../../components/MusicPlayer.astro";
 | Consistency（一致）| 统一的 token 系统，相同组件在不同页面使用相同样式 |
 | Deference（克制）  | 克制的 hover 效果，动效保持最小化，UI 不干扰阅读  |
 
-## Foundations
+## Foundations（基础）
 
-### Color
+### Color（色彩）
 
 配色只有两点是我认为重要的:
 
@@ -41,7 +41,7 @@ import MusicPlayer from "../../../components/MusicPlayer.astro";
 
 <ColorPalette />
 
-### Typography
+### Typography（排版）
 
 基础字号 17px，符合 Apple HIG 推荐的移动端阅读标准。标题行高 1.22（紧凑），正文行高 1.75（宽松，适合长时间阅读），中文字距 0.01em。
 
@@ -204,3 +204,4 @@ Don't:
 [^6]: [WCAG 2.1 Understanding Docs](https://www.w3.org/WAI/WCAG21/Understanding/) - W3C 的无障碍标准解读文档，逐条解释每个成功准则的含义和达标方法。博客的对比度（4.5:1+）和触控目标（44px）等要求均来源于此。
 [^7]: [Astro Documentation](https://docs.astro.build) - 博客使用的静态站点框架，支持 MDX、内容集合、Island 架构。文档写得非常清晰，基本上遇到的问题都能在这里找到答案。
 [^8]: [Tailwind CSS Documentation](https://tailwindcss.com/docs) - 博客的样式系统基础，v4 开始支持 `@theme inline` 直接映射 CSS 变量为 utility class，省去了大量配置。
+[^9]: [awesome-design-md](https://github.com/VoltAgent/awesome-design-md) - 从知名网站提取设计系统的开源项目，提供标准化的 DESIGN.md 格式和可视化预览。本文的组件展示方式受其启发。
