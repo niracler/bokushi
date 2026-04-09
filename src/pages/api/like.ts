@@ -5,6 +5,7 @@
  * POST /api/like { slug } - 点赞（每次 +1，每人最多 16 次）
  */
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getClientIP, hashIP, jsonResponse, verifySameOrigin } from "../../lib/utils";
 
@@ -19,7 +20,7 @@ interface LikeData {
     likes: Record<string, number>;
 }
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url);
     const slug = url.searchParams.get("slug");
 
@@ -28,7 +29,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     try {
-        const kv = locals.runtime?.env?.LIKES;
+        const kv = env.LIKES;
 
         // 本地开发环境没有 KV，返回模拟数据
         if (!kv) {
@@ -51,7 +52,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 };
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
     if (!verifySameOrigin(request)) {
         return jsonResponse({ error: "Origin mismatch" }, 403);
     }
@@ -64,7 +65,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             return jsonResponse({ error: "Missing slug" }, 400);
         }
 
-        const kv = locals.runtime?.env?.LIKES;
+        const kv = env.LIKES;
 
         // 本地开发环境没有 KV，返回模拟数据
         if (!kv) {

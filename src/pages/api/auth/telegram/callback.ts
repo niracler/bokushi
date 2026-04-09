@@ -6,19 +6,19 @@
  * → Verifies HMAC-SHA256 signature, upserts user, creates session
  */
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { createSession, type TelegramAuthData, verifyTelegramAuth } from "../../../../lib/auth";
 import { jsonResponse, verifySameOrigin } from "../../../../lib/utils";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
     if (!verifySameOrigin(request)) {
         return jsonResponse({ error: "Origin mismatch" }, 403);
     }
 
-    const env = locals.runtime?.env;
-    if (!env?.TELEGRAM_BOT_TOKEN || !env?.SESSIONS || !env?.COMMENTS_DB) {
+    if (!env.TELEGRAM_BOT_TOKEN || !env.SESSIONS || !env.COMMENTS_DB) {
         return jsonResponse({ error: "Telegram auth not configured" }, 503);
     }
 

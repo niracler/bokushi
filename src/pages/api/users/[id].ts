@@ -4,6 +4,7 @@
  * PATCH /api/users/:id - Update user email for notifications
  */
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getSessionUser } from "../../../lib/auth";
 import { jsonResponse, verifySameOrigin } from "../../../lib/utils";
@@ -26,7 +27,7 @@ async function verifyAdmin(request: Request, env: Env | undefined): Promise<bool
     return false;
 }
 
-export const PATCH: APIRoute = async ({ params, request, locals }) => {
+export const PATCH: APIRoute = async ({ params, request }) => {
     if (!verifySameOrigin(request)) {
         return jsonResponse({ error: "Origin mismatch" }, 403);
     }
@@ -36,12 +37,11 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
         return jsonResponse({ error: "Missing user id" }, 400);
     }
 
-    const env = locals.runtime?.env;
     if (!(await verifyAdmin(request, env))) {
         return jsonResponse({ error: "Unauthorized" }, 401);
     }
 
-    const db = env?.COMMENTS_DB;
+    const db = env.COMMENTS_DB;
     if (!db) {
         return jsonResponse({ error: "Database not available" }, 503);
     }

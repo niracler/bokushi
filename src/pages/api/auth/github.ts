@@ -5,6 +5,7 @@
  * → Generates state, stores in KV, redirects to GitHub authorize URL
  */
 
+import { env } from "cloudflare:workers";
 import { GitHub, generateState } from "arctic";
 import type { APIRoute } from "astro";
 import { jsonResponse } from "../../../lib/utils";
@@ -13,9 +14,8 @@ export const prerender = false;
 
 const STATE_TTL = 60 * 10; // 10 minutes
 
-export const GET: APIRoute = async ({ request, locals }) => {
-    const env = locals.runtime?.env;
-    if (!env?.GITHUB_CLIENT_ID || !env?.GITHUB_CLIENT_SECRET || !env?.SESSIONS) {
+export const GET: APIRoute = async ({ request }) => {
+    if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET || !env.SESSIONS) {
         return jsonResponse({ error: "OAuth not configured" }, 503);
     }
 

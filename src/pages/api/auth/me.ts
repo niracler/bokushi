@@ -6,15 +6,15 @@
  *   Also returns linked providers for account linking UI.
  */
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getSessionUser } from "../../../lib/auth";
 import { jsonResponse } from "../../../lib/utils";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request, locals }) => {
-    const env = locals.runtime?.env;
-    if (!env?.SESSIONS || !env?.COMMENTS_DB) {
+export const GET: APIRoute = async ({ request }) => {
+    if (!env.SESSIONS || !env.COMMENTS_DB) {
         return jsonResponse({ user: null });
     }
 

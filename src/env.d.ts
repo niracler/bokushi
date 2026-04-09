@@ -17,8 +17,14 @@ interface Env {
     NOTIFY_FROM_EMAIL?: string; // sender address (must be a Fastmail identity)
 }
 
-type Runtime = import("@astrojs/cloudflare").Runtime<Env>;
+// Provide type declarations for the cloudflare:workers virtual module
+declare module "cloudflare:workers" {
+    const env: Env;
+    export { env };
+}
 
 declare namespace App {
-    interface Locals extends Runtime {}
+    interface Locals {
+        cfContext: ExecutionContext;
+    }
 }

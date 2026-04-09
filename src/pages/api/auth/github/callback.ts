@@ -5,6 +5,7 @@
  * → Validates state, exchanges code for token, upserts user, creates session, redirects back
  */
 
+import { env } from "cloudflare:workers";
 import { GitHub } from "arctic";
 import type { APIRoute } from "astro";
 import { createSession } from "../../../../lib/auth";
@@ -19,14 +20,8 @@ interface GitHubUser {
     name: string | null;
 }
 
-export const GET: APIRoute = async ({ request, locals }) => {
-    const env = locals.runtime?.env;
-    if (
-        !env?.GITHUB_CLIENT_ID ||
-        !env?.GITHUB_CLIENT_SECRET ||
-        !env?.SESSIONS ||
-        !env?.COMMENTS_DB
-    ) {
+export const GET: APIRoute = async ({ request }) => {
+    if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET || !env.SESSIONS || !env.COMMENTS_DB) {
         return jsonResponse({ error: "OAuth not configured" }, 503);
     }
 

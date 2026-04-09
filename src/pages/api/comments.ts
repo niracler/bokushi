@@ -5,6 +5,7 @@
  * POST /api/comments           - Create a new comment
  */
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getSessionUser } from "../../lib/auth";
 import { notifyCommentReply } from "../../lib/email-notify";
@@ -155,7 +156,7 @@ async function buildCommentTree(
     return { comments: result, total };
 }
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url);
     const slug = url.searchParams.get("slug");
     const sortOrder = parseSortOrder(url.searchParams.get("sort"));
@@ -164,8 +165,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
         return jsonResponse({ error: "Missing slug parameter" }, 400);
     }
 
-    const env = locals.runtime?.env;
-    const db = env?.COMMENTS_DB;
+    const db = env.COMMENTS_DB;
 
     // Mock fallback for local dev without D1
     if (!db) {
@@ -174,7 +174,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
     // Check if requester is admin (optional, for user_email visibility)
     let isAdminRequest = false;
-    if (env?.SESSIONS) {
+    if (env.SESSIONS) {
         const sessionUser = await getSessionUser(db, env.SESSIONS, request);
         isAdminRequest = sessionUser?.role === "admin";
     }
@@ -235,8 +235,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             );
         }
 
-        const env = locals.runtime?.env;
-        const db = env?.COMMENTS_DB;
+        const db = env.COMMENTS_DB;
 
         // Check if user is logged in
         let sessionUser: {
@@ -245,7 +244,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             avatar_url: string | null;
             role: string;
         } | null = null;
-        if (db && env?.SESSIONS) {
+        if (db && env.SESSIONS) {
             sessionUser = await getSessionUser(db, env.SESSIONS, request);
         }
 
@@ -355,7 +354,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             .run();
 
         // Fire-and-forget: notify Telegram group
-        if (env?.TELEGRAM_BOT_TOKEN && env?.TELEGRAM_NOTIFY_CHAT_ID) {
+        if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_NOTIFY_CHAT_ID) {
             const parentAuthor = parentRow ? parentRow.user_name || parentRow.author : undefined;
             const parentContent = parentRow?.content;
 
@@ -373,7 +372,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                     postTitle: body.post_title?.trim() || undefined,
                 },
             );
-            const ctx = locals.runtime?.ctx;
+            const ctx = locals.cfContext;
             if (ctx?.waitUntil) {
                 ctx.waitUntil(notifyPromise);
             } else {
@@ -406,7 +405,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 }>();
         }
         const recipientEmail = notifyRow?.email || notifyRow?.user_email;
-        if (notifyTargetId && env?.FASTMAIL_API_TOKEN && notifyRow && recipientEmail) {
+        if (notifyTargetId && env.FASTMAIL_API_TOKEN && notifyRow && recipientEmail) {
             const targetName = notifyRow.user_name || notifyRow.author;
             const jmapConfig = {
                 token: env.FASTMAIL_API_TOKEN,
@@ -437,7 +436,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                         .run();
                 });
 
-            const ctx = locals.runtime?.ctx;
+            const ctx = locals.cfContext;
             if (ctx?.waitUntil) {
                 ctx.waitUntil(emailAndTrack);
             } else {

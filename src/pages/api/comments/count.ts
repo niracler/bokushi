@@ -5,12 +5,13 @@
  * GET /api/comments/count?slug=a&slug=b    - Batch count for multiple posts
  */
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { jsonResponse } from "../../../lib/utils";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url);
     const slugs = url.searchParams.getAll("slug");
 
@@ -18,7 +19,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
         return jsonResponse({ error: "Missing slug parameter" }, 400);
     }
 
-    const db = locals.runtime?.env?.COMMENTS_DB;
+    const db = env.COMMENTS_DB;
 
     // Mock fallback for local dev
     if (!db) {

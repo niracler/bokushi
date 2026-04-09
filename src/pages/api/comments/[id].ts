@@ -6,6 +6,7 @@
  * PATCH  /api/comments/:id  - Admin update (hidden/visible status or pin/unpin)
  */
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getSessionUser } from "../../../lib/auth";
 import { COMMENT_LIMITS, jsonResponse, verifySameOrigin } from "../../../lib/utils";
@@ -36,7 +37,7 @@ async function verifyAdmin(request: Request, env: Env | undefined): Promise<bool
 
 const EDIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
-export const PUT: APIRoute = async ({ params, request, locals }) => {
+export const PUT: APIRoute = async ({ params, request }) => {
     if (!verifySameOrigin(request)) {
         return jsonResponse({ error: "Origin mismatch" }, 403);
     }
@@ -46,14 +47,13 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
         return jsonResponse({ error: "Missing comment id" }, 400);
     }
 
-    const env = locals.runtime?.env;
-    const db = env?.COMMENTS_DB;
+    const db = env.COMMENTS_DB;
     if (!db) {
         return jsonResponse({ error: "Database not available" }, 503);
     }
 
     // Must be logged in
-    if (!env?.SESSIONS) {
+    if (!env.SESSIONS) {
         return jsonResponse({ error: "Unauthorized" }, 401);
     }
     const sessionUser = await getSessionUser(db, env.SESSIONS, request);
@@ -110,7 +110,7 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
     return jsonResponse({ success: true, content, updated_at: now });
 };
 
-export const DELETE: APIRoute = async ({ params, request, locals }) => {
+export const DELETE: APIRoute = async ({ params, request }) => {
     if (!verifySameOrigin(request)) {
         return jsonResponse({ error: "Origin mismatch" }, 403);
     }
@@ -120,12 +120,11 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
         return jsonResponse({ error: "Missing comment id" }, 400);
     }
 
-    const env = locals.runtime?.env;
     if (!(await verifyAdmin(request, env))) {
         return jsonResponse({ error: "Unauthorized" }, 401);
     }
 
-    const db = env?.COMMENTS_DB;
+    const db = env.COMMENTS_DB;
     if (!db) {
         return jsonResponse({ error: "Database not available" }, 503);
     }
@@ -147,7 +146,7 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
     }
 };
 
-export const PATCH: APIRoute = async ({ params, request, locals }) => {
+export const PATCH: APIRoute = async ({ params, request }) => {
     if (!verifySameOrigin(request)) {
         return jsonResponse({ error: "Origin mismatch" }, 403);
     }
@@ -157,12 +156,11 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
         return jsonResponse({ error: "Missing comment id" }, 400);
     }
 
-    const env = locals.runtime?.env;
     if (!(await verifyAdmin(request, env))) {
         return jsonResponse({ error: "Unauthorized" }, 401);
     }
 
-    const db = env?.COMMENTS_DB;
+    const db = env.COMMENTS_DB;
     if (!db) {
         return jsonResponse({ error: "Database not available" }, 503);
     }
