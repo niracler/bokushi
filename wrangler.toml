@@ -4,6 +4,7 @@
 name = "bokushi"
 pages_build_output_dir = "./dist"
 compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
 
 # KV Namespace Bindings
 # 在 Cloudflare Dashboard 创建 KV namespace 后填入 id
