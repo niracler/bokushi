@@ -18,7 +18,7 @@ Niracler 的个人博客，记录一个话唠的技术与生活。
 |-------|------|
 | ![Light theme](assets/design-preview-light.png) | ![Dark theme](assets/design-preview-dark.png) |
 
-完整设计系统预览: [niracler.com/design-preview](https://niracler.com/design-preview)
+完整设计系统文章: [niracler.com/design](https://niracler.com/blog/zh/design) | 机器可读版: [DESIGN.md](DESIGN.md)
 
 ## 技术栈
 
