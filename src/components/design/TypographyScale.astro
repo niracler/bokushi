@@ -1,0 +1,124 @@
+---
+/**
+ * TypographyScale — renders live typography samples at each scale level.
+ * Inspired by getdesign.md's typography showcase pattern.
+ */
+
+const typeSamples = [
+    {
+        sample: "博物志 Bokushi",
+        meta: "H1 — 36px / 700 / 1.22",
+        style: "font-size: var(--font-size-3xl); font-weight: 700; line-height: var(--line-height-tight);",
+    },
+    {
+        sample: "设计基础 Design Foundations",
+        meta: "H2 — 30px / 800 / 1.22 / -0.02em",
+        style: "font-size: var(--font-size-2xl); font-weight: 800; line-height: var(--line-height-tight); letter-spacing: -0.02em;",
+    },
+    {
+        sample: "色彩系统 Color System",
+        meta: "H3 — 24px / 700 / 1.22 / -0.01em",
+        style: "font-size: var(--font-size-xl); font-weight: 700; line-height: var(--line-height-tight); letter-spacing: -0.01em;",
+    },
+    {
+        sample: "浅色主题 Light Theme",
+        meta: "H4 — 20px / 700 / 1.22",
+        style: "font-size: var(--font-size-lg); font-weight: 700; line-height: var(--line-height-tight);",
+    },
+    {
+        sample: "正文排版服务于长时间阅读，行高宽松，字距微调。The quick brown fox jumps over the lazy dog. 粉圓體赋予页面温暖手写感。",
+        meta: "Body — 17px / 400 / 1.75 — jf-openhuninn-2.0",
+        style: "font-size: var(--font-size-base); font-weight: 400; line-height: var(--line-height-base); max-width: 60ch;",
+    },
+    {
+        sample: "图片说明、脚注和次要信息",
+        meta: "Small — 15px / 400 / 1.65",
+        style: "font-size: var(--font-size-sm); font-weight: 400; line-height: var(--line-height-relaxed);",
+    },
+    {
+        sample: "标签 · 日期 · 元数据",
+        meta: "Caption — 13px / 400 / 1.75",
+        style: "font-size: var(--font-size-xs); font-weight: 400; line-height: var(--line-height-base);",
+    },
+    {
+        sample: "const design = await vibe.coding()",
+        meta: "Code — 11px / 500 — Fira Code",
+        style: "font-size: var(--font-size-2xs); font-weight: 500; font-family: 'Fira Code', monospace;",
+    },
+];
+---
+
+<section class="typography-scale not-prose">
+    <div class="type-list">
+        {typeSamples.map((t) => (
+            <div class="type-card">
+                <p class="type-sample" style={t.style}>{t.sample}</p>
+                <span class="type-meta">{t.meta}</span>
+            </div>
+        ))}
+    </div>
+
+    <div class="bold-demo">
+        <p>
+            在正文中，<strong>粗体会以强调色渲染</strong>，而非普通的黑色加粗。这是一个<strong>有意为之的设计选择</strong>，用于视觉强调。
+        </p>
+    </div>
+</section>
+
+<style>
+    .typography-scale {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .type-list {
+        display: grid;
+        gap: 0;
+    }
+
+    .type-card {
+        padding: var(--space-4) 0;
+        border-bottom: 1px solid var(--color-border-soft);
+    }
+
+    .type-card:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .type-card:first-child {
+        padding-top: 0;
+    }
+
+    .type-sample {
+        margin: 0;
+        color: var(--color-text-primary);
+    }
+
+    .type-meta {
+        display: block;
+        margin-top: var(--space-2);
+        font-family: "Fira Code", monospace;
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+    }
+
+    .bold-demo {
+        margin-top: var(--space-4);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--color-border-soft);
+    }
+
+    .bold-demo p {
+        margin: 0;
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-base);
+        line-height: var(--line-height-base);
+    }
+
+    .bold-demo strong {
+        color: var(--color-accent);
+        font-weight: 600;
+    }
+</style>

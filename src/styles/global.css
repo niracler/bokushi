@@ -17,30 +17,18 @@
     /* Accent colors - reference tokens.css */
     --color-accent: var(--color-accent);
     --color-accent-soft: var(--color-accent-soft);
-    --color-accent-tint-6: var(--color-accent-tint-6);
-    --color-accent-tint-8: var(--color-accent-tint-8);
-    --color-accent-tint-12: var(--color-accent-tint-12);
-    --color-accent-tint-18: var(--color-accent-tint-18);
 
-    /* Link colors */
-    --color-link: var(--color-link);
-    --color-link-hover: var(--color-link-hover);
+    /* Link colors — alias accent-dark / accent */
+    --color-link: var(--color-accent-dark);
+    --color-link-hover: var(--color-accent);
 
     /* Border colors - reference tokens.css */
     --color-border: var(--color-border);
     --color-border-soft: var(--color-border-soft);
-    --color-border-subtle: var(--color-border-subtle);
 
     /* Overlay colors */
     --color-overlay-dark-35: var(--color-overlay-dark-35);
-    --color-overlay-dark-40: var(--color-overlay-dark-40);
-    --color-overlay-dark-60: var(--color-overlay-dark-60);
-    --color-overlay-light-25: var(--color-overlay-light-25);
-    --color-overlay-light-35: var(--color-overlay-light-35);
-    --color-overlay-light-50: var(--color-overlay-light-50);
 
-    /* Code block colors */
-    --color-code-bg: var(--color-code-bg);
 }
 
 @layer base {
@@ -312,7 +300,7 @@
     }
 
     .prose :where(h2, h3, h4) > .anchor-link:focus-visible {
-        outline: 2px solid var(--color-border-subtle);
+        outline: 2px solid var(--color-border-soft);
         outline-offset: 2px;
         border-radius: var(--radius-sm);
     }
@@ -421,7 +409,7 @@
         margin: 0;
         max-width: 100%;
         padding: var(--space-4);
-        border: 1px solid var(--color-border-subtle);
+        border: 1px solid var(--color-border-soft);
         border-radius: var(--radius-md);
         background: var(--color-code-bg);
         font-size: 0.95em;
@@ -429,7 +417,7 @@
     }
 
     html[data-theme="dark"] .prose pre {
-        border-color: var(--color-border-subtle);
+        border-color: var(--color-border-soft);
     }
 
     .prose pre code {
@@ -477,7 +465,7 @@
         align-items: center;
         justify-content: space-between;
         padding: var(--space-2) var(--space-4);
-        border: 1px solid var(--color-border-subtle);
+        border: 1px solid var(--color-border-soft);
         border-bottom: none;
         border-radius: var(--radius-md) var(--radius-md) 0 0;
         background: color-mix(in srgb, var(--color-bg-surface) 95%, var(--color-text-primary) 5%);
@@ -497,7 +485,7 @@
         align-items: center;
         gap: var(--space-1);
         padding: var(--space-1) var(--space-2);
-        border: 1px solid var(--color-border-subtle);
+        border: 1px solid var(--color-border-soft);
         border-radius: var(--radius-sm);
         background: var(--color-bg-surface);
         color: var(--color-text-secondary);
@@ -533,7 +521,7 @@
     .prose .mermaid {
         margin: var(--space-4) 0;
         padding: var(--space-4);
-        border: 1px solid var(--color-border-subtle);
+        border: 1px solid var(--color-border-soft);
         border-radius: var(--radius-lg);
         background: color-mix(in srgb, var(--color-bg-surface) 90%, var(--color-bg-muted) 10%);
         box-shadow: var(--shadow-soft);
@@ -541,7 +529,7 @@
     }
 
     html[data-theme="dark"] .prose .mermaid {
-        border-color: var(--color-border-strong);
+        border-color: var(--color-border);
         background: color-mix(in srgb, var(--color-bg-surface) 80%, var(--color-bg-muted) 20%);
     }
 
@@ -689,7 +677,7 @@
             display: grid;
             gap: var(--space-3);
             padding: var(--space-3);
-            border: 1px solid var(--color-border-subtle);
+            border: 1px solid var(--color-border-soft);
             border-radius: var(--radius-md);
             background: color-mix(in srgb, var(--color-bg-surface) 90%, var(--color-bg-page) 10%);
             box-shadow: var(--shadow-soft);
@@ -965,7 +953,7 @@
         margin-top: 0.375rem;
         margin-left: 0.75rem;
         padding-left: 0.75rem;
-        border-left: 1px solid color-mix(in srgb, var(--color-border-subtle) 50%, transparent);
+        border-left: 1px solid color-mix(in srgb, var(--color-border-soft) 50%, transparent);
     }
 
     .toc-sublist > li {
@@ -1040,11 +1028,11 @@
 
     .toc::-webkit-scrollbar-thumb {
         border-radius: 2px;
-        background: color-mix(in srgb, var(--color-border-subtle) 60%, transparent);
+        background: color-mix(in srgb, var(--color-border-soft) 60%, transparent);
     }
 
     .toc::-webkit-scrollbar-thumb:hover {
-        background: var(--color-border-subtle);
+        background: var(--color-border-soft);
     }
 
     /* Mobile TOC overrides */
@@ -1110,14 +1098,14 @@
     /* Variant: soft - less prominent card */
     .surface-card--soft {
         box-shadow: none;
-        border-color: var(--color-border-subtle);
+        border-color: var(--color-border-soft);
         background: color-mix(in srgb, var(--color-bg-surface) 80%, var(--color-bg-muted) 20%);
     }
 
     /* Variant: flat - no shadow, minimal border */
     .surface-card--flat {
         box-shadow: none;
-        border-color: var(--color-border-subtle);
+        border-color: var(--color-border-soft);
     }
 
     /* Variant: compact - smaller padding (apply padding in component) */
@@ -1147,7 +1135,7 @@
         gap: var(--space-2);
         padding: var(--space-1) var(--space-3);
         border-radius: var(--radius-full);
-        border: 1px solid var(--color-border-subtle);
+        border: 1px solid var(--color-border-soft);
         background: var(--color-bg-muted);
         color: var(--color-text-secondary);
         font-size: var(--font-size-xs);
@@ -1176,7 +1164,7 @@
 
     .pill[data-tone="accent"] {
         background: color-mix(in srgb, var(--color-accent-soft) 70%, transparent);
-        border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-border-subtle));
+        border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-border-soft));
         color: var(--color-accent);
     }
 
@@ -1302,7 +1290,7 @@
     }
 
     .theme-toggle[data-variant="mobile"] [data-theme-toggle]:hover {
-        background: var(--color-accent-tint-8);
+        background: color-mix(in srgb, var(--color-accent) 8%, transparent);
     }
 
     .theme-toggle[data-variant="mobile"] [data-theme-toggle-label] {
@@ -1335,7 +1323,7 @@
     }
 
     .deepsearch-checkbox:hover {
-        border-color: var(--color-border-strong);
+        border-color: var(--color-border);
     }
 
     .deepsearch-checkbox:checked {

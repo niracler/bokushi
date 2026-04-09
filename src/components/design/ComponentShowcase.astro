@@ -1,0 +1,302 @@
+---
+/**
+ * ComponentShowcase — renders card variants, pills, buttons, and shadow levels.
+ * Uses live CSS classes from global.css (always accurate).
+ */
+
+const shadows = [
+    {
+        name: "--shadow-soft",
+        lightValue: "0 6px 18px rgba(47,37,25, 0.08)",
+        darkValue: "0 10px 28px rgba(0,0,0, 0.32)",
+    },
+    {
+        name: "--shadow-strong",
+        lightValue: "0 16px 36px rgba(47,37,25, 0.14)",
+        darkValue: "0 24px 42px rgba(0,0,0, 0.44)",
+    },
+    {
+        name: "--shadow-lightbox",
+        lightValue: "0 20px 60px rgba(0,0,0, 0.4)",
+        darkValue: "0 20px 60px rgba(0,0,0, 0.6)",
+    },
+    {
+        name: "--shadow-button-hover",
+        lightValue: "0 6px 20px rgba(251,143,104, 0.3)",
+        darkValue: "0 6px 20px rgba(251,159,116, 0.35)",
+    },
+];
+
+const radiusScale = [
+    { name: "--radius-xs", value: "2px" },
+    { name: "--radius-sm", value: "6px" },
+    { name: "--radius-md", value: "10px" },
+    { name: "--radius-lg", value: "16px" },
+    { name: "--radius-full", value: "9999px" },
+];
+
+const spacingScale = [
+    { name: "--space-1", value: "0.25rem", pixels: "4px" },
+    { name: "--space-2", value: "0.5rem", pixels: "8px" },
+    { name: "--space-3", value: "0.75rem", pixels: "12px" },
+    { name: "--space-4", value: "1rem", pixels: "16px" },
+    { name: "--space-5", value: "1.25rem", pixels: "20px" },
+    { name: "--space-6", value: "1.5rem", pixels: "24px" },
+    { name: "--space-8", value: "2rem", pixels: "32px" },
+    { name: "--space-12", value: "3rem", pixels: "48px" },
+];
+---
+
+<section class="component-showcase not-prose">
+    <h3>Surface Card Variants</h3>
+    <div class="card-grid">
+        <div class="surface-card" style="padding: var(--space-4);">
+            <span class="eyebrow">Default</span>
+            <p class="card-desc">.surface-card</p>
+            <p class="card-detail">White bg, soft border, soft shadow</p>
+        </div>
+        <div class="surface-card surface-card--soft" style="padding: var(--space-4);">
+            <span class="eyebrow">Soft</span>
+            <p class="card-desc">.surface-card--soft</p>
+            <p class="card-detail">No shadow, muted bg blend</p>
+        </div>
+        <div class="surface-card surface-card--flat" style="padding: var(--space-4);">
+            <span class="eyebrow">Flat</span>
+            <p class="card-desc">.surface-card--flat</p>
+            <p class="card-detail">No shadow, subtle border</p>
+        </div>
+        <div class="surface-card surface-card--compact" style="padding: var(--space-3);">
+            <span class="eyebrow">Compact</span>
+            <p class="card-desc">.surface-card--compact</p>
+            <p class="card-detail">Smaller radius (md)</p>
+        </div>
+        <div class="surface-card surface-card--hover-border" style="padding: var(--space-4);">
+            <span class="eyebrow">Hover: border</span>
+            <p class="card-desc">.surface-card--hover-border</p>
+            <p class="card-detail">Hover to see border change</p>
+        </div>
+    </div>
+
+    <h3>Pills & Tags</h3>
+    <div class="pills-row">
+        <span class="pill">Default pill</span>
+        <span class="pill" data-tone="accent">Accent pill</span>
+        <a href="#" class="pill pill--clickable">Clickable pill</a>
+        <a href="#" class="pill pill--clickable" data-tone="accent">Accent clickable</a>
+    </div>
+
+    <h3>Icon Buttons</h3>
+    <div class="btn-row">
+        <div class="btn-group">
+            <span class="btn-label">XS round</span>
+            <button class="icon-btn icon-btn--xs icon-btn--round" aria-label="Example">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+        </div>
+        <div class="btn-group">
+            <span class="btn-label">SM round bordered</span>
+            <button class="icon-btn icon-btn--sm icon-btn--round icon-btn--bordered" aria-label="Example">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+        </div>
+        <div class="btn-group">
+            <span class="btn-label">MD square</span>
+            <button class="icon-btn icon-btn--md icon-btn--square" aria-label="Example">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+        </div>
+        <div class="btn-group">
+            <span class="btn-label">MD square bordered</span>
+            <button class="icon-btn icon-btn--md icon-btn--square icon-btn--bordered" aria-label="Example">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <h3>Shadow / Elevation</h3>
+    <div class="shadow-grid">
+        {shadows.map((s) => (
+            <div class="shadow-sample" style={`box-shadow: var(${s.name})`}>
+                <code>{s.name}</code>
+                <span class="shadow-detail">Light: {s.lightValue}</span>
+            </div>
+        ))}
+    </div>
+
+    <h3>Border Radius Scale</h3>
+    <div class="radius-row">
+        {radiusScale.map((r) => (
+            <div class="radius-sample">
+                <div class="radius-block" style={`border-radius: var(${r.name})`} />
+                <code>{r.name}</code>
+                <span class="radius-value">{r.value}</span>
+            </div>
+        ))}
+    </div>
+
+    <h3>Spacing Scale</h3>
+    <div class="spacing-samples">
+        {spacingScale.map((s) => (
+            <div class="spacing-row">
+                <code class="spacing-label">{s.name}</code>
+                <div class="spacing-bar" style={`width: var(${s.name})`} />
+                <span class="spacing-value">{s.value} ({s.pixels})</span>
+            </div>
+        ))}
+    </div>
+</section>
+
+<style>
+    .component-showcase {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .component-showcase h3 {
+        margin: var(--space-6) 0 var(--space-3);
+        font-size: var(--font-size-xl);
+        font-weight: 700;
+        color: var(--color-text-primary);
+    }
+
+    /* Card grid */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+        gap: var(--space-3);
+    }
+
+    .card-desc {
+        margin: var(--space-2) 0 0;
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+
+    .card-detail {
+        margin: var(--space-1) 0 0;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+    }
+
+    /* Pills */
+    .pills-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        align-items: center;
+    }
+
+    /* Buttons */
+    .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        align-items: flex-end;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .btn-label {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+        text-align: center;
+    }
+
+    /* Shadows */
+    .shadow-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+        gap: var(--space-4);
+    }
+
+    .shadow-sample {
+        padding: var(--space-4);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-surface);
+    }
+
+    .shadow-sample code {
+        display: block;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-primary);
+    }
+
+    .shadow-detail {
+        display: block;
+        margin-top: var(--space-1);
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+        word-break: break-all;
+    }
+
+    /* Radius */
+    .radius-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        align-items: flex-end;
+    }
+
+    .radius-sample {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-1);
+    }
+
+    .radius-block {
+        width: 3.5rem;
+        height: 3.5rem;
+        background: var(--color-accent-soft);
+        border: 2px solid var(--color-accent);
+    }
+
+    .radius-sample code {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-primary);
+    }
+
+    .radius-value {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+    }
+
+    /* Spacing */
+    .spacing-samples {
+        display: grid;
+        gap: var(--space-2);
+    }
+
+    .spacing-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .spacing-label {
+        flex: 0 0 8rem;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-primary);
+        text-align: right;
+    }
+
+    .spacing-bar {
+        height: 1rem;
+        background: var(--color-accent);
+        border-radius: var(--radius-xs);
+        min-width: 4px;
+    }
+
+    .spacing-value {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+        white-space: nowrap;
+    }
+</style>

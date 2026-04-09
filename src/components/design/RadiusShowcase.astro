@@ -1,0 +1,67 @@
+---
+/**
+ * RadiusShowcase — renders border radius scale.
+ */
+
+const radiusScale = [
+    { name: "--radius-xs", value: "2px" },
+    { name: "--radius-sm", value: "6px" },
+    { name: "--radius-md", value: "10px" },
+    { name: "--radius-lg", value: "16px" },
+    { name: "--radius-full", value: "9999px" },
+];
+---
+
+<div class="radius-showcase not-prose">
+    <div class="radius-row">
+        {radiusScale.map((r) => (
+            <div class="radius-sample">
+                <div class="radius-block" style={`border-radius: var(${r.name})`} />
+                <code>{r.name}</code>
+                <span class="radius-value">{r.value}</span>
+            </div>
+        ))}
+    </div>
+</div>
+
+<style>
+    .radius-showcase {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .radius-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        align-items: flex-end;
+    }
+
+    .radius-sample {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-1);
+    }
+
+    .radius-block {
+        width: 3.5rem;
+        height: 3.5rem;
+        background: var(--color-accent-soft);
+        border: 2px solid var(--color-accent);
+    }
+
+    .radius-sample code {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-primary);
+        padding: 0;
+        border-radius: 0;
+        background: none;
+    }
+
+    .radius-value {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+    }
+</style>

@@ -1,0 +1,74 @@
+---
+import ButtonShowcase from "../components/design/ButtonShowcase.astro";
+import CardShowcase from "../components/design/CardShowcase.astro";
+/**
+ * Design Screenshot Page — minimal page for automated screenshot capture.
+ * Not linked from navigation. Used by pre-commit hook to generate
+ * assets/design-preview-light.png and assets/design-preview-dark.png.
+ *
+ * Access: /design-screenshot
+ */
+import ColorPalette from "../components/design/ColorPalette.astro";
+import PillShowcase from "../components/design/PillShowcase.astro";
+import ShadowShowcase from "../components/design/ShadowShowcase.astro";
+import TypographyScale from "../components/design/TypographyScale.astro";
+
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="noindex" />
+        <title>Design Preview</title>
+        <style>
+            @import "../styles/tokens.css";
+            @import "../styles/global.css";
+        </style>
+    </head>
+    <body style="background: var(--color-bg-page); padding: 2rem; max-width: 960px; margin: 0 auto;">
+        <section class="showcase-section">
+            <h2>Color</h2>
+            <ColorPalette />
+        </section>
+
+        <section class="showcase-section">
+            <h2>Typography</h2>
+            <TypographyScale />
+        </section>
+
+        <section class="showcase-section">
+            <h2>Cards</h2>
+            <CardShowcase />
+        </section>
+
+        <section class="showcase-section">
+            <h2>Buttons</h2>
+            <ButtonShowcase />
+        </section>
+
+        <section class="showcase-section">
+            <h2>Pills</h2>
+            <PillShowcase />
+        </section>
+
+        <section class="showcase-section">
+            <h2>Shadows</h2>
+            <ShadowShowcase />
+        </section>
+
+        <style>
+            .showcase-section {
+                margin-bottom: 2rem;
+            }
+            .showcase-section h2 {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--color-text-primary);
+                margin: 0 0 0.75rem;
+            }
+        </style>
+    </body>
+</html>

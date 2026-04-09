@@ -147,7 +147,7 @@ const heading = locale === "en" ? "Comments" : "评论";
     .comment-login-link:hover {
         color: var(--color-accent);
         border-color: var(--color-accent-tint);
-        background: var(--color-accent-tint-6);
+        background: color-mix(in srgb, var(--color-accent) 6%, transparent);
     }
 
     .comment-login-link svg {
@@ -163,7 +163,7 @@ const heading = locale === "en" ? "Comments" : "评论";
     }
 
     .comment-card + .comment-card {
-        border-top: 1px solid var(--color-border-subtle);
+        border-top: 1px solid var(--color-border-soft);
     }
 
     /* Reply thread wrapper with connecting line */
@@ -189,7 +189,7 @@ const heading = locale === "en" ? "Comments" : "评论";
     }
 
     .comment-card--reply + .comment-card--reply {
-        border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 50%, transparent);
+        border-top: 1px solid color-mix(in srgb, var(--color-border-soft) 50%, transparent);
     }
 
     .comment-card--deleted {
@@ -217,7 +217,7 @@ const heading = locale === "en" ? "Comments" : "评论";
         padding: 2px;
         border-radius: var(--radius-full);
         background: var(--color-bg-muted);
-        border: 1px solid var(--color-border-subtle);
+        border: 1px solid var(--color-border-soft);
     }
 
     .comment-sort-btn {
@@ -266,7 +266,7 @@ const heading = locale === "en" ? "Comments" : "评论";
         flex-shrink: 0;
         border-radius: 50%;
         background: var(--color-bg-muted);
-        border: 2px solid var(--color-border-subtle);
+        border: 2px solid var(--color-border-soft);
         transition: border-color var(--transition-base);
     }
 
@@ -423,7 +423,7 @@ const heading = locale === "en" ? "Comments" : "评论";
 
     .comment-body hr {
         border: none;
-        border-top: 1px solid var(--color-border-subtle);
+        border-top: 1px solid var(--color-border-soft);
         margin: var(--space-3) 0;
     }
 

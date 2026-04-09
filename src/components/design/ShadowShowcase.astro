@@ -1,0 +1,71 @@
+---
+/**
+ * ShadowShowcase — renders shadow/elevation levels.
+ */
+
+const shadows = [
+    {
+        name: "--shadow-soft",
+        desc: "Cards, tables, images",
+    },
+    {
+        name: "--shadow-strong",
+        desc: "Unused (reserved)",
+    },
+    {
+        name: "--shadow-lightbox",
+        desc: "Lightbox overlay",
+    },
+    {
+        name: "--shadow-button-hover",
+        desc: "Button hover glow",
+    },
+];
+---
+
+<div class="shadow-showcase not-prose">
+    <div class="shadow-grid">
+        {shadows.map((s) => (
+            <div class="shadow-sample" style={`box-shadow: var(${s.name})`}>
+                <code>{s.name}</code>
+                <span class="shadow-desc">{s.desc}</span>
+            </div>
+        ))}
+    </div>
+</div>
+
+<style>
+    .shadow-showcase {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .shadow-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+        gap: var(--space-4);
+    }
+
+    .shadow-sample {
+        padding: var(--space-4);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-surface);
+    }
+
+    .shadow-sample code {
+        display: block;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-primary);
+        padding: 0;
+        border-radius: 0;
+        background: none;
+    }
+
+    .shadow-desc {
+        display: block;
+        margin-top: var(--space-1);
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+    }
+</style>

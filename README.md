@@ -12,13 +12,21 @@ Niracler 的个人博客，记录一个话唠的技术与生活。
 - **动态频道** — Telegram 频道同步，日常碎碎念
 - **漫画表情包库** — 从漫画里截的表情包收藏（Cloudflare D1 驱动）
 
+## 设计预览
+
+| Light | Dark |
+|-------|------|
+| ![Light theme](assets/design-preview-light.png) | ![Dark theme](assets/design-preview-dark.png) |
+
+完整设计系统文章: [niracler.com/design](https://niracler.com/blog/zh/design) | 机器可读版: [DESIGN.md](DESIGN.md)
+
 ## 技术栈
 
 [Astro](https://astro.build/) + [Tailwind CSS](https://tailwindcss.com/) + [Cloudflare Pages](https://pages.cloudflare.com/)
 
 代码质量由 [Biome](https://biomejs.dev/) 管理，评论系统基于 Cloudflare D1 自建。
 
-设计思路详见 [博物志 - 一份设计说明书](https://niracler.com/design-primitives)。
+设计思路详见 [博物志 - 一份设计说明书](https://niracler.com/design)。
 
 ## 开发
 

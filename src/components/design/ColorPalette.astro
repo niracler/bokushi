@@ -1,0 +1,170 @@
+---
+/**
+ * ColorPalette — design system color showcase.
+ * Uses live CSS variables — automatically matches current theme.
+ */
+
+const groups = [
+    {
+        label: "Background",
+        colors: [
+            { name: "--color-bg-page", friendlyName: "Page", desc: "Primary page background" },
+            { name: "--color-bg-surface", friendlyName: "Surface", desc: "Card / panel" },
+            { name: "--color-bg-muted", friendlyName: "Muted", desc: "Secondary background" },
+        ],
+    },
+    {
+        label: "Text",
+        colors: [
+            { name: "--color-text-primary", friendlyName: "Primary", desc: "Headings, emphasis" },
+            { name: "--color-text-secondary", friendlyName: "Secondary", desc: "Body text" },
+            { name: "--color-text-muted", friendlyName: "Muted", desc: "Captions, metadata" },
+        ],
+    },
+    {
+        label: "Accent",
+        colors: [
+            {
+                name: "--color-accent",
+                friendlyName: "Accent",
+                desc: "Primary accent (Padparadscha)",
+            },
+            {
+                name: "--color-accent-dark",
+                friendlyName: "Deep Accent",
+                desc: "Links, hover states",
+            },
+            { name: "--color-accent-soft", friendlyName: "Accent Tint", desc: "Subtle highlights" },
+        ],
+    },
+    {
+        label: "Border & Semantic",
+        colors: [
+            { name: "--color-border", friendlyName: "Border", desc: "Dividers, card edges" },
+            { name: "--color-success", friendlyName: "Success", desc: "Positive states" },
+            { name: "--color-warning", friendlyName: "Warning", desc: "Caution states" },
+            { name: "--color-danger", friendlyName: "Danger", desc: "Error states" },
+            { name: "--color-note", friendlyName: "Note", desc: "Info callouts" },
+        ],
+    },
+];
+---
+
+<section class="color-palette not-prose">
+    {groups.map((group) => (
+        <div class="color-group">
+            <h4 class="group-label">{group.label}</h4>
+            <div class="swatch-grid">
+                {group.colors.map((c) => (
+                    <div class="swatch">
+                        <div class="swatch-block" style={`background: var(${c.name})`}>
+                            <span class="swatch-hex" data-color-var={c.name}></span>
+                        </div>
+                        <div class="swatch-info">
+                            <span class="swatch-name">{c.friendlyName}</span>
+                            <span class="swatch-desc">{c.desc}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    ))}
+</section>
+
+<script>
+    function updateHexLabels() {
+        const root = document.documentElement;
+        document.querySelectorAll("[data-color-var]").forEach((el) => {
+            const varName = (el as HTMLElement).dataset.colorVar!;
+            const resolved = getComputedStyle(root).getPropertyValue(varName).trim();
+            (el as HTMLElement).textContent = resolved;
+
+            const canvas = document.createElement("canvas");
+            canvas.width = canvas.height = 1;
+            const ctx = canvas.getContext("2d")!;
+            ctx.fillStyle = resolved;
+            ctx.fillRect(0, 0, 1, 1);
+            const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+            const luma = (r * 299 + g * 587 + b * 114) / 1000;
+            (el as HTMLElement).style.color = luma > 160 ? "#2a1c17" : "#f8ede1";
+        });
+    }
+
+    updateHexLabels();
+    const observer = new MutationObserver(updateHexLabels);
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-theme"],
+    });
+</script>
+
+<style>
+    .color-palette {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .color-group {
+        margin-bottom: var(--space-6);
+    }
+
+    .color-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .group-label {
+        font-size: var(--font-size-xs);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-text-muted);
+        margin: 0 0 var(--space-3);
+    }
+
+    .swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+        gap: var(--space-3);
+    }
+
+    .swatch {
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: var(--color-bg-surface);
+    }
+
+    .swatch-block {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-start;
+        height: 5rem;
+        padding: var(--space-2);
+    }
+
+    .swatch-hex {
+        font-family: "Fira Code", monospace;
+        font-size: var(--font-size-2xs);
+        font-weight: 500;
+        opacity: 0.85;
+    }
+
+    .swatch-info {
+        padding: var(--space-2) var(--space-2) var(--space-3);
+    }
+
+    .swatch-name {
+        display: block;
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+
+    .swatch-desc {
+        display: block;
+        margin-top: 2px;
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+    }
+</style>

@@ -1,0 +1,70 @@
+---
+/**
+ * SpacingShowcase — renders spacing scale bars.
+ */
+
+const spacingScale = [
+    { name: "--space-1", value: "0.25rem", pixels: "4px" },
+    { name: "--space-2", value: "0.5rem", pixels: "8px" },
+    { name: "--space-3", value: "0.75rem", pixels: "12px" },
+    { name: "--space-4", value: "1rem", pixels: "16px" },
+    { name: "--space-5", value: "1.25rem", pixels: "20px" },
+    { name: "--space-6", value: "1.5rem", pixels: "24px" },
+    { name: "--space-8", value: "2rem", pixels: "32px" },
+    { name: "--space-12", value: "3rem", pixels: "48px" },
+];
+---
+
+<div class="spacing-showcase not-prose">
+    <div class="spacing-samples">
+        {spacingScale.map((s) => (
+            <div class="spacing-row">
+                <code class="spacing-label">{s.name}</code>
+                <div class="spacing-bar" style={`width: var(${s.name})`} />
+                <span class="spacing-value">{s.value} ({s.pixels})</span>
+            </div>
+        ))}
+    </div>
+</div>
+
+<style>
+    .spacing-showcase {
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-muted);
+    }
+
+    .spacing-samples {
+        display: grid;
+        gap: var(--space-2);
+    }
+
+    .spacing-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .spacing-label {
+        flex: 0 0 8rem;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-primary);
+        text-align: right;
+        padding: 0;
+        border-radius: 0;
+        background: none;
+    }
+
+    .spacing-bar {
+        height: 1rem;
+        background: var(--color-accent);
+        border-radius: var(--radius-xs);
+        min-width: 4px;
+    }
+
+    .spacing-value {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
+        white-space: nowrap;
+    }
+</style>
