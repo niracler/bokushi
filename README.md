@@ -18,7 +18,7 @@ Niracler 的个人博客，记录一个话唠的技术与生活。
 |-------|------|
 | ![Light theme](assets/design-preview-light.png) | ![Dark theme](assets/design-preview-dark.png) |
 
-设计系统文章: [博物志的设计说明书](https://niracler.com/blog/zh/design) | 机器可读版: [DESIGN.md](DESIGN.md)
+设计系统文章: [博物志的设计说明书](https://niracler.com/design) | 机器可读版: [DESIGN.md](DESIGN.md)
 
 ## 技术栈
 
@@ -26,7 +26,7 @@ Niracler 的个人博客，记录一个话唠的技术与生活。
 
 代码质量由 [Biome](https://biomejs.dev/) 管理，评论系统基于 Cloudflare D1 自建。
 
-设计思路详见 [博物志的设计说明书](https://niracler.com/blog/zh/design)。
+设计思路详见 [博物志的设计说明书](https://niracler.com/design)。
 
 ## 开发
 
