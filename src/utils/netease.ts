@@ -1,8 +1,9 @@
 /**
  * Netease Cloud Music API client using LinuxAPI encryption.
- * Requires nodejs_compat flag and compatibility_date >= 2024-09-23.
+ * Uses aes-js for AES-128-ECB (pure JS, no node:crypto dependency).
  */
-import crypto from "node:crypto";
+// @ts-expect-error aes-js has no type declarations
+import aesjs from "aes-js";
 
 export interface MetingSong {
     title: string;
@@ -12,17 +13,28 @@ export interface MetingSong {
     lrc: string;
 }
 
-const LINUX_API_KEY = new Uint8Array(Buffer.from("7246674226682325323F5E6544673A51", "hex"));
+// LinuxAPI AES key: hex "7246674226682325323F5E6544673A51" = "rFgB&h#%2?^eDg:Q"
+const LINUX_API_KEY = [
+    0x72, 0x46, 0x67, 0x42, 0x26, 0x68, 0x23, 0x25, 0x32, 0x3f, 0x5e, 0x65, 0x44, 0x67, 0x3a, 0x51,
+];
 const LINUX_API_URL = "https://music.163.com/api/linux/forward";
 const LINUX_USER_AGENT =
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36";
 
+function pkcs7Pad(data: Uint8Array): Uint8Array {
+    const padLen = 16 - (data.length % 16);
+    const padded = new Uint8Array(data.length + padLen);
+    padded.set(data);
+    for (let i = data.length; i < padded.length; i++) padded[i] = padLen;
+    return padded;
+}
+
 function linuxApiEncrypt(payload: object): string {
-    const json = JSON.stringify(payload);
-    const cipher = crypto.createCipheriv("aes-128-ecb", LINUX_API_KEY, null);
-    let encrypted = cipher.update(json, "utf8", "hex");
-    encrypted += cipher.final("hex");
-    return encrypted.toUpperCase();
+    const json = new TextEncoder().encode(JSON.stringify(payload));
+    const padded = pkcs7Pad(json);
+    const ecb = new aesjs.ModeOfOperation.ecb(LINUX_API_KEY);
+    const encrypted = ecb.encrypt(padded);
+    return aesjs.utils.hex.fromBytes(encrypted).toUpperCase();
 }
 
 async function linuxApiRequest<T>(url: string, data: object): Promise<T> {

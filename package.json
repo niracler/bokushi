@@ -18,6 +18,7 @@
         "@astrojs/sitemap": "^3.6.0",
         "@iconify-json/ri": "^1.2.6",
         "@tailwindcss/vite": "^4.1.18",
+        "aes-js": "^3.1.2",
         "arctic": "^3.7.0",
         "astro": "^5.18.1",
         "astro-icon": "^1.1.5",
