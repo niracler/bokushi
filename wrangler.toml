@@ -1,9 +1,18 @@
-# Cloudflare Pages 配置
-# 参考: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+# Cloudflare Workers deployment config
+# Migrated from Pages to Workers (2026-04)
+# Ref: https://developers.cloudflare.com/workers/framework-guides/web-apps/astro/
+#
+# NOTE: "main" is intentionally omitted here — dist/_worker.js/index.js
+# is a build artifact that doesn't exist at check time. The vite plugin
+# auto-detects entry during build; CI passes --main on deploy.
 
 name = "bokushi"
-pages_build_output_dir = "./dist"
 compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+binding = "ASSETS"
+directory = "./dist"
 
 # KV Namespace Bindings
 # 在 Cloudflare Dashboard 创建 KV namespace 后填入 id
@@ -26,6 +35,6 @@ database_name = "bokushi-comments"
 database_id = "f95ebf0a-500e-4096-86fb-9e7edfde7679"
 
 # Email notifications use Fastmail JMAP API (no Cloudflare Email Routing needed).
-# Set these secrets in Cloudflare Pages environment variables:
+# Set these secrets in Cloudflare Workers environment variables:
 #   FASTMAIL_API_TOKEN  - Fastmail app password with mail + submission scope
 #   NOTIFY_FROM_EMAIL   - (optional) sender address, must be a configured Fastmail identity
