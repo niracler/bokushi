@@ -297,6 +297,55 @@ CLI 中按 **Shift+Tab** 切换[^6]：
 
 </details>
 
+## 附录：用了两周后，再优化一次
+
+初始配置只是起点。实际使用一段时间后，你的 session 历史里已经积累了大量「哪些命令被 sandbox 拦截后走了 bypass」「哪些操作反复弹窗手动确认」的真实数据。这些数据比任何模板都更能说明**你的配置哪里该收紧、哪里该放宽**。
+
+建议在使用两周左右后，把以下 prompt 丢给 Claude Code，让它扫描你的 session 历史并给出针对性的优化方案：
+
+<details>
+<summary>点击展开优化 Prompt</summary>
+
+````markdown
+请审查我的 Claude Code 安全配置。我已经根据该博客配置了 sandbox 用了大概两周了，现在我希望可以根据我这两周的各种 session 记录重新审查一下。
+
+## 参考资料
+
+1. 先用 WebFetch 读取这篇指南，理解 Sandbox + Permission Rules 的分层安全模型：
+   https://niracler.com/2026-03-26-claude-code-security-config/
+2. 再用 context7（resolve-library-id 搜 "claude code"，然后 query-docs）查官方最新文档，
+   确认指南中的配置项在当前版本是否仍然适用、是否有新增配置项。
+
+## 执行步骤
+
+1. **收集配置**：读取 `~/.claude/settings.json`（全局）以及所有项目的 `.claude/settings.json` 和 `.claude/settings.local.json`
+2. **分析摩擦点**：扫描 `~/.claude/projects/` 下各项目的 session 历史，找出被反复手动确认的高频命令和 bypassPermissions 使用频率
+3. **对照指南审查**：按指南中的检查清单（Sandbox、Permission Rules、配置作用域）逐项对照当前配置
+4. **输出改动方案**：
+
+| # | 文件 | 现状 | 建议 | 原因 |
+|---|------|------|------|------|
+| 1 | ... | ... | ... | （引用指南或官方文档中的具体依据） |
+
+以及各项目的摩擦分析表：
+
+| 项目 | 主要摩擦来源 | 建议 allow 规则 |
+|------|-------------|----------------|
+| ... | ... | ... |
+
+5. **给出修改后的完整 JSON**（可直接复制使用），并列出需要用户手动处理的事项
+````
+
+</details>
+
+这个 prompt 会让 Claude 做三件事：
+
+1. **挖掘真实摩擦**——扫描 `~/.claude/projects/` 下的 `.jsonl` session 文件，统计 `dangerouslyDisableSandbox` 出现频率和对应命令，找出你最常被阻断的操作
+2. **对照基线审查**——把你当前配置和本文推荐的分层模型逐项比对，发现遗漏或过度放行
+3. **输出可执行方案**——直接给出修改后的 JSON，而不是抽象建议
+
+**优化原则**：频繁 bypass 是信号（说明 `excludedCommands` 或 `permissions.allow` 覆盖不足），应该加精准规则而非关 sandbox。通配符优于硬编码命令，全局兜底 + 项目只放差异。
+
 ## 脚注
 
 [^1]: [Claude Code auto mode: a safer way to skip permissions | Anthropic Engineering](https://www.anthropic.com/engineering/claude-code-auto-mode) - Anthropic 工程博客 (2026-03-24)，介绍 auto mode 的设计。文中提到用户批准了 93% 的权限请求，说明大部分确认是走过场。分类器基于 Sonnet 4.6，采用两层防御（input-layer prompt-injection 探测 + output-layer transcript 分类）。
