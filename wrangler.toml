@@ -2,9 +2,9 @@
 # Migrated from Pages to Workers (2026-04)
 # Ref: https://developers.cloudflare.com/workers/framework-guides/web-apps/astro/
 #
-# NOTE: "main" is intentionally omitted here — dist/_worker.js/index.js
-# is a build artifact that doesn't exist at check time. The vite plugin
-# auto-detects entry during build; CI passes --main on deploy.
+# NOTE: "main" is intentionally omitted — the Astro build auto-generates
+# dist/server/wrangler.json with the correct entry point. Wrangler uses
+# that redirected config at deploy time.
 
 name = "bokushi"
 compatibility_date = "2024-09-23"
