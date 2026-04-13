@@ -63,6 +63,10 @@ export default defineConfig({
     ],
     adapter: cloudflare({
         imageService: "compile",
+        // Run prerender pages through Node during build/dev.
+        // Workaround for dev server 500s on static pages under Astro 6 +
+        // @astrojs/cloudflare 13 (SSR workerd pageMap excludes prerender routes).
+        prerenderEnvironment: "node",
     }),
 
     markdown: {
