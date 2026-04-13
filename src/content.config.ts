@@ -1,5 +1,6 @@
-import { defineCollection, z } from "astro:content";
+import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
+import { z } from "astro/zod";
 
 const sharedSchema = z.object({
     title: z.string(),
@@ -67,8 +68,8 @@ const mangashots = defineCollection({
     schema: z.object({
         id: z.string(),
         title: z.string(),
-        photo_url: z.string().url(),
-        thumbnail_url: z.string().url(),
+        photo_url: z.url(),
+        thumbnail_url: z.url(),
         caption: z.string().nullable(),
         created_at: z.coerce.date(),
     }),

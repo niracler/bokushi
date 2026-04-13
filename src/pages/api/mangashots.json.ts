@@ -10,8 +10,8 @@ const MangaShotSchema = z.object({
     id: z.string(),
     title: z.string().max(500),
     manga_name: z.string().max(200),
-    photo_url: z.string().url(),
-    thumbnail_url: z.string().url().optional(),
+    photo_url: z.url(),
+    thumbnail_url: z.url().optional(),
     caption: z.string().max(1000).nullable().optional(),
     created_at: z.string().optional(),
 });
