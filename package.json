@@ -4,6 +4,7 @@
     "version": "0.0.1",
     "scripts": {
         "dev": "astro dev",
+        "dev:clean": "lsof -ti:4321 | xargs kill -9 2>/dev/null; rm -rf node_modules/.vite node_modules/.astro; astro dev",
         "build": "astro build",
         "preview": "astro preview",
         "astro": "astro",
