@@ -1,6 +1,6 @@
 ---
 title: 与学习有关的一切-v0.1
-pubDate: "2026-04-07"
+pubDate: "2026-04-13"
 tags: ["学习", "AI", "vibe-coding", "思考"]
 description: "以 Home Assistant 插件 vibe coding 的真实经历为引子，探讨 AI 时代下基础知识积累的重要性、持续学习的意义，以及个人可落地的行为指南。"
 hidden: true
