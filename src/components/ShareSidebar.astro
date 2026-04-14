@@ -1,7 +1,13 @@
 ---
 // ShareSidebar.astro - Fixed sidebar for social sharing
 // Follows Vercel Design Guidelines: keyboard accessible, focus visible, 44px touch targets
-import { Icon } from "astro-icon/components";
+import IconCheck from "~icons/ri/check-line";
+import IconHeartFill from "~icons/ri/heart-fill";
+import IconHeartLine from "~icons/ri/heart-line";
+import IconLink from "~icons/ri/link";
+import IconShare from "~icons/ri/share-line";
+import IconTelegram from "~icons/ri/telegram-fill";
+import IconTwitter from "~icons/ri/twitter-fill";
 
 interface Props {
     title: string;
@@ -64,13 +70,13 @@ const shareLinks = [
     {
         name: "Twitter",
         label: shareLabels.twitter,
-        icon: "ri:twitter-fill",
+        Icon: IconTwitter,
         href: `https://twitter.com/intent/tweet?${twitterParams.toString()}`,
     },
     {
         name: "Telegram",
         label: shareLabels.telegram,
-        icon: "ri:telegram-fill",
+        Icon: IconTelegram,
         href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTelegramText}`,
     },
 ];
@@ -83,17 +89,20 @@ const shareLinks = [
     style="right: calc(50% + 25rem + 2rem); top: 6rem;"
     aria-label={shareLabels.shareArticle}
 >
-    {shareLinks.map((link) => (
-        <a
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:text-accent hover:shadow-md focus-accent"
-            aria-label={link.label}
-        >
-            <Icon name={link.icon} class="h-6 w-6" aria-hidden="true" />
-        </a>
-    ))}
+    {shareLinks.map((link) => {
+        const LinkIcon = link.Icon;
+        return (
+            <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:text-accent hover:shadow-md focus-accent"
+                aria-label={link.label}
+            >
+                <LinkIcon class="h-6 w-6" aria-hidden="true" />
+            </a>
+        );
+    })}
     <button
         type="button"
         class="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface shadow-sm transition-all hover:border-accent hover:text-accent hover:shadow-md focus-accent"
@@ -101,7 +110,7 @@ const shareLinks = [
         data-copy-link
         data-url={url}
     >
-        <Icon name="ri:link" class="h-6 w-6" aria-hidden="true" />
+        <IconLink class="h-6 w-6" aria-hidden="true" />
     </button>
     <!-- Like button -->
     <button
@@ -114,8 +123,8 @@ const shareLinks = [
         data-label-like={shareLabels.like}
         data-label-unlike={shareLabels.unlike}
     >
-        <Icon name="ri:heart-line" class="h-6 w-6 group-data-[liked]:hidden" aria-hidden="true" />
-        <Icon name="ri:heart-fill" class="h-6 w-6 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
+        <IconHeartLine class="h-6 w-6 group-data-[liked]:hidden" aria-hidden="true" />
+        <IconHeartFill class="h-6 w-6 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
         <span
             class="absolute -bottom-1 -right-1 min-w-5 h-5 flex items-center justify-center rounded-full bg-surface border border-border text-xs text-muted"
             data-like-count
@@ -136,8 +145,8 @@ const shareLinks = [
         data-label-like={shareLabels.like}
         data-label-unlike={shareLabels.unlike}
     >
-        <Icon name="ri:heart-line" class="h-5 w-5 text-secondary group-data-[liked]:hidden" aria-hidden="true" />
-        <Icon name="ri:heart-fill" class="h-5 w-5 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
+        <IconHeartLine class="h-5 w-5 text-secondary group-data-[liked]:hidden" aria-hidden="true" />
+        <IconHeartFill class="h-5 w-5 hidden group-data-[liked]:block text-red-500" aria-hidden="true" />
         <span
             class="absolute -bottom-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center rounded-full bg-surface border border-border text-[9px] text-muted"
             data-like-count
@@ -152,7 +161,7 @@ const shareLinks = [
         aria-label={shareLabels.shareArticle}
         aria-expanded="false"
     >
-        <Icon name="ri:share-line" class="h-5 w-5" aria-hidden="true" />
+        <IconShare class="h-5 w-5" aria-hidden="true" />
     </button>
 
     <!-- Share menu (hidden by default) -->
@@ -161,18 +170,21 @@ const shareLinks = [
         class="fixed bottom-[72px] right-6 z-40 flex flex-col-reverse gap-2 pb-12 opacity-0 pointer-events-none transition-opacity duration-200"
         aria-hidden="true"
     >
-        {shareLinks.map((link) => (
-            <a
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex h-11 w-11 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
-                aria-label={link.label}
-                data-share-menu-item
-            >
-                <Icon name={link.icon} class="h-5 w-5 text-secondary" aria-hidden="true" />
-            </a>
-        ))}
+        {shareLinks.map((link) => {
+            const LinkIcon = link.Icon;
+            return (
+                <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="flex h-11 w-11 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
+                    aria-label={link.label}
+                    data-share-menu-item
+                >
+                    <LinkIcon class="h-5 w-5 text-secondary" aria-hidden="true" />
+                </a>
+            );
+        })}
         <button
             type="button"
             class="flex h-11 w-11 items-center justify-center rounded-full bg-surface border border-border shadow-md transition-transform duration-200 scale-75 focus-accent touch-manipulation"
@@ -181,7 +193,7 @@ const shareLinks = [
             data-url={url}
             data-share-menu-item
         >
-            <Icon name="ri:link" class="h-5 w-5 text-secondary" aria-hidden="true" />
+            <IconLink class="h-5 w-5 text-secondary" aria-hidden="true" />
         </button>
     </div>
 </div>
@@ -193,7 +205,7 @@ const shareLinks = [
     role="status"
     aria-live="polite"
 >
-    <Icon name="ri:check-line" class="h-5 w-5 text-accent" aria-hidden="true" />
+    <IconCheck class="h-5 w-5 text-accent" aria-hidden="true" />
     <span class="text-sm text-primary">{shareLabels.copied}</span>
 </div>
 

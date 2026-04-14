@@ -5,8 +5,8 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
-import icon from "astro-icon";
 import pagefind from "astro-pagefind";
+import Icons from "unplugin-icons/vite";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeFigure from "rehype-figure";
 import rehypeImgSize from "rehype-img-size";
@@ -32,41 +32,10 @@ export default defineConfig({
                 },
             },
         }),
-        icon({
-            include: {
-                // Only include icons we actually use to reduce bundle size
-                ri: [
-                    "twitter-fill",
-                    "telegram-fill",
-                    "github-fill",
-                    "steam-fill",
-                    "douban-fill",
-                    "mail-fill",
-                    "rss-fill",
-                    "link",
-                    "share-line",
-                    "check-line",
-                    "heart-line",
-                    "heart-fill",
-                    "creative-commons-fill",
-                    "creative-commons-by-fill",
-                    "creative-commons-nc-fill",
-                    "creative-commons-sa-fill",
-                    "file-text-line",
-                    "time-line",
-                    "article-line",
-                ],
-                "simple-icons": ["folo"],
-            },
-        }),
         pagefind(),
     ],
     adapter: cloudflare({
         imageService: "compile",
-        // Run prerender pages through Node during build/dev.
-        // Workaround for dev server 500s on static pages under Astro 6 +
-        // @astrojs/cloudflare 13 (SSR workerd pageMap excludes prerender routes).
-        prerenderEnvironment: "node",
     }),
 
     markdown: {
@@ -117,6 +86,12 @@ export default defineConfig({
     },
 
     vite: {
-        plugins: [tailwindcss()],
+        plugins: [
+            tailwindcss(),
+            Icons({
+                compiler: "astro",
+                autoInstall: false,
+            }),
+        ],
     },
 });

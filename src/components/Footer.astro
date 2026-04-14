@@ -1,5 +1,19 @@
 ---
-import { Icon } from "astro-icon/components";
+import IconArticle from "~icons/ri/article-line";
+import IconCCBy from "~icons/ri/creative-commons-by-fill";
+import IconCC from "~icons/ri/creative-commons-fill";
+import IconCCNc from "~icons/ri/creative-commons-nc-fill";
+import IconCCSa from "~icons/ri/creative-commons-sa-fill";
+import IconDouban from "~icons/ri/douban-fill";
+import IconFileText from "~icons/ri/file-text-line";
+import IconGithub from "~icons/ri/github-fill";
+import IconMail from "~icons/ri/mail-fill";
+import IconRss from "~icons/ri/rss-fill";
+import IconSteam from "~icons/ri/steam-fill";
+import IconTelegram from "~icons/ri/telegram-fill";
+import IconTime from "~icons/ri/time-line";
+import IconTwitter from "~icons/ri/twitter-fill";
+import IconFolo from "~icons/simple-icons/folo";
 import { SOCIAL_LINKS } from "../consts";
 import { getSiteStats } from "../utils/site-stats";
 import PostPreviewSetup from "./PostPreviewSetup.astro";
@@ -32,11 +46,7 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                 class={iconButtonClass}
             >
                 <span class="sr-only">Join Niracler on Telegram</span>
-                <Icon
-                    name="ri:telegram-fill"
-                    class={iconClass}
-                    aria-hidden="true"
-                />
+                <IconTelegram class={iconClass} aria-hidden="true" />
             </a>
             <a
                 href={SOCIAL_LINKS.github}
@@ -46,7 +56,7 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                 class={iconButtonClass}
             >
                 <span class="sr-only">Go to Niracler's GitHub</span>
-                <Icon name="ri:github-fill" class={iconClass} aria-hidden="true" />
+                <IconGithub class={iconClass} aria-hidden="true" />
             </a>
             <a
                 href={SOCIAL_LINKS.steam}
@@ -56,7 +66,7 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                 class={iconButtonClass}
             >
                 <span class="sr-only">Visit Niracler on Steam</span>
-                <Icon name="ri:steam-fill" class={iconClass} aria-hidden="true" />
+                <IconSteam class={iconClass} aria-hidden="true" />
             </a>
             <a
                 href={SOCIAL_LINKS.douban}
@@ -66,7 +76,7 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                 class={iconButtonClass}
             >
                 <span class="sr-only">Visit Niracler on Douban</span>
-                <Icon name="ri:douban-fill" class={iconClass} aria-hidden="true" />
+                <IconDouban class={iconClass} aria-hidden="true" />
             </a>
             <a
                 href={SOCIAL_LINKS.email}
@@ -74,7 +84,7 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                 class={iconButtonClass}
             >
                 <span class="sr-only">Send email to Niracler</span>
-                <Icon name="ri:mail-fill" class={iconClass} aria-hidden="true" />
+                <IconMail class={iconClass} aria-hidden="true" />
             </a>
             <a
                 href={SOCIAL_LINKS.twitter}
@@ -84,7 +94,7 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                 class={iconButtonClass}
             >
                 <span class="sr-only">Follow Niracler on X</span>
-                <Icon name="ri:twitter-fill" class={iconClass} aria-hidden="true" />
+                <IconTwitter class={iconClass} aria-hidden="true" />
             </a>
             <a
                 href={SOCIAL_LINKS.folo}
@@ -94,27 +104,27 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                 class={iconButtonClass}
             >
                 <span class="sr-only">Follow Niracler on Folo</span>
-                <Icon name="simple-icons:folo" class={iconClass} aria-hidden="true" />
+                <IconFolo class={iconClass} aria-hidden="true" />
             </a>
             <a href={SOCIAL_LINKS.rss} title="RSS Feed" class={iconButtonClass}>
                 <span class="sr-only">Subscribe to RSS Feed</span>
-                <Icon name="ri:rss-fill" class={iconClass} aria-hidden="true" />
+                <IconRss class={iconClass} aria-hidden="true" />
             </a>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-6 text-muted text-sm">
             <span class="inline-flex items-center gap-2 opacity-75 transition-opacity hover:opacity-100">
-                <Icon name="ri:file-text-line" class="h-4 w-4" aria-hidden="true" />
+                <IconFileText class="h-4 w-4" aria-hidden="true" />
                 <span class="font-medium">{charsDisplay}</span>
                 <span class="text-xs">字</span>
             </span>
             <span class="h-4 w-px bg-border-subtle"></span>
             <span class="inline-flex items-center gap-2 opacity-75 transition-opacity hover:opacity-100" title={locale === "en" ? "Estimated total reading time" : "预计总阅读时长"}>
-                <Icon name="ri:time-line" class="h-4 w-4" aria-hidden="true" />
+                <IconTime class="h-4 w-4" aria-hidden="true" />
                 <span class="font-medium">{timeDisplay}</span>
             </span>
             <span class="h-4 w-px bg-border-subtle"></span>
             <span class="inline-flex items-center gap-2 opacity-75 transition-opacity hover:opacity-100">
-                <Icon name="ri:article-line" class="h-4 w-4" aria-hidden="true" />
+                <IconArticle class="h-4 w-4" aria-hidden="true" />
                 <span class="font-medium">{totalArticles}</span>
                 <span class="text-xs">篇</span>
             </span>
@@ -130,26 +140,10 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
             >
                 <span>CC BY-NC-SA 4.0</span>
                 <span class="inline-flex items-center gap-1 text-base text-secondary">
-                    <Icon
-                        name="ri:creative-commons-fill"
-                        class="h-4 w-4"
-                        aria-hidden="true"
-                    />
-                    <Icon
-                        name="ri:creative-commons-by-fill"
-                        class="h-4 w-4"
-                        aria-hidden="true"
-                    />
-                    <Icon
-                        name="ri:creative-commons-nc-fill"
-                        class="h-4 w-4"
-                        aria-hidden="true"
-                    />
-                    <Icon
-                        name="ri:creative-commons-sa-fill"
-                        class="h-4 w-4"
-                        aria-hidden="true"
-                    />
+                    <IconCC class="h-4 w-4" aria-hidden="true" />
+                    <IconCCBy class="h-4 w-4" aria-hidden="true" />
+                    <IconCCNc class="h-4 w-4" aria-hidden="true" />
+                    <IconCCSa class="h-4 w-4" aria-hidden="true" />
                 </span>
             </a>
         </div>

@@ -13,7 +13,7 @@
         "prepare": "husky"
     },
     "dependencies": {
-        "@astrojs/cloudflare": "^13.1.8",
+        "@astrojs/cloudflare": "^13.1.9",
         "@astrojs/mdx": "^5.0.3",
         "@astrojs/rss": "^4.0.18",
         "@astrojs/sitemap": "^3.7.2",
@@ -22,7 +22,6 @@
         "aes-js": "^3.1.2",
         "arctic": "^3.7.0",
         "astro": "^6.1.5",
-        "astro-icon": "^1.1.5",
         "astro-masonry": "^1.2.2",
         "astro-pagefind": "^1.8.6",
         "cheerio": "^1.2.0",
