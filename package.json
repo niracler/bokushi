@@ -54,6 +54,7 @@
         "shiki": "^4.0.2",
         "unified": "^11.0.5",
         "unist-util-visit": "^5.1.0",
+        "unplugin-icons": "^23.0.1",
         "wrangler": "^4.81.0"
     },
     "pnpm": {
