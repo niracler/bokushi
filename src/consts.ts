@@ -20,7 +20,7 @@ export const SOCIAL_LINKS = {
     steam: "https://steamcommunity.com/id/niracler/",
     douban: "https://www.douban.com/people/niracler/",
     folo: "https://app.folo.is/share/users/niracler",
-    rss: "/rss.xml",
+    rss: "/feed/",
 };
 
 // Meting API base URL (用于音乐播放器自动获取歌曲信息)
