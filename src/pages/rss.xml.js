@@ -7,6 +7,19 @@ import { postUrl } from "../utils/i18n";
 
 const parser = new MarkdownIt();
 
+// Strip MDX-specific syntax that MarkdownIt cannot render:
+// - import statements (e.g. `import Foo from "..."`)
+// - self-closing JSX components (e.g. `<ColorPalette />`)
+// - opening/closing JSX component tags, keeping inner text (e.g. `<Spoiler>text</Spoiler>`)
+function stripMdx(body) {
+    if (!body) return "";
+    return body
+        .replace(/^import\s+.*$/gm, "")
+        .replace(/<[A-Z]\w*\s*\/>/g, "")
+        .replace(/<[A-Z]\w*[^>]*>/g, "")
+        .replace(/<\/[A-Z]\w*>/g, "");
+}
+
 export async function GET(context) {
     const blogPosts = await getCollection("blog");
     const monthlyPosts = await getCollection("monthly");
@@ -25,7 +38,7 @@ export async function GET(context) {
             pubDate: post.data.pubDate,
             link: postUrl(post.id),
             categories: post.data.tags,
-            content: sanitizeHtml(parser.render(post.body), {
+            content: sanitizeHtml(parser.render(stripMdx(post.body)), {
                 allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
             }),
         })),
