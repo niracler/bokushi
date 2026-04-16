@@ -141,7 +141,7 @@ const isActive = (href: string) => href === pathname || href === `/${firstSegmen
         rel="alternate"
         type="application/rss+xml"
         title={t(locale, "site.title")}
-        href={new URL("rss.xml", Astro.site)}
+        href={new URL("feed/", Astro.site)}
     />
 </header>
 
