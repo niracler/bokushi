@@ -160,7 +160,7 @@ export function initPostPreview(root: ParentNode = document) {
     const isSmallViewport = window.matchMedia?.("(max-width: 1024px)").matches ?? false;
     if (isCoarse || isSmallViewport) return;
     const metaScript = document.getElementById("all-posts-meta");
-    if (!metaScript || !metaScript.textContent) return;
+    if (!metaScript?.textContent) return;
 
     let metaMap: PostMetaMap;
     try {

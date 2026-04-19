@@ -350,7 +350,7 @@ const heading = locale === "en" ? "Comments" : "评论";
     }
 
     .comment-body p + p {
-        margin-top: var(--space-5);
+        margin-top: var(--space-block-loose);
     }
 
     /* Bold-only paragraphs act as visual section headers */
@@ -378,8 +378,9 @@ const heading = locale === "en" ? "Comments" : "评论";
 
     .comment-body ol,
     .comment-body ul {
-        margin: var(--space-2) 0;
+        margin: var(--space-block-base) 0;
         padding-left: 1.5em;
+        line-height: var(--line-height-compact);
     }
 
     .comment-body ol {
@@ -391,7 +392,7 @@ const heading = locale === "en" ? "Comments" : "评论";
     }
 
     .comment-body li {
-        margin-bottom: var(--space-1);
+        margin-bottom: var(--space-block-tight);
     }
 
     .comment-body li p {

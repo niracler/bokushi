@@ -6,7 +6,6 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import pagefind from "astro-pagefind";
-import Icons from "unplugin-icons/vite";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeFigure from "rehype-figure";
 import rehypeImgSize from "rehype-img-size";
@@ -14,6 +13,7 @@ import rehypeMermaid from "rehype-mermaid";
 import rehypePicture from "rehype-picture";
 import rehypeSlug from "rehype-slug";
 import { remarkAlert } from "remark-github-blockquote-alert";
+import Icons from "unplugin-icons/vite";
 import { remarkModifiedTime } from "./remark-modified-time.mjs";
 
 // https://astro.build/config

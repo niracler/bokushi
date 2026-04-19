@@ -1,6 +1,6 @@
 ---
 /**
- * SpacingShowcase — renders spacing scale bars.
+ * SpacingShowcase — renders spacing scale bars plus a live block-rhythm demo.
  */
 
 const spacingScale = [
@@ -13,6 +13,24 @@ const spacingScale = [
     { name: "--space-8", value: "2rem", pixels: "32px" },
     { name: "--space-12", value: "3rem", pixels: "48px" },
 ];
+
+const blockRhythm = [
+    {
+        name: "--space-block-loose",
+        pixels: "24px",
+        role: "段落 → 段落",
+    },
+    {
+        name: "--space-block-base",
+        pixels: "16px",
+        role: "段落 → 列表 / 块之间",
+    },
+    {
+        name: "--space-block-tight",
+        pixels: "4px",
+        role: "列表项之间（+ line-height 1.5）",
+    },
+];
 ---
 
 <div class="spacing-showcase not-prose">
@@ -24,6 +42,30 @@ const spacingScale = [
                 <span class="spacing-value">{s.value} ({s.pixels})</span>
             </div>
         ))}
+    </div>
+
+    <div class="block-rhythm">
+        <p class="block-rhythm-caption">Block Rhythm — 实际节奏</p>
+        <div class="block-rhythm-grid">
+            <div class="rhythm-sample">
+                <p>段落一：段与段之间留出明显的呼吸感。</p>
+                <p>段落二：让读者一眼看出「这是新的一段」。</p>
+                <ul>
+                    <li>列表项一：彼此紧邻</li>
+                    <li>列表项二：行距也收紧一档</li>
+                    <li>列表项三：视觉聚合感更强</li>
+                </ul>
+            </div>
+            <div class="rhythm-legend">
+                {blockRhythm.map((r) => (
+                    <div class="legend-row">
+                        <code class="legend-token">{r.name}</code>
+                        <span class="legend-pixels">{r.pixels}</span>
+                        <span class="legend-role">{r.role}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -66,5 +108,105 @@ const spacingScale = [
         font-size: var(--font-size-2xs);
         color: var(--color-text-muted);
         white-space: nowrap;
+    }
+
+    /* Block rhythm demo */
+    .block-rhythm {
+        margin-top: var(--space-6);
+        padding-top: var(--space-6);
+        border-top: 1px dashed var(--color-border-soft);
+    }
+
+    .block-rhythm-caption {
+        margin: 0 0 var(--space-4);
+        font-size: var(--font-size-xs);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        font-weight: 600;
+    }
+
+    .block-rhythm-grid {
+        display: grid;
+        gap: var(--space-4);
+        align-items: start;
+    }
+
+    @media (min-width: 40rem) {
+        .block-rhythm-grid {
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: var(--space-6);
+        }
+    }
+
+    .rhythm-sample {
+        padding: var(--space-4);
+        border-radius: var(--radius-md);
+        background: var(--color-bg-surface);
+        border: 1px solid var(--color-border-soft);
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-base);
+    }
+
+    .rhythm-sample p {
+        margin: 0;
+    }
+
+    .rhythm-sample p + p {
+        margin-top: var(--space-block-loose);
+    }
+
+    .rhythm-sample ul {
+        margin: var(--space-block-base) 0 0;
+        padding-left: 1.5em;
+        list-style: disc;
+        display: grid;
+        gap: var(--space-block-tight);
+        line-height: var(--line-height-compact);
+    }
+
+    .rhythm-sample li {
+        margin: 0;
+    }
+
+    .rhythm-legend {
+        display: grid;
+        gap: var(--space-2);
+        align-content: start;
+    }
+
+    .legend-row {
+        display: grid;
+        grid-template-columns: auto auto;
+        row-gap: 2px;
+        column-gap: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm);
+        background: var(--color-bg-surface);
+        border: 1px solid var(--color-border-soft);
+    }
+
+    .legend-token {
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-primary);
+        padding: 0;
+        border-radius: 0;
+        background: none;
+        white-space: nowrap;
+    }
+
+    .legend-pixels {
+        font-size: var(--font-size-2xs);
+        color: var(--color-accent);
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .legend-role {
+        grid-column: 1 / -1;
+        font-size: var(--font-size-2xs);
+        color: var(--color-text-muted);
     }
 </style>
