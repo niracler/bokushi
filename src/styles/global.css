@@ -196,7 +196,7 @@
     /* Prose typography */
     .prose {
         display: grid;
-        gap: var(--space-4);
+        gap: var(--space-block-base);
         margin-inline: auto;
         color: var(--color-text-primary);
         line-height: var(--line-height-base);
@@ -310,7 +310,7 @@
     }
 
     .prose p + p {
-        margin-top: var(--space-3);
+        margin-top: var(--space-block-base);
     }
 
     .prose :is(h1, h2) + p {
@@ -355,9 +355,10 @@
     .prose :is(ul, ol) {
         margin: 0;
         display: grid;
-        gap: var(--space-2);
+        gap: var(--space-block-tight);
         padding-left: var(--space-6);
         color: var(--color-text-secondary);
+        line-height: var(--line-height-compact);
         list-style-position: outside;
     }
 
@@ -371,7 +372,7 @@
     }
 
     .prose :is(ul, ol) :is(ul, ol) {
-        margin-top: var(--space-2);
+        margin-top: var(--space-block-tight);
     }
 
     .prose ul ul {
@@ -387,7 +388,7 @@
     }
 
     .prose li > * + * {
-        margin-top: var(--space-2);
+        margin-top: var(--space-block-tight);
     }
 
     .prose code {

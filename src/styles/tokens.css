@@ -13,6 +13,7 @@
     --font-size-3xl: 2.25rem;
     --line-height-base: 1.75;
     --line-height-relaxed: 1.65;
+    --line-height-compact: 1.5;
     --line-height-tight: 1.22;
 
     /* Spacing scale */
@@ -24,6 +25,13 @@
     --space-6: 1.5rem;
     --space-8: 2rem;
     --space-12: 3rem;
+
+    /* Block spacing — semantic vertical rhythm
+       Separates "tight cluster" (list items) from "loose separation" (paragraphs)
+       so the visual hierarchy between them is explicit. */
+    --space-block-tight: var(--space-1); /* 4px — list items, tight clusters */
+    --space-block-base: var(--space-4); /* 16px — default block gap */
+    --space-block-loose: var(--space-6); /* 24px — paragraph separation */
 
     /* Radius */
     --radius-xs: 2px;

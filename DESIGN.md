@@ -113,8 +113,9 @@ Used for hover states, backgrounds, and subtle fills:
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `--line-height-base` | 1.75 | Body text, lists |
-| `--line-height-relaxed` | 1.65 | Figcaptions |
+| `--line-height-base` | 1.75 | Body paragraphs — long-form reading |
+| `--line-height-relaxed` | 1.65 | Figcaptions, secondary text |
+| `--line-height-compact` | 1.5 | Lists, dense UI text — visually tighter clusters |
 | `--line-height-tight` | 1.22 | Headings |
 
 ### Heading Styles
@@ -236,6 +237,18 @@ Three-state cycle: system → light → dark. Icon animation uses `scale + rotat
 | `--space-6` | 1.5rem | 24px |
 | `--space-8` | 2rem | 32px |
 | `--space-12` | 3rem | 48px |
+
+### Block Spacing (Vertical Rhythm)
+
+Semantic layer over `--space-*` that expresses **why** a gap exists rather than **how big** it is. Use these inside prose / comment bodies so the hierarchy stays explicit and tunable from one place.
+
+| Token | Alias | Use |
+|-------|-------|-----|
+| `--space-block-tight` | `--space-1` (4px) | List items, tightly-grouped clusters — combine with `--line-height-compact` for denser lists |
+| `--space-block-base` | `--space-4` (16px) | Default gap between blocks of different types (list ↔ paragraph, heading ↔ paragraph) |
+| `--space-block-loose` | `--space-6` (24px) | Paragraph-to-paragraph separation — emphasizes the boundary between thoughts |
+
+**Ratio:** `4 / 16 / 24` — list items are roughly 1/6 of paragraph separation, producing a clearly legible hierarchy in both `.prose` and `.comment-body`.
 
 ### Section Stack
 
