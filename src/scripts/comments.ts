@@ -214,6 +214,10 @@ let currentSort: CommentSort = "latest";
 
 const md = MarkdownIt({ linkify: true, breaks: true }).disable("heading");
 
+// Wrap tables so they can scroll horizontally on narrow screens.
+md.renderer.rules.table_open = () => '<div class="comment-table-wrapper"><table>';
+md.renderer.rules.table_close = () => "</table></div>";
+
 const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
     allowedTags: [
         "b",
@@ -230,9 +234,27 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
         "pre",
         "blockquote",
         "hr",
+        "table",
+        "thead",
+        "tbody",
+        "tr",
+        "th",
+        "td",
+        "div",
     ],
     allowedAttributes: {
         a: ["href", "target", "rel"],
+        th: ["style"],
+        td: ["style"],
+        div: ["class"],
+    },
+    allowedClasses: {
+        div: ["comment-table-wrapper"],
+    },
+    allowedStyles: {
+        "*": {
+            "text-align": [/^left$/, /^right$/, /^center$/],
+        },
     },
 };
 
