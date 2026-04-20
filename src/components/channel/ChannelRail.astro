@@ -1,0 +1,370 @@
+---
+import type { CardType } from "../../utils/telegram";
+
+interface ForwardSource {
+    handle: string;
+    link?: string;
+    count: number;
+}
+
+interface Props {
+    channelTitle: string;
+    channelAvatar: string;
+    /** Telegram username without "@" — used to build the Telegram deep link. */
+    username: string;
+    /** Shown in eyebrow above title, e.g. "2026·04" (latest post's month). */
+    currentMonthLabel?: string;
+    /** Short subtitle under channel name, e.g. "自 2019·03". Optional. */
+    sinceLabel?: string;
+    /** HTML-formatted channel description (ordered list / paragraphs). Optional. */
+    description?: string;
+    /** Counts per card type for the current slice. */
+    typeCounts?: Partial<Record<CardType, number>>;
+    /** Recent forward sources in the current slice. */
+    forwardSources?: ForwardSource[];
+}
+
+const {
+    channelTitle,
+    channelAvatar,
+    username,
+    currentMonthLabel,
+    sinceLabel,
+    description,
+    typeCounts = {},
+    forwardSources = [],
+} = Astro.props;
+
+const typeLabels: Record<CardType, string> = {
+    text: "文字",
+    link: "链接",
+    photo: "照片",
+    fwd: "转发",
+    code: "代码",
+};
+
+const typeOrder: CardType[] = ["text", "link", "photo", "fwd", "code"];
+const totalTyped = typeOrder.reduce((sum, t) => sum + (typeCounts[t] ?? 0), 0);
+const distRows = totalTyped
+    ? typeOrder
+          .map((type) => ({
+              type,
+              label: typeLabels[type],
+              count: typeCounts[type] ?? 0,
+              pct: Math.round(((typeCounts[type] ?? 0) / totalTyped) * 100),
+          }))
+          .filter((row) => row.count > 0)
+    : [];
+---
+
+<aside class="rail">
+    <div class="rail__card">
+        <span class="rail__eyebrow">
+            <i class="rail__status-dot" aria-hidden="true"></i>
+            {username}{currentMonthLabel && <> · {currentMonthLabel}</>}
+        </span>
+
+        <div class="rail__avatar">
+            <img src={channelAvatar} alt={channelTitle} class="rail__av" />
+            <div class="rail__info">
+                <b>{channelTitle}</b>
+                {sinceLabel && <small>{sinceLabel}</small>}
+            </div>
+        </div>
+
+        {description && (
+            <div class="rail__description" set:html={description} />
+        )}
+
+        <div class="rail__acts">
+            <a
+                class="rail__btn rail__btn--primary"
+                href={`https://t.me/${username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                Telegram
+            </a>
+            <a class="rail__btn" href="/channel-rss.xml">RSS</a>
+        </div>
+    </div>
+
+    {distRows.length > 0 && (
+        <div class="rail__card">
+            <h4 class="rail__h4">本页分布</h4>
+            <div class="rail__dist">
+                {distRows.map((row) => (
+                    <div class="rail__row">
+                        <span class="rail__lbl">{row.label}</span>
+                        <span class="rail__bar"><i style={`width:${row.pct}%`}></i></span>
+                        <span class="rail__num">{row.count}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )}
+
+    {forwardSources.length > 0 && (
+        <div class="rail__card">
+            <h4 class="rail__h4">本页转发自</h4>
+            <div class="rail__fwds">
+                {forwardSources.map((source) => {
+                    const FwdRow = source.link ? "a" : "span";
+                    const linkProps = source.link
+                        ? { href: source.link, target: "_blank", rel: "noopener noreferrer" }
+                        : {};
+                    return (
+                        <FwdRow class="rail__fwd" {...linkProps}>
+                            <span>{source.handle}</span>
+                            <small>{source.count}</small>
+                        </FwdRow>
+                    );
+                })}
+            </div>
+        </div>
+    )}
+</aside>
+
+<style>
+    .rail {
+        position: sticky;
+        top: 5rem;
+        max-height: calc(100vh - 6rem);
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .rail__card {
+        padding: var(--space-4);
+        border-radius: var(--radius-md);
+        background: var(--color-bg-surface);
+        border: 1px solid var(--color-border-soft);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .rail__h4 {
+        margin: 0 0 var(--space-2);
+        font-size: 0.66rem;
+        color: var(--color-text-muted);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    /* ====== Channel info ====== */
+    .rail__eyebrow {
+        display: inline-flex;
+        gap: 0.45rem;
+        align-items: center;
+        font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
+        font-size: 0.66rem;
+        letter-spacing: 0.14em;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+    }
+
+    .rail__status-dot {
+        width: 0.4rem;
+        height: 0.4rem;
+        border-radius: 50%;
+        background: var(--color-success);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success) 28%, transparent);
+        flex-shrink: 0;
+    }
+
+    .rail__avatar {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+    }
+
+    .rail__av {
+        width: 2.4rem;
+        height: 2.4rem;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .rail__info {
+        font-size: 0.85rem;
+        line-height: 1.35;
+        min-width: 0;
+    }
+
+    .rail__info b {
+        display: block;
+        color: var(--color-text-primary);
+    }
+
+    .rail__info small {
+        color: var(--color-text-muted);
+        font-size: 0.74rem;
+    }
+
+    .rail__description {
+        font-size: 0.86rem;
+        color: var(--color-text-secondary);
+        line-height: 1.55;
+        padding-top: var(--space-3);
+        border-top: 1px dashed var(--color-border-soft);
+        overflow-wrap: break-word;
+    }
+
+    .rail__description :global(p) {
+        margin: 0 0 var(--space-2);
+    }
+
+    .rail__description :global(p:last-child) {
+        margin-bottom: 0;
+    }
+
+    .rail__description :global(ol),
+    .rail__description :global(ul) {
+        margin: 0;
+        padding-left: 1.4em;
+    }
+
+    .rail__description :global(ol) {
+        list-style: decimal;
+    }
+
+    .rail__description :global(ul) {
+        list-style: disc;
+    }
+
+    .rail__description :global(li) {
+        margin: 0.2rem 0;
+    }
+
+    .rail__description :global(li::marker) {
+        color: var(--color-accent-dark);
+        font-weight: 600;
+    }
+
+    .rail__description :global(a) {
+        color: var(--color-accent-dark);
+        text-decoration: none;
+    }
+
+    .rail__description :global(a:hover) {
+        text-decoration: underline;
+    }
+
+    /* ====== Type distribution ====== */
+    .rail__dist {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
+        font-size: 0.74rem;
+    }
+
+    .rail__row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rail__lbl {
+        color: var(--color-text-muted);
+        width: 2.4rem;
+        flex-shrink: 0;
+    }
+
+    .rail__bar {
+        flex: 1;
+        height: 6px;
+        background: var(--color-bg-muted);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .rail__bar i {
+        display: block;
+        height: 100%;
+        background: var(--color-accent);
+        border-radius: 3px;
+    }
+
+    .rail__num {
+        font-weight: 700;
+        color: var(--color-text-primary);
+        min-width: 1.6rem;
+        text-align: right;
+    }
+
+    /* ====== Action buttons ====== */
+    .rail__acts {
+        display: flex;
+        gap: 0.4rem;
+        padding-top: var(--space-2);
+    }
+
+    .rail__btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 0.75rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid var(--color-border);
+        background: var(--color-bg-surface);
+        color: var(--color-text-primary);
+        text-decoration: none;
+        transition: all var(--transition-base);
+        flex: 1;
+        justify-content: center;
+    }
+
+    .rail__btn:hover {
+        border-color: var(--color-accent);
+        color: var(--color-accent-dark);
+    }
+
+    .rail__btn--primary {
+        background: var(--color-accent);
+        color: #fff;
+        border-color: var(--color-accent);
+    }
+
+    .rail__btn--primary:hover {
+        background: var(--color-accent-dark);
+        border-color: var(--color-accent-dark);
+        color: #fff;
+    }
+
+    /* ====== Forward sources ====== */
+    .rail__fwds {
+        font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
+        font-size: 0.78rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .rail__fwd {
+        display: flex;
+        justify-content: space-between;
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        transition: color var(--transition-base);
+    }
+
+    .rail__fwd small {
+        color: var(--color-text-muted);
+        font-size: 0.7rem;
+    }
+
+    a.rail__fwd:hover {
+        color: var(--color-accent-dark);
+    }
+</style>

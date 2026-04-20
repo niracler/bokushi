@@ -78,6 +78,12 @@ export interface TelegramChannel {
 export interface FetchOptions {
     before?: string;
     after?: string;
+    /**
+     * Target minimum number of posts. Telegram's t.me/s/ page returns ~16-20 posts per
+     * request; if minPosts exceeds that, we stitch additional older batches until we
+     * have enough. Capped by MAX_EXTRA_BATCHES to keep SSR latency bounded.
+     */
+    minPosts?: number;
 }
 
 /**
@@ -203,205 +209,357 @@ function convertPipeTables(html: string): string {
 }
 
 /**
- * Fetch and parse Telegram channel information from public web page
+ * Cap on additional stitched batches. Telegram's t.me/s/ page returns ~16-20 posts
+ * per request, so 3 extras bounds SSR at ~4 sequential fetches / ~60-80 posts total.
+ */
+const MAX_EXTRA_BATCHES = 3;
+
+interface ParsedBatch {
+    title: string;
+    description: string;
+    avatar: string;
+    /** Posts in Telegram's DOM order (oldest-first); caller decides final ordering. */
+    posts: TelegramPost[];
+}
+
+/**
+ * Parse a single Telegram channel page's HTML. Pure function — no network I/O.
+ * Extracted so we can parse multiple batches when stitching a larger result set.
+ */
+function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
+    const $ = cheerio.load(html);
+
+    const title = $(".tgme_channel_info_header_title").text().trim();
+    const $description = $(".tgme_channel_info_description");
+    $description.find("br").replaceWith("\n");
+    const description = convertNumberedLists($description.text().trim());
+
+    const avatarSrc = $(".tgme_page_photo_image img").attr("src") || "";
+    const avatar = getProxiedImageUrl(avatarSrc);
+
+    const posts: TelegramPost[] = [];
+    $(".tgme_widget_message_wrap").each((_index, element) => {
+        const $message = $(element).find(".tgme_widget_message");
+        const id = $message.attr("data-post")?.replace(`${channelUsername}/`, "") || "";
+
+        // Skip if no valid ID
+        if (!id) return;
+
+        // Get datetime
+        const datetime = $message.find(".tgme_widget_message_date time").attr("datetime") || "";
+        if (!datetime) {
+            console.warn(`Missing datetime for message ${id}`);
+        }
+
+        // Check if message is forwarded
+        const $forwardedFromElem = $message.find(".tgme_widget_message_forwarded_from_name");
+        const forwardedFrom = $forwardedFromElem.text().trim();
+        const forwardedFromLink = $forwardedFromElem.attr("href") || undefined;
+
+        // Get text content
+        const $text = $message.find(".tgme_widget_message_text");
+        const text = $text.text().trim();
+
+        // Generate title from first sentence or first line
+        const title = text.match(/^.*?(?=[。\n]|$)/)?.[0] || text.substring(0, 100);
+
+        // Process content HTML
+        const $content = $text.clone();
+
+        // Convert <br> to newlines for better text formatting
+        $content.find("br").replaceWith("\n");
+
+        // Remove inline styles from emojis
+        $content.find(".emoji").removeAttr("style");
+
+        // Add target and rel to links
+        $content.find("a").each((_, link) => {
+            $(link).attr("target", "_blank").attr("rel", "noopener noreferrer");
+        });
+
+        // Get images
+        const images: string[] = [];
+        $message.find(".tgme_widget_message_photo_wrap").each((_, photo) => {
+            const style = $(photo).attr("style") || "";
+            const match = style.match(/url\(['"](.+?)['"]\)/);
+            if (match?.[1]) {
+                images.push(getProxiedImageUrl(match[1]));
+            }
+        });
+
+        // Build content HTML and convert numbered lists
+        let contentHtml = convertNumberedLists($content.html() || "");
+
+        // Convert pipe-delimited tables to HTML tables
+        contentHtml = convertPipeTables(contentHtml);
+
+        // Add images if any
+        if (images.length > 0) {
+            const imagesHtml = images
+                .map(
+                    (img) =>
+                        `<img src="${img}" alt="${title}" loading="lazy" class="telegram-post-image" />`,
+                )
+                .join("");
+            contentHtml = `<div class="telegram-images">${imagesHtml}</div>${contentHtml}`;
+        }
+
+        // Extract link preview
+        let linkPreview: LinkPreview | undefined;
+        const $linkPreview = $message.find(".tgme_widget_message_link_preview");
+        if ($linkPreview.length) {
+            const previewUrl = $linkPreview.attr("href") || "";
+            const siteName = $linkPreview.find(".link_preview_site_name").text().trim();
+            const previewTitle = $linkPreview.find(".link_preview_title").text().trim();
+            const previewDescription = $linkPreview.find(".link_preview_description").text().trim();
+
+            // Extract image from style or img tag
+            let previewImageUrl = "";
+            const $previewImage = $linkPreview.find(
+                ".link_preview_image, .link_preview_right_image",
+            );
+            if ($previewImage.length) {
+                const style = $previewImage.attr("style") || "";
+                const imgMatch = style.match(/url\(['"](.+?)['"]\)/);
+                if (imgMatch?.[1]) {
+                    previewImageUrl = getProxiedImageUrl(imgMatch[1]);
+                } else {
+                    const imgSrc =
+                        $previewImage.find("img").attr("src") || $previewImage.attr("src");
+                    if (imgSrc) {
+                        previewImageUrl = getProxiedImageUrl(imgSrc);
+                    }
+                }
+            }
+
+            if (previewUrl || previewTitle) {
+                linkPreview = {
+                    url: previewUrl,
+                    ...(siteName && { siteName }),
+                    ...(previewTitle && { title: previewTitle }),
+                    ...(previewDescription && { description: previewDescription }),
+                    ...(previewImageUrl && { imageUrl: previewImageUrl }),
+                };
+            }
+        }
+
+        // Extract reply info
+        let replyInfo: ReplyInfo | undefined;
+        const $reply = $message.find(".tgme_widget_message_reply");
+        if ($reply.length) {
+            const replyToAuthor = $reply.find(".tgme_widget_message_author_name").text().trim();
+            const replyToText = $reply
+                .find(".tgme_widget_message_metatext, .tgme_widget_message_text")
+                .text()
+                .trim();
+            const replyToLink = $reply.attr("href") || undefined;
+
+            if (replyToAuthor || replyToText) {
+                replyInfo = {
+                    ...(replyToAuthor && { replyToAuthor }),
+                    ...(replyToText && { replyToText }),
+                    ...(replyToLink && { replyToLink }),
+                };
+            }
+        }
+
+        // Extract hashtags
+        const hashtags: string[] = [];
+        $content.find("a").each((_, link) => {
+            const href = $(link).attr("href") || "";
+            const linkText = $(link).text().trim();
+            if (linkText.startsWith("#") && (href.includes("?q=") || href.includes("/s/"))) {
+                hashtags.push(linkText.slice(1));
+            }
+        });
+
+        posts.push({
+            id,
+            datetime,
+            title,
+            content: contentHtml,
+            text,
+            ...(forwardedFrom && { forwardedFrom }),
+            ...(forwardedFromLink && { forwardedFromLink }),
+            ...(linkPreview && { linkPreview }),
+            ...(replyInfo && { replyInfo }),
+            ...(hashtags.length > 0 && { hashtags }),
+        });
+    });
+
+    return { title, description, avatar, posts };
+}
+
+/**
+ * Fetch and parse Telegram channel information from public web page.
+ * When `options.minPosts` exceeds what a single fetch returns (~16-20), we stitch
+ * additional older batches using `before=<oldestId>` until we reach the target or
+ * hit `MAX_EXTRA_BATCHES`. Duplicates across batches are discarded by post id.
+ *
  * @param channelUsername - Telegram channel username (without @)
- * @param options - Pagination options (before/after message ID)
- * @returns Channel information including posts
+ * @param options - Pagination cursor + optional minPosts target
+ * @returns Channel information including posts (newest-first for display)
  */
 export async function fetchTelegramChannel(
     channelUsername: string,
     options: FetchOptions = {},
 ): Promise<TelegramChannel> {
-    const params = new URLSearchParams();
-    if (options.before) params.append("before", options.before);
-    if (options.after) params.append("after", options.after);
-
-    const queryString = params.toString();
-    const url = `https://t.me/s/${channelUsername}${queryString ? `?${queryString}` : ""}`;
-
-    try {
+    const fetchBatch = async (params: URLSearchParams): Promise<ParsedBatch> => {
+        const queryString = params.toString();
+        const url = `https://t.me/s/${channelUsername}${queryString ? `?${queryString}` : ""}`;
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Failed to fetch channel: ${response.statusText}`);
         }
+        return parseChannelHtml(await response.text(), channelUsername);
+    };
 
-        const html = await response.text();
-        const $ = cheerio.load(html);
+    try {
+        const initialParams = new URLSearchParams();
+        if (options.before) initialParams.append("before", options.before);
+        if (options.after) initialParams.append("after", options.after);
 
-        // Extract channel info
-        const title = $(".tgme_channel_info_header_title").text().trim();
-        // Get description HTML to preserve line breaks
-        const $description = $(".tgme_channel_info_description");
-        $description.find("br").replaceWith("\n");
+        const initial = await fetchBatch(initialParams);
+        const { title, description, avatar } = initial;
 
-        // Convert numbered lists in description
-        const description = convertNumberedLists($description.text().trim());
+        // Collected posts stay in DOM order (oldest-first) while we stitch.
+        let collected = initial.posts;
+        const seenIds = new Set(collected.map((p) => p.id));
 
-        const avatarSrc = $(".tgme_page_photo_image img").attr("src") || "";
-        const avatar = getProxiedImageUrl(avatarSrc);
+        const minPosts = options.minPosts ?? 20;
+        let extraBatches = 0;
 
-        // Extract posts
-        const posts: TelegramPost[] = [];
-        $(".tgme_widget_message_wrap").each((_index, element) => {
-            const $message = $(element).find(".tgme_widget_message");
-            const id = $message.attr("data-post")?.replace(`${channelUsername}/`, "") || "";
+        while (collected.length < minPosts && extraBatches < MAX_EXTRA_BATCHES) {
+            const oldestId = collected[0]?.id;
+            if (!oldestId) break;
 
-            // Skip if no valid ID
-            if (!id) return;
+            const nextParams = new URLSearchParams();
+            nextParams.append("before", oldestId);
+            const next = await fetchBatch(nextParams);
 
-            // Get datetime
-            const datetime = $message.find(".tgme_widget_message_date time").attr("datetime") || "";
-            if (!datetime) {
-                console.warn(`Missing datetime for message ${id}`);
-            }
-
-            // Check if message is forwarded
-            const $forwardedFromElem = $message.find(".tgme_widget_message_forwarded_from_name");
-            const forwardedFrom = $forwardedFromElem.text().trim();
-            const forwardedFromLink = $forwardedFromElem.attr("href") || undefined;
-
-            // Get text content
-            const $text = $message.find(".tgme_widget_message_text");
-            const text = $text.text().trim();
-
-            // Generate title from first sentence or first line
-            const title = text.match(/^.*?(?=[。\n]|$)/)?.[0] || text.substring(0, 100);
-
-            // Process content HTML
-            const $content = $text.clone();
-
-            // Convert <br> to newlines for better text formatting
-            $content.find("br").replaceWith("\n");
-
-            // Remove inline styles from emojis
-            $content.find(".emoji").removeAttr("style");
-
-            // Add target and rel to links
-            $content.find("a").each((_, link) => {
-                $(link).attr("target", "_blank").attr("rel", "noopener noreferrer");
-            });
-
-            // Get images
-            const images: string[] = [];
-            $message.find(".tgme_widget_message_photo_wrap").each((_, photo) => {
-                const style = $(photo).attr("style") || "";
-                const match = style.match(/url\(['"](.+?)['"]\)/);
-                if (match?.[1]) {
-                    images.push(getProxiedImageUrl(match[1]));
-                }
-            });
-
-            // Build content HTML and convert numbered lists
-            let contentHtml = convertNumberedLists($content.html() || "");
-
-            // Convert pipe-delimited tables to HTML tables
-            contentHtml = convertPipeTables(contentHtml);
-
-            // Add images if any
-            if (images.length > 0) {
-                const imagesHtml = images
-                    .map(
-                        (img) =>
-                            `<img src="${img}" alt="${title}" loading="lazy" class="telegram-post-image" />`,
-                    )
-                    .join("");
-                contentHtml = `<div class="telegram-images">${imagesHtml}</div>${contentHtml}`;
-            }
-
-            // Extract link preview
-            let linkPreview: LinkPreview | undefined;
-            const $linkPreview = $message.find(".tgme_widget_message_link_preview");
-            if ($linkPreview.length) {
-                const previewUrl = $linkPreview.attr("href") || "";
-                const siteName = $linkPreview.find(".link_preview_site_name").text().trim();
-                const previewTitle = $linkPreview.find(".link_preview_title").text().trim();
-                const previewDescription = $linkPreview
-                    .find(".link_preview_description")
-                    .text()
-                    .trim();
-
-                // Extract image from style or img tag
-                let previewImageUrl = "";
-                const $previewImage = $linkPreview.find(
-                    ".link_preview_image, .link_preview_right_image",
-                );
-                if ($previewImage.length) {
-                    const style = $previewImage.attr("style") || "";
-                    const imgMatch = style.match(/url\(['"](.+?)['"]\)/);
-                    if (imgMatch?.[1]) {
-                        previewImageUrl = getProxiedImageUrl(imgMatch[1]);
-                    } else {
-                        const imgSrc =
-                            $previewImage.find("img").attr("src") || $previewImage.attr("src");
-                        if (imgSrc) {
-                            previewImageUrl = getProxiedImageUrl(imgSrc);
-                        }
-                    }
-                }
-
-                if (previewUrl || previewTitle) {
-                    linkPreview = {
-                        url: previewUrl,
-                        ...(siteName && { siteName }),
-                        ...(previewTitle && { title: previewTitle }),
-                        ...(previewDescription && { description: previewDescription }),
-                        ...(previewImageUrl && { imageUrl: previewImageUrl }),
-                    };
-                }
-            }
-
-            // Extract reply info
-            let replyInfo: ReplyInfo | undefined;
-            const $reply = $message.find(".tgme_widget_message_reply");
-            if ($reply.length) {
-                const replyToAuthor = $reply.find(".tgme_widget_message_author_name").text().trim();
-                const replyToText = $reply
-                    .find(".tgme_widget_message_metatext, .tgme_widget_message_text")
-                    .text()
-                    .trim();
-                const replyToLink = $reply.attr("href") || undefined;
-
-                if (replyToAuthor || replyToText) {
-                    replyInfo = {
-                        ...(replyToAuthor && { replyToAuthor }),
-                        ...(replyToText && { replyToText }),
-                        ...(replyToLink && { replyToLink }),
-                    };
-                }
-            }
-
-            // Extract hashtags
-            const hashtags: string[] = [];
-            $content.find("a").each((_, link) => {
-                const href = $(link).attr("href") || "";
-                const linkText = $(link).text().trim();
-                if (linkText.startsWith("#") && (href.includes("?q=") || href.includes("/s/"))) {
-                    hashtags.push(linkText.slice(1));
-                }
-            });
-
-            posts.push({
-                id,
-                datetime,
-                title,
-                content: contentHtml,
-                text,
-                ...(forwardedFrom && { forwardedFrom }),
-                ...(forwardedFromLink && { forwardedFromLink }),
-                ...(linkPreview && { linkPreview }),
-                ...(replyInfo && { replyInfo }),
-                ...(hashtags.length > 0 && { hashtags }),
-            });
-        });
+            const newPosts = next.posts.filter((p) => !seenIds.has(p.id));
+            if (newPosts.length === 0) break; // reached channel's oldest post
+            for (const p of newPosts) seenIds.add(p.id);
+            collected = [...newPosts, ...collected];
+            extraBatches++;
+        }
 
         return {
             title,
             description,
             avatar,
-            posts: posts.reverse(), // Reverse to show newest first
+            posts: collected.reverse(), // newest-first for display
         };
     } catch (error) {
         console.error("Error fetching Telegram channel:", error);
         throw error;
     }
+}
+
+/* =================================================================
+ * Channel view helpers — card-type detection + aggregations
+ * Used by /channel page to drive the v4 剪报本 layout (spine / rail /
+ * day dividers / typed cards).
+ * ================================================================= */
+
+export type CardType = "text" | "link" | "photo" | "fwd" | "code";
+
+/**
+ * Classify a post into one of the 5 card shapes the design supports.
+ * This is the only business-logic choice in the display pipeline —
+ * which signal wins when a post has multiple (e.g. a forward that
+ * also contains an image). Tweak priorities below to taste.
+ */
+export function detectCardType(post: TelegramPost): CardType {
+    // TODO: Customize the priority order or add new signals
+    if (post.forwardedFrom) return "fwd";
+    if (/<pre[\s>]/i.test(post.content)) return "code";
+    if (/<img[\s>]/i.test(post.content)) return "photo";
+    if (post.linkPreview) return "link";
+    return "text";
+}
+
+interface DayGroup {
+    /** YYYY-MM-DD */
+    date: string;
+    /** Local month anchor id, e.g. "m-2026-04" */
+    monthAnchor: string;
+    /** Day of month, zero-padded, e.g. "19" */
+    day: string;
+    /** Month-dot-day label, e.g. "04·19" */
+    dayLabel: string;
+    /** Uppercase weekday, e.g. "SUN" */
+    weekday: string;
+    posts: TelegramPost[];
+}
+
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"] as const;
+
+/**
+ * Group posts by calendar day (in UTC for determinism between SSR runs).
+ * Posts without a valid datetime are collected under an "undated" bucket.
+ */
+export function groupPostsByDay(posts: TelegramPost[]): DayGroup[] {
+    const groups = new Map<string, DayGroup>();
+
+    for (const post of posts) {
+        const parsed = post.datetime ? new Date(post.datetime) : null;
+        if (!parsed || Number.isNaN(parsed.getTime())) continue;
+
+        const year = parsed.getUTCFullYear();
+        const month = String(parsed.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(parsed.getUTCDate()).padStart(2, "0");
+        const date = `${year}-${month}-${day}`;
+
+        let group = groups.get(date);
+        if (!group) {
+            group = {
+                date,
+                monthAnchor: `m-${year}-${month}`,
+                day,
+                dayLabel: `${month}·${day}`,
+                weekday: WEEKDAYS[parsed.getUTCDay()],
+                posts: [],
+            };
+            groups.set(date, group);
+        }
+        group.posts.push(post);
+    }
+
+    return Array.from(groups.values()).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/** Count posts per card type within the given slice. */
+export function tallyByType(posts: TelegramPost[]): Record<CardType, number> {
+    const result: Record<CardType, number> = { text: 0, link: 0, photo: 0, fwd: 0, code: 0 };
+    for (const post of posts) result[detectCardType(post)]++;
+    return result;
+}
+
+interface ForwardSource {
+    handle: string;
+    link?: string;
+    count: number;
+}
+
+/** Tally forward sources (most frequent first, deduped by handle). */
+export function collectForwardSources(posts: TelegramPost[], limit = 4): ForwardSource[] {
+    const sources = new Map<string, ForwardSource>();
+    for (const post of posts) {
+        if (!post.forwardedFrom) continue;
+        const handle = post.forwardedFrom;
+        const existing = sources.get(handle);
+        if (existing) {
+            existing.count++;
+        } else {
+            sources.set(handle, {
+                handle,
+                count: 1,
+                ...(post.forwardedFromLink && { link: post.forwardedFromLink }),
+            });
+        }
+    }
+    return Array.from(sources.values())
+        .sort((a, b) => b.count - a.count)
+        .slice(0, limit);
 }
