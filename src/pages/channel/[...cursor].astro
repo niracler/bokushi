@@ -1,21 +1,28 @@
 ---
 /**
- * Telegram Channel Display Page
+ * Telegram Channel Display Page — v4 「剪报本」 layout
  *
- * Redesigned with Apple HIG principles: Clarity, Consistency, Deference
- * Two-column layout: posts (~600px) + sidebar (channel info)
+ * Structure: narrow strip at top + 3-col layout (month spine | feed | rail)
+ * Feed is grouped by day, with 2-col CSS-columns masonry per day group.
+ * Cards come in 5 variants detected from the post shape (see telegram.ts).
  *
  * @author Niracler
  */
 
 import BaseHead from "../../components/BaseHead.astro";
-import ChannelSidebar from "../../components/channel/ChannelSidebar.astro";
+import ChannelDayDivider from "../../components/channel/ChannelDayDivider.astro";
+import ChannelRail from "../../components/channel/ChannelRail.astro";
 import PostCard from "../../components/channel/PostCard.astro";
 import Footer from "../../components/Footer.astro";
 import Header from "../../components/Header.astro";
 import Lightbox from "../../components/Lightbox.astro";
 import type { TelegramChannel } from "../../utils/telegram";
-import { fetchTelegramChannel } from "../../utils/telegram";
+import {
+    collectForwardSources,
+    fetchTelegramChannel,
+    groupPostsByDay,
+    tallyByType,
+} from "../../utils/telegram";
 
 // Enable server-side rendering for this dynamic route
 export const prerender = false;
@@ -24,7 +31,6 @@ const { cursor } = Astro.params;
 const CHANNEL_USERNAME = "tomoko_channel";
 const CACHE_SECONDS = 300;
 
-// Parse cursor parameter
 function parseCursor(cursor: string | undefined): {
     type: "before" | "after" | null;
     value: string | undefined;
@@ -41,7 +47,7 @@ let channelData: TelegramChannel | undefined;
 let error: string | null = null;
 
 try {
-    const options: { before?: string; after?: string } = {};
+    const options: { before?: string; after?: string; minPosts?: number } = { minPosts: 40 };
     if (cursorType === "before" && cursorValue) {
         options.before = cursorValue;
     } else if (cursorType === "after" && cursorValue) {
@@ -54,19 +60,38 @@ try {
     console.error("Error loading Telegram channel:", e);
 }
 
-// Get first and last post IDs for pagination
 const firstPostId = channelData?.posts?.[0]?.id;
 const lastPostId = channelData?.posts?.[channelData.posts.length - 1]?.id;
 
-// Determine if there are more posts
 const hasNewerPosts = cursorType === "before" || cursorType === "after";
 const hasOlderPosts = channelData?.posts && channelData.posts.length > 0;
 
-// Set short cache to avoid re-fetching on every refresh
 Astro.response.headers.set(
     "Cache-Control",
     `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=30`,
 );
+
+const posts = channelData?.posts ?? [];
+const dayGroups = groupPostsByDay(posts);
+const typeCounts = tallyByType(posts);
+const forwardSources = collectForwardSources(posts, 4);
+
+// Track which days are the first of their month — only those get the month anchor id,
+// so deep links like /channel#m-2026-04 still work for bookmarking a specific month.
+const monthAnchorSeen = new Set<string>();
+const dayGroupsWithAnchor = dayGroups.map((group) => {
+    const needsAnchor = !monthAnchorSeen.has(group.monthAnchor);
+    if (needsAnchor) monthAnchorSeen.add(group.monthAnchor);
+    return { ...group, anchorId: needsAnchor ? group.monthAnchor : undefined };
+});
+
+// Eyebrow "YYYY·MM" — latest month present in this slice
+const latestPost = posts[0];
+const latestDate = latestPost?.datetime ? new Date(latestPost.datetime) : null;
+const currentMonthLabel =
+    latestDate && !Number.isNaN(latestDate.getTime())
+        ? `${latestDate.getUTCFullYear()}·${String(latestDate.getUTCMonth() + 1).padStart(2, "0")}`
+        : undefined;
 ---
 
 <!doctype html>
@@ -80,7 +105,7 @@ Astro.response.headers.set(
   </head>
   <body>
     <Header />
-    <main id="main-content" class="page-shell">
+    <main id="main-content" class="page-shell max-w-5xl section-stack">
       {error ? (
         <div class="error-message surface-card">
           <h1>加载频道失败</h1>
@@ -92,68 +117,78 @@ Astro.response.headers.set(
           </p>
         </div>
       ) : channelData ? (
-        <div class="channel-layout">
-          {/* Main content: posts + pagination */}
-          <div class="channel-main section-stack">
-            {/* Posts list */}
-            <div class="posts-container">
-              {channelData.posts.map((post) => (
-                <PostCard post={post} channelUsername={CHANNEL_USERNAME} />
+        <>
+          <div class="channel-layout">
+            <section class="channel-main">
+              {dayGroupsWithAnchor.map((group) => (
+                <>
+                  <ChannelDayDivider
+                    dayLabel={group.dayLabel}
+                    weekday={group.weekday}
+                    postCount={group.posts.length}
+                    monthAnchor={group.anchorId}
+                  />
+                  <div class="feed">
+                    {group.posts.map((post) => (
+                      <PostCard post={post} channelUsername={CHANNEL_USERNAME} />
+                    ))}
+                  </div>
+                </>
               ))}
-            </div>
 
-            {/* Pagination */}
-            <nav class="pagination">
-              {hasNewerPosts && firstPostId && (
-                <a href={`/channel/after-${firstPostId}`} class="pagination__link pagination__link--prev">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  更新的动态
+              <nav class="pager">
+                {hasNewerPosts && firstPostId && (
+                  <a href={`/channel/after-${firstPostId}`} class="pager__link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    更新的
+                  </a>
+                )}
+                <a
+                  href="/channel"
+                  class:list={["pager__link", { "pager__link--active": !cursor }]}
+                >
+                  最新
                 </a>
-              )}
-              <a href="/channel"
-                 class:list={["pagination__link", "pagination__link--home", { "pagination__link--active": !cursor }]}>
-                最新
-              </a>
-              {hasOlderPosts && lastPostId && (
-                <a href={`/channel/before-${lastPostId}`} class="pagination__link pagination__link--next">
-                  更早的动态
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </a>
-              )}
-            </nav>
+                {hasOlderPosts && lastPostId && (
+                  <a href={`/channel/before-${lastPostId}`} class="pager__link">
+                    更早的
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                )}
+              </nav>
+            </section>
+
+            <ChannelRail
+              channelTitle={channelData.title}
+              channelAvatar={channelData.avatar}
+              username={CHANNEL_USERNAME}
+              currentMonthLabel={currentMonthLabel}
+              description={channelData.description}
+              typeCounts={typeCounts}
+              forwardSources={forwardSources}
+            />
           </div>
-
-          {/* Sidebar: channel info */}
-          <ChannelSidebar
-            title={channelData.title}
-            description={channelData.description}
-            avatar={channelData.avatar}
-            username={CHANNEL_USERNAME}
-          />
-        </div>
+        </>
       ) : null}
     </main>
     <Footer />
-    <Lightbox id="channel-lightbox" selector=".post-card__content img:not([data-lightbox-skip]), .telegram-post-image" />
+    <Lightbox id="channel-lightbox" selector=".card__content img:not([data-lightbox-skip]), .telegram-post-image" />
   </body>
 </html>
 
 <script>
-  // Mark channel images for lightbox and lazy load + collapse long posts + pipe-table fallback
   document.addEventListener('DOMContentLoaded', () => {
-    // Images
-    document.querySelectorAll('.post-card__content img').forEach((element) => {
+    document.querySelectorAll('.card__content img').forEach((element) => {
       const img = element as HTMLImageElement;
       img.classList.add('telegram-post-image');
       img.loading = img.loading || 'lazy';
     });
 
-    // Wrap <table> elements in a scroll container for horizontal overflow
-    document.querySelectorAll<HTMLElement>('.post-card__content table').forEach((table) => {
+    document.querySelectorAll<HTMLElement>('.card__content table').forEach((table) => {
       if (table.parentElement?.classList.contains('table-scroll-wrapper')) return;
       const wrapper = document.createElement('div');
       wrapper.className = 'table-scroll-wrapper';
@@ -162,8 +197,7 @@ Astro.response.headers.set(
     });
 
     // Client-side fallback: detect remaining raw pipe-table text and wrap in <pre>
-    document.querySelectorAll<HTMLElement>('.post-card__content').forEach((content) => {
-      // Only check text nodes (pipe tables that the server parser missed)
+    document.querySelectorAll<HTMLElement>('.card__content').forEach((content) => {
       const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
       const pipeLineRe = /^\s*\|.+\|\s*$/;
       const sepRe = /^\s*\|[\s\-:]+(\|[\s\-:]+)+\|\s*$/;
@@ -178,16 +212,14 @@ Astro.response.headers.set(
         for (let idx = 0; idx < lines.length; idx++) {
           if (pipeLineRe.test(lines[idx])) {
             if (tableStart === -1) tableStart = idx;
-            // Check for header + separator pattern
             if (
               idx >= tableStart + 1 &&
               sepRe.test(lines[tableStart + 1]) &&
               idx >= tableStart + 2
             ) {
-              // We have at least header + sep + one data row — continue collecting
+              // Continue collecting
             }
           } else {
-            // End of a potential table block
             if (
               tableStart !== -1 &&
               idx - tableStart >= 3 &&
@@ -201,7 +233,6 @@ Astro.response.headers.set(
             tableStart = -1;
           }
         }
-        // Check if table extends to end of text node
         if (
           tableStart !== -1 &&
           lines.length - tableStart >= 3 &&
@@ -213,7 +244,6 @@ Astro.response.headers.set(
         }
       }
 
-      // Replace raw pipe-table text with styled <pre> blocks
       for (const { node: textNode, tableText, before, after } of nodesToReplace) {
         const frag = document.createDocumentFragment();
         if (before) frag.appendChild(document.createTextNode(before));
@@ -226,11 +256,11 @@ Astro.response.headers.set(
       }
     });
 
-    // Collapse long posts based on rendered height (384px desktop / 256px mobile)
-    const HEIGHT_THRESHOLD = 384; // 24rem
+    // Collapse long posts based on rendered height
+    const HEIGHT_THRESHOLD = 320; // 20rem, matches card CSS
 
     document.querySelectorAll<HTMLElement>('[data-post-content-wrapper]').forEach((wrapper) => {
-      const content = wrapper.querySelector<HTMLElement>('.post-card__content');
+      const content = wrapper.querySelector<HTMLElement>('.card__content');
       const btn = wrapper.querySelector<HTMLButtonElement>('[data-expand-btn]');
       const label = btn?.querySelector<HTMLElement>('[data-expand-label]');
       if (!content || !btn || !label) return;
@@ -253,12 +283,15 @@ Astro.response.headers.set(
 </script>
 
 <style>
+  /* =================================================================
+   * Layout: feed (main) + channel rail
+   * Below 900px the rail drops to avoid squeezing the feed.
+   * ================================================================= */
   .channel-layout {
     display: grid;
-    grid-template-columns: minmax(0, 600px) 280px;
+    grid-template-columns: minmax(0, 1fr) 14rem;
     gap: var(--space-6);
-    max-width: 920px;
-    margin: 0 auto;
+    align-items: start;
   }
 
   .channel-main {
@@ -266,12 +299,89 @@ Astro.response.headers.set(
     overflow: hidden;
   }
 
-  .posts-container {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
+  @media (max-width: 900px) {
+    .channel-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .channel-layout > :global(.rail) {
+      position: static;
+      max-height: none;
+      order: -1;
+    }
   }
 
+  /* =================================================================
+   * Per-day masonry feed — 2-col CSS columns
+   * Packs variable-height cards tightly (the 错落有致 look).
+   * Reading order: fill left col top-to-bottom, then right col.
+   * ================================================================= */
+  .feed {
+    column-count: 2;
+    column-gap: var(--space-4);
+  }
+
+  .feed > :global(*) {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: var(--space-4);
+    display: block;
+  }
+
+  @media (max-width: 760px) {
+    .feed {
+      column-count: 1;
+    }
+  }
+
+  /* =================================================================
+   * Pager
+   * ================================================================= */
+  .pager {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .pager__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: all var(--transition-base);
+  }
+
+  .pager__link:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent-dark);
+  }
+
+  .pager__link--active {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+  }
+
+  .pager__link--active:hover {
+    background: var(--color-accent-dark);
+    border-color: var(--color-accent-dark);
+    color: #fff;
+  }
+
+  /* =================================================================
+   * Error state
+   * ================================================================= */
   .error-message {
     text-align: center;
     padding: var(--space-8) var(--space-4);
@@ -288,67 +398,9 @@ Astro.response.headers.set(
     text-decoration: underline;
   }
 
-  /* Pagination */
-  .pagination {
-    display: flex;
-    gap: var(--space-3);
-    justify-content: center;
-    align-items: center;
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--color-border-soft);
-  }
-
-  .pagination__link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    background: var(--color-bg-surface);
-    border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-md);
-    color: var(--color-text-primary);
-    text-decoration: none;
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    transition: all var(--transition-base);
-  }
-
-  .pagination__link:hover {
-    background: var(--color-bg-muted);
-    border-color: var(--color-border);
-  }
-
-  .pagination__link--home {
-    background: var(--color-bg-muted);
-  }
-
-  .pagination__link--active {
-    background: var(--color-accent);
-    color: white;
-    border-color: var(--color-accent);
-  }
-
-  .pagination__link--active:hover {
-    background: var(--color-accent-dark);
-    border-color: var(--color-accent-dark);
-  }
-
-  @media (max-width: 860px) {
-    .channel-layout {
-      grid-template-columns: 1fr;
-      max-width: none;
-    }
-  }
-
   @media (max-width: 640px) {
-    .pagination {
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-
-    .pagination__link {
-      width: 100%;
-      justify-content: center;
+    .pager {
+      flex-wrap: wrap;
     }
   }
 </style>

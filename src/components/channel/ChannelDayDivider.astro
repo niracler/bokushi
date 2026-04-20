@@ -1,0 +1,66 @@
+---
+interface Props {
+    dayLabel: string;
+    weekday: string;
+    postCount: number;
+    /** When set, renders as a month anchor target for the spine's jump links. */
+    monthAnchor?: string;
+}
+
+const { dayLabel, weekday, postCount, monthAnchor } = Astro.props;
+---
+
+<div
+    class:list={["day", { "day--month-anchor": !!monthAnchor }]}
+    {...(monthAnchor ? { id: monthAnchor } : {})}
+>
+    <span class="day__date">{dayLabel}</span>
+    <span class="day__wk">{weekday}</span>
+    <span class="day__rule"></span>
+    <span class="day__ts">{postCount} posts</span>
+</div>
+
+<style>
+    .day {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-3);
+        margin: var(--space-6) 0 var(--space-3);
+        font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
+    }
+
+    .day:first-of-type {
+        margin-top: 0;
+    }
+
+    .day--month-anchor {
+        scroll-margin-top: 5rem;
+    }
+
+    .day__date {
+        font-size: 0.95rem;
+        color: var(--color-accent-dark);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .day__wk {
+        font-size: 0.66rem;
+        color: var(--color-text-muted);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .day__rule {
+        flex: 1;
+        height: 1px;
+        background: var(--color-border);
+    }
+
+    .day__ts {
+        font-size: 0.7rem;
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+</style>
