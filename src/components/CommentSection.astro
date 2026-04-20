@@ -428,6 +428,48 @@ const heading = locale === "en" ? "Comments" : "评论";
         margin: var(--space-3) 0;
     }
 
+    /* Markdown tables in comments */
+    .comment-body .comment-table-wrapper {
+        margin: var(--space-3) 0;
+        overflow-x: auto;
+        border: 1px solid var(--color-border-soft);
+        border-radius: var(--radius-md);
+        background: var(--color-bg-surface);
+    }
+
+    .comment-body table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .comment-body thead {
+        background: color-mix(in srgb, var(--color-accent-soft) 55%, transparent);
+    }
+
+    .comment-body th,
+    .comment-body td {
+        padding: var(--space-2) var(--space-3);
+        text-align: left;
+        border-bottom: 1px solid var(--color-border-soft);
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .comment-body thead th {
+        color: var(--color-text-primary);
+        font-weight: 600;
+    }
+
+    .comment-body tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .comment-body tbody tr:nth-child(even) {
+        background: color-mix(in srgb, var(--color-bg-surface) 82%, var(--color-bg-muted) 18%);
+    }
+
     /* Reply + edit action buttons */
     .comment-actions {
         margin-top: var(--space-2);
