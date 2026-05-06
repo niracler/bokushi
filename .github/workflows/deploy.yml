@@ -10,10 +10,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    env:
-      NPM_CONFIG_STRICT_DEP_BUILDS: "false"
-      NPM_CONFIG_VERIFY_DEPS_BEFORE_RUN: "warn"
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,13 +25,13 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --config.strictDepBuilds=false
 
       - name: Install Playwright for Mermaid rendering
         run: npx playwright install chromium --with-deps
 
       - name: Build site
-        run: pnpm build
+        run: node_modules/.bin/astro build
         env:
           PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_TURNSTILE_SITE_KEY }}
 
