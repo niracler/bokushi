@@ -23,12 +23,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm approve-builds --all
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright for Mermaid rendering
         run: npx playwright install chromium --with-deps
