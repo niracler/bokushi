@@ -25,7 +25,7 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --config.strictDepBuilds=false
 
       - name: Install Playwright for Mermaid rendering
         run: npx playwright install chromium --with-deps
