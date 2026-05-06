@@ -26,7 +26,9 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm approve-builds --all
 
       - name: Install Playwright for Mermaid rendering
         run: npx playwright install chromium --with-deps
