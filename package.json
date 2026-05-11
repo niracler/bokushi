@@ -27,7 +27,7 @@
         "astro-pagefind": "^1.8.6",
         "cheerio": "^1.2.0",
         "markdown-it": "^14.1.1",
-        "mermaid": "^11.14.0",
+        "mermaid": "^11.15.0",
         "rehype-autolink-headings": "^7.1.0",
         "rehype-figure": "^1.0.1",
         "rehype-img-size": "^1.0.1",
