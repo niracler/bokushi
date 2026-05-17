@@ -3,7 +3,7 @@ title: "How Do You Live?"
 description: "草稿啦，仅仅是草稿，使命宣言什么的，看看就好～"
 pubDate: 2026-05-06
 socialImage: "https://image.niracler.com/2026/05/44433094a7f7e2702aceb8d0761e966b.png"
-tags: ["使命宣言", "生活", "思考", "注意力"]
+tags: ["使命宣言", "生活", "思考", "注意力", "人际关系"]
 ---
 
 > 五一假期全在终末地拉电线，直接时间消失术了，故随手放一篇之前写的文章以表存活。
