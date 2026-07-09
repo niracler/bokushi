@@ -7,6 +7,7 @@
         "dev": "astro dev",
         "dev:clean": "lsof -ti:4321 | xargs kill -9 2>/dev/null; rm -rf node_modules/.vite node_modules/.astro; astro dev",
         "build": "astro build",
+        "check:design": "node scripts/check-design-rendering.mjs",
         "preview": "astro preview",
         "astro": "astro",
         "format": "biome format --write .",
@@ -57,23 +58,5 @@
         "unist-util-visit": "^5.1.0",
         "unplugin-icons": "^23.0.1",
         "wrangler": "^4.84.1"
-    },
-    "pnpm": {
-        "overrides": {
-            "undici": ">=7.24.6",
-            "mdast-util-to-hast": ">=13.2.1",
-            "diff": ">=8.0.3",
-            "devalue": ">=5.6.3",
-            "fast-xml-parser": ">=5.7.0",
-            "dompurify": ">=3.4.0",
-            "ajv": ">=8.18.0",
-            "lodash-es": ">=4.18.1",
-            "h3": ">=1.15.5"
-        },
-        "onlyBuiltDependencies": [
-            "esbuild",
-            "sharp",
-            "workerd"
-        ]
     }
 }
