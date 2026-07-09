@@ -1,5 +1,6 @@
 // @ts-check
 
+import { existsSync } from "node:fs";
 import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
@@ -12,9 +13,12 @@ import rehypeImgSize from "rehype-img-size";
 import rehypeMermaid from "rehype-mermaid";
 import rehypePicture from "rehype-picture";
 import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 import { remarkAlert } from "remark-github-blockquote-alert";
 import Icons from "unplugin-icons/vite";
 import { remarkModifiedTime } from "./remark-modified-time.mjs";
+
+const localChromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 // https://astro.build/config
 export default defineConfig({
@@ -39,7 +43,7 @@ export default defineConfig({
     }),
 
     markdown: {
-        remarkPlugins: [remarkAlert, remarkModifiedTime],
+        remarkPlugins: [remarkGfm, remarkAlert, remarkModifiedTime],
         shikiConfig: {
             // 双主题配置：通过 CSS 变量控制，无需 !important
             themes: {
@@ -69,6 +73,9 @@ export default defineConfig({
                 rehypeMermaid,
                 {
                     strategy: "inline-svg", // 服务端渲染为内联 SVG
+                    launchOptions: existsSync(localChromePath)
+                        ? { executablePath: localChromePath }
+                        : undefined,
                 },
             ],
             rehypePicture,

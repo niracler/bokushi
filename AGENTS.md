@@ -12,6 +12,12 @@
 - Install: `pnpm install`. Dev server: `pnpm dev`.
 - Build: `pnpm build`; local preview: `pnpm preview`.
 - Quality: `pnpm lint` (Biome) + `pnpm format`; use `pnpm astro check` when adding TS/MDX.
+- Design render check: `node scripts/check-design-rendering.mjs` (or `pnpm check:design` when pnpm is healthy).
+
+## Local Development Notes
+
+- Prefer scripts for repeatable local checks instead of manual workaround notes. `scripts/check-design-rendering.mjs` starts Astro when needed, uses `/design` without a trailing slash, and verifies GFM tables/footnotes.
+- If pnpm 11 rewrites a large `pnpm-lock.yaml` during an unrelated task, treat it as dependency-tooling churn and keep it out of the change unless the task is explicitly about dependency maintenance.
 
 ## Coding Style & Naming Conventions
 
@@ -21,7 +27,7 @@
 
 ## Testing Guidelines
 
-- No automated suite yet; Playwright is available if you add browser specs. Name them `*.spec.ts` under `tests/` and keep headless-friendly.
+- Lightweight Node regression tests live under `tests/`; run targeted tests with `node --test tests/<name>.test.mjs`. Playwright is available if you add browser specs. Name them `*.spec.ts` under `tests/` and keep headless-friendly.
 - For UI or script changes, at minimum run `pnpm build` then `pnpm preview` and interact with scripts in `src/scripts/`.
 
 ## Development Workflow
