@@ -1,0 +1,8 @@
+{
+    "$schema": "https://unpkg.com/knip@6/schema.json",
+    "entry": ["remark-modified-time.mjs", "scripts/**/*.{mjs,ts}", "tests/**/*.mjs"],
+    "project": ["*.mjs", "scripts/**/*.{mjs,ts}", "src/**/*.{astro,js,ts}", "tests/**/*.mjs"],
+    "ignoreDependencies": ["cloudflare"],
+    "ignoreBinaries": ["lsof"],
+    "ignoreUnresolved": ["/pagefind/pagefind.js"]
+}

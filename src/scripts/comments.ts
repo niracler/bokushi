@@ -567,7 +567,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
         : "";
 
     const deleteBtn =
-        Boolean(isAdminUser) && comment.status !== "deleted"
+        isAdminUser && comment.status !== "deleted"
             ? `<button class="comment-delete-btn" data-delete-id="${comment.id}">${ct("deleteComment")}</button>`
             : "";
 
