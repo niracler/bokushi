@@ -19,6 +19,7 @@ import { extractDescription } from "../utils/extractDescription";
 import type { Locale } from "../utils/i18n";
 import { localePath } from "../utils/i18n";
 import { estimateReadingTime } from "../utils/readingTime";
+import { serializeJsonForHtml } from "../utils/serializeJsonForHtml";
 
 type BlogEntry = CollectionEntry<"blog"> | CollectionEntry<"monthly"> | CollectionEntry<"til">;
 
@@ -74,34 +75,40 @@ const slug = Astro.url.pathname.replace(/^\/|\/$/g, "");
 
 // 只有当文章有足够的标题时才显示目录（至少 2 个 h2/h3）
 const showToc = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3).length >= 2;
+
+const structuredData = serializeJsonForHtml({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    description: description,
+    image: new URL(imageSrc, Astro.site).toString(),
+    datePublished: pubDate.toISOString(),
+    ...(updatedDate
+        ? { dateModified: updatedDate.toISOString() }
+        : lastModified
+          ? { dateModified: new Date(lastModified).toISOString() }
+          : {}),
+    author: {
+        "@type": "Person",
+        name: "Niracler",
+        url: "https://www.niracler.com",
+    },
+    publisher: {
+        "@type": "Person",
+        name: "Niracler",
+    },
+    mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": new URL(Astro.url.pathname, Astro.site).toString(),
+    },
+    ...(tags && tags.length > 0 ? { keywords: tags.join(", ") } : {}),
+});
 ---
 
 <html lang={htmlLang}>
 	<head>
 		<BaseHead title={title} description={description} image={imageSrc} type="article" hreflangAlternates={hreflangAlternates} />
-		<script is:inline type="application/ld+json" set:html={JSON.stringify({
-			"@context": "https://schema.org",
-			"@type": "BlogPosting",
-			"headline": title,
-			"description": description,
-			"image": new URL(imageSrc, Astro.site).toString(),
-			"datePublished": pubDate.toISOString(),
-			...(updatedDate ? { "dateModified": updatedDate.toISOString() } : lastModified ? { "dateModified": new Date(lastModified).toISOString() } : {}),
-			"author": {
-				"@type": "Person",
-				"name": "Niracler",
-				"url": "https://www.niracler.com"
-			},
-			"publisher": {
-				"@type": "Person",
-				"name": "Niracler"
-			},
-			"mainEntityOfPage": {
-				"@type": "WebPage",
-				"@id": new URL(Astro.url.pathname, Astro.site).toString()
-			},
-			...(tags && tags.length > 0 ? { "keywords": tags.join(", ") } : {})
-		})} />
+		<script is:inline type="application/ld+json" set:html={structuredData} />
 	</head>
 
 	<body>

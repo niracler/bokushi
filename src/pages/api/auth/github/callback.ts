@@ -117,7 +117,7 @@ export const GET: APIRoute = async ({ request }) => {
             .bind(githubId, userId, ghUser.login, ghUser.avatar_url, now)
             .run();
         if (!oauthResult.success) {
-            console.error("Failed to insert oauth_account:", oauthResult);
+            console.error("Failed to insert GitHub oauth_account");
             return Response.redirect(`${url.origin}${redirectUrl}`, 302);
         }
 

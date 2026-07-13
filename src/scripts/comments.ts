@@ -1,5 +1,10 @@
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
+import {
+    bindOrderedImageFallbacks,
+    getCommentAvatarSources,
+    proxiedImageUrl,
+} from "../utils/avatarFallback";
 
 // --- Client-side i18n ---
 
@@ -265,17 +270,6 @@ function renderMarkdown(raw: string): string {
 
 // --- Avatar helpers ---
 
-/** Route external image through /api/image-proxy for CDN caching. */
-function proxied(url: string): string {
-    if (!url) return "";
-    return `/api/image-proxy?url=${encodeURIComponent(url)}`;
-}
-
-function gravatarUrl(hash: string | null): string {
-    if (!hash) return "";
-    return proxied(`https://www.gravatar.com/avatar/${hash}?d=404&s=48`);
-}
-
 /** Mask email for display: "lowbee.icu@outlook.com" → "low***@outlook.com" */
 function maskEmail(email: string): string {
     const [local, domain] = email.split("@");
@@ -284,47 +278,13 @@ function maskEmail(email: string): string {
     return `${visible}***@${domain}`;
 }
 
-function dicebearUrl(name: string): string {
-    return proxied(
-        `https://api.dicebear.com/9.x/bottts-neutral/svg?seed=${encodeURIComponent(name)}`,
-    );
-}
+const pendingAvatarFallbacks: string[][] = [];
 
-function faviconUrl(website: string | null): string {
-    if (!website) return "";
-    try {
-        const { hostname } = new URL(website);
-        return proxied(`https://www.google.com/s2/favicons?domain=${hostname}&sz=48`);
-    } catch {
-        return "";
-    }
+function bindAvatarFallbacks(container: HTMLElement): void {
+    const avatars = container.querySelectorAll<HTMLImageElement>("img.comment-avatar");
+    bindOrderedImageFallbacks(avatars, pendingAvatarFallbacks);
+    pendingAvatarFallbacks.length = 0;
 }
-
-function handleAvatarError(img: HTMLImageElement): void {
-    const fallbackAttr = img.getAttribute("data-fallback") || "";
-    const fallbacks = fallbackAttr.split(",").filter(Boolean);
-    if (fallbacks.length === 0) {
-        img.removeAttribute("onerror");
-        return;
-    }
-    const next = fallbacks.shift();
-    if (!next) {
-        img.removeAttribute("onerror");
-        return;
-    }
-    img.setAttribute("data-fallback", fallbacks.join(","));
-    img.src = next;
-    if (fallbacks.length === 0) {
-        img.removeAttribute("onerror");
-    }
-}
-
-declare global {
-    interface Window {
-        handleAvatarError: typeof handleAvatarError;
-    }
-}
-window.handleAvatarError = handleAvatarError;
 
 // --- Auth helpers ---
 
@@ -499,33 +459,13 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
 			</div>`;
     }
 
-    let avatarSrc: string;
-    let fallbacks: string[];
-
-    if (comment.avatar_url) {
-        // OAuth user
-        avatarSrc = proxied(comment.avatar_url);
-        fallbacks = [dicebearUrl(comment.author)];
-    } else if (comment.gravatar_hash) {
-        // Anonymous with email
-        avatarSrc = gravatarUrl(comment.gravatar_hash);
-        fallbacks = [faviconUrl(comment.website), dicebearUrl(comment.author)].filter(
-            Boolean,
-        ) as string[];
-    } else if (comment.website) {
-        // Anonymous with website only
-        avatarSrc = faviconUrl(comment.website);
-        fallbacks = [dicebearUrl(comment.author)];
-    } else {
-        // No identity info
-        avatarSrc = dicebearUrl(comment.author);
-        fallbacks = [];
-    }
-
-    const onerrorAttr =
-        fallbacks.length > 0
-            ? ` onerror="handleAvatarError(this)" data-fallback="${fallbacks.join(",")}"`
-            : "";
+    const { src: avatarSrc, fallbacks } = getCommentAvatarSources({
+        author: comment.author,
+        avatarUrl: comment.avatar_url,
+        gravatarHash: comment.gravatar_hash,
+        website: comment.website,
+    });
+    pendingAvatarFallbacks.push(fallbacks);
 
     const authorEl = createAuthorEl(comment);
     const pinBadge =
@@ -595,12 +535,12 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
     return `
 		<div class="comment-card${replyClass}" data-comment-id="${comment.id}">
 			<div style="display:flex;gap:0.75rem">
-				<img
-					src="${avatarSrc}"
-					alt=""
-					class="comment-avatar ${avatarClass}"
-					loading="lazy"${onerrorAttr}
-				/>
+					<img
+						src="${avatarSrc}"
+						alt=""
+						class="comment-avatar ${avatarClass}"
+						loading="lazy"
+					/>
 				<div style="min-width:0;flex:1">
 					<div class="comment-header">
 						${authorEl}
@@ -681,8 +621,8 @@ function renderCommentForm(parentId?: string, replyAuthor?: string): string {
 
     if (currentUser) {
         const avatarSrc = currentUser.avatar_url
-            ? escapeHtml(proxied(currentUser.avatar_url))
-            : proxied("https://www.gravatar.com/avatar/?d=mp&s=48");
+            ? escapeHtml(proxiedImageUrl(currentUser.avatar_url))
+            : proxiedImageUrl("https://www.gravatar.com/avatar/?d=mp&s=48");
         const adminBadge =
             currentUser.role === "admin" ? ` <span class="comment-badge">Admin</span>` : "";
 
@@ -808,6 +748,7 @@ function renderSortToolbar(total: number): string {
 }
 
 function renderCommentList(data: CommentsResponse): string {
+    pendingAvatarFallbacks.length = 0;
     if (data.comments.length === 0) {
         return `
 			${renderSortToolbar(data.total)}
@@ -1354,6 +1295,7 @@ async function loadComments(container: HTMLElement, slug: string) {
     try {
         const data = await fetchComments(slug, currentSort);
         container.innerHTML = renderCommentList(data);
+        bindAvatarFallbacks(container);
         bindEvents(container, slug);
     } catch {
         container.innerHTML =

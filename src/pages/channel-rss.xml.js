@@ -1,4 +1,5 @@
 import rss from "@astrojs/rss";
+import * as cheerio from "cheerio";
 import sanitizeHtml from "sanitize-html";
 import { SITE_TITLE } from "../consts";
 import { fetchTelegramChannel } from "../utils/telegram";
@@ -28,15 +29,14 @@ function detectMediaType(content) {
  */
 function htmlToText(html) {
     if (!html) return "";
-    return html
-        .replace(/<div[^>]*class="telegram-images"[^>]*>[\s\S]*?<\/div>/g, "") // Remove image containers
-        .replace(/<br\s*\/?>/gi, "\n") // Convert br to newlines
-        .replace(/<\/p>/gi, "\n") // Convert closing p to newlines
-        .replace(/<[^>]+>/g, "") // Remove all HTML tags
-        .replace(/&nbsp;/g, " ")
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">")
-        .replace(/&amp;/g, "&")
+    const $ = cheerio.load(html, null, false);
+    $(".telegram-images").remove();
+    $("script, style, textarea, option, noscript").remove();
+    $("br").replaceWith("\n");
+    $("p").append("\n");
+    return $.root()
+        .text()
+        .replace(/\u00a0/g, " ")
         .trim();
 }
 
@@ -117,12 +117,10 @@ function generateTitle(content, maxLength = 80) {
  * - Removes emojis
  * - Limits to 200 characters
  */
-function generateDescription(html, maxLength = 200) {
-    if (!html) return "";
+function generateDescription(plainText, maxLength = 200) {
+    if (!plainText) return "";
 
-    // Strip HTML tags
-    let text = html
-        .replace(/<[^>]*>/g, "") // Remove HTML tags
+    let text = plainText
         .replace(/[\u{1F300}-\u{1F9FF}]/gu, "") // Remove emojis
         .replace(/\s+/g, " ") // Normalize whitespace
         .trim();
@@ -165,7 +163,7 @@ export async function GET(context) {
             items: channelData.posts.map((post) => {
                 const fixedContent = fixHashtagLinks(post.content, CHANNEL_USERNAME);
                 const cleanTitle = generateTitle(fixedContent);
-                const description = generateDescription(post.text);
+                const description = generateDescription(htmlToText(fixedContent));
 
                 return {
                     title: cleanTitle,

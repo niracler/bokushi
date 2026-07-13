@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import { DEFAULT_POST_SOCIAL_IMAGE } from "../consts";
 import { extractDescription } from "../utils/extractDescription";
+import { serializeJsonForHtml } from "../utils/serializeJsonForHtml";
 
 interface PostMeta {
     title: string;
@@ -50,7 +51,7 @@ if (meta) {
 
 postMetaMap = normalizeMetaMap(postMetaMap);
 
-const serializedMeta = JSON.stringify(postMetaMap).replace(/</g, "\\u003c");
+const serializedMeta = serializeJsonForHtml(postMetaMap);
 ---
 <script id="all-posts-meta" type="application/json" set:html={serializedMeta} is:inline></script>
 <script>

@@ -81,7 +81,7 @@ export const POST: APIRoute = async ({ request }) => {
             .bind(telegramId, userId, data.username || displayName, avatarUrl, now)
             .run();
         if (!oauthResult.success) {
-            console.error("Failed to insert oauth_account:", oauthResult);
+            console.error("Failed to insert Telegram oauth_account");
             return jsonResponse({ error: "Internal server error" }, 500);
         }
 
