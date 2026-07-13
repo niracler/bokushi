@@ -23,7 +23,7 @@
         "format": "biome format --write .",
         "lint": "biome check .",
         "lint:staged": "lint-staged",
-        "test": "node --test tests/*.test.mjs",
+        "test": "node --experimental-strip-types --test tests/*.test.mjs",
         "prepare": "husky"
     },
     "dependencies": {

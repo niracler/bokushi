@@ -1,7 +1,29 @@
 import * as cheerio from "cheerio";
+import sanitizeHtml from "sanitize-html";
 
 /** Maximum input length for numbered list conversion to prevent ReDoS. */
 const MAX_NUMBERED_LIST_INPUT = 50_000;
+
+const TELEGRAM_CONTENT_SANITIZE_OPTIONS = {
+    allowedTags: [...sanitizeHtml.defaults.allowedTags, "img"],
+    allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        a: ["href", "target", "rel"],
+        div: ["class"],
+        img: ["src", "alt", "loading", "class"],
+        span: ["class"],
+    },
+    allowedClasses: {
+        div: ["telegram-images"],
+        img: ["telegram-post-image"],
+        span: ["emoji"],
+    },
+};
+
+const TELEGRAM_DESCRIPTION_SANITIZE_OPTIONS = {
+    allowedTags: ["ol", "li"],
+    allowedAttributes: {},
+};
 
 /** Convert plain-text numbered lists (1. 2. 3.) into HTML <ol>/<li> markup. */
 function convertNumberedLists(text: string): string {
@@ -101,13 +123,13 @@ function getProxiedImageUrl(imageUrl: string): string {
  */
 function decodeHtmlEntities(text: string): string {
     return text
-        .replace(/&amp;/g, "&")
         .replace(/&lt;/g, "<")
         .replace(/&gt;/g, ">")
         .replace(/&quot;/g, '"')
         .replace(/&#0*39;/g, "'")
         .replace(/&#0*124;/g, "|")
-        .replace(/&nbsp;/g, " ");
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&");
 }
 
 /**
@@ -232,7 +254,10 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
     const title = $(".tgme_channel_info_header_title").text().trim();
     const $description = $(".tgme_channel_info_description");
     $description.find("br").replaceWith("\n");
-    const description = convertNumberedLists($description.text().trim());
+    const description = sanitizeHtml(
+        convertNumberedLists($description.text().trim()),
+        TELEGRAM_DESCRIPTION_SANITIZE_OPTIONS,
+    );
 
     const avatarSrc = $(".tgme_page_photo_image img").attr("src") || "";
     const avatar = getProxiedImageUrl(avatarSrc);
@@ -303,6 +328,10 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
                 .join("");
             contentHtml = `<div class="telegram-images">${imagesHtml}</div>${contentHtml}`;
         }
+
+        // Telegram is a remote HTML source. Sanitize once after every local transformation so
+        // all consumers, including Astro set:html, receive the same inert content.
+        contentHtml = sanitizeHtml(contentHtml, TELEGRAM_CONTENT_SANITIZE_OPTIONS);
 
         // Extract link preview
         let linkPreview: LinkPreview | undefined;

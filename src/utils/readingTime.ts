@@ -9,43 +9,52 @@
  * - The two durations are summed and rounded up to at least 1 minute.
  */
 
+import * as cheerio from "cheerio";
+import MarkdownIt from "markdown-it";
+
 /** CJK Unified Ideographs + Extension A/B + Compatibility Ideographs */
 const CJK_REGEX =
     /[\u4e00-\u9fff\u3400-\u4dbf\u{20000}-\u{2a6df}\u{2a700}-\u{2b73f}\u{2b740}-\u{2b81f}\uf900-\ufaff]/gu;
 
 const CJK_CHARS_PER_MINUTE = 300;
 const WORDS_PER_MINUTE = 200;
+const markdownParser = new MarkdownIt({ html: true });
+
+function stripFrontmatter(text: string): string {
+    const firstLineEnd = text.indexOf("\n");
+    if (firstLineEnd === -1) return text;
+
+    const firstLine = text.slice(0, firstLineEnd).replace(/\r$/, "");
+    if (firstLine !== "---") return text;
+
+    let lineStart = firstLineEnd + 1;
+    while (lineStart <= text.length) {
+        const nextLineEnd = text.indexOf("\n", lineStart);
+        const lineEnd = nextLineEnd === -1 ? text.length : nextLineEnd;
+        const line = text.slice(lineStart, lineEnd).replace(/\r$/, "");
+
+        if (line === "---") {
+            return nextLineEnd === -1 ? "" : text.slice(nextLineEnd + 1);
+        }
+        if (nextLineEnd === -1) break;
+        lineStart = nextLineEnd + 1;
+    }
+
+    return text;
+}
 
 export function stripMarkdown(text: string): string {
-    return (
-        text
-            // Remove frontmatter
-            .replace(/^---[\s\S]*?---\s*/m, "")
-            // Remove fenced code blocks
-            .replace(/```[\s\S]*?```/g, "")
-            // Remove inline code
-            .replace(/`[^`]*`/g, "")
-            // Remove images
-            .replace(/!\[([^\]]*)\]\([^)]+\)/g, "")
-            // Remove links (keep link text)
-            .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-            // Remove heading markers
-            .replace(/^#{1,6}\s+/gm, "")
-            // Remove bold/italic markers
-            .replace(/(\*{1,2}|_{1,2})([^*_]+)\1/g, "$2")
-            // Remove blockquote markers
-            .replace(/^>\s+/gm, "")
-            // Remove list markers
-            .replace(/^[\s]*[-*+]\s+/gm, "")
-            .replace(/^[\s]*\d+\.\s+/gm, "")
-            // Remove horizontal rules
-            .replace(/^(-{3,}|_{3,}|\*{3,})$/gm, "")
-            // Remove HTML tags
-            .replace(/<[^>]+>/g, "")
-            // Collapse whitespace
-            .replace(/\s+/g, " ")
-            .trim()
-    );
+    const rendered = markdownParser.render(stripFrontmatter(text));
+    const $ = cheerio.load(rendered, null, false);
+
+    $("script, style, textarea, option, noscript, pre, code, img").remove();
+    $("br").replaceWith("\n");
+    $(
+        "address, article, aside, blockquote, div, dl, fieldset, footer, form, h1, h2, h3, h4, h5, h6, header, hr, li, main, nav, ol, p, section, table, ul",
+    ).append("\n");
+    $("td, th").append(" ");
+
+    return $.root().text().replace(/\s+/g, " ").trim();
 }
 
 export function estimateReadingTime(markdown: string | undefined): number {
