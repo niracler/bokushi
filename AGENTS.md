@@ -12,6 +12,7 @@
 - Install: `pnpm install`. Dev server: `pnpm dev`.
 - Build: `pnpm build`; local preview: `pnpm preview`.
 - Quality: `pnpm lint` (Biome) + `pnpm format`; use `pnpm astro check` when adding TS/MDX.
+- Lockfile: `node scripts/check-lockfile.mjs` validates frozen installs in a clean temporary workspace.
 - Design render check: `node scripts/check-design-rendering.mjs` (or `pnpm check:design` when pnpm is healthy).
 
 ## Local Development Notes
