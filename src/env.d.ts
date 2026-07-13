@@ -21,6 +21,7 @@ interface Env {
 // Provide type declarations for the cloudflare:workers virtual module
 declare module "cloudflare:workers" {
     const env: Env;
+
     export { env };
 }
 

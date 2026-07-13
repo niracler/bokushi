@@ -1,6 +1,7 @@
-python3 scripts/check-font-coverage.py
-pnpm astro check
-pnpm lint-staged
+pnpm run lint:staged
+pnpm run check:font
+pnpm run check:types
+pnpm run check:deps:commit
 
 # Check token consistency when tokens.css is staged
 if git diff --cached --name-only | grep -q 'src/styles/tokens.css'; then

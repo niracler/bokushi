@@ -7,19 +7,15 @@ const projectRoot = new URL("../", import.meta.url);
 const testRoot = await mkdtemp(join(tmpdir(), "bokushi-lockfile-"));
 
 try {
-    for (const filename of [".npmrc", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]) {
+    for (const filename of ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]) {
         await copyFile(new URL(filename, projectRoot), join(testRoot, filename));
     }
 
-    const result = spawnSync(
-        "pnpm",
-        ["install", "--frozen-lockfile", "--ignore-scripts", "--config.strictDepBuilds=false"],
-        {
-            cwd: testRoot,
-            encoding: "utf8",
-            env: { ...process.env, CI: "true" },
-        },
-    );
+    const result = spawnSync("pnpm", ["install", "--frozen-lockfile", "--ignore-scripts"], {
+        cwd: testRoot,
+        encoding: "utf8",
+        env: { ...process.env, CI: "true" },
+    });
 
     if (result.error) {
         throw result.error;
