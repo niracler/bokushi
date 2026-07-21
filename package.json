@@ -35,7 +35,7 @@
         "@tailwindcss/vite": "^4.3.2",
         "aes-js": "^3.1.2",
         "arctic": "^3.7.0",
-        "astro": "^6.4.8",
+        "astro": "^7.1.0",
         "astro-pagefind": "^1.8.6",
         "cheerio": "^1.2.0",
         "markdown-it": "^14.3.0",
