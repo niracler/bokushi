@@ -6,6 +6,7 @@ import { t } from "../../i18n/ui";
 
 const siteTitle = t("en", "site.title");
 const siteDescription = t("en", "site.description");
+const siteUrl = Astro.site?.toString();
 ---
 
 <!doctype html>
@@ -17,7 +18,7 @@ const siteDescription = t("en", "site.description");
       "@type": "WebSite",
       "name": siteTitle,
       "description": siteDescription,
-      "url": Astro.site?.toString()
+      "url": siteUrl
     })} />
     <style>
       @keyframes fadeIn {

@@ -55,11 +55,15 @@ async function startAstroDevServer() {
     await rm(new URL("../.astro", import.meta.url), { force: true, recursive: true });
     await rm(new URL("../node_modules/.vite", import.meta.url), { force: true, recursive: true });
 
-    const child = spawn(astroBin.pathname, ["dev", "--host", "127.0.0.1", "--port", "4321"], {
-        cwd: repoRoot.pathname,
-        env: { ...process.env, FORCE_COLOR: "0" },
-        stdio: ["ignore", "pipe", "pipe"],
-    });
+    const child = spawn(
+        astroBin.pathname,
+        ["dev", "--ignore-lock", "--host", "127.0.0.1", "--port", "4321"],
+        {
+            cwd: repoRoot.pathname,
+            env: { ...process.env, ASTRO_DEV_BACKGROUND: "0", FORCE_COLOR: "0" },
+            stdio: ["ignore", "pipe", "pipe"],
+        },
+    );
 
     child.stdout.on("data", (chunk) => process.stderr.write(chunk));
     child.stderr.on("data", (chunk) => process.stderr.write(chunk));

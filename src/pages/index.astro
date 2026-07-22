@@ -3,6 +3,8 @@ import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+
+const siteUrl = Astro.site?.toString();
 ---
 
 <!doctype html>
@@ -14,7 +16,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
       "@type": "WebSite",
       "name": SITE_TITLE,
       "description": SITE_DESCRIPTION,
-      "url": Astro.site?.toString()
+      "url": siteUrl
     })} />
     <style>
       @keyframes fadeIn {
