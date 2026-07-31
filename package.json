@@ -54,7 +54,7 @@
         "husky": "^9.1.7",
         "knip": "^6.26.0",
         "lint-staged": "^16.4.0",
-        "markdownlint-cli2": "^0.23.1",
+        "markdownlint-cli2": "^0.23.2",
         "playwright": "^1.61.1",
         "unplugin-icons": "^23.0.1",
         "wrangler": "^4.113.0"
