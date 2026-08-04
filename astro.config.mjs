@@ -10,6 +10,7 @@ import { defineConfig } from "astro/config";
 import pagefind from "astro-pagefind";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeMermaid from "rehype-mermaid";
+import rehypeSlug from "rehype-slug";
 import { remarkAlert } from "remark-github-blockquote-alert";
 import Icons from "unplugin-icons/vite";
 import { rehypeFigure } from "./rehype-figure.mjs";
@@ -43,6 +44,7 @@ export default defineConfig({
         processor: unified({
             remarkPlugins: [remarkAlert, remarkModifiedTime],
             rehypePlugins: [
+                rehypeSlug,
                 [
                     rehypeAutolinkHeadings,
                     {
