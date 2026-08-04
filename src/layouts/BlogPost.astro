@@ -167,13 +167,13 @@ const structuredData = serializeJsonForHtml({
 					)}
 				</div>
 
-				{/* 移动端 TOC */}
+				{/* 窄屏 TOC */}
 				{showToc && (
 					<>
-						{/* 移动端：浮动按钮 (缩小到 2/3 尺寸) */}
+						{/* 窄屏：浮动按钮 (缩小到 2/3 尺寸) */}
 						<button
 							data-toc-mobile-toggle
-							class="min-[960px]:hidden fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md bg-[rgb(var(--color-accent-rgb))] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_6px_24px_rgba(var(--color-accent-rgb),0.35)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(var(--color-accent-rgb),0.45)] active:scale-95 touch-manipulation"
+							class="min-[1280px]:hidden fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full backdrop-blur-md bg-[rgb(var(--color-accent-rgb))] border border-[rgba(255,255,255,0.3)] text-white shadow-[0_6px_24px_rgba(var(--color-accent-rgb),0.35)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(var(--color-accent-rgb),0.45)] active:scale-95 touch-manipulation"
 							aria-label={t(locale, "post.openToc")}
 						>
 							<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -181,10 +181,10 @@ const structuredData = serializeJsonForHtml({
 							</svg>
 						</button>
 
-						{/* 移动端：抽屉式目录 */}
+						{/* 窄屏：抽屉式目录 */}
 						<div
 							data-toc-mobile-drawer
-							class="min-[960px]:hidden fixed inset-0 z-50 pointer-events-none"
+							class="min-[1280px]:hidden fixed inset-0 z-50 pointer-events-none"
 							aria-hidden="true"
 						>
 							{/* 遮罩层 */}
@@ -242,7 +242,7 @@ const structuredData = serializeJsonForHtml({
 			{showToc && (
 				<aside
 					data-toc-sidebar
-					class="hidden min-[960px]:block fixed w-[200px] min-[1100px]:w-[240px] min-[1280px]:w-[260px] opacity-0 transition-opacity duration-300"
+					class="hidden min-[1280px]:block fixed w-[260px] opacity-0 transition-opacity duration-300"
 					style="left: calc(50% + 25rem + 1.5rem); top: 6rem; max-width: calc(50vw - 25rem - 3rem);"
 				>
 					{/* 阅读进度指示器 */}
