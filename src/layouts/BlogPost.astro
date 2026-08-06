@@ -234,7 +234,7 @@ const structuredData = serializeJsonForHtml({
 					<RelatedPosts posts={relatedPosts} />
 
 					<CommentSection />
-					<Lightbox id="blog-lightbox" selector=".prose img:not([data-lightbox-skip])" />
+					<Lightbox id="blog-lightbox" selector=".prose img:not([data-lightbox-skip]), .comment-body img.comment-image" />
 				</div>
 			</article>
 

@@ -61,6 +61,17 @@ interface CommentNode {
     replies: CommentNode[];
 }
 
+interface ReplyTargetRow {
+    id: string;
+    parent_id: string | null;
+    author: string;
+    content: string;
+    email: string | null;
+    user_id: string | null;
+    user_name: string | null;
+    user_email: string | null;
+}
+
 type CommentSortOrder = "latest" | "oldest";
 
 function parseSortOrder(sort: string | null): CommentSortOrder {
@@ -288,6 +299,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 ? body.reply_to.trim()
                 : null;
 
+        if (replyTo && !parentId) {
+            return jsonResponse({ error: "reply_to requires parent_id" }, 400);
+        }
+
         // Mock fallback for local dev
         if (!db) {
             const mockComment: CommentNode = {
@@ -309,36 +324,43 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }
 
         // Validate parent comment in the same slug before creating a reply.
-        let parentRow: {
-            author: string;
-            content: string;
-            email: string | null;
-            user_id: string | null;
-            user_name: string | null;
-            user_email: string | null;
-        } | null = null;
+        let parentRow: ReplyTargetRow | null = null;
         if (parentId) {
             parentRow = await db
                 .prepare(
-                    `SELECT c.author, c.content, c.email, c.user_id,
+                    `SELECT c.id, c.parent_id, c.author, c.content, c.email, c.user_id,
                             u.name AS user_name, u.email AS user_email
                      FROM comments c LEFT JOIN users u ON c.user_id = u.id
-                     WHERE c.id = ? AND c.slug = ? AND c.status = 'visible'`,
+                     WHERE c.id = ? AND c.slug = ? AND c.status = 'visible'
+                       AND c.parent_id IS NULL`,
                 )
                 .bind(parentId, slug)
-                .first<{
-                    author: string;
-                    content: string;
-                    email: string | null;
-                    user_id: string | null;
-                    user_name: string | null;
-                    user_email: string | null;
-                }>();
+                .first<ReplyTargetRow>();
 
             if (!parentRow) {
                 return jsonResponse({ error: "Parent comment not found" }, 400);
             }
         }
+
+        // Resolve the exact reply target before inserting. reply_to may point to a flat child
+        // while parent_id always identifies the top-level thread.
+        let replyTargetRow = parentRow;
+        if (replyTo && replyTo !== parentId) {
+            replyTargetRow = await db
+                .prepare(
+                    `SELECT c.id, c.parent_id, c.author, c.content, c.email, c.user_id,
+                            u.name AS user_name, u.email AS user_email
+                     FROM comments c LEFT JOIN users u ON c.user_id = u.id
+                     WHERE c.id = ? AND c.slug = ? AND c.status = 'visible'`,
+                )
+                .bind(replyTo, slug)
+                .first<ReplyTargetRow>();
+
+            if (!replyTargetRow || replyTargetRow.parent_id !== parentId) {
+                return jsonResponse({ error: "Reply target not found in parent thread" }, 400);
+            }
+        }
+        const replyTargetId = replyTo || parentId;
 
         const id = crypto.randomUUID();
         const now = new Date().toISOString();
@@ -355,8 +377,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
         // Fire-and-forget: notify Telegram group
         if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_NOTIFY_CHAT_ID) {
-            const parentAuthor = parentRow ? parentRow.user_name || parentRow.author : undefined;
-            const parentContent = parentRow?.content;
+            const replyToAuthor = replyTargetRow
+                ? replyTargetRow.user_name || replyTargetRow.author
+                : undefined;
 
             const notifyPromise = notifyNewComment(
                 env.TELEGRAM_BOT_TOKEN,
@@ -366,9 +389,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
                     commentId: id,
                     author,
                     content,
-                    parentId: parentId ?? undefined,
-                    parentAuthor,
-                    parentContent,
+                    replyToId: replyTargetId ?? undefined,
+                    replyToAuthor,
+                    replyToContent: replyTargetRow?.content,
                     postTitle: body.post_title?.trim() || undefined,
                 },
             );
@@ -384,29 +407,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
         // Email notification: notify the actual reply target (reply_to or parent)
         // For nested replies, reply_to points to the specific comment being replied to,
         // while parent_id always points to the top-level comment (flat tree structure).
-        const notifyTargetId = replyTo || parentId;
-        let notifyRow = notifyTargetId === parentId ? parentRow : null;
-        if (notifyTargetId && notifyTargetId !== parentId && db) {
-            notifyRow = await db
-                .prepare(
-                    `SELECT c.author, c.content, c.email, c.user_id,
-                            u.name AS user_name, u.email AS user_email
-                     FROM comments c LEFT JOIN users u ON c.user_id = u.id
-                     WHERE c.id = ? AND c.slug = ? AND c.status = 'visible'`,
-                )
-                .bind(notifyTargetId, slug)
-                .first<{
-                    author: string;
-                    content: string;
-                    email: string | null;
-                    user_id: string | null;
-                    user_name: string | null;
-                    user_email: string | null;
-                }>();
-        }
-        const recipientEmail = notifyRow?.email || notifyRow?.user_email;
-        if (notifyTargetId && env.FASTMAIL_API_TOKEN && notifyRow && recipientEmail) {
-            const targetName = notifyRow.user_name || notifyRow.author;
+        const recipientEmail = replyTargetRow?.email || replyTargetRow?.user_email;
+        if (replyTargetId && env.FASTMAIL_API_TOKEN && replyTargetRow && recipientEmail) {
+            const targetName = replyTargetRow.user_name || replyTargetRow.author;
             const jmapConfig = {
                 token: env.FASTMAIL_API_TOKEN,
                 from: env.NOTIFY_FROM_EMAIL || "noreply@niracler.com",
@@ -418,7 +421,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 recipientName: targetName,
                 replyAuthor: author,
                 replyContent: content,
-                parentContent: notifyRow.content,
+                parentContent: replyTargetRow.content,
                 postTitle: body.post_title?.trim() || slug,
                 postSlug: slug,
             })

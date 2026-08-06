@@ -37,7 +37,7 @@ const description = pageDescription || siteDescription;
 			</Prose>
 
 			{commentsEnabled && <CommentSection />}
-			<Lightbox id="page-lightbox" selector=".prose img:not([data-lightbox-skip])" />
+			<Lightbox id="page-lightbox" selector=".prose img:not([data-lightbox-skip]), .comment-body img.comment-image" />
 		</main>
 		<Footer />
 	</body>

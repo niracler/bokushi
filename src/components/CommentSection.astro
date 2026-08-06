@@ -166,6 +166,16 @@ const heading = locale === "en" ? "Comments" : "评论";
         border-top: 1px solid var(--color-border-soft);
     }
 
+    .comment-card--linked {
+        border-radius: var(--radius-md);
+        background: var(--color-accent-tint-8);
+        box-shadow: 0 0 0 var(--space-2) var(--color-accent-tint-8);
+        transition:
+            background-color var(--transition-slow),
+            box-shadow var(--transition-slow);
+        scroll-margin-top: 6rem;
+    }
+
     /* Reply thread wrapper with connecting line */
     .comment-replies {
         position: relative;
@@ -366,6 +376,31 @@ const heading = locale === "en" ? "Comments" : "评论";
 
     .comment-body a:hover {
         color: var(--color-link-hover);
+    }
+
+    .comment-body .comment-image {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        max-height: 32rem;
+        object-fit: contain;
+        margin-block: var(--space-block-base);
+        border: 1px solid var(--color-border-soft);
+        border-radius: var(--radius-md);
+        background: var(--color-bg-muted);
+        cursor: zoom-in;
+    }
+
+    .comment-image-fallback {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.75rem;
+        margin-block: var(--space-block-base);
+        padding-inline: var(--space-3);
+        border: 1px solid var(--color-border-soft);
+        border-radius: var(--radius-md);
+        background: var(--color-bg-muted);
+        font-size: var(--font-size-xs);
     }
 
     .comment-body code {
@@ -824,6 +859,12 @@ const heading = locale === "en" ? "Comments" : "评论";
         }
         50% {
             opacity: 0.4;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .comment-card--linked {
+            transition: none;
         }
     }
 </style>

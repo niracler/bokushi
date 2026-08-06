@@ -1,10 +1,9 @@
-import MarkdownIt from "markdown-it";
-import sanitizeHtml from "sanitize-html";
 import {
     bindOrderedImageFallbacks,
     getCommentAvatarSources,
     proxiedImageUrl,
 } from "../utils/avatarFallback";
+import { renderCommentMarkdown } from "../utils/commentMarkdown";
 
 // --- Client-side i18n ---
 
@@ -89,6 +88,7 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         deleteComment: "删除",
         deleteConfirm: "确定要删除这条评论吗？（可以恢复）",
         deleting: "删除中...",
+        imageLoadFailed: "图片加载失败，查看原图",
     },
     en: {
         justNow: "just now",
@@ -160,6 +160,7 @@ const commentUi: Record<CommentLocale, Record<string, string>> = {
         deleteComment: "Delete",
         deleteConfirm: "Delete this comment? (can be restored)",
         deleting: "Deleting...",
+        imageLoadFailed: "Image failed to load; view original",
     },
 };
 
@@ -214,58 +215,10 @@ type CommentSort = "latest" | "oldest";
 
 let currentUser: AuthUser | null = null;
 let currentSort: CommentSort = "latest";
-
-// --- Markdown renderer ---
-
-const md = MarkdownIt({ linkify: true, breaks: true }).disable("heading");
-
-// Wrap tables so they can scroll horizontally on narrow screens.
-md.renderer.rules.table_open = () => '<div class="comment-table-wrapper"><table>';
-md.renderer.rules.table_close = () => "</table></div>";
-
-const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
-    allowedTags: [
-        "b",
-        "i",
-        "em",
-        "strong",
-        "a",
-        "p",
-        "br",
-        "ul",
-        "ol",
-        "li",
-        "code",
-        "pre",
-        "blockquote",
-        "hr",
-        "table",
-        "thead",
-        "tbody",
-        "tr",
-        "th",
-        "td",
-        "div",
-    ],
-    allowedAttributes: {
-        a: ["href", "target", "rel"],
-        th: ["style"],
-        td: ["style"],
-        div: ["class"],
-    },
-    allowedClasses: {
-        div: ["comment-table-wrapper"],
-    },
-    allowedStyles: {
-        "*": {
-            "text-align": [/^left$/, /^right$/, /^center$/],
-        },
-    },
-};
+let hashNavigationBound = false;
 
 function renderMarkdown(raw: string): string {
-    const html = md.render(raw);
-    return sanitizeHtml(html, SANITIZE_OPTIONS);
+    return renderCommentMarkdown(raw);
 }
 
 // --- Avatar helpers ---
@@ -284,6 +237,27 @@ function bindAvatarFallbacks(container: HTMLElement): void {
     const avatars = container.querySelectorAll<HTMLImageElement>("img.comment-avatar");
     bindOrderedImageFallbacks(avatars, pendingAvatarFallbacks);
     pendingAvatarFallbacks.length = 0;
+}
+
+function bindCommentImageFallbacks(container: HTMLElement): void {
+    for (const image of container.querySelectorAll<HTMLImageElement>(
+        "img.comment-image:not([data-fallback-bound])",
+    )) {
+        image.dataset.fallbackBound = "true";
+        image.addEventListener(
+            "error",
+            () => {
+                const link = document.createElement("a");
+                link.className = "comment-image-fallback";
+                link.href = image.src;
+                link.target = "_blank";
+                link.rel = "nofollow noopener noreferrer";
+                link.textContent = ct("imageLoadFailed");
+                image.replaceWith(link);
+            },
+            { once: true },
+        );
+    }
 }
 
 // --- Auth helpers ---
@@ -432,7 +406,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
         if (!isAdminUser || !comment.content) {
             // Non-admin or no content: show placeholder
             return `
-				<div class="comment-card comment-card--deleted${replyClass}">
+				<div id="comment-${escapeHtml(comment.id)}" class="comment-card comment-card--deleted${replyClass}" data-comment-id="${escapeHtml(comment.id)}">
 					<p style="font-style:italic;font-size:var(--font-size-sm);color:var(--color-text-muted)">${ct("deleted")}</p>
 				</div>`;
         }
@@ -441,7 +415,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
         const authorEl = createAuthorEl(comment);
         const time = formatTime(comment.created_at);
         return `
-			<div class="comment-card comment-card--deleted-admin${replyClass}" data-comment-id="${comment.id}">
+			<div id="comment-${escapeHtml(comment.id)}" class="comment-card comment-card--deleted-admin${replyClass}" data-comment-id="${escapeHtml(comment.id)}">
 				<div style="display:flex;gap:0.75rem">
 					<div style="min-width:0;flex:1">
 						<div class="comment-header">
@@ -533,7 +507,7 @@ function renderCommentCard(comment: CommentNode, isReply = false, parentOverride
     }
 
     return `
-		<div class="comment-card${replyClass}" data-comment-id="${comment.id}">
+		<div id="comment-${escapeHtml(comment.id)}" class="comment-card${replyClass}" data-comment-id="${escapeHtml(comment.id)}">
 			<div style="display:flex;gap:0.75rem">
 					<img
 						src="${avatarSrc}"
@@ -953,6 +927,7 @@ function bindEditEvents(container: HTMLElement) {
                 const bodyEl = container.querySelector(`[data-comment-body="${commentId}"]`);
                 if (bodyEl) {
                     bodyEl.innerHTML = renderMarkdown(newContent);
+                    bindCommentImageFallbacks(bodyEl as HTMLElement);
                 }
 
                 // Update edit button's data-edit-content for future edits
@@ -1289,6 +1264,28 @@ function hideError(el: HTMLElement) {
 
 // --- Main init ---
 
+function revealLinkedComment(): void {
+    if (!window.location.hash.startsWith("#comment-")) return;
+    let targetId: string;
+    try {
+        targetId = decodeURIComponent(window.location.hash.slice(1));
+    } catch {
+        return;
+    }
+    const target = document.getElementById(targetId);
+    if (!target?.closest(CONTAINER_SELECTOR)) return;
+
+    target.scrollIntoView({ block: "center" });
+    target.classList.add("comment-card--linked");
+    window.setTimeout(() => target.classList.remove("comment-card--linked"), 2400);
+}
+
+function bindCommentHashNavigation(): void {
+    if (hashNavigationBound) return;
+    hashNavigationBound = true;
+    window.addEventListener("hashchange", revealLinkedComment);
+}
+
 async function loadComments(container: HTMLElement, slug: string) {
     container.innerHTML = renderLoadingSkeleton();
 
@@ -1296,7 +1293,9 @@ async function loadComments(container: HTMLElement, slug: string) {
         const data = await fetchComments(slug, currentSort);
         container.innerHTML = renderCommentList(data);
         bindAvatarFallbacks(container);
+        bindCommentImageFallbacks(container);
         bindEvents(container, slug);
+        requestAnimationFrame(revealLinkedComment);
     } catch {
         container.innerHTML =
             '<div style="text-align:center;padding:var(--space-4)">' +
@@ -1331,6 +1330,7 @@ async function initCommentSection() {
 
     // Fetch auth state before rendering (auth is integrated into the form)
     currentUser = await fetchCurrentUser();
+    bindCommentHashNavigation();
     loadComments(container, slug);
 }
 
