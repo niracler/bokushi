@@ -62,3 +62,17 @@ test("plain-text summaries collapse markdown and replace images with a marker", 
         "正文 〔图片〕 代码",
     );
 });
+
+test("single newlines wrap as prose while explicit Markdown breaks remain", () => {
+    const softBreak = renderCommentMarkdown("第一行\n第二行");
+    const hardBreak = renderCommentMarkdown("第一行  \n第二行");
+
+    assert.doesNotMatch(softBreak, /<br/);
+    assert.match(hardBreak, /<br/);
+});
+
+test("CJK punctuation stays attached to inline emphasis", () => {
+    const html = renderCommentMarkdown("感慨「 **加粗内容** 」（补充说明）");
+
+    assert.match(html, /感慨「<strong>加粗内容<\/strong>」（补充说明）/);
+});

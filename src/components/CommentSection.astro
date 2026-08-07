@@ -363,11 +363,10 @@ const heading = locale === "en" ? "Comments" : "评论";
         margin-top: var(--space-block-loose);
     }
 
-    /* Bold-only paragraphs act as visual section headers */
-    .comment-body p > strong:only-child {
-        display: block;
-        color: var(--color-text-primary);
-        margin-top: var(--space-2);
+    .comment-body strong,
+    .comment-body b {
+        color: inherit;
+        font-weight: 600;
     }
 
     .comment-body a {

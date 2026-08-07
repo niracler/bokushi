@@ -2,7 +2,7 @@ import MarkdownIt from "markdown-it";
 import type Token from "markdown-it/lib/token.mjs";
 import sanitizeHtml from "sanitize-html";
 
-const md = MarkdownIt({ html: false, linkify: true, breaks: true }).disable("heading");
+const md = MarkdownIt({ html: false, linkify: true, breaks: false }).disable("heading");
 
 md.renderer.rules.table_open = () => '<div class="comment-table-wrapper"><table>';
 md.renderer.rules.table_close = () => "</table></div>";
@@ -81,7 +81,11 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
 };
 
 export function renderCommentMarkdown(raw: string): string {
-    return sanitizeHtml(md.render(raw), SANITIZE_OPTIONS);
+    const html = sanitizeHtml(md.render(raw), SANITIZE_OPTIONS);
+    const cjk = "\\u2e80-\\u9fff\\u3000-\\u303f\\uff00-\\uffef";
+    return html
+        .replace(new RegExp(`([${cjk}])\\s+(<(?:strong|em|b|i)>)`, "gu"), "$1$2")
+        .replace(new RegExp(`(<\\/(?:strong|em|b|i)>)\\s+([${cjk}])`, "gu"), "$1$2");
 }
 
 function visitTokens(tokens: Token[], visitor: (token: Token) => void): void {
