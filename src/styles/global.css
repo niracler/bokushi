@@ -834,6 +834,18 @@
         background: transparent;
     }
 
+    .prose .rehype-figure-container {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+        gap: var(--space-3);
+        margin-block: var(--space-6);
+    }
+
+    .prose .rehype-figure-container > figure {
+        min-width: 0;
+    }
+
     .prose figcaption {
         color: var(--color-text-muted);
         font-size: var(--font-size-sm);

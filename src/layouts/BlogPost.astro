@@ -28,14 +28,14 @@ type EntryData =
     | CollectionEntry<"monthly">["data"]
     | CollectionEntry<"til">["data"];
 
-type Props = EntryData & {
+type Props = Omit<EntryData, "relatedSlugs"> & {
     locale?: Locale;
     postId?: string;
     body?: string;
     headings?: MarkdownHeading[];
     lastModified?: string;
     lastModifiedCommitUrl?: string | null;
-    relatedPosts?: BlogEntry[];
+    relatedPostEntries?: BlogEntry[];
     hreflangAlternates?: { locale: string; url: string }[];
     translationUrl?: string;
     translationLocale?: string;
@@ -53,7 +53,7 @@ const {
     headings = [],
     lastModified,
     lastModifiedCommitUrl,
-    relatedPosts = [],
+    relatedPostEntries = [],
     hreflangAlternates = [],
     translationUrl,
     translationLocale,
@@ -231,7 +231,7 @@ const structuredData = serializeJsonForHtml({
 						<slot />
 					</Prose>
 
-					<RelatedPosts posts={relatedPosts} />
+					<RelatedPosts posts={relatedPostEntries} />
 
 					<CommentSection />
 					<Lightbox id="blog-lightbox" selector=".prose img:not([data-lightbox-skip]), .comment-body img.comment-image" />

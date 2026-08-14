@@ -28,6 +28,14 @@ type Props = { post: BlogEntry; allPosts: BlogEntry[] };
 const { post, allPosts } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(post);
 const { locale, slug: baseSlug } = parsePostId(post.id);
+const { relatedSlugs: dataRelatedSlugs = [], ...postData } = post.data;
+const frontmatterRelatedSlugs = remarkPluginFrontmatter?.relatedSlugs;
+const configuredRelatedSlugs =
+    dataRelatedSlugs.length > 0
+        ? dataRelatedSlugs
+        : Array.isArray(frontmatterRelatedSlugs)
+          ? frontmatterRelatedSlugs.filter((slug): slug is string => typeof slug === "string")
+          : [];
 
 // Build hreflang alternates for SEO (only when a translation exists)
 const siteUrl = Astro.site?.toString().replace(/\/$/, "") ?? "";
@@ -50,40 +58,52 @@ if (translationEntry) {
 const translationUrl = translationEntry ? postUrl(translationEntry.id) : undefined;
 const translationLocale = translationEntry ? parsePostId(translationEntry.id).locale : undefined;
 
-// Compute related posts by tag similarity (same locale only)
-const currentTags = post.data.tags ?? [];
+// Resolve configured related posts first, then fill remaining slots by tag similarity.
+const currentTags = postData.tags ?? [];
 const otherPosts = allPosts.filter(
     (p) => p.id !== post.id && !p.data.hidden && parsePostId(p.id).locale === locale,
 );
 
-// Only show posts that actually share tags (no fallback to "most recent")
-let relatedPosts: BlogEntry[] = [];
-if (currentTags.length > 0) {
-    const scored = otherPosts.map((p) => {
-        const pTags = p.data.tags ?? [];
-        const shared = currentTags.filter((t: string) => pTags.includes(t)).length;
-        return { post: p, score: shared };
-    });
+const configuredPosts: BlogEntry[] = [];
+for (const configuredSlug of configuredRelatedSlugs) {
+    const candidate = otherPosts.find((p) => parsePostId(p.id).slug === configuredSlug);
+    if (candidate && !configuredPosts.some((p) => p.id === candidate.id)) {
+        configuredPosts.push(candidate);
+    }
+}
+
+let relatedPosts = configuredPosts.slice(0, 3);
+if (relatedPosts.length < 3 && currentTags.length > 0) {
+    const configuredIds = new Set(relatedPosts.map((p) => p.id));
+    const scored = otherPosts
+        .filter((p) => !configuredIds.has(p.id))
+        .map((p) => {
+            const pTags = p.data.tags ?? [];
+            const shared = currentTags.filter((t: string) => pTags.includes(t)).length;
+            return { post: p, score: shared };
+        });
     scored.sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score;
         return b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf();
     });
-    relatedPosts = scored
-        .filter((s) => s.score > 0)
-        .slice(0, 3)
-        .map((s) => s.post);
+    relatedPosts.push(
+        ...scored
+            .filter((s) => s.score > 0)
+            .slice(0, 3 - relatedPosts.length)
+            .map((s) => s.post),
+    );
 }
 ---
 
 <BlogPost
-    {...post.data}
+    {...postData}
     locale={locale}
     postId={post.id}
     body={post.body}
     headings={headings}
     lastModified={remarkPluginFrontmatter?.lastModified}
     lastModifiedCommitUrl={remarkPluginFrontmatter?.lastModifiedCommitUrl}
-    relatedPosts={relatedPosts}
+    relatedPostEntries={relatedPosts}
     hreflangAlternates={hreflangAlternates}
     translationUrl={translationUrl}
     translationLocale={translationLocale}

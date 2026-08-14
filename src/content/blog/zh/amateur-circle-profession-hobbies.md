@@ -4,6 +4,10 @@ pubDate: '2026-08-03'
 socialImage: https://image.niracler.com/2026/08/53cb2070ae08c09dd0d728ee486a9056.png
 tags:
 - 杂谈
+- 喜欢上 XXX
+relatedSlugs:
+- nana
+- why-i-love-one-music
 title: 渣渣圈 X 专业 X 兴趣爱好
 description: 在兴趣、专业与职业之间，辨认哪些领域值得接受真实评价，哪些领域可以安心做个快乐的 NPC。
 ---
