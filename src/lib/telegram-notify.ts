@@ -53,6 +53,8 @@ function markdownToTelegramHtml(raw: string, imageMode: ImageRenderMode): string
     const html = md
         .render(raw, { imageMode } satisfies TelegramRenderEnv)
         .replace(/<\/p>\s*<p>/g, "\n\n")
+        .replace(/<\/p>\s*<blockquote>/g, "</p>\n\n<blockquote>")
+        .replace(/<\/blockquote>\s*<p>/g, "</blockquote>\n\n<p>")
         .replace(/<\/?p>/g, "")
         .replace(/<br\s*\/?>/g, "\n")
         .replace(/<li>/g, "• ")

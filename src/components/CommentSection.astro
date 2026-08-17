@@ -452,8 +452,15 @@ const heading = locale === "en" ? "Comments" : "评论";
     .comment-body blockquote {
         border-left: 3px solid var(--color-accent);
         padding-left: var(--space-3);
-        margin: var(--space-2) 0;
+        margin: var(--space-block-base) 0;
         color: var(--color-text-muted);
+    }
+
+    /* A Markdown blank line separates these into sibling blocks. Give that
+       paragraph boundary the same breathing room as consecutive paragraphs. */
+    .comment-body > p + blockquote,
+    .comment-body > blockquote + p {
+        margin-top: var(--space-block-loose);
     }
 
     .comment-body hr {

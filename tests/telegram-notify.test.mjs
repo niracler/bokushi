@@ -74,6 +74,19 @@ test("top-level comments send a plain text notification without a quote", async 
     }
 });
 
+test("Telegram notifications preserve blank lines around Markdown blockquotes", () => {
+    const message = buildTelegramMessage(
+        {
+            ...baseParams,
+            content: "引用前的段落。\n\n> 引用内容。\n\n引用后的段落。",
+        },
+        { limit: TELEGRAM_TEXT_LIMIT, imageMode: "links" },
+    );
+
+    assert.match(message, /引用前的段落。\n\n<blockquote>/);
+    assert.match(message, /<\/blockquote>\n\n引用后的段落。/);
+});
+
 test("Telegram notification sends one Markdown image with sendPhoto", async () => {
     const mocked = mockFetch();
     try {
