@@ -3,17 +3,17 @@ title: 人 X 社区 X 物
 tags: ["社区", "工具"]
 socialImage: https://image.niracler.com/2025/11/b2ef6430e8e437cdbff99b1346badbfc.png
 pubDate: "Sep 26, 2024"
-updatedDate: "Aug 09, 2026"
+updatedDate: "Oct 29, 2026"
 ---
 关于我关注的人和物。这个主题很个人化，我喜欢的内容，别人或许会觉得不适合。毕竟这与我的阅历和经验密切相关。不过，我希望能列出一些我认为不错的东西，给你一些启发。
 
-> 我一般用 RSS 订阅以下列表中的人或组织，并且几乎每篇都读。
+> 我一般用 RSS 订阅以下列表中的人或组织，并且几乎每篇都读。  
 > 顺序不分先后，纯靠心情
 
 ## 人
 
-> 一些不方便公开的人，我就不在这里写了，隐藏的上限是 100 个（可能会调整）
-> 后面想一个法子将此处的列表跟我的 [Follow 关注](https://app.follow.is/profile/@niracler) 进行同步才行，重复程度有点太高了。近期应该不更新这个列表。~~国庆写个脚本用于同步。~~
+> 一些不方便公开的人，我就不在这里写了，隐藏的上限是 100 个（可能会调整）  
+> 后面想一个法子将此处的列表跟我的 [Follow 关注](https://app.follow.is/profile/@niracler) 进行同步才行，重复程度有点太高了。现在每月从 Folo 的每日核心和 Star 里过一遍。~~国庆写个脚本用于同步。~~
 
 ### 📚 ~~技术~~博主
 
@@ -24,6 +24,8 @@ updatedDate: "Aug 09, 2026"
 - [宝玉](https://baoyu.io/) - 在国内 AI 方面，精华资讯翻译面向普通程序员的搬运感觉就数这位了。
 - [Simon Willison](https://simonwillison.net/) - Django 共同作者，现在每天都在博客更 LLM 工具的实测记录和踩坑笔记。海外 AI 工程视角我主要看他。
 - [烤肉肉](https://www.lowbee.icu/) - xLog 时期的笔友，周更生活向周记多年。读他的文字像久违的朋友坐到对面讲新鲜事，是从他这里我才相信「平凡地记录下自己的生活，就已经足够吸引人」。
+- [评论尸（虹线）](https://1q43.blog/) - 最开始是在读库上读到《[互联网与中国后现代性呓语](https://1q43.blog/post/782/)》，才注意到这个作者。话题挺有趣，就一路关注下来了。
+- [Thorsten Ball](https://registerspill.thorstenball.com/) - Amp 的联合创始人，曾在 Zed、Sourcegraph 工作，博客形式是周记，一般分享软件工程与 AI 编程的实践和思考。
 - …此处其实应该多找一点，尤其是国外的英文博主
 
 ### ✍️ 作家
@@ -31,7 +33,7 @@ updatedDate: "Aug 09, 2026"
 > 这里列的作者，是我抱着「他/她/它」所有的作品我都会去读的态度。
 
 - [沃尔特·艾萨克森](https://book.douban.com/author/197148/) - 乔布斯传以及马斯克传的作者，他写的传记是我读过的最好的传记。
-- [住野夜](https://book.douban.com/author/4625207/) - 好久没有新作，以至于我都快忘记了。出道即巅峰，后面评分一本比一本低，但其实我还是很喜欢的。
+- [住野夜](https://book.douban.com/author/4625207/) - 《告白擊》读完了，终于不是「好久没有新作」了。出道即巅峰，后面评分一本比一本低，但其实我还是很喜欢的。
 - [阿尔贝·加缪](https://book.douban.com/author/4513690/) - 《西西弗神话》虽然我看得不太懂，但是大受震撼。尤其喜欢里面对荒谬的定义以及陈述。(事后发现，荒谬就是崩铁中的「虚无」命途)
 - [卡夫卡](https://book.douban.com/author/4539732/) - 单单是《变形记》就让我对他的作品充满了好奇。
 - [钱钟书](https://book.douban.com/author/4502389/) - 《围城》我最开始看的时候还以为是关于泡妞的 72 绝技的～～
@@ -39,7 +41,15 @@ updatedDate: "Aug 09, 2026"
 - [榎宮祐](https://twitter.com/yuukamiya68) - 《NO GAME NO LIFE》的作者，已经买了一套。
 - [陈忠实](https://baike.baidu.com/item/%E9%99%88%E5%BF%A0%E5%AE%9E/45450) - 《白鹿原》可以说是中国的《百年孤独》了
 - [刘勃](https://www.douban.com/personage/35430946/) - 历史作家，编剧。看了他的《说三分》，从历史、民间、演义三个角度评述三国故事，很有意思。
-- [六神磊磊](https://book.douban.com/author/330996/) - 点评金庸的部分不多谈，《唐诗寒武纪》轻松易读，仿若在品味武侠小说。
+- [虚渊玄](https://www.douban.com/personage/27493576/) - 最近看了《魔法少女小圆：沃普尔吉斯的回天》，又把老虚想起来了，故写下。
+- [西尾維新](https://ja.wikipedia.org/wiki/西尾維新) - 什么人形打字机，写得太多根本就看不完好吧😑。不过他的作品我好多都是一看就停不下来，一个系列直接吃完。
+
+<details>
+<summary>弃坑列表</summary>
+
+- [六神磊磊](https://book.douban.com/author/330996/) - 点评金庸的部分不多谈，《唐诗寒武纪》轻松易读，仿若在品味武侠小说。已经没有什么兴趣了
+
+</details>
 
 ### 🎨 漫画家
 
@@ -68,7 +78,7 @@ updatedDate: "Aug 09, 2026"
 漫画原作
 
 - [山川直輝](https://twitter.com/yamakawaMGnaoki) - 《我家的英雄》以及《我立于百万生命之上》的原作作者，故事很有趣，就是带了好多政治方面的观念。而且两部作品动画化都暴死了。
-- [舞城王太郎](https://twitter.com/maijouotarou) - 设定非常有趣，但是故事也就如此。是《异度入侵》和《深渊融接》的原作作者。
+- 舞城王太郎 - 设定非常有趣，但是故事也就如此。是《异度入侵》和《深渊融接》的原作作者。
 
 <details>
 <summary>弃坑列表</summary>
@@ -121,7 +131,7 @@ updatedDate: "Aug 09, 2026"
 - [三個字 SunGuts](https://www.youtube.com/user/ray123822) - 他的视频内容主要是科普日常的身体酸痛知识，并分享简单的检测方式及自救方法。我有跟着去改一些日常姿态以及运动的坏习惯。
 - [孫沁岳](https://www.youtube.com/@yorke) - 是一个专门做漫画评论的油管主。
 - [李天豪](https://www.youtube.com/@Tenhao1978) - 是一个台湾的历史教师，他讲的历史挺不错的，起码刷新了我很多年的历史观
-- [王志安](https://www.youtube.com/@wangzhian) - 前中央电视台调查记者，2020年移居日本后在YouTube经营自媒体频道"王局拍案"。访谈节目非常专业。
+- [王志安](https://www.youtube.com/@wangzhian) - 前中央电视台调查记者，2020 年移居日本后在 YouTube 经营自媒体频道「王局拍案」。访谈节目非常专业。
 - [硬件茶谈](https://space.bilibili.com/14871346) - 质量挺高的电脑硬件方面的 UP，之前组装主机时，也受到挺大帮助的。
 
 ### 🛩️ TG 芳邻
@@ -137,10 +147,10 @@ updatedDate: "Aug 09, 2026"
 
 ### 🎙️ 播客
 
-- [科学史评话](https://podcasts.apple.com/cn/podcast/%E7%A7%91%E5%AD%A6%E5%8F%B2%E8%AF%84%E8%AF%9D%E6%9C%80%E6%96%B0%E4%B8%93%E8%BE%91/id1166109768) - 讲科学的历史，其实很有趣的。
 - [科学有故事](https://podcasts.apple.com/cn/podcast/%E6%B1%AA%E8%AF%98-%E7%A7%91%E5%AD%A6%E6%9C%89%E6%95%85%E4%BA%8B-%E4%B8%BB%E6%89%93/id1163969355) - 可能是国内最好的科普主播了，讲的内容非常通俗易懂，而且他是真的想教懂小孩子们科学思维。
 - [大老李聊数学](https://podcasts.apple.com/us/podcast/%E5%A4%A7%E8%80%81%E6%9D%8E%E8%81%8A%E6%95%B0%E5%AD%A6-%E5%85%A8%E9%9B%86/id1389947641) - 讲数学能讲的这么有趣，真是有他的，尤其我最喜欢的一期是讲凉宫春日中的超级排列数的那一期。
 - [读库 有声书版本](https://www.duku.cn) - 每期读库完全没有时间看怎么办？可以在通勤路上用读库 App 听，效果还挺不错的。
+- [无人知晓](https://podcasts.apple.com/cn/podcast/%E6%97%A0%E4%BA%BA%E7%9F%A5%E6%99%93/id1581271335) - 听的过程会让我觉得非常安静，像有人替我把脑子里的噪音关掉了。
 
 <details>
 <summary>不活跃列表</summary>
@@ -150,6 +160,7 @@ updatedDate: "Aug 09, 2026"
 - [忽左忽右](https://www.xiaoyuzhoufm.com/podcast/5e4ee557418a84a0466737b7) - 他们谈论的话题很有趣，不过主要是我听得不够多，暂时不好判断
 - [纵横四海](https://podcasts.apple.com/cn/podcast/%E7%BA%B5%E6%A8%AA%E5%9B%9B%E6%B5%B7/id1671490972) - 「做一份人人都需要的人类使用说明书」。也是听得不多，从她的情绪那一期听起，感觉很不错。
 - [原来是这样 Dscience](https://podcasts.apple.com/cn/podcast/%E5%8E%9F%E6%9D%A5%E6%98%AF%E8%BF%99%E6%A0%B7-dscience/id852289138) - 很有主播范的科普播客
+- [科学史评话](https://podcasts.apple.com/cn/podcast/%E7%A7%91%E5%AD%A6%E5%8F%B2%E8%AF%84%E8%AF%9D%E6%9C%80%E6%96%B0%E4%B8%93%E8%BE%91/id1166109768) - 讲科学的历史，其实很有趣的。吴京平老师去世了，RIP
 
 </details>
 
@@ -190,6 +201,7 @@ updatedDate: "Aug 09, 2026"
 - [少数派](https://sspai.com) - 出来工作这几年，染上了重度的「买买买」的习惯，其实就是从这里来的。。。
 - [取伙](https://quhuo.com.cn/Home) - Z 世代年轻人的活动聚集平台，在深圳可以跟着各种观影团去看电影，还有音乐、演出等多样化线下活动体验。
 - [触乐](https://www.chuapp.com/) - 国内游戏媒体里少有还认真做长文专题的，玩家视角的访谈和评论比纯快讯多得多。
+- [有知有行](https://youzhiyouxing.cn/) - 孟岩团队出的理财 App。实不相瞒，我也买了一点海外长钱。
 
 <details>
 <summary>过期列表</summary>
@@ -198,7 +210,7 @@ updatedDate: "Aug 09, 2026"
 
 </details>
 
-- [琉璃神社](https://www.hacg.ceo) - 「琉璃神社是一个分享最新最酷的ACG同人作品资讯社团,在这里你能找到很多欢乐」。懂的都懂，实为看了十几年神社的老登了～～
+- [琉璃神社](https://www.hacg.ceo) - 「琉璃神社是一个分享最新最酷的 ACG 同人作品资讯社团,在这里你能找到很多欢乐」。懂的都懂，实为看了十几年神社的老登了～～
 
 ### 🏢 游戏 & 动画公司
 
@@ -207,8 +219,8 @@ updatedDate: "Aug 09, 2026"
 - [AliceSoft](https://www.alicesoft.com/) - 成立于 1989 年的日本成人游戏制作公司，以《兰斯》系列闻名，每次人生发生重大变动时都会重玩《战国兰斯》。
 - [Qruppo](https://qruppo.com/) - 新锐游戏公司，以《抜きゲーみたいな島》(拔作岛)系列受到关注，Henpri 让我狠狠爱上，后续一定要玩拔作岛系列。
 - ~~[Eushully](https://zh.moegirl.org.cn/Eushully) - 成立于 2005 年的 E 社，曾是我游戏启蒙的公司，上大学前内存只有 2G 时它的 RPG 游戏就是我的主要娱乐。~~
-- [Intelligent Systems](https://www.intsys.co.jp/) - 成立于 1986 年的任天堂第二方开发商，《火焰纹章》系列制作方，在 Switch上 游戏时长最长的游戏系列。
-- [香草社](https://mzh.moegirl.org.cn/Vanillaware) - 成立于 2002 年的 Vanillaware，以精美2D美术著称，玩过《圣兽之王》美术真的顶，《十三机兵防卫圈》一直在我的 todo list 里。
+- [Intelligent Systems](https://www.intsys.co.jp/) - 成立于 1986 年的任天堂第二方开发商，《火焰纹章》系列制作方，在 Switch 上游戏时长最长的游戏系列。
+- [香草社](https://mzh.moegirl.org.cn/Vanillaware) - 成立于 2002 年的 Vanillaware，以精美 2D 美术著称，玩过《圣兽之王》美术真的顶，《十三机兵防卫圈》一直在我的 todo list 里。
 
 ### 📰 技术新闻
 
@@ -220,14 +232,14 @@ updatedDate: "Aug 09, 2026"
 
 ### 💻 电脑及配件
 
-- [MacBook Air (M5, 2026)](https://www.apple.com/macbook-air/)(¥9999 国补+以旧换新 3000) - 32G RAM 512G SSD，四舍五入 7000 块拿下，真香。
+- [MacBook Air (M5, 2026)](https://www.apple.com/macbook-air/)(¥9999 国补 + 以旧换新 3000) - 32G RAM 512G SSD，四舍五入 7000 块拿下，真香。
 - [Raspberry Pi 4 Model B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) - 8G RAM, 现在用来运行 [HAOS](https://www.home-assistant.io/installation/)
 - [倍控工控主机四核 J1900 8G内存 256G 固态](https://item.jd.com/10040009548064.html#crumb-wrap) - 一开始用来做软路由来着，但是 OpenWrt 太灵车了，最后还是转回了 Apple TV + Surge 做软路由。后面找找有什么可玩的方案。
 - 13600kf+4070s - 最近配的一台主机，但是还没发现更具体的用途，单纯只是用来完了两盘《文明 6 》。不过现在下班后都是用它了。在熟悉 MacOS 到 Windows 的过程。
   - [LG 27UQ850V 27英寸 4K 显示器](https://item.jd.com/100081317949.html) - IPS 高清专业设计显示器，TypeC 90W，HDR400，内置音箱。
   - [Filco 圣手 2 代双模机械键盘](https://www.zhihu.com/question/273691080) - 八年老键盘了，现在宿舍电脑就是用的它。
-  - [Logitech MX Master 3](https://www.logitech.com.cn/zh-cn/products/mice/mx-master-3.910-005694.html) - ~~买回来的时候期待很高，不过现在吃灰了，我基本就只用笔记本的触摸板。因为用鼠标的话，右手要经常切换，其实挺影响效率的。~~ 现在是连着 windows 主机在用。
-  - [西部数据(WD) 2TB 移动硬盘 USB 3.0](https://www.wd.com/products/portable-storage/my-passport.html) - 中间有段时间用于备份我的 MacBook Air 的数据，但是经常会因为太慢甚至将我电脑卡死，所以就更换用途了。现在是用来作为 AutoBangumi 的动画存储。
+  - [Logitech MX Master 3](https://support.logi.com/hc/en-us/articles/360035271133-Getting-Started-MX-Master-3) - ~~买回来的时候期待很高，不过现在吃灰了，我基本就只用笔记本的触摸板。因为用鼠标的话，右手要经常切换，其实挺影响效率的。~~ 现在是连着 windows 主机在用。
+  - [西部数据(WD) 2TB 移动硬盘 USB 3.0](https://www.westerndigital.com/en-sg/products/portable-drives/wd-my-passport-usb-3-0-hdd?sku=WDBPKJ0050BWT-WESN) - 中间有段时间用于备份我的 MacBook Air 的数据，但是经常会因为太慢甚至将我电脑卡死，所以就更换用途了。现在是用来作为 AutoBangumi 的动画存储。
   - [Pioneer BDR-XD07B 便携式蓝光刻录机](https://www.amazon.com/Pioneer-BDR-XD07B-Slim-Portable-Burner/dp/B07ZJX5HSH)(¥356 二手) - 用来读取蓝光光盘，主要是去日本旅游买了几张 CD，被迫跟着要对应的配套设施了。
 - [Logitech MX Keys](https://www.logitech.com/zh-cn/products/keyboards/mx-keys-mac-wireless-keyboard.920-009559.html) - 拿去公司上班用了
 - [Magic Trackpad](https://support.apple.com/en-hk/111884) - pseudoyu 送的，现在在公司用。已经用了四五年 MacBook 的触摸板，鼠标变成超级用的不习惯了，于是就求救弄了一个😂。
@@ -274,7 +286,7 @@ updatedDate: "Aug 09, 2026"
 ### 🎧 耳机及音箱
 
 - [AirPods Pro2](https://www.apple.com/cn/airpods-pro/) - 很糟糕的是，我已经是第三个 AirPods Pro 了， 前两个都被洗衣机洗了，现在已经不敢放到裤袋里面了
-- [Sony WH-XB910N](https://www.sony.com/electronics/headband-headphones/wh-xb910n) - 不知道是不是不是旗舰的原因，我觉得戴久了很不舒服，尤其是压着我眼镜架了。不过音质还是不错的，头戴式的降噪效果应该说比 AirPods Pro 2 也要好些。不常用，觉得不方便，**吃灰中，想出手了**。
+- [Sony WH-XB910N](https://www.sony.com/electronics/support/product/wh-xb910n/downloads) - 不知道是不是不是旗舰的原因，我觉得戴久了很不舒服，尤其是压着我眼镜架了。不过音质还是不错的，头戴式的降噪效果应该说比 AirPods Pro 2 也要好些。不常用，觉得不方便，**吃灰中，想出手了**。
 - [小爱智能音箱](https://www.mi.com/aispeaker) - 也是基本上不能缺的设备，用来控制家里的各种智能家居。不过基本没有用来听音乐就是了。
 - [HomePod mini](https://www.apple.com/homepod-mini/)(¥438 转转二手) - 二手入手了一个，继续践行「每月买一个物联网设备」的计划（不是😂）。音质比小爱好不少。
 
@@ -394,7 +406,7 @@ updatedDate: "Aug 09, 2026"
 - [zsh-fzf-history-search](https://github.com/joshskidmore/zsh-fzf-history-search) - 用于在 zsh 中使用 fzf 来搜索历史命令。
 - [rsync](https://rsync.samba.org/) - 服务器间的文件同步命令。类 Linux 系统应该都是自带的，服务器之间的文件传输我都是靠它的。我最喜欢用的参数是 `-acvP` 。
 - [rclone](https://rclone.org/) - 可以将本地文件传输到云存储上。用过 S3、R2、OSS 等云产品的同学应该都多多少少用过的。
-- [imagemagick](https://imagemagick.org/index.php) - 用于处理图片的命令行工具，我主要用它来批量转换图片格式。
+- [imagemagick](https://imagemagick.org/download/) - 用于处理图片的命令行工具，我主要用它来批量转换图片格式。
 - [ffmpeg](https://ffmpeg.org/) - 用于处理视频的命令行工具，简单的视频切片、转码等操作都可以用它来完成。
 - [onefetch](https://github.com/o2sh/onefetch) - 用 Rust 编写的命令行 Git 仓库信息展示工具，类似于 neofetch 但专门用于显示代码仓库的详细信息。
 
@@ -410,10 +422,11 @@ updatedDate: "Aug 09, 2026"
 
 ### 🤖 大模型工具
 
-> 这里记录我在 Codex 中实际启用的插件、MCP 服务和常用辅助工具。未启用或已经不用的内容放在「未启用或不再使用」里。
+> 这里记录我在 Codex 中实际启用的插件、MCP 服务和常用辅助工具。未启用或已经不用的内容放在「未启用或不再使用」里。  
 > 类型划分参考：[构建 Claude Code 的经验：我们如何使用 Skills](https://baoyu.io/translations/2026-03-17/claude-code-skills-lessons)，这里只保留与当前配置相关的类别。
 
 - [ccusage](https://github.com/ryoppippi/ccusage)（辅助工具） - Agent Token 用量分析工具，订阅场景下主要用来看 100 刀的极限能用多少 😂。Codex 可用 `npx ccusage@latest codex`
+- [magpie](https://github.com/yetone/magpie)（辅助工具） - 把 Claude Code、Codex、Gemini CLI 接到同一张模型路由表上，一个额度用完自动换下一个。以前是我伺候订阅，现在是订阅伺候我。
 - [skills.sh](https://skills.sh/)（辅助工具） - AI Agent Skills 开源生态市场，社区驱动的 skills 分发平台。有热度排行榜和分类浏览，能发现各种高质量 skills（React 最佳实践、Web 设计规范、安全指南等）。支持多种 Agent。
 - [Apifox CLI](https://docs.apifox.com/doc-5637756)（接口开发与测试） - 通过 Apifox CLI 管理接口、环境、Schema、Mock、测试套件和 Runner 等项目资源。
 - [飞书 / Lark](https://open.feishu.cn/document/tools-and-sdks/developer-tools-portal)（业务流程与团队协作） - 通过本地 Skill 处理文档、云盘、表格、多维表格、日历、消息、邮件、会议、知识库和任务等内容。
@@ -447,9 +460,9 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 - [skills CLI](https://github.com/vercel-labs/skills) - Vercel 出品的 Agent Skills 管理命令行工具，`npx skills add <owner/repo>` 一键安装。支持全局/项目级安装、自动检测本地 agent、批量更新 skills。配合 skills.sh 使用，形成完整的 skills 发现→安装→管理流程。
 - [find-skills](https://skills.sh/vercel-labs/skills/find-skills) - 搜索和推荐适合你的 Skill，通过对话了解需求后提供个性化推荐。
-- [我的 Skill 仓库](https://github.com/niracler/skill) - 个人 Skills 集合，涵盖工作流自动化(Git、云效、代码同步、工作回顾等)、写作辅助(校对、灵感、日记)、学习工具(Anki)和趣味转换(戏言风格)。
+- [我的 Skill 仓库](https://github.com/niracler/skill) - 个人 Skills 集合，涵盖工作流自动化 (Git、云效、代码同步、工作回顾等)、写作辅助 (校对、灵感、日记)、学习工具 (Anki) 和趣味转换 (戏言风格)。
 - [humanizer-zh](https://skills.sh/op7418/humanizer-zh/humanizer-zh) - 去除中文 AI 痕迹，让文字更像人写的。基于维基百科的 AI 写作特征指南，检测并修复夸大象征、宣传性语言、模糊归因等模式。
-- [obsidian-skills](https://github.com/nicholasrq/obsidian-skills) - 支持 Obsidian 特有语法：wikilinks、callouts、properties、Canvas 文件等。
+- [obsidian-skills](https://github.com/kepano/obsidian-skills) - 支持 Obsidian 特有语法：wikilinks、callouts、properties、Canvas 文件等。
 - [ui-ux-pro-max](https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max) - UI/UX 设计智能，支持 50 种风格、21 种配色方案、50 种字体组合，涵盖 React、Next.js、Vue 等 9 种技术栈。
 - [slidev](https://skills.sh/antfu/skills/slidev) - 用 Markdown 创建开发者演示文稿（Slidev），支持代码高亮、动画、Vue 组件等。
 - [antfu/skills](https://github.com/antfu/skills) - Anthony Fu 的 Vue 生态技能集合，包含 17 个技能：Vue、Nuxt、Vite、Vitest、VitePress、Pinia、UnoCSS、pnpm、Slidev 等，直接从官方文档同步。
@@ -495,6 +508,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 - [align](https://apps.apple.com/sk/app/align-organize-app-windows/id6480428845)(限免) - 专为 macOS 设计的窗口管理工具，限免的时候入的。一开始我觉得没什么用，因为我大多数情况下是用多桌面而不是多窗口的，直到我用了 4K 显示器～～ 现在 MacOS 已经自带了，**但是没它好用，就装回来了**
 - [ChatGPT App](https://openai.com/chatgpt/overview/)($8/m) - 绑定了 cmd + space 来快速打开。一般用来快速问答。订的是 ChatGPT Go 入门档。（**最近主要是想用 gpt-image-2.0**）
+- [WorkBuddy](https://www.workbuddy.cn/) - 腾讯出的桌面端 AI 办公智能体，能在本地文件夹里自己干活。装它本来是想少干点活，结果先花了两天研究怎么让它干活。
 - [Raycast](https://www.raycast.com/) - 用了都说好，好漂亮的界面，现在很多时候就靠它来做各种桌面操作了。粘贴板历史功能是几乎必须的工具。**现在 Spotlight 的功能也稍微起来了**
 - [keybr.com](https://www.keybr.com/) - 我前段时间用来练习打字的网站。
 - [iStat Menus](https://bjango.com/mac/istatmenus/)(¥60) - 用于在菜单栏显示系统状态的工具，退订 Setapp 后单独买断了。
@@ -516,6 +530,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 ### 💻 虚拟化
 
+- [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment/overview) - 用来做 Linux 虚拟机的宿主系统。
 - [OrbStack](https://orbstack.dev/) - 一个 Docker Desktop 的轻量级替代品，我用它来管理我的 Docker 容器。
 - [VMware Fusion](https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion) - 最近主要是用来跑 HAOS 测试，比 UTM 要好用。
 - [Raspberry Pi Imager](https://www.raspberrypi.com/software/) - 用于烧录树莓派系统镜像的官方工具，界面简单直观，支持多种系统选择。
@@ -579,7 +594,6 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 ### 🌐 浏览器
 
 - Safari - 怎么说呢，用了 Chrome 许久，然后又用了 Arc 许久，最后还是用奥卡姆剃刀原理，选择了 Safari。
-  - [bookmarker for pinboard](https://apps.apple.com/de/app/bookmarker-for-pinboard/id1451400394?l=en&mt=12) - 用于将当前页面添加到 Pinboard。
   - 1Password for Safari - 密码管理器，我是将 Safari 原生的填充给关了。
   - AdGuard for Safari - 广告拦截器，不过用的不太久，还没能体验它和 uBlock Origin 的区别。
   - bookmarker for pinboard - 用于将当前页面添加到 Pinboard。
@@ -596,7 +610,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 ### 💬 通讯工具
 
-- [Telegram](https://telegram.org/)($36/y) - Telegram Premium 年付。我的 TG 频道 [Tomoko RD](https://t.me/tomoko_channel) 是我的个人碎碎念空间。作为一个话痨(年发2000+条消息)，我更喜欢在这里分享生活琐事，而不是在 X 上 - 在 TG 频道发言就像在家里自言自语，而 X 则像是在广场上大喊，对我这个社恐来说压力太大了。欢迎来我的频道逛逛，虽然都是些日常琐碎。**明年到期不续了——每年都说不续，今年提前画押**。
+- [Telegram](https://telegram.org/)($36/y) - Telegram Premium 年付。我的 TG 频道 [Tomoko RD](https://t.me/tomoko_channel) 是我的个人碎碎念空间。作为一个话痨 (年发 2000+ 条消息)，我更喜欢在这里分享生活琐事，而不是在 X 上 - 在 TG 频道发言就像在家里自言自语，而 X 则像是在广场上大喊，对我这个社恐来说压力太大了。欢迎来我的频道逛逛，虽然都是些日常琐碎。**明年到期不续了——每年都说不续，今年提前画押**。
 - [X](https://x.com) - 主要用来关注一些技术博主和开源项目的动态。
 - [Discord](https://discord.com/) - 主要用于参与开源社区讨论和反馈问题，日常很少使用。
 - [Fastmail](https://www.fastmail.com/)($50/y) - 我的主力邮箱服务。它的随机匿名邮箱功能配合 1Password 使用非常方便，是我注册各类网站的首选。这个功能也很好地保护了我的隐私。
@@ -604,7 +618,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 - [QQ](https://im.qq.com/index/) - 现在除了二次元还有谁在玩 QQ 呢 😂，最近手机上也偶尔会刷一下一些旧朋友 QQ 上的说说。
 - [熊猫吃短信 2](https://apps.apple.com/us/app/%E7%86%8A%E7%8C%AB%E5%90%83%E7%9F%AD%E4%BF%A12-%E5%9E%83%E5%9C%BE%E7%9F%AD%E4%BF%A1%E6%8B%A6%E6%88%AA/id1642682818)(¥1/m) - iPhone 上的垃圾短信拦截工具。虽然效果不错，但有时因为长期不查看，系统会自动清理掉被拦截的短信。
 - [中国移动](https://www.10086.cn/)(¥8/m, 保号套餐) - 保号用，主要给收验证码 / 一些外卖平台留的备用号。
-- [中国联通](https://www.10010.com/)(¥38/m, 流量卡) - 主号流量套餐，日常上网+通话靠它。
+- [中国联通](https://www.10010.com/)(¥38/m, 流量卡) - 主号流量套餐，日常上网 + 通话靠它。
 
 ### 🔑 隐私安全
 
@@ -634,7 +648,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 ### 💪 健康检测
 
-- [Apple Health](https://www.apple.com/cn/ios/health/) - 用于记录我每天的步数以及睡眠时间，我此前的睡眠目标是 0:00-7:00，但这错得离谱。结合 Apple Watch  我发现我睡眠效率还不到 90%（Sleep Apnea），按这种方法睡就相当于长期睡眠 6H，难怪我一直以来都感觉挺困的。最近改成 10:30 上床，大概 11:00 睡着，到 7:00 就差不多了（精神了很多）
+- [Apple Health](https://www.apple.com/cn/ios/health/) - 用于记录我每天的步数以及睡眠时间，我此前的睡眠目标是 0:00-7:00，但这错得离谱。结合 Apple Watch 我发现我睡眠效率还不到 90%（Sleep Apnea），按这种方法睡就相当于长期睡眠 6H，难怪我一直以来都感觉挺困的。最近改成 10:30 上床，大概 11:00 睡着，到 7:00 就差不多了（精神了很多）
 - [小米运动健康](https://apps.apple.com/us/app/mi-fitness-xiaomi-wear-lite/id1493500777) - 主要用来看体脂称上面的数据。
 
 <details>
@@ -645,7 +659,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 - ~~[Apple Fitness+](https://www.apple.com/apple-fitness-plus/) - 订阅了 Apple One 之后就有了这个服务，替代掉之前使用的 Keep。不过使用频率堪忧。~~ 首先没有中文，二来也贵，所以还是停用了。
 - ~~[Keep](https://www.gotokeep.com/) - 结合跳绳的方案其实还挺好的。~~ ~~之前用来做健身的，不过现在已经停用了，转去用 Fitness+。~~ 怎么说呢，keep 其实很适合新手根练，但是对于我这种已经有一定基础的人来说，就有点不够了。我现在已经是通过自己的安排，结合视频来练了。
 - ~~[AutoSleep](https://autosleepapp.tantsissa.com/) - 用于监测我睡眠的 APP~~, 感觉没什么意义，现在已经停用了。
-- ~~[Pillow](https://www.neybox.com/pillow) - 用于监测我睡眠的 APP~~, 试着订阅了一年，但发现其实跟 AutoSleep 拉不开距离而且跟原生 Health 的睡眠监测体感也没什么区别，所以也停用了。
+- ~~[Pillow](https://pillow.app/) - 用于监测我睡眠的 APP~~, 试着订阅了一年，但发现其实跟 AutoSleep 拉不开距离而且跟原生 Health 的睡眠监测体感也没什么区别，所以也停用了。
 - ~~[Pokemon Sleep](https://www.pokemon.com/us/app/pokemon-sleep) - 用于监测我睡眠的 APP，同时收集点小精灵的睡姿。(虽然睡眠质量还是很糟糕就是了～～)~~ 还是弃用了，明天都要定时打开，还是挺费精神的。现在就仅仅保留了 Apple Health
 - ~~[Zepp Life](https://apps.apple.com/us/app/zepp-life-formerly-mifit/id938688461) - 前身是小米运动，在没有使用小米手环之后，现在主要用来看体脂称上面的数据。（后面才知道这个 APP 是也会同步体重数据到 Apple Health 上的）~~ 原来小米运动还在，搞错了。
 
@@ -653,9 +667,9 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 ### 🤖 智能家居
 
-> 我尽量只使用米家生态的智能家居设备,避免安装过多不同平台的 App。购买设备时会优先考虑是否支持米家,不过有些设备(如电饭煲)支持米家的意义并不大。
+> 我尽量只使用米家生态的智能家居设备,避免安装过多不同平台的 App。购买设备时会优先考虑是否支持米家,不过有些设备 (如电饭煲) 支持米家的意义并不大。
 
-- [米家](https://home.mi.com/) - 用于控制家里的智能设备,如灯、空调、扫地机器人等。不过当家里断网时,这些智能设备就成了摆设(似乎可以通过网关解决这个问题)。
+- [米家](https://home.mi.com/) - 用于控制家里的智能设备,如灯、空调、扫地机器人等。不过当家里断网时,这些智能设备就成了摆设 (似乎可以通过网关解决这个问题)。
 - [Aqara Home](https://www.aqara.com/) - 因为使用了 Aqara 的摄像头而不得不安装。
 - [Home Assistant](https://www.home-assistant.io/) - 已部署在树莓派上，后续会逐步扩展这方面的应用。**其实还有其他的，不过我就列一些用的比较多的**
 - [Home Assistant Cloud (Nabu Casa)](https://www.nabucasa.com/)($6.5/m) - HA 官方云服务，支持远程访问、Alexa/Google Assistant 桥接、加密备份。订阅顺便也是给 Open Home Foundation 捐钱。
@@ -675,7 +689,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 - [多抓鱼](https://www.duozhuayu.com/book) - 以前常买各种书籍,现在已将其视为奢侈品,不再盲目购买。
 - [京东](https://www.jd.com/)(小程序，PLUS 走联名卡) - 会员价值感逐渐降低。
-- [京东 PLUS 超级联名卡](https://plus.jd.com/index)(¥298/y, 含 PLUS+B站大会员+其他权益) - 京东 PLUS 年度盛典「买 1 得 5」联名卡，我配的视频权益是 B 站大会员，京东+B站 都通过这一张卡续。
+- [京东 PLUS 超级联名卡](https://plus.jd.com/index)(¥298/y, 含 PLUS+B 站大会员 + 其他权益) - 京东 PLUS 年度盛典「买 1 得 5」联名卡，我配的视频权益是 B 站大会员，京东 + B 站都通过这一张卡续。
 - [拼多多](https://www.pinduoduo.com/)(小程序) - 主要用于购买 Switch 游戏卡带、乐高、模型等娱乐用品。
 - [淘宝](https://www.taobao.com/)(¥88/y, 88VIP) - 适合购买特殊商品,如台版书籍、外区充值卡等。88VIP 也覆盖了优酷、饿了么、网易云季卡等附赠权益。
 - [闲鱼](https://www.goofish.com)(小程序) - 因不愿花时间讨价还价,很少用于卖物。每年购买几件二手商品,在消费降级趋势下可能会增加使用频率。
@@ -739,8 +753,8 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 ### 📰 新闻 & 阅读
 
 - [RSSHub](https://rsshub.app/) - 强大的 RSS 生成器，可为众多不支持 RSS 的网站提供订阅源，支持自定义参数调整内容。
-- [Folo](https://github.com/RSSNext/Folo)($100/年) - 一站式信息聚合平台，整合了 RSS、Telegram、YouTube、Bilibili、Pixiv、Twitter 等多平台订阅。作为 Inoreader 的替代品，我写了一篇[使用体验](https://t.me/tomoko_channel/592)。欢迎访问我的 [Folo 主页](https://app.folo.is/share/users/niracler)。**明年到期可能砍到 Basic 档或者直接不续——目前感觉付费档对我来说有点 over.**
-- [豆瓣](https://douban.com) - 影视、书籍、音乐等作品的评分参考平台。这是我的[豆瓣主页](https://www.douban.com/people/niracler/)，主要记录 ACG 作品的观看体验。
+- [Folo](https://github.com/RSSNext/Folo)($100/年) - 一站式信息聚合平台，整合了 RSS、Telegram、YouTube、Bilibili、Pixiv、Twitter 等多平台订阅。作为 Inoreader 的替代品，我写了一篇 [使用体验](https://t.me/tomoko_channel/592)。欢迎访问我的 [Folo 主页](https://app.folo.is/share/users/niracler)。**明年到期可能砍到 Basic 档或者直接不续——目前感觉付费档对我来说有点 over.**
+- [豆瓣](https://douban.com) - 影视、书籍、音乐等作品的评分参考平台。这是我的 [豆瓣主页](https://www.douban.com/people/niracler/)，主要记录 ACG 作品的观看体验。
 - [读库 APP](https://www.duku.cn)(需要订阅读库) - 提供志愿者朗读的精选文章音频，适合碎片时间收听。
 - [微信读书](https://weread.qq.com/)(¥228/y, 无限卡) - 内容丰富的电子书平台，适合阅读文学类作品。技术类书籍建议选择纸质版或 PDF 格式。年卡 ¥228（每周一活动 ¥168 更划算）。
 - [得到](https://www.igetget.com/)(¥365/y, 听书 VIP) - 知识付费平台，作为微信读书的补充书源，按需订阅。最近用来听书比较多。
@@ -791,7 +805,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 - [飞猪](https://www.fliggy.com) - 现在签证和境外机票都是在这里买的。**正准备第一次出国**
 - [Rond](https://sspai.com/post/85355)(¥48/y, PLUS) - 一款基于本地数据记录行程的软件，软件很优雅。PLUS 是年付。
 - [Apple Maps](https://www.apple.com/cn/maps/) - 在国内挺难使用的，再坚持用一会吧（不过大概率很快就又切换回高德了）
-- [大麦](https://www.damai.cn) - 成为现充(伪)经常处于看各种演出之后，现在会偶尔关注这些信息了。（钱包不太能顶得住）
+- [大麦](https://www.damai.cn) - 成为现充（伪）经常处于看各种演出之后，现在会偶尔关注这些信息了。（钱包不太能顶得住）
 
 <details>
 <summary>过期列表</summary>
@@ -806,9 +820,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 > 这里只列出我在打卡的游戏，以及常用的与游戏有关的软件
 
 - [Steam](https://store.steampowered.com/) - 手机 App，作为验证用的，平常因为网络太卡了，也很少用。
-- [崩坏: 星穹铁道](https://sr.mihoyo.com/)(¥98/42d 大月卡进阶/基础轮充 + ¥30/m 小月卡) - 当作是每月花两张电影票的钱去看两场电影（加了终末地，就完全没有时间玩了）
 - [明日方舟: 终末地](https://endfield.gryphline.com/zh-cn)(¥68/35d 大月卡 + ¥30/m 小月卡) - 需要召集终末地的好友什么的。
-- [Muse Dash](https://musedash.peropero.net/#/version) - 早期计划通，现在看来简直不能再赚了，一直在更新真的很良心。
 - [小黑盒](https://www.xiaoheihe.cn) - 主要用来看各种游戏机上面的游戏时长，以前的话会在上面看游戏点评以及买游戏什么的。
 
 <details>
@@ -816,6 +828,8 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 - ~~[绝区零](https://zzz.mihoyo.com/main/) - 犹豫了很久，还是进了。~~ 后续：玩不下去，资金真的是撑不住两个氪金手游。
 - ~~[崩坏3rd](https://www.bh3.com/) - 重新下载回来，弄了个真理鸭～～~~ 已经不属于这个时代的游戏了，肝度什么的都太高了。看来我只好 [看视频](https://www.bilibili.com/video/BV12W411h76f/) 云了。
+- [崩坏: 星穹铁道](https://sr.mihoyo.com/)(¥98/42d 大月卡进阶/基础轮充 + ¥30/m 小月卡) - ~~当作是每月花两张电影票的钱去看两场电影（加了终末地，就完全没有时间玩了）~~ 最后的记录，停留在了周年庆的实体设定集。没有足够的精力去玩了
+- [Muse Dash](https://musedash.peropero.net/#/version) - ~~早期计划通，现在看来简直不能再赚了，一直在更新真的很良心。~~
 
 </details>
 
@@ -843,6 +857,7 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 - [Raspberry Pi Imager](https://www.raspberrypi.com/software/) - 用于将树莓派的镜像写入到 SD 卡上的工具。
 - [Windows App](https://apps.microsoft.com/detail/9n1f85v9t8bn?hl=en-us&gl=US) - 用来远程控制 Windows 的软件，感觉挺好用的。应该是官方出品。
 - [BuhoCleaner](https://www.drbuho.com/buhocleaner) - Mac 系统清理工具，终身版，替代了之前的 CleanMyMac X。
+- [Stretchly](https://github.com/hovancik/stretchly) - 跨平台的休息提醒工具，开源免费，到点就强制你离开屏幕。腰突之后才发现，这种「烦人」的软件才是真爱。
 
 <details>
 <summary>过期列表</summary>
@@ -874,12 +889,11 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 1. 各端设备（手机、电脑、平板）上的应用软件
 2. Tachimanga 漫画订阅源中的新作者
-3. Folo 平台上关注的内容源
 
 内容规范：
 
 1. 尽可能标注软件的付费方式（订阅制或一次性付费）及具体费用、软件形态（小程序、原生应用或网页应用）、软件平台（iOS、Android、macOS、Windows 等）
-2. 不再使用的项目将移至"过期列表"
+2. 不再使用的项目将移至「过期列表」
 3. 新使用的软件需要稳定使用一段时间后才会加入列表，以确保其实用性和持久性
 4. 有一些涉及敏感信息比较多的软件就不列出来了，例如用什么银行，以及公司用的什么软件等
 
@@ -891,12 +905,12 @@ PS. 因为模型能力本身的增强，很多原有的用于开发流程的 Ski
 
 | # | 维度 | 当前 | 上限 | 状态 | 备注 |
 |---|------|------|------|------|------|
-| 1 | 月订阅基础消费 (¥/月) | 727 | 666 | 🚨 超 61 | 钱的容量 |
-| 2 | 关注的人 | 82 | 100 | ✅ 留白 18 | README 里你自己声明过的隐藏上限 |
-| 3 | 软件工具总数 | 161 | — | — | 决策疲劳 |
+| 1 | 月订阅基础消费 (¥/月) | 627.5 | 666 | ✅ 留白 38.5 | 钱的容量 |
+| 2 | 关注的人 | 85 | 100 | ✅ 留白 15 | README 里你自己声明过的隐藏上限 |
+| 3 | 软件工具总数 | 162 | — | — | 决策疲劳 |
 | 4 | 物理资产 (设备) | 55 | — | — | 物理空间 / 维护成本 |
-| 5 | 🤖 大模型工具 | 15 | — | — | 涨势最快，FOMO 重灾区 |
-| 6 | 沉睡库存 (不活跃总数) | 109 | — | — | 反指标：太多就该清 |
+| 5 | 🤖 大模型工具 | 16 | — | — | 涨势最快，FOMO 重灾区 |
+| 6 | 沉睡库存 (不活跃总数) | 113 | — | — | 反指标：太多就该清 |
 
 <!-- AUDIT:END -->
 
