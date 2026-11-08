@@ -28,6 +28,7 @@ overrides:
   miniflare@4.20260708.1>sharp: "0.35.5"
   miniflare@4.20260721.0>sharp: "0.35.5"
   postcss: ">=8.5.18 <9"
+  "re2js@>=2.2.0 <2.8.7": "2.8.7"
   sharp@<0.35.4: ^0.35.4
   sharp@<0.35.5: ^0.35.5
   smol-toml@<=1.7.0: ^1.7.1
