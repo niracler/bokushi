@@ -5,6 +5,7 @@ import {
     buildCheckCommands,
     getStagedFiles,
     isDependencyControlFile,
+    resolvePnpmCommand,
 } from "../scripts/check-dependencies.mjs";
 
 test("recognizes dependency control files", () => {
@@ -55,4 +56,24 @@ test("ci mode always audits at moderate severity", () => {
 
 test("rejects unsupported modes", () => {
     assert.throws(() => buildCheckCommands("unknown", []), /Unsupported dependency check mode/);
+});
+
+test("runs a standalone pnpm binary directly instead of through node", () => {
+    assert.deepEqual(resolvePnpmCommand("/opt/pnpm/@pnpm/exe/pnpm"), {
+        command: "/opt/pnpm/@pnpm/exe/pnpm",
+        args: [],
+    });
+});
+
+test("runs a JavaScript pnpm entry point through the current node", () => {
+    for (const entry of ["/usr/lib/node_modules/pnpm/bin/pnpm.cjs", "/tmp/pnpm.mjs"]) {
+        assert.deepEqual(resolvePnpmCommand(entry), {
+            command: process.execPath,
+            args: [entry],
+        });
+    }
+});
+
+test("falls back to pnpm on PATH without npm_execpath", () => {
+    assert.deepEqual(resolvePnpmCommand(undefined), { command: "pnpm", args: [] });
 });
