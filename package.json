@@ -26,16 +26,16 @@
         "prepare": "husky"
     },
     "dependencies": {
-        "@astrojs/cloudflare": "^14.4.2",
-        "@astrojs/markdown-remark": "^7.3.4",
+        "@astrojs/cloudflare": "^14.4.6",
+        "@astrojs/markdown-remark": "^7.3.6",
         "@astrojs/mdx": "^7.0.8",
         "@astrojs/rss": "^4.0.19",
         "@astrojs/sitemap": "^3.7.4",
         "@iconify-json/ri": "^1.2.10",
-        "@tailwindcss/vite": "^4.3.3",
+        "@tailwindcss/vite": "^4.3.4",
         "aes-js": "^3.1.2",
         "arctic": "^3.7.0",
-        "astro": "^7.4.2",
+        "astro": "^7.4.7",
         "astro-pagefind": "^1.8.6",
         "cheerio": "^1.2.0",
         "markdown-it": "^14.3.3",
@@ -44,20 +44,20 @@
         "rehype-slug": "^6.0.0",
         "remark-github-blockquote-alert": "^2.1.0",
         "sanitize-html": "^2.18.1",
-        "tailwindcss": "^4.3.3"
+        "tailwindcss": "^4.3.4"
     },
     "devDependencies": {
         "@astrojs/check": "^0.9.12",
-        "@biomejs/biome": "^2.6.3",
+        "@biomejs/biome": "^2.6.5",
         "@iconify-json/simple-icons": "^1.2.101",
         "@types/markdown-it": "^14.1.2",
         "@types/sanitize-html": "^2.16.2",
         "husky": "^9.1.7",
-        "knip": "^6.43.0",
+        "knip": "^6.44.1",
         "lint-staged": "^16.4.0",
         "markdownlint-cli2": "^0.24.0",
-        "playwright": "^1.64.1",
+        "playwright": "^1.65.0",
         "unplugin-icons": "^23.0.1",
-        "wrangler": "^4.152.0"
+        "wrangler": "^4.158.0"
     }
 }
