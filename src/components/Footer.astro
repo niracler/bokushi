@@ -16,7 +16,6 @@ import IconTwitter from "~icons/ri/twitter-fill";
 import IconFolo from "~icons/simple-icons/folo";
 import { SOCIAL_LINKS } from "../consts";
 import { getSiteStats } from "../utils/site-stats";
-import ForeverBlogWormhole from "./ForeverBlogWormhole.astro";
 import PostPreviewSetup from "./PostPreviewSetup.astro";
 
 const today = new Date();
@@ -147,9 +146,16 @@ const timeDisplay = `${String(hours).padStart(2, "0")}:${String(mins).padStart(2
                     <IconCCSa class="h-4 w-4" aria-hidden="true" />
                 </span>
             </a>
-        </div>
-        <div class="flex items-center justify-center pt-2">
-            <ForeverBlogWormhole />
+            <span aria-hidden="true" class="mx-1">·</span>
+            <a
+                href="https://www.foreverblog.cn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="十年之约成员博客"
+                class="transition-colors hover:text-accent"
+            >
+                十年之约
+            </a>
         </div>
     </div>
 </footer>
