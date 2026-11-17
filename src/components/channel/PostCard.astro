@@ -1,7 +1,6 @@
 ---
 import type { CardType, TelegramPost } from "../../utils/telegram";
 import { detectCardType } from "../../utils/telegram";
-import FormattedDate from "../FormattedDate.astro";
 import LinkPreviewCard from "./LinkPreviewCard.astro";
 import ReplyQuote from "./ReplyQuote.astro";
 
@@ -15,216 +14,536 @@ interface Props {
 const { post, channelUsername, variant } = Astro.props;
 
 const cardType: CardType = variant ?? detectCardType(post);
+const parsedDate = post.datetime ? new Date(post.datetime) : null;
+const timeLabel =
+    parsedDate && !Number.isNaN(parsedDate.getTime())
+        ? `${String(parsedDate.getUTCHours()).padStart(2, "0")}:${String(parsedDate.getUTCMinutes()).padStart(2, "0")}`
+        : undefined;
+
+const photos = post.photos ?? [];
+const isAlbum = photos.length > 1;
+const isMosaicAlbum =
+    isAlbum &&
+    Boolean(post.albumAspectRatio) &&
+    photos.every(
+        (p) =>
+            typeof p.leftPct === "number" &&
+            typeof p.topPct === "number" &&
+            typeof p.widthPct === "number" &&
+            typeof p.heightPct === "number",
+    );
+const hasMedia = photos.length > 0 || Boolean(post.video);
+const hasTopHeader = Boolean(post.forwardedFrom) || Boolean(post.replyInfo);
+const bodyHtml = (post.textHtml ?? post.content).trim();
 ---
 
 <article
-    class:list={["card", `card--${cardType}`]}
+    class:list={[
+        "tg-bubble",
+        `tg-bubble--${cardType}`,
+        { "tg-bubble--wide": hasMedia || Boolean(post.linkPreview) || Boolean(post.replyInfo) },
+    ]}
     id={`post-${post.id}`}
 >
-    {post.replyInfo && <ReplyQuote reply={post.replyInfo} />}
-
-    {cardType === "fwd" && post.forwardedFrom && (
-        <div class="card__fwd-from">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-                <path d="M5 12L19 12M19 12l-6-6M19 12l-6 6" />
-            </svg>
+    {post.forwardedFrom && (
+        <div class="tg-bubble__fwd">
+            <span>Forwarded from </span>
             {post.forwardedFromLink ? (
                 <a href={post.forwardedFromLink} target="_blank" rel="noopener noreferrer">
-                    @{post.forwardedFrom}
+                    {post.forwardedFrom}
                 </a>
             ) : (
-                <span>@{post.forwardedFrom}</span>
+                <strong>{post.forwardedFrom}</strong>
             )}
         </div>
     )}
 
-    <div
-        class="card__content-wrapper"
-        id={`post-content-${post.id}`}
-        data-post-content-wrapper
-    >
-        <div class="card__content" set:html={post.content} />
-        <button
-            class="card__expand-btn"
-            data-expand-btn
-            aria-label="展开全文"
-            aria-expanded="false"
-            aria-controls={`post-content-${post.id}`}
-            hidden
+    {post.replyInfo && <ReplyQuote reply={post.replyInfo} />}
+
+    {hasMedia && (
+        <div
+            class:list={[
+                "tg-bubble__media",
+                { "tg-bubble__media--flush-top": !hasTopHeader },
+            ]}
         >
-            <span data-expand-label>展开全文</span>
-            <svg class="card__expand-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 9l6 6 6-6" />
-            </svg>
-        </button>
-    </div>
+            {photos.length === 1 && (
+                <div class="tg-bubble__single-photo">
+                    <img
+                        src={photos[0].url}
+                        alt={post.title}
+                        loading="lazy"
+                        class="telegram-post-image"
+                    />
+                </div>
+            )}
+
+            {isAlbum && isMosaicAlbum && (
+                <div
+                    class="tg-bubble__album-mosaic"
+                    style={`aspect-ratio: ${post.albumAspectRatio};`}
+                >
+                    {photos.map((photo, idx) => (
+                        <div
+                            class="tg-bubble__album-item"
+                            style={`left:${photo.leftPct}%;top:${photo.topPct}%;width:${photo.widthPct}%;height:${photo.heightPct}%;`}
+                        >
+                            <img
+                                src={photo.url}
+                                alt={`${post.title} (${idx + 1}/${photos.length})`}
+                                loading="lazy"
+                                class="telegram-post-image"
+                            />
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {isAlbum && !isMosaicAlbum && (
+                <div class="tg-bubble__album-grid">
+                    {photos.map((photo, idx) => (
+                        <img
+                            src={photo.url}
+                            alt={`${post.title} (${idx + 1}/${photos.length})`}
+                            loading="lazy"
+                            class="telegram-post-image"
+                        />
+                    ))}
+                </div>
+            )}
+
+            {post.video && (
+                <div
+                    class="tg-bubble__video"
+                    style={
+                        post.video.paddingTopPct
+                            ? `aspect-ratio: ${Number((100 / post.video.paddingTopPct).toFixed(4))};`
+                            : undefined
+                    }
+                >
+                    {!post.video.notSupported && post.video.videoUrl ? (
+                        <div class="tg-bubble__video-player">
+                            <video
+                                src={post.video.videoUrl}
+                                poster={post.video.thumbUrl}
+                                controls
+                                preload="metadata"
+                                playsinline
+                            />
+                        </div>
+                    ) : (
+                        <a
+                            href={post.video.postUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="tg-bubble__video-cover"
+                        >
+                            {post.video.thumbUrl && (
+                                <img
+                                    src={post.video.thumbUrl}
+                                    alt={post.title}
+                                    loading="lazy"
+                                    data-lightbox-skip
+                                />
+                            )}
+                            {post.video.duration && (
+                                <span class="tg-bubble__video-duration">
+                                    {post.video.duration}
+                                </span>
+                            )}
+                            <span class="tg-bubble__video-play" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M8 5.14v14l11-7-11-7z" />
+                                </svg>
+                            </span>
+                            <span class="tg-bubble__video-badge">在 Telegram 中观看</span>
+                        </a>
+                    )}
+                </div>
+            )}
+        </div>
+    )}
+
+    {bodyHtml && (
+        <div class="tg-bubble__text card__content" set:html={bodyHtml} />
+    )}
 
     {post.linkPreview && <LinkPreviewCard preview={post.linkPreview} />}
 
-    <footer class="card__meta">
-        <div class="card__meta-left">
-            {post.datetime && (
-                <time datetime={post.datetime} class="card__date">
-                    <FormattedDate date={new Date(post.datetime)} />
-                </time>
-            )}
-        </div>
-
-        {post.hashtags && post.hashtags.length > 0 && (
-            <div class="card__tags">
-                {post.hashtags.map(tag => (
-                    <a
-                        href={`https://t.me/s/${channelUsername}?q=%23${encodeURIComponent(tag)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        #{tag}
-                    </a>
+    <footer class="tg-bubble__footer">
+        {post.reactions && post.reactions.length > 0 && (
+            <div class="tg-bubble__reactions">
+                {post.reactions.map((r) => (
+                    <span class="tg-reaction">
+                        <span class="tg-reaction__emoji">{r.emoji}</span>
+                        <span class="tg-reaction__count">{r.count}</span>
+                    </span>
                 ))}
             </div>
         )}
+
+        <div class="tg-bubble__info">
+            {post.views && (
+                <span class="tg-bubble__views" title={`${post.views} 次浏览`}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    {post.views}
+                </span>
+            )}
+            {post.edited && <span class="tg-bubble__edited">edited</span>}
+            {post.datetime && timeLabel && (
+                <a
+                    href={`https://t.me/${channelUsername}/${post.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="tg-bubble__date"
+                >
+                    <time datetime={post.datetime}>{timeLabel}</time>
+                </a>
+            )}
+        </div>
     </footer>
 </article>
 
 <style>
     /* =================================================================
-     * Card base — v4 剪报本 look: white paper, thin border, soft shadow
+     * Official Telegram Bubble (.tgme_widget_message_bubble) + Warm Theme
      * ================================================================= */
-    .card {
+    .tg-bubble {
         position: relative;
-        background: var(--color-bg-surface);
-        border: 1px solid var(--color-border-soft);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-soft);
-        padding: var(--space-3) var(--space-4);
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-        min-width: 0;
-        overflow: hidden;
+        width: 100%;
+        padding: 0.65rem 0.85rem 0.55rem;
+        border-radius: 6px 15px 15px 15px;
+        background: var(--color-bg-surface);
+        border: 1px solid var(--color-border);
+        box-shadow: 0 3px 12px rgba(42, 28, 23, 0.08), 0 1px 2px rgba(42, 28, 23, 0.04);
         color: var(--color-text-primary);
-        font-size: 0.94rem;
-        line-height: 1.62;
-        letter-spacing: 0.01em;
-        transition:
-            border-color var(--transition-base),
-            box-shadow var(--transition-base);
+        box-sizing: border-box;
     }
 
-    .card:hover {
-        border-color: var(--color-border);
-        box-shadow: var(--shadow-strong);
+    :global(:root[data-theme="dark"]) .tg-bubble {
+        background: color-mix(in srgb, var(--color-bg-muted) 88%, var(--color-text-primary) 4%);
+        border-color: color-mix(in srgb, var(--color-border) 82%, var(--color-text-primary) 14%);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.42), 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    /* Forward: left accent bar identifies the type at a glance. */
-    .card--fwd {
-        border-left: 3px solid var(--color-accent);
-        padding-left: calc(var(--space-4) - 2px);
+    /* Forwarded from header */
+    .tg-bubble__fwd {
+        font-size: 0.8rem;
+        line-height: 1.3;
+        color: var(--color-text-muted);
+        margin-bottom: 0.3rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .card__fwd-from {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
-        font-size: 0.7rem;
+    .tg-bubble__fwd a,
+    .tg-bubble__fwd strong {
+        font-weight: 600;
         color: var(--color-accent-dark);
-        font-weight: 700;
-        letter-spacing: 0.04em;
-    }
-
-    .card__fwd-from a {
-        color: inherit;
         text-decoration: none;
     }
 
-    .card__fwd-from a:hover {
+    .tg-bubble__fwd a:hover {
         text-decoration: underline;
     }
 
     /* =================================================================
-     * Content rendering (markdown HTML from Telegram)
+     * Edge-to-edge Media (Single Photo, Mosaic Album, Video Player)
      * ================================================================= */
-    .card__content {
-        min-width: 0;
-        color: var(--color-text-primary);
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
+    .tg-bubble__media {
+        margin: 0.2rem 0 0.55rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-border);
+        overflow: hidden;
+        background: var(--color-bg-muted);
     }
 
-    .card__content :global(a) {
-        color: var(--color-accent);
+    .tg-bubble__media--flush-top {
+        margin: -0.65rem -0.85rem 0.55rem;
+        border-radius: 5px 14px 0 0;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .tg-bubble__single-photo img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 36rem;
+        object-fit: contain;
+        cursor: zoom-in;
+    }
+
+    /* Multi-photo mosaic preserving Telegram's exact grouped_layer coordinates */
+    .tg-bubble__album-mosaic {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background: var(--color-bg-surface);
+    }
+
+    .tg-bubble__album-item {
+        position: absolute;
+        overflow: hidden;
+        background: var(--color-bg-muted);
+    }
+
+    .tg-bubble__album-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        cursor: zoom-in;
+        transition: transform 0.2s ease;
+    }
+
+    .tg-bubble__album-item img:hover {
+        transform: scale(1.015);
+    }
+
+    .tg-bubble__album-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2px;
+    }
+
+    .tg-bubble__album-grid img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        display: block;
+        cursor: zoom-in;
+    }
+
+    /* Video player & cover fallback */
+    .tg-bubble__video {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #1c1917;
+        overflow: hidden;
+    }
+
+    .tg-bubble__video-player,
+    .tg-bubble__video-cover {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+        color: #fff;
         text-decoration: none;
-        transition: opacity var(--transition-base);
+    }
+
+    .tg-bubble__video-player video,
+    .tg-bubble__video-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .tg-bubble__video-duration {
+        position: absolute;
+        left: 0.55rem;
+        top: 0.55rem;
+        padding: 0.12rem 0.45rem;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.58);
+        color: #fff;
+        font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
+        font-size: 0.74rem;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .tg-bubble__video-play {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.54);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        transition: transform 0.18s ease, background-color 0.18s ease;
+    }
+
+    .tg-bubble__video-cover:hover .tg-bubble__video-play {
+        transform: scale(1.06);
+        background: rgba(217, 119, 87, 0.88);
+    }
+
+    .tg-bubble__video-badge {
+        position: absolute;
+        right: 0.55rem;
+        bottom: 0.55rem;
+        padding: 0.16rem 0.5rem;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.58);
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 0.72rem;
+        font-weight: 500;
+        line-height: 1.3;
+    }
+
+    /* =================================================================
+     * Message Text Body (.tgme_widget_message_text)
+     * ================================================================= */
+    .tg-bubble__text {
+        min-width: 0;
+        font-size: 0.95rem;
+        line-height: 1.52;
+        color: var(--color-text-primary);
+        white-space: pre-line;
+        word-break: break-word;
         overflow-wrap: anywhere;
     }
 
-    .card__content :global(a:hover) {
-        opacity: 0.8;
-        text-decoration: underline;
+    .tg-bubble__text :global(.emoji) {
+        font-style: normal;
+        font-weight: normal;
     }
 
-    .card__content :global(img) {
+    .tg-bubble__text :global(a) {
+        color: var(--color-accent-dark);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-color: color-mix(in srgb, var(--color-accent-dark) 40%, transparent);
+        overflow-wrap: anywhere;
+    }
+
+    .tg-bubble__text :global(a:hover) {
+        text-decoration-color: var(--color-accent-dark);
+    }
+
+    .tg-bubble__text :global(a.hashtag-link) {
+        display: inline-block;
+        color: var(--color-accent-dark);
+        background: color-mix(in srgb, var(--color-accent-soft) 65%, var(--color-bg-muted));
+        border: 1px solid color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
+        padding: 0.04rem 0.42rem;
+        border-radius: 5px;
+        font-size: 0.84rem;
+        line-height: 1.35;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .tg-bubble__text :global(a.hashtag-link:hover) {
+        border-color: var(--color-accent);
+    }
+
+    .tg-bubble__text :global(img) {
         max-width: 100%;
         height: auto;
     }
 
-    .card__content :global(.telegram-images) {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2px;
-        margin: var(--space-3) 0;
-        border-radius: var(--radius-sm);
-        overflow: hidden;
-    }
-
-    .card__content :global(.telegram-images):has(> :only-child) {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-
-    .card__content :global(.telegram-post-image) {
-        width: 100%;
-        height: 100%;
-        aspect-ratio: 1;
+    /* Official Telegram blockquote & blockquote[expandable] */
+    .tg-bubble__text :global(blockquote) {
+        position: relative;
         display: block;
-        object-fit: cover;
+        margin: 0.4rem 0;
+        padding: 0.38rem 1.85rem 0.38rem 0.75rem;
+        border-radius: 6px;
+        border: 1px solid var(--color-border);
+        border-left: 3px solid var(--color-accent);
         background: var(--color-bg-muted);
+        color: var(--color-text-secondary);
+        font-style: normal;
+        font-size: 0.88rem;
+        line-height: 1.48;
+    }
+
+    .tg-bubble__text :global(blockquote::after) {
+        content: "";
+        position: absolute;
+        width: 11px;
+        height: 11px;
+        top: 6px;
+        right: 6px;
+        background: var(--color-accent);
+        opacity: 0.65;
+        -webkit-mask: no-repeat center / contain
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 366.3018'%3E%3Cpath d='M3 101q0-18 9-33t24-23.5T68.5 36t32.5 8.5T125 68t9 33v19q0 54-24 102l-12 24q-6 12-19 16t-25-2-16.5-18.5T39 217l12-24q7-13 11-27-25-3-42-21.5T3 101zm163 0q0-18 9-33t24-23.5 32.5-8.5 32.5 8.5T288 68t9 33v19q0 54-24 102l-12 24q-6 12-19 16t-25-2-16.5-18.5T202 217l12-24q7-13 11-27-25-3-42-21.5T166 101z'/%3E%3C/svg%3E");
+        mask: no-repeat center / contain
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 366.3018'%3E%3Cpath d='M3 101q0-18 9-33t24-23.5T68.5 36t32.5 8.5T125 68t9 33v19q0 54-24 102l-12 24q-6 12-19 16t-25-2-16.5-18.5T39 217l12-24q7-13 11-27-25-3-42-21.5T3 101zm163 0q0-18 9-33t24-23.5 32.5-8.5 32.5 8.5T288 68t9 33v19q0 54-24 102l-12 24q-6 12-19 16t-25-2-16.5-18.5T202 217l12-24q7-13 11-27-25-3-42-21.5T166 101z'/%3E%3C/svg%3E");
+    }
+
+    .tg-bubble__text :global(blockquote[expandable]) {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        padding-top: 0.32rem;
+        padding-bottom: 0.1rem;
+        max-height: calc(3 * 1.48em + 0.42rem);
+        overflow: hidden;
         cursor: pointer;
-        border-radius: 0;
     }
 
-    .card__content :global(.telegram-images):has(> :only-child) :global(.telegram-post-image) {
-        aspect-ratio: auto;
-        height: auto;
-        object-fit: contain;
-        border-radius: var(--radius-sm);
-        box-shadow: var(--shadow-soft);
+    .tg-bubble__text :global(blockquote[expandable]::after) {
+        top: auto;
+        bottom: 5px;
+        right: 6px;
+        width: 13px;
+        height: 13px;
+        opacity: 0.85;
+        z-index: 2;
+        background: var(--color-accent-dark);
+        -webkit-mask: no-repeat center / contain
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 366.3018'%3E%3Cpath d='M150 182l79-78q3-4 8.5-4t9 3.5 3.5 9-4 8.5l-87 88q-4 4-9 4t-9-4l-87-88q-4-3-4-8.5t3.5-9 9-3.5 8.5 4z'/%3E%3C/svg%3E");
+        mask: no-repeat center / contain
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 366.3018'%3E%3Cpath d='M150 182l79-78q3-4 8.5-4t9 3.5 3.5 9-4 8.5l-87 88q-4 4-9 4t-9-4l-87-88q-4-3-4-8.5t3.5-9 9-3.5 8.5 4z'/%3E%3C/svg%3E");
     }
 
-    .card__content :global(ol),
-    .card__content :global(ul) {
+    .tg-bubble__text :global(blockquote[expandable][open]) {
+        display: block;
+        -webkit-line-clamp: unset;
+        max-height: none;
+        padding-top: 0.38rem;
+        padding-bottom: 1.35rem;
+    }
+
+    .tg-bubble__text :global(blockquote[expandable][open]::after) {
+        transform: rotate(180deg);
+    }
+
+    .tg-bubble__text :global(ol),
+    .tg-bubble__text :global(ul) {
         margin: var(--space-2) 0;
         padding-left: 0;
         list-style: none;
     }
 
-    .card__content :global(ol li),
-    .card__content :global(ul li) {
+    .tg-bubble__text :global(ol li),
+    .tg-bubble__text :global(ul li) {
         position: relative;
         padding-left: var(--space-5);
         margin-bottom: var(--space-1);
     }
 
-    .card__content :global(ol) {
+    .tg-bubble__text :global(ol) {
         counter-reset: list-counter;
     }
 
-    .card__content :global(ol li) {
+    .tg-bubble__text :global(ol li) {
         counter-increment: list-counter;
     }
 
-    .card__content :global(ol li::before) {
+    .tg-bubble__text :global(ol li::before) {
         content: counter(list-counter) ".";
         position: absolute;
         left: 0;
@@ -232,33 +551,33 @@ const cardType: CardType = variant ?? detectCardType(post);
         font-weight: 500;
     }
 
-    .card__content :global(ul li::before) {
+    .tg-bubble__text :global(ul li::before) {
         content: "\2022";
         position: absolute;
         left: var(--space-2);
         color: var(--color-text-muted);
     }
 
-    /* Code block — v4 gives code cards a slightly tighter, monospaced look */
-    .card__content :global(pre) {
-        background: color-mix(in srgb, var(--color-bg-muted) 60%, var(--color-bg-surface));
-        padding: var(--space-3);
-        border-radius: var(--radius-sm);
+    .tg-bubble__text :global(pre) {
+        background: var(--color-bg-muted);
+        padding: 0.55rem 0.7rem;
+        margin: 0.35rem 0;
+        border-radius: 6px;
         overflow-x: auto;
         border: 1px solid var(--color-border-soft);
         white-space: pre-wrap;
         word-break: break-word;
         font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
         font-size: 0.82rem;
-        line-height: 1.55;
+        line-height: 1.5;
     }
 
-    .card__content :global(code) {
+    .tg-bubble__text :global(code) {
         font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
         font-size: 0.88em;
     }
 
-    .card__content :global(:not(pre) > code) {
+    .tg-bubble__text :global(:not(pre) > code) {
         background: var(--color-bg-muted);
         padding: 0.04em 0.4em;
         border-radius: var(--radius-xs);
@@ -266,40 +585,33 @@ const cardType: CardType = variant ?? detectCardType(post);
         border: 1px solid var(--color-border-soft);
     }
 
-    .card__content :global(blockquote) {
-        border-left: 3px solid var(--color-accent);
-        padding: var(--space-2) var(--space-3);
-        margin: var(--space-3) 0;
-        color: var(--color-text-secondary);
-        background: var(--color-bg-muted);
-        border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
-        font-style: italic;
-    }
-
-    .card__content :global(.table-scroll-wrapper) {
+    .tg-bubble__text :global(.table-scroll-wrapper) {
         overflow-x: auto;
-        margin: var(--space-3) 0;
+        margin: 0.35rem 0;
+        background: var(--color-bg-surface);
+        border: 1px solid var(--color-border-soft);
+        border-radius: var(--radius-sm);
         -webkit-overflow-scrolling: touch;
     }
 
-    .card__content :global(.table-scroll-wrapper) :global(table) {
+    .tg-bubble__text :global(.table-scroll-wrapper) :global(table) {
         margin: 0;
     }
 
-    .card__content :global(table) {
+    .tg-bubble__text :global(table) {
         width: 100%;
         border-collapse: collapse;
-        margin: var(--space-3) 0;
-        font-size: 0.88rem;
+        margin: 0.35rem 0;
+        font-size: 0.85rem;
         white-space: normal;
     }
 
-    .card__content :global(thead) {
+    .tg-bubble__text :global(thead) {
         background: var(--color-bg-muted);
     }
 
-    .card__content :global(th),
-    .card__content :global(td) {
+    .tg-bubble__text :global(th),
+    .tg-bubble__text :global(td) {
         padding: var(--space-2) var(--space-3);
         border: 1px solid var(--color-border-soft);
         text-align: left;
@@ -307,23 +619,19 @@ const cardType: CardType = variant ?? detectCardType(post);
         word-break: break-word;
     }
 
-    .card__content :global(th) {
+    .tg-bubble__text :global(th) {
         font-weight: 600;
         color: var(--color-text-primary);
     }
 
-    .card__content :global(tr:nth-child(even)) {
+    .tg-bubble__text :global(tr:nth-child(even)) {
         background: var(--color-bg-muted);
     }
 
-    .card__content :global(tr:hover) {
-        background: var(--color-accent-soft);
-    }
-
-    .card__content :global(.pipe-table-fallback) {
+    .tg-bubble__text :global(.pipe-table-fallback) {
         background: var(--color-bg-muted);
-        padding: var(--space-3);
-        border-radius: var(--radius-sm);
+        padding: 0.55rem 0.7rem;
+        border-radius: 6px;
         overflow-x: auto;
         border: 1px solid var(--color-border-soft);
         white-space: pre;
@@ -334,107 +642,72 @@ const cardType: CardType = variant ?? detectCardType(post);
     }
 
     /* =================================================================
-     * Content collapse for long posts
+     * Bubble Footer: Reactions capsules (left) + Views & Timestamp (right)
      * ================================================================= */
-    .card__content-wrapper {
-        position: relative;
-    }
-
-    .card__content-wrapper[data-collapsed="true"] .card__content {
-        max-height: 20rem;
-        overflow: hidden;
-        -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-        mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-    }
-
-    .card__expand-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--space-1);
-        margin-top: var(--space-2);
-        padding: var(--space-1) var(--space-3);
-        border: 1px solid var(--color-border-soft);
-        border-radius: var(--radius-sm);
-        background: var(--color-bg-muted);
-        color: var(--color-text-secondary);
-        font-size: 0.76rem;
-        font-weight: 500;
-        font-family: inherit;
-        cursor: pointer;
-        transition:
-            border-color var(--transition-base),
-            color var(--transition-base);
-    }
-
-    .card__expand-btn:hover {
-        border-color: var(--color-accent);
-        color: var(--color-accent);
-    }
-
-    .card__expand-icon {
-        transition: transform var(--transition-base);
-    }
-
-    .card__content-wrapper[data-collapsed="false"] .card__expand-icon {
-        transform: rotate(180deg);
-    }
-
-    /* =================================================================
-     * Meta footer (time + tags)
-     * ================================================================= */
-    .card__meta {
+    .tg-bubble__footer {
         display: flex;
+        align-items: flex-end;
         justify-content: space-between;
-        align-items: center;
-        gap: 0.5rem;
-        font-family: "Fira Code", "SFMono-Regular", Menlo, monospace;
-        font-size: 0.66rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--color-text-muted);
-        margin-top: 0.2rem;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.6rem;
+        margin-top: 0.25rem;
     }
 
-    .card__meta-left {
-        display: flex;
-        align-items: center;
-        gap: var(--space-2);
-    }
-
-    .card__date {
-        color: var(--color-text-secondary);
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .card__tags {
+    .tg-bubble__reactions {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.3rem 0.5rem;
-        font-size: 0.72rem;
-        letter-spacing: 0.02em;
-        text-transform: none;
+        gap: 0.25rem;
     }
 
-    .card__tags a {
+    .tg-reaction {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        height: 25px;
+        padding: 0 0.55rem 0 0.42rem;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--color-accent-soft) 72%, var(--color-bg-muted));
+        border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+        color: var(--color-accent-dark);
+        font-size: 0.76rem;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .tg-reaction__emoji {
+        font-size: 0.85rem;
+        line-height: 1;
+    }
+
+    .tg-bubble__info {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.38rem;
+        font-size: 0.72rem;
+        line-height: 1.2;
+        color: var(--color-text-muted);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .tg-bubble__views {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.18rem;
+    }
+
+    .tg-bubble__edited {
+        font-style: italic;
+    }
+
+    .tg-bubble__date {
         color: var(--color-text-muted);
         text-decoration: none;
-        transition: color var(--transition-base);
     }
 
-    .card__tags a:hover {
+    .tg-bubble__date:hover {
         color: var(--color-accent-dark);
-    }
-
-    @media (max-width: 640px) {
-        .card__content-wrapper[data-collapsed="true"] .card__content {
-            max-height: 14rem;
-        }
-
-        .card__meta {
-            flex-direction: column;
-            align-items: flex-start;
-        }
+        text-decoration: underline;
     }
 </style>
