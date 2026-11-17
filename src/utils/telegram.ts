@@ -8,12 +8,14 @@ const TELEGRAM_CONTENT_SANITIZE_OPTIONS = {
     allowedTags: [...sanitizeHtml.defaults.allowedTags, "img"],
     allowedAttributes: {
         ...sanitizeHtml.defaults.allowedAttributes,
-        a: ["href", "target", "rel"],
+        a: ["href", "target", "rel", "class"],
+        blockquote: ["expandable"],
         div: ["class"],
         img: ["src", "alt", "loading", "class"],
         span: ["class"],
     },
     allowedClasses: {
+        a: ["hashtag-link"],
         div: ["telegram-images"],
         img: ["telegram-post-image"],
         span: ["emoji"],
@@ -75,6 +77,33 @@ export interface ReplyInfo {
     replyToText?: string;
     replyToAuthor?: string;
     replyToLink?: string;
+    replyToThumb?: string;
+}
+
+export interface TelegramPhotoItem {
+    url: string;
+    link?: string;
+    /** Single-photo height/width percentage from Telegram's padding-top */
+    paddingTopPct?: number;
+    /** Percentage coordinates inside a grouped album mosaic */
+    leftPct?: number;
+    topPct?: number;
+    widthPct?: number;
+    heightPct?: number;
+}
+
+export interface TelegramVideoInfo {
+    postUrl: string;
+    thumbUrl?: string;
+    videoUrl?: string;
+    duration?: string;
+    paddingTopPct?: number;
+    notSupported?: boolean;
+}
+
+export interface TelegramReaction {
+    emoji: string;
+    count: string;
 }
 
 export interface TelegramPost {
@@ -82,12 +111,20 @@ export interface TelegramPost {
     datetime: string;
     title: string;
     content: string;
+    /** Sanitized HTML of the message text body without prepended .telegram-images */
+    textHtml?: string;
     text: string;
     forwardedFrom?: string;
     forwardedFromLink?: string;
     linkPreview?: LinkPreview;
     replyInfo?: ReplyInfo;
     hashtags?: string[];
+    photos?: TelegramPhotoItem[];
+    albumAspectRatio?: number;
+    video?: TelegramVideoInfo;
+    views?: string;
+    edited?: boolean;
+    reactions?: TelegramReaction[];
 }
 
 export interface TelegramChannel {
@@ -115,6 +152,15 @@ export interface FetchOptions {
 function getProxiedImageUrl(imageUrl: string): string {
     if (!imageUrl) return "";
     return `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
+}
+
+/**
+ * Proxy playable Telegram videos by channel + post ID so expired CDN tokens
+ * can be refreshed on demand even when /channel HTML is edge-cached.
+ */
+function getProxiedVideoUrl(channelUsername: string, postId: string): string {
+    if (!channelUsername || !postId) return "";
+    return `/api/video-proxy?channel=${encodeURIComponent(channelUsername)}&post=${encodeURIComponent(postId)}`;
 }
 
 /**
@@ -265,6 +311,10 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
     const posts: TelegramPost[] = [];
     $(".tgme_widget_message_wrap").each((_index, element) => {
         const $message = $(element).find(".tgme_widget_message");
+
+        // Skip service messages (e.g. "Channel pinned «...»")
+        if ($message.hasClass("service_message")) return;
+
         const id = $message.attr("data-post")?.replace(`${channelUsername}/`, "") || "";
 
         // Skip if no valid ID
@@ -281,42 +331,187 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
         const forwardedFrom = $forwardedFromElem.text().trim();
         const forwardedFromLink = $forwardedFromElem.attr("href") || undefined;
 
-        // Get text content
-        const $text = $message.find(".tgme_widget_message_text");
-        const text = $text.text().trim();
-
-        // Generate title from first sentence or first line
-        const title = text.match(/^.*?(?=[。\n]|$)/)?.[0] || text.substring(0, 100);
+        // Get message body text: exclude reply quote text (.js-message_reply_text)
+        // and unwrap grouped-album double-nested .js-message_text containers.
+        const $text = $message
+            .find(".tgme_widget_message_text")
+            .filter((_, el) => {
+                const $el = $(el);
+                if ($el.closest(".tgme_widget_message_reply").length > 0) return false;
+                if ($el.hasClass("js-message_reply_text")) return false;
+                if ($el.find(".tgme_widget_message_text").length > 0) return false;
+                return true;
+            })
+            .first();
 
         // Process content HTML
         const $content = $text.clone();
 
-        // Convert <br> to newlines for better text formatting
+        // Unwrap <i class="emoji" style="..."><b>🌟</b></i> into upright <span class="emoji">🌟</span>
+        $content.find(".emoji").each((_, el) => {
+            const $el = $(el);
+            $el.replaceWith(`<span class="emoji">${$el.text()}</span>`);
+        });
+
+        // Extract hashtags and normalize links (including relative ?q=%23hashtag links)
+        const hashtags: string[] = [];
+        $content.find("a").each((_, link) => {
+            const $link = $(link);
+            const href = $link.attr("href") || "";
+            let linkText = $link.text().trim();
+
+            // Merge truncated CJK/word hashtag suffixes (e.g. `<a ...>#1</a>月新番` -> `#1月新番`)
+            if (linkText.startsWith("#") && link.nextSibling?.type === "text") {
+                const nextTextNode = link.nextSibling as unknown as { data?: string };
+                const rawAfter = nextTextNode.data || "";
+                const suffixMatch = rawAfter.match(/^([\p{L}\p{N}_]+)/u);
+                if (suffixMatch?.[1]) {
+                    linkText = `${linkText}${suffixMatch[1]}`;
+                    $link.text(linkText);
+                    nextTextNode.data = rawAfter.slice(suffixMatch[1].length);
+                }
+            }
+
+            if (
+                linkText.startsWith("#") &&
+                (href.includes("?q=") || href.includes("/s/") || href.includes("/hashtag/"))
+            ) {
+                hashtags.push(linkText.slice(1));
+            }
+            if (
+                linkText.startsWith("#") &&
+                (href.startsWith("?q=") || href.includes("/hashtag/"))
+            ) {
+                $link.attr(
+                    "href",
+                    `https://t.me/s/${channelUsername}?q=%23${encodeURIComponent(linkText.slice(1))}`,
+                );
+            }
+            if (linkText.startsWith("#")) {
+                $link.addClass("hashtag-link");
+            }
+            $link.attr("target", "_blank").attr("rel", "noopener noreferrer");
+            $link.removeAttr("onclick");
+        });
+
+        // Convert <br> to newlines for line-based list/table converters
         $content.find("br").replaceWith("\n");
 
-        // Remove inline styles from emojis
-        $content.find(".emoji").removeAttr("style");
+        const text = $content.text().trim();
 
-        // Add target and rel to links
-        $content.find("a").each((_, link) => {
-            $(link).attr("target", "_blank").attr("rel", "noopener noreferrer");
-        });
+        // Generate title from first sentence or first line
+        const title = text.match(/^.*?(?=[。\n]|$)/)?.[0] || text.substring(0, 100);
 
-        // Get images
+        // Extract photos (supporting both single photo and grouped album mosaic coordinates)
         const images: string[] = [];
-        $message.find(".tgme_widget_message_photo_wrap").each((_, photo) => {
-            const style = $(photo).attr("style") || "";
-            const match = style.match(/url\(['"](.+?)['"]\)/);
-            if (match?.[1]) {
-                images.push(getProxiedImageUrl(match[1]));
+        const photos: TelegramPhotoItem[] = [];
+        let albumAspectRatio: number | undefined;
+
+        const $groupedLayer = $message.find(".tgme_widget_message_grouped_layer").first();
+        if ($groupedLayer.length) {
+            const layerStyle = $groupedLayer.attr("style") || "";
+            const layerW = Number(layerStyle.match(/width:\s*([\d.]+)px/i)?.[1] || 0);
+            const layerH = Number(layerStyle.match(/height:\s*([\d.]+)px/i)?.[1] || 0);
+            if (layerW > 0 && layerH > 0) {
+                albumAspectRatio = Number((layerW / layerH).toFixed(4));
             }
-        });
+            $groupedLayer.find(".tgme_widget_message_photo_wrap").each((_, photo) => {
+                const $photo = $(photo);
+                const style = $photo.attr("style") || "";
+                const match = style.match(/url\(['"]?([^'")]+)['"]?\)/i);
+                if (!match?.[1]) return;
+                const proxiedUrl = getProxiedImageUrl(match[1]);
+                images.push(proxiedUrl);
+
+                const left = Number(style.match(/left:\s*([\d.]+)px/i)?.[1] ?? Number.NaN);
+                const top = Number(style.match(/top:\s*([\d.]+)px/i)?.[1] ?? Number.NaN);
+                const width = Number(style.match(/width:\s*([\d.]+)px/i)?.[1] ?? Number.NaN);
+                const height = Number(style.match(/height:\s*([\d.]+)px/i)?.[1] ?? Number.NaN);
+                const hasCoords =
+                    layerW > 0 &&
+                    layerH > 0 &&
+                    !Number.isNaN(left) &&
+                    !Number.isNaN(top) &&
+                    !Number.isNaN(width) &&
+                    !Number.isNaN(height);
+
+                photos.push({
+                    url: proxiedUrl,
+                    link: $photo.attr("href") || undefined,
+                    ...(hasCoords && {
+                        leftPct: Number(((left / layerW) * 100).toFixed(3)),
+                        topPct: Number(((top / layerH) * 100).toFixed(3)),
+                        widthPct: Number(((width / layerW) * 100).toFixed(3)),
+                        heightPct: Number(((height / layerH) * 100).toFixed(3)),
+                    }),
+                });
+            });
+        } else {
+            $message.find(".tgme_widget_message_photo_wrap").each((_, photo) => {
+                const $photo = $(photo);
+                const style = $photo.attr("style") || "";
+                const match = style.match(/url\(['"]?([^'")]+)['"]?\)/i);
+                if (!match?.[1]) return;
+                const proxiedUrl = getProxiedImageUrl(match[1]);
+                images.push(proxiedUrl);
+
+                const innerStyle = $photo.find(".tgme_widget_message_photo").attr("style") || "";
+                const paddingTop = Number(
+                    innerStyle.match(/padding-top:\s*([\d.]+)%/i)?.[1] ?? Number.NaN,
+                );
+                photos.push({
+                    url: proxiedUrl,
+                    link: $photo.attr("href") || undefined,
+                    ...(!Number.isNaN(paddingTop) && { paddingTopPct: paddingTop }),
+                });
+            });
+        }
+
+        // Extract video player (cover thumb, playable <video> if small, duration badge)
+        let video: TelegramVideoInfo | undefined;
+        const $videoPlayer = $message.find(".tgme_widget_message_video_player").first();
+        if ($videoPlayer.length) {
+            const postUrl = $videoPlayer.attr("href") || `https://t.me/${channelUsername}/${id}`;
+            const thumbStyle =
+                $videoPlayer.find(".tgme_widget_message_video_thumb").attr("style") || "";
+            const thumbMatch = thumbStyle.match(/url\(['"]?([^'")]+)['"]?\)/i);
+            const thumbUrl = thumbMatch?.[1] ? getProxiedImageUrl(thumbMatch[1]) : undefined;
+            const rawVideoUrl =
+                $videoPlayer.find("video.tgme_widget_message_video, video").attr("src") ||
+                undefined;
+            const duration =
+                $videoPlayer.find(".message_video_duration").text().trim() || undefined;
+            const wrapStyle =
+                $videoPlayer.find(".tgme_widget_message_video_wrap").attr("style") || "";
+            const paddingTop = Number(
+                wrapStyle.match(/padding-top:\s*([\d.]+)%/i)?.[1] ?? Number.NaN,
+            );
+            const notSupported = $videoPlayer.hasClass("not_supported") || !rawVideoUrl;
+            const videoUrl = !notSupported ? getProxiedVideoUrl(channelUsername, id) : undefined;
+
+            video = {
+                postUrl,
+                ...(thumbUrl && { thumbUrl }),
+                ...(videoUrl && { videoUrl }),
+                ...(duration && { duration }),
+                ...(!Number.isNaN(paddingTop) && { paddingTopPct: paddingTop }),
+                notSupported,
+            };
+        }
 
         // Build content HTML and convert numbered lists
-        let contentHtml = convertNumberedLists($content.html() || "");
+        let rawTextHtml = convertNumberedLists($content.html() || "");
 
         // Convert pipe-delimited tables to HTML tables
-        contentHtml = convertPipeTables(contentHtml);
+        rawTextHtml = convertPipeTables(rawTextHtml);
+
+        // Clean up stray newlines around blockquotes so pre-line doesn't double-space them
+        rawTextHtml = rawTextHtml
+            .replace(/\n*(<blockquote\b[^>]*>)\n*/gi, "$1")
+            .replace(/\n*(<\/blockquote>)\n*/gi, "$1");
+
+        const textHtml = sanitizeHtml(rawTextHtml, TELEGRAM_CONTENT_SANITIZE_OPTIONS);
+        let contentHtml = rawTextHtml;
 
         // Add images if any
         if (images.length > 0) {
@@ -381,24 +576,42 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
                 .find(".tgme_widget_message_metatext, .tgme_widget_message_text")
                 .text()
                 .trim();
-            const replyToLink = $reply.attr("href") || undefined;
+            const rawReplyHref = $reply.attr("href") || "";
+            const replyToLink =
+                rawReplyHref && !rawReplyHref.startsWith("https://t.me//")
+                    ? rawReplyHref
+                    : undefined;
+            const replyThumbStyle =
+                $reply.find(".tgme_widget_message_reply_thumb").attr("style") || "";
+            const replyThumbMatch = replyThumbStyle.match(/url\(['"]?([^'")]+)['"]?\)/i);
+            const replyToThumb = replyThumbMatch?.[1]
+                ? getProxiedImageUrl(replyThumbMatch[1])
+                : undefined;
 
-            if (replyToAuthor || replyToText) {
+            if (replyToAuthor || replyToText || replyToThumb) {
                 replyInfo = {
                     ...(replyToAuthor && { replyToAuthor }),
                     ...(replyToText && { replyToText }),
                     ...(replyToLink && { replyToLink }),
+                    ...(replyToThumb && { replyToThumb }),
                 };
             }
         }
 
-        // Extract hashtags
-        const hashtags: string[] = [];
-        $content.find("a").each((_, link) => {
-            const href = $(link).attr("href") || "";
-            const linkText = $(link).text().trim();
-            if (linkText.startsWith("#") && (href.includes("?q=") || href.includes("/s/"))) {
-                hashtags.push(linkText.slice(1));
+        // Extract views, edited flag, and reactions
+        const views =
+            $message.find(".tgme_widget_message_views").first().text().trim() || undefined;
+        const metaText = $message.find(".tgme_widget_message_meta").first().text() || "";
+        const edited = /\bedited\b/i.test(metaText);
+        const reactions: TelegramReaction[] = [];
+        $message.find(".tgme_widget_message_reactions .tgme_reaction").each((_, el) => {
+            const $r = $(el).clone();
+            const emojiText =
+                $r.find(".emoji").text().trim() || ($r.find("tg-emoji").length ? "✨" : "");
+            $r.find(".emoji, tg-emoji").remove();
+            const count = $r.text().trim();
+            if (emojiText && count) {
+                reactions.push({ emoji: emojiText, count });
             }
         });
 
@@ -407,12 +620,19 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
             datetime,
             title,
             content: contentHtml,
+            textHtml,
             text,
             ...(forwardedFrom && { forwardedFrom }),
             ...(forwardedFromLink && { forwardedFromLink }),
             ...(linkPreview && { linkPreview }),
             ...(replyInfo && { replyInfo }),
             ...(hashtags.length > 0 && { hashtags }),
+            ...(photos.length > 0 && { photos }),
+            ...(albumAspectRatio && { albumAspectRatio }),
+            ...(video && { video }),
+            ...(views && { views }),
+            ...(edited && { edited }),
+            ...(reactions.length > 0 && { reactions }),
         });
     });
 
@@ -508,7 +728,9 @@ export function detectCardType(post: TelegramPost): CardType {
     // TODO: Customize the priority order or add new signals
     if (post.forwardedFrom) return "fwd";
     if (/<pre[\s>]/i.test(post.content)) return "code";
-    if (/<img[\s>]/i.test(post.content)) return "photo";
+    if ((post.photos && post.photos.length > 0) || post.video || /<img[\s>]/i.test(post.content)) {
+        return "photo";
+    }
     if (post.linkPreview) return "link";
     return "text";
 }

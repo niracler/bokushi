@@ -65,7 +65,7 @@ const distRows = totalTyped
         </span>
 
         <div class="rail__avatar">
-            <img src={channelAvatar} alt={channelTitle} class="rail__av" />
+            <img src={channelAvatar} alt={channelTitle} class="rail__av" referrerpolicy="no-referrer" />
             <div class="rail__info">
                 <b>{channelTitle}</b>
                 {sinceLabel && <small>{sinceLabel}</small>}
@@ -141,12 +141,19 @@ const distRows = totalTyped
 
     .rail__card {
         padding: var(--space-4);
-        border-radius: var(--radius-md);
+        border-radius: 14px;
         background: var(--color-bg-surface);
-        border: 1px solid var(--color-border-soft);
+        border: 1px solid var(--color-border);
+        box-shadow: 0 3px 12px rgba(42, 28, 23, 0.08), 0 1px 2px rgba(42, 28, 23, 0.04);
         display: flex;
         flex-direction: column;
         gap: var(--space-3);
+    }
+
+    :global(:root[data-theme="dark"]) .rail__card {
+        background: color-mix(in srgb, var(--color-bg-muted) 88%, var(--color-text-primary) 4%);
+        border-color: color-mix(in srgb, var(--color-border) 82%, var(--color-text-primary) 14%);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.42);
     }
 
     .rail__h4 {
