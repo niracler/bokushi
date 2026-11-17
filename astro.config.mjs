@@ -15,6 +15,7 @@ import { remarkAlert } from "remark-github-blockquote-alert";
 import Icons from "unplugin-icons/vite";
 import { rehypeFigure } from "./rehype-figure.mjs";
 import { remarkModifiedTime } from "./remark-modified-time.mjs";
+import { siteStatsPlugin } from "./scripts/site-stats-plugin.mjs";
 
 const localChromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
@@ -92,6 +93,7 @@ export default defineConfig({
 
     vite: {
         plugins: [
+            siteStatsPlugin(),
             tailwindcss(),
             Icons({
                 compiler: "astro",
