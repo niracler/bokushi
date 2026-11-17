@@ -4,7 +4,9 @@ import Footer from "../../components/Footer.astro";
 import Header from "../../components/Header.astro";
 import Lightbox from "../../components/Lightbox.astro";
 
-export const prerender = false;
+// The gallery loads live data through client-side API requests. Generate its
+// shell (including footer statistics) at build time, not on every Worker visit.
+export const prerender = true;
 ---
 
 <!doctype html>
