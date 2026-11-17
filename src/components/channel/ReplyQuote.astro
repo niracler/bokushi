@@ -12,67 +12,94 @@ const wrapperProps = reply.replyToLink
     : {};
 ---
 
-<WrapperTag class:list={["reply-quote", { "reply-quote--clickable": reply.replyToLink }]} {...wrapperProps}>
-    <div class="reply-quote__bar"></div>
-    <div class="reply-quote__content">
+<WrapperTag
+    class:list={["tg-reply", { "tg-reply--clickable": !!reply.replyToLink }]}
+    {...wrapperProps}
+>
+    {reply.replyToThumb && (
+        <span class="tg-reply__thumb">
+            <img src={reply.replyToThumb} alt="" loading="lazy" data-lightbox-skip />
+        </span>
+    )}
+    <div class="tg-reply__body">
         {reply.replyToAuthor && (
-            <span class="reply-quote__author">{reply.replyToAuthor}</span>
+            <div class="tg-reply__author">{reply.replyToAuthor}</div>
         )}
         {reply.replyToText && (
-            <p class="reply-quote__text">{reply.replyToText}</p>
+            <div class="tg-reply__text">{reply.replyToText}</div>
         )}
     </div>
 </WrapperTag>
 
 <style>
-.reply-quote {
-    display: flex;
-    gap: var(--space-2);
-    margin-bottom: var(--space-3);
-    padding: var(--space-2) var(--space-3);
-    background: var(--color-bg-muted);
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    color: inherit;
-    overflow: hidden;
-}
+    /* Official Telegram .tgme_widget_message_reply structure + bokushi warm palette */
+    .tg-reply {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.38rem 0.6rem 0.38rem 0.7rem;
+        margin: 0.15rem 0 0.45rem;
+        border-radius: 6px;
+        border: 1px solid var(--color-border);
+        border-left: 3px solid var(--color-accent);
+        background: var(--color-bg-muted);
+        text-decoration: none;
+        color: inherit;
+        min-width: 0;
+        overflow: hidden;
+    }
 
-.reply-quote--clickable {
-    cursor: pointer;
-    transition: all var(--transition-base);
-}
+    .tg-reply--clickable {
+        cursor: pointer;
+        transition: background-color var(--transition-fast), border-color var(--transition-fast);
+    }
 
-.reply-quote--clickable:hover {
-    background: var(--color-bg-surface);
-    box-shadow: var(--shadow-soft);
-}
+    .tg-reply--clickable:hover {
+        background: color-mix(in srgb, var(--color-accent-soft) 50%, var(--color-bg-muted));
+        border-color: var(--color-accent);
+    }
 
-.reply-quote__bar {
-    width: 3px;
-    flex-shrink: 0;
-    background: var(--color-accent);
-    border-radius: 2px;
-}
+    .tg-reply__thumb {
+        flex: 0 0 35px;
+        width: 35px;
+        height: 35px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: var(--color-bg-muted);
+    }
 
-.reply-quote__content {
-    min-width: 0;
-}
+    .tg-reply__thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
 
-.reply-quote__author {
-    display: block;
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    color: var(--color-accent);
-    margin-bottom: var(--space-1);
-}
+    .tg-reply__body {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 
-.reply-quote__text {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+    .tg-reply__author {
+        font-size: 0.8rem;
+        line-height: 1.25;
+        font-weight: 600;
+        color: var(--color-accent-dark);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tg-reply__text {
+        font-size: 0.82rem;
+        line-height: 1.35;
+        color: var(--color-text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 </style>

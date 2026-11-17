@@ -101,7 +101,7 @@ const currentMonthLabel =
       image={channelData?.avatar}
     />
   </head>
-  <body>
+  <body class="channel-page">
     <Header />
     <main id="main-content" class="page-shell max-w-5xl section-stack">
       {error ? (
@@ -118,21 +118,23 @@ const currentMonthLabel =
         <>
           <div class="channel-layout">
             <section class="channel-main">
-              {dayGroupsWithAnchor.map((group) => (
-                <>
-                  <ChannelDayDivider
-                    dayLabel={group.dayLabel}
-                    weekday={group.weekday}
-                    postCount={group.posts.length}
-                    monthAnchor={group.anchorId}
-                  />
-                  <div class="feed">
-                    {group.posts.map((post) => (
-                      <PostCard post={post} channelUsername={CHANNEL_USERNAME} />
-                    ))}
-                  </div>
-                </>
-              ))}
+              <div class="day-list">
+                {dayGroupsWithAnchor.map((group) => (
+                  <section class="day-group">
+                    <ChannelDayDivider
+                      dayLabel={group.dayLabel}
+                      weekday={group.weekday}
+                      postCount={group.posts.length}
+                      monthAnchor={group.anchorId}
+                    />
+                    <div class="feed">
+                      {group.posts.map((post) => (
+                        <PostCard post={post} channelUsername={CHANNEL_USERNAME} />
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
 
               <nav class="pager">
                 {hasNewerPosts && firstPostId && (
@@ -184,6 +186,22 @@ const currentMonthLabel =
       const img = element as HTMLImageElement;
       img.classList.add('telegram-post-image');
       img.loading = img.loading || 'lazy';
+    });
+
+    // Toggle official Telegram expandable blockquotes on click
+    document.querySelectorAll<HTMLElement>('.card__content blockquote[expandable]').forEach((bq) => {
+      if (bq.scrollHeight <= bq.clientHeight + 4) {
+        bq.removeAttribute('expandable');
+        return;
+      }
+      bq.addEventListener('click', (event) => {
+        if ((event.target as HTMLElement).closest('a')) return;
+        if (bq.hasAttribute('open')) {
+          bq.removeAttribute('open');
+        } else {
+          bq.setAttribute('open', '');
+        }
+      });
     });
 
     document.querySelectorAll<HTMLElement>('.card__content table').forEach((table) => {
@@ -253,48 +271,36 @@ const currentMonthLabel =
         textNode.parentNode?.replaceChild(frag, textNode);
       }
     });
-
-    // Collapse long posts based on rendered height
-    const HEIGHT_THRESHOLD = 320; // 20rem, matches card CSS
-
-    document.querySelectorAll<HTMLElement>('[data-post-content-wrapper]').forEach((wrapper) => {
-      const content = wrapper.querySelector<HTMLElement>('.card__content');
-      const btn = wrapper.querySelector<HTMLButtonElement>('[data-expand-btn]');
-      const label = btn?.querySelector<HTMLElement>('[data-expand-label]');
-      if (!content || !btn || !label) return;
-
-      if (content.scrollHeight > HEIGHT_THRESHOLD) {
-        wrapper.dataset.collapsed = 'true';
-        btn.hidden = false;
-        btn.setAttribute('aria-expanded', 'false');
-
-        btn.addEventListener('click', () => {
-          const isCollapsed = wrapper.dataset.collapsed === 'true';
-          wrapper.dataset.collapsed = isCollapsed ? 'false' : 'true';
-          label.textContent = isCollapsed ? '收起' : '展开全文';
-          btn.setAttribute('aria-label', isCollapsed ? '收起' : '展开全文');
-          btn.setAttribute('aria-expanded', isCollapsed ? 'true' : 'false');
-        });
-      }
-    });
   });
 </script>
 
 <style>
+  :global(body.channel-page) {
+    background-color: color-mix(in srgb, var(--color-bg-muted) 68%, var(--color-border) 32%);
+  }
+
+  :global(:root[data-theme="dark"] body.channel-page) {
+    background-color: color-mix(in srgb, var(--color-bg-page) 82%, #000 18%);
+  }
+
   /* =================================================================
-   * Layout: feed (main) + channel rail
+   * Layout: Telegram bubble stream (main) + channel rail (right)
    * Below 900px the rail drops to avoid squeezing the feed.
    * ================================================================= */
   .channel-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 14rem;
-    gap: var(--space-6);
+    grid-template-columns: minmax(0, 1fr) 17rem;
+    gap: var(--space-8);
     align-items: start;
+    max-width: 55rem;
+    margin-inline: auto;
   }
 
   .channel-main {
     min-width: 0;
-    overflow: hidden;
+    width: 100%;
+    max-width: 34rem;
+    margin-inline: auto;
   }
 
   @media (max-width: 900px) {
@@ -306,31 +312,32 @@ const currentMonthLabel =
       position: static;
       max-height: none;
       order: -1;
+      max-width: 34rem;
+      width: 100%;
+      margin-inline: auto;
     }
   }
 
   /* =================================================================
-   * Per-day masonry feed — 2-col CSS columns
-   * Packs variable-height cards tightly (the 错落有致 look).
-   * Reading order: fill left col top-to-bottom, then right col.
+   * Telegram Bubble Stream (Option A: centered date pills + bubbles)
    * ================================================================= */
+  .day-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .day-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
   .feed {
-    column-count: 2;
-    column-gap: var(--space-4);
-  }
-
-  .feed > :global(*) {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    margin-bottom: var(--space-4);
-    display: block;
-  }
-
-  @media (max-width: 760px) {
-    .feed {
-      column-count: 1;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 0;
   }
 
   /* =================================================================
