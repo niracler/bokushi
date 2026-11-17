@@ -5,7 +5,39 @@ import {
     buildCheckCommands,
     getStagedFiles,
     isDependencyControlFile,
+    runPnpm,
 } from "../scripts/check-dependencies.mjs";
+
+test("launches native pnpm directly and JavaScript pnpm through Node", () => {
+    for (const path of ["/tools/pnpm", "/tools/pnpm.exe", "/tools/pnpm.cjs", "/tools/pnpm.js"]) {
+        let invocation;
+        runPnpm(
+            ["exec", "knip"],
+            (...args) => {
+                invocation = args;
+            },
+            path,
+        );
+        const javascript = path.endsWith(".js") || path.endsWith(".cjs");
+        assert.deepEqual(invocation, [
+            javascript ? process.execPath : path,
+            javascript ? [path, "exec", "knip"] : ["exec", "knip"],
+            { stdio: "inherit" },
+        ]);
+    }
+});
+
+test("falls back to pnpm on PATH without npm_execpath", () => {
+    let invocation;
+    runPnpm(
+        ["exec", "knip"],
+        (...args) => {
+            invocation = args;
+        },
+        "",
+    );
+    assert.deepEqual(invocation, ["pnpm", ["exec", "knip"], { stdio: "inherit" }]);
+});
 
 test("recognizes dependency control files", () => {
     for (const file of ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", ".npmrc"]) {

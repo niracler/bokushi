@@ -38,15 +38,18 @@ export function getStagedFiles(exec = execFileSync) {
         .filter(Boolean);
 }
 
-function runPnpm(args) {
-    const npmExecPath = process.env.npm_execpath;
-
+export function runPnpm(args, exec = execFileSync, npmExecPath = process.env.npm_execpath) {
     if (npmExecPath) {
-        execFileSync(process.execPath, [npmExecPath, ...args], { stdio: "inherit" });
+        // pnpm may expose either its JavaScript CLI or a native executable.
+        if (/\.[cm]?js$/i.test(npmExecPath)) {
+            exec(process.execPath, [npmExecPath, ...args], { stdio: "inherit" });
+        } else {
+            exec(npmExecPath, args, { stdio: "inherit" });
+        }
         return;
     }
 
-    execFileSync("pnpm", args, { stdio: "inherit" });
+    exec("pnpm", args, { stdio: "inherit" });
 }
 
 function main() {
