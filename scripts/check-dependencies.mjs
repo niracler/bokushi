@@ -38,18 +38,23 @@ export function getStagedFiles(exec = execFileSync) {
         .filter(Boolean);
 }
 
-export function runPnpm(args, exec = execFileSync, npmExecPath = process.env.npm_execpath) {
-    if (npmExecPath) {
-        // pnpm may expose either its JavaScript CLI or a native executable.
-        if (/\.[cm]?js$/i.test(npmExecPath)) {
-            exec(process.execPath, [npmExecPath, ...args], { stdio: "inherit" });
-        } else {
-            exec(npmExecPath, args, { stdio: "inherit" });
-        }
-        return;
+export function resolvePnpmCommand(npmExecPath) {
+    if (!npmExecPath) {
+        return { command: "pnpm", args: [] };
     }
 
-    exec("pnpm", args, { stdio: "inherit" });
+    // npm_execpath 只有在是 JS 入口时才需要交给 node；standalone 的 pnpm
+    // （如 @pnpm/exe 二进制）本身就是可执行文件，交给 node 会被当成源码解析。
+    if (/\.[cm]?js$/.test(npmExecPath)) {
+        return { command: process.execPath, args: [npmExecPath] };
+    }
+
+    return { command: npmExecPath, args: [] };
+}
+
+function runPnpm(args) {
+    const { command, args: prefix } = resolvePnpmCommand(process.env.npm_execpath);
+    execFileSync(command, [...prefix, ...args], { stdio: "inherit" });
 }
 
 function main() {

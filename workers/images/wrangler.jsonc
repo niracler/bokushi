@@ -1,0 +1,15 @@
+{
+    "$schema": "../../node_modules/wrangler/config-schema.json",
+    "name": "bokushi-images",
+    "account_id": "1e06c741f48712b9be6634001698888d",
+    "main": "index.js",
+    "compatibility_date": "2026-11-10",
+    "workers_dev": false,
+    "preview_urls": false,
+    "routes": [{ "pattern": "image.niracler.com", "custom_domain": true }],
+    "observability": {
+        "enabled": true,
+        "logs": { "enabled": true, "head_sampling_rate": 0.1 },
+        "traces": { "enabled": true, "head_sampling_rate": 0.01 }
+    }
+}

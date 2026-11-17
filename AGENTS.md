@@ -23,6 +23,7 @@
 ## Coding Style & Naming Conventions
 
 - Biome enforces 4-space indentation, line width 100, double quotes, and organized imports; run format before pushing.
+- Keep Biome Markdown and YAML formatting disabled: Markdown uses the existing `markdownlint-cli2` staged-file checks, while workflow YAML and generated pnpm lockfiles retain their existing formatting. Do not mass-reformat content/frontmatter when updating Biome.
 - Naming: PascalCase for components/layouts, kebab-case for content slugs and utilities, clear filenames. Favor semantic Tailwind tokens (`text-secondary`, `bg-surface`) over raw values.
 - Keep Astro/TS lean: derive props from data, prune unused imports/variables.
 
