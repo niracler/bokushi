@@ -29,7 +29,6 @@ export const prerender = false;
 
 const { cursor } = Astro.params;
 const CHANNEL_USERNAME = "tomoko_channel";
-const CACHE_SECONDS = 300;
 
 function parseCursor(cursor: string | undefined): {
     type: "before" | "after" | null;
@@ -66,10 +65,9 @@ const lastPostId = channelData?.posts?.[channelData.posts.length - 1]?.id;
 const hasNewerPosts = cursorType === "before" || cursorType === "after";
 const hasOlderPosts = channelData?.posts && channelData.posts.length > 0;
 
-Astro.response.headers.set(
-    "Cache-Control",
-    `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=30`,
-);
+// Never cache the rendered error fallback as a successful channel page.
+if (error) Astro.response.status = 502;
+Astro.response.headers.set("Cache-Control", error ? "no-store" : "public, max-age=0");
 
 const posts = channelData?.posts ?? [];
 const dayGroups = groupPostsByDay(posts);
