@@ -432,11 +432,16 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
 export async function fetchTelegramChannel(
     channelUsername: string,
     options: FetchOptions = {},
+    transport: { fetch?: typeof fetch; timeoutMs?: number } = {},
 ): Promise<TelegramChannel> {
+    // One deadline covers all batches and response bodies, not 8s per batch.
+    const signal = AbortSignal.timeout(transport.timeoutMs ?? 8_000);
+    const fetcher = transport.fetch ?? fetch;
     const fetchBatch = async (params: URLSearchParams): Promise<ParsedBatch> => {
+        signal.throwIfAborted();
         const queryString = params.toString();
         const url = `https://t.me/s/${channelUsername}${queryString ? `?${queryString}` : ""}`;
-        const response = await fetch(url);
+        const response = await fetcher(url, { signal });
         if (!response.ok) {
             throw new Error(`Failed to fetch channel: ${response.statusText}`);
         }
