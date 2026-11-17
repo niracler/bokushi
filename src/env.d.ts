@@ -1,6 +1,11 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="unplugin-icons/types/astro" />
 
+declare module "virtual:site-stats" {
+    const stats: { totalChars: number; totalMinutes: number; totalArticles: number };
+    export default stats;
+}
+
 // Cloudflare bindings type declarations
 
 interface Env {

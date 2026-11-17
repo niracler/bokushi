@@ -30,11 +30,12 @@ function fixture() {
         renderCount() {
             return renders;
         },
-        run(path = "/channel", init) {
+        run(path = "/channel", init, render = next) {
             return cachedChannelPage(
                 new Request(`https://niracler.com${path}`, init),
-                next,
+                render,
                 async () => cache,
+                () => now * 1000,
             );
         },
     };
@@ -132,4 +133,69 @@ test("cache failures preserve the live page response", async () => {
         assert.equal(await response.text(), "render 1");
         assert.equal(f.renderCount(), 1);
     }
+});
+
+test("failed refresh serves retained HTML without extending its deadline", async () => {
+    for (const failure of [
+        async () =>
+            new Response("upstream failed", {
+                status: 502,
+                headers: { "Cache-Control": "no-store" },
+            }),
+        async () => {
+            throw new Error("timeout");
+        },
+    ]) {
+        const f = fixture();
+        await f.run();
+        f.advance(259_200);
+        const response = await f.run("/channel", undefined, failure);
+        assert.equal(response.headers.get("X-Channel-Cache"), "STALE");
+        assert.equal(response.headers.get("Cache-Control"), "no-store");
+        assert.equal(response.headers.get("X-Channel-Stored-At"), null);
+        assert.equal(await response.text(), "render 1");
+        f.advance(604_800);
+        try {
+            const expired = await f.run("/channel", undefined, failure);
+            assert.equal(expired.status, 502);
+            assert.equal(expired.headers.get("X-Channel-Cache"), null);
+        } catch (error) {
+            assert.equal(error.message, "timeout");
+        }
+    }
+});
+
+test("successful refresh replaces the fallback and starts a fresh TTL", async () => {
+    const f = fixture();
+    await f.run();
+    f.advance(259_200);
+    assert.equal(await (await f.run()).text(), "render 2");
+    const hit = await f.run();
+    assert.equal(hit.headers.get("X-Channel-Cache"), "HIT");
+    assert.equal(await hit.text(), "render 2");
+});
+
+test("stale fallback does not mask redirects, missing pages or personalized failures", async () => {
+    const f = fixture();
+    await f.run();
+    f.advance(259_200);
+    for (const [status, headers] of [
+        [404, {}],
+        [302, { Location: "/login" }],
+        [502, { "Set-Cookie": "session=x" }],
+    ]) {
+        const response = await f.run(
+            "/channel",
+            undefined,
+            async () => new Response("live", { status, headers }),
+        );
+        assert.equal(response.status, status);
+        assert.equal(await response.text(), "live");
+    }
+    const privateResponse = await f.run(
+        "/channel",
+        { headers: { Cookie: "session=x" } },
+        async () => new Response("private", { status: 502 }),
+    );
+    assert.equal(privateResponse.status, 502);
 });
