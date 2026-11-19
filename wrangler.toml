@@ -38,3 +38,8 @@ database_id = "f95ebf0a-500e-4096-86fb-9e7edfde7679"
 # Set these secrets in Cloudflare Workers environment variables:
 #   FASTMAIL_API_TOKEN  - Fastmail app password with mail + submission scope
 #   NOTIFY_FROM_EMAIL   - (optional) sender address, must be a configured Fastmail identity
+
+# Full-resolution display copies for the Japan travel diary.
+[[r2_buckets]]
+binding = "TRIP_PHOTOS"
+bucket_name = "nini-image"

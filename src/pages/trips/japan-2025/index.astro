@@ -1,0 +1,112 @@
+---
+import BaseHead from "../../../components/BaseHead.astro";
+import Lightbox from "../../../components/Lightbox.astro";
+import days from "../../../data/japan-2025.json";
+import "leaflet/dist/leaflet.css";
+
+const preview = (key: string) => `https://image.niracler.com/trips/japan-2025/${key}/preview.jpg`;
+const stops = days.flatMap((day) => day.stops);
+const photoCount = stops.reduce((sum, stop) => sum + stop.photos.length, 0);
+const cover = stops.find((stop) => stop.name === "平等院")!.photos[0];
+---
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <BaseHead title="日本七日记 · 旅程回放" description="从广州出发，经大阪、京都和东京，再回到深圳。按站回看沿途的照片和游记。" />
+    </head>
+    <body>
+        <main>
+            <section id="cover" aria-labelledby="trip-title">
+                <img src={preview(cover.key)} alt="宇治平等院凤凰堂与池中的倒影" fetchpriority="high" />
+                <div class="scrim"></div>
+                <div class="cover-copy">
+                    <p class="date">2025.09.28 — 10.07</p>
+                    <h1 id="trip-title">日本七日记</h1>
+                    <p>大阪 · 京都 · 东京</p>
+                    <button id="start" type="button">▶　回放旅程</button>
+                    <small>{stops.length} 站 · {photoCount} 张照片</small>
+                </div>
+            </section>
+            <section id="player" hidden aria-label="旅程回放">
+                <header>
+                    <select id="day" aria-label="选择行程日期">
+                        {days.map((day, i) => <option value={i}>{day.date}　{day.title}</option>)}
+                    </select>
+                    <button id="overview" type="button">全程地图</button>
+                    <button id="fullscreen" type="button">全屏</button>
+                </header>
+                <div class="map-wrap">
+                    <div id="map" aria-label="旅行地点与连线"></div>
+                    <small class="map-note">虚线表示游览顺序</small>
+                </div>
+                <article id="stop"></article>
+                <footer>
+                    <button id="previous" type="button" aria-label="上一站">←</button>
+                    <button id="play" type="button">播放</button>
+                    <span id="progress" aria-live="off"></span>
+                    <button id="next" type="button" aria-label="下一站">→</button>
+                </footer>
+            </section>
+            {days.map((day, i) => day.stops.map((stop) => (
+                <template data-day={i} data-lat={stop.lat} data-lng={stop.lng} data-name={stop.name}>
+                    <div class="stop-heading">
+                        <h2>{stop.name}</h2>
+                        <a href={`/2510/#${day.anchor}`} target="_top">读当天游记 ↗</a>
+                    </div>
+                    <p>{stop.note}</p>
+                    {stop.photos.length > 0 && <div class="photos" aria-label={`${stop.name}的照片`}>
+                        {stop.photos.map((photo) => (
+                            <a href={`/trips/japan-2025/photo/${photo.key}`} data-photo-url={`/trips/japan-2025/photo/${photo.key}`} data-caption={photo.caption}>
+                                <img src={preview(photo.key)} alt={photo.caption} loading="lazy" />
+                            </a>
+                        ))}
+                    </div>}
+                </template>
+            )))}
+            <Lightbox id="trip-lightbox" selector="#stop [data-photo-url]" showFullSizeLink />
+        </main>
+        <script src="../../../scripts/japan-trip.ts"></script>
+    </body>
+</html>
+<style>
+    :global(*) { box-sizing: border-box; }
+    :global([hidden]) { display: none !important; }
+    :global(body) { margin: 0; background: var(--color-bg-page); color: var(--color-text-primary); font: 16px/1.5 system-ui, sans-serif; }
+    main { width: 100%; margin: 0 auto; padding: 0; max-width: 1200px; }
+    button, select { font: inherit; cursor: pointer; color: inherit; }
+    button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid var(--color-focus, #de7445); outline-offset: 2px; }
+    #cover { height: 100svh; min-height: 350px; position: relative; overflow: hidden; background: #243327; color: white; }
+    #cover > img, .scrim { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .scrim { background: linear-gradient(0deg, rgb(16 26 21 / 90%), transparent 84%); }
+    .cover-copy { position: absolute; bottom: clamp(26px, 8%, 80px); left: clamp(22px, 6%, 76px); }
+    .cover-copy p { margin: .5em 0; }
+    .date { font: 500 .8rem/1.5 ui-monospace, monospace; letter-spacing: .12em; }
+    h1 { font: 600 clamp(2.5rem, 10vw, 5rem)/1.15 ui-serif, serif; margin: .25em 0; }
+    #start { margin-top: 1rem; background: var(--color-bg-page); color: var(--color-text-primary); border: 0; border-radius: 2rem; padding: .75rem 1.25rem; font-weight: 650; }
+    .cover-copy small { margin-left: .8rem; white-space: nowrap; }
+    #player { height: 100svh; min-height: 340px; display: grid; grid-template-rows: auto minmax(140px, 1fr) auto auto; }
+    header, footer { display: flex; align-items: center; gap: .45rem; padding: .55rem clamp(.6rem, 3vw, 1.4rem); }
+    header button, header select, footer button { min-height: 40px; border: 1px solid var(--color-border-soft); border-radius: .6rem; background: var(--color-bg-surface); padding: .3rem .65rem; }
+    header select { flex: 1; min-width: 0; }
+    #day { font-weight: 650; }
+    .map-wrap { position: relative; min-height: 0; }
+    #map { height: 100%; background: #e4e8dc; }
+    .map-note { position: absolute; z-index: 450; left: .5rem; bottom: .3rem; padding: 1px 5px; background: #fffc; color: #444; font-size: .65rem; pointer-events: none; }
+    #stop { padding: .8rem clamp(.8rem, 3vw, 1.4rem) .3rem; max-height: 45svh; overflow: auto; }
+    .stop-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; }
+    h2 { margin: 0; font: 650 clamp(1.15rem, 3vw, 1.55rem)/1.4 ui-serif, serif; }
+    .stop-heading a { flex: none; font-size: .78rem; color: var(--color-link, #904326); }
+    #stop p { margin: .3rem 0 .55rem; font-size: .9rem; }
+    .photos { display: flex; gap: .45rem; overflow-x: auto; padding: 3px 2px; }
+    .photos a { flex: none; }
+    .photos img { display: block; width: auto; height: clamp(74px, 16svh, 135px); border-radius: .35rem; }
+    footer { border-top: 1px solid var(--color-border-soft); }
+    footer span { flex: 1; text-align: right; font-variant-numeric: tabular-nums; font-size: .83rem; }
+    button:disabled { opacity: .4; }
+    @media(max-width: 430px) {
+        header, footer { font-size: .85rem; }
+        footer { justify-content: center; }
+        footer span { flex: none; padding-inline: .25rem; }
+        .cover-copy small { display: block; margin: .65rem 0 0; }
+    }
+</style>

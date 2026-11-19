@@ -9,6 +9,7 @@ declare module "virtual:site-stats" {
 // Cloudflare bindings type declarations
 
 interface Env {
+    TRIP_PHOTOS: R2Bucket;
     LIKES: KVNamespace;
     SESSIONS: KVNamespace;
     COMMENTS_DB: D1Database;
