@@ -293,3 +293,11 @@ a:focus-visible {
         }
     }
 }
+
+.trip-map-card__text {
+    white-space: pre-line;
+}
+
+.route-note a {
+    text-decoration: underline;
+}
