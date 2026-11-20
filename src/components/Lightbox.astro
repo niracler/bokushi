@@ -39,6 +39,8 @@ const lightboxLabels = {
     close: locale === "en" ? "Close" : "关闭",
     prev: locale === "en" ? "Previous" : "上一张",
     next: locale === "en" ? "Next" : "下一张",
+    loadError: locale === "en" ? "Couldn’t load photo {number}." : "第 {number} 张照片加载失败",
+    retry: locale === "en" ? "Retry" : "重试",
 };
 ---
 
@@ -48,6 +50,7 @@ const lightboxLabels = {
 	aria-label={lightboxLabels.viewImage}
 	data-lightbox
 	data-selector={selector}
+	data-load-error={lightboxLabels.loadError}
 	data-can-load-more={canLoadMore ? "" : undefined}
 >
 	<div class="lightbox__backdrop" data-lightbox-close></div>
@@ -87,6 +90,10 @@ const lightboxLabels = {
 
 		<div class="lightbox__image-container" data-lightbox-container>
 			<img data-lightbox-img alt="" />
+			<div class="lightbox__error">
+				<p role="status" data-lightbox-error></p>
+				<button type="button" data-lightbox-retry hidden>{lightboxLabels.retry}</button>
+			</div>
 		</div>
 
 		<button
@@ -131,6 +138,9 @@ const lightboxLabels = {
 			const captionEl = dialog.querySelector("[data-lightbox-caption]");
 			const counterEl = dialog.querySelector("[data-lightbox-counter]");
 			const fullSizeLink = dialog.querySelector("[data-lightbox-full-size]");
+			const meta = dialog.querySelector("[data-lightbox-meta]");
+			const errorMessage = dialog.querySelector("[data-lightbox-error]");
+			const retryBtn = dialog.querySelector("[data-lightbox-retry]");
 			const container = dialog.querySelector("[data-lightbox-container]");
 			const closeButtons = dialog.querySelectorAll("[data-lightbox-close]");
 			const prevBtn = dialog.querySelector("[data-lightbox-prev]");
@@ -144,16 +154,9 @@ const lightboxLabels = {
 			const preload = (url) => {
 				if (!url || preloadCache.has(url)) return;
 				const img = new Image();
+				img.fetchPriority = "low";
 				img.src = url;
 				preloadCache.add(url);
-			};
-
-			const preloadNeighbors = (index) => {
-				if (!shots.length) return;
-				const next = shots[(index + 1) % shots.length]?.src;
-				const prev = shots[(index - 1 + shots.length) % shots.length]?.src;
-				preload(next);
-				preload(prev);
 			};
 
 			// Get all matching elements and their data (called on each open for dynamic content)
@@ -200,53 +203,56 @@ const lightboxLabels = {
 				}
 			};
 
-			const showImage = (index) => {
+			const showImage = (index, direction = 0) => {
 				const shot = shots[index];
 				if (!shot) return;
 
-				setLoading(true);
-
 				const sequence = ++loadSequence;
 				current = index;
-				if (fullSizeLink) fullSizeLink.href = shot.src;
+				if (document.activeElement === retryBtn || document.activeElement === fullSizeLink) {
+					nextBtn.focus();
+				}
+				meta.hidden = true;
+				imgEl.hidden = true;
+				retryBtn.hidden = true;
+				errorMessage.textContent = "";
+				setLoading(true);
 				const loader = new Image();
 				loader.onload = () => {
 					if (sequence !== loadSequence) return;
-					if (imgEl) {
-						imgEl.src = shot.src;
-						imgEl.alt = shot.caption;
-					}
+					imgEl.src = shot.src;
+					imgEl.alt = shot.caption;
+					imgEl.hidden = false;
 					if (captionEl) captionEl.textContent = shot.caption || "";
 					if (counterEl) counterEl.textContent = `${index + 1} / ${shots.length}`;
+					if (fullSizeLink) fullSizeLink.href = shot.src;
+					meta.hidden = false;
 					setLoading(false);
-					preloadNeighbors(index);
+					if (direction) preload(shots[index + direction]?.src);
 				};
 				loader.onerror = () => {
-					if (sequence === loadSequence) setLoading(false);
+					if (sequence !== loadSequence) return;
+					setLoading(false);
+					errorMessage.textContent = dialog.dataset.loadError.replace("{number}", index + 1);
+					retryBtn.hidden = false;
 				};
 				loader.src = shot.src;
 			};
 
-			let lastFocusedElement = null;
-
 			const open = (index) => {
 				if (!shots.length) return;
-				lastFocusedElement = document.activeElement;
-				current = ((index % shots.length) + shots.length) % shots.length;
-				showImage(current);
+				showImage(index);
 				dialog.showModal();
 				dialog.classList.add("is-open");
 				document.body.classList.add("scroll-locked");
 			};
 
-			const close = () => {
-				dialog.close();
+			dialog.addEventListener("close", () => {
+				if (dialog.open) return;
+				++loadSequence;
 				dialog.classList.remove("is-open");
 				document.body.classList.remove("scroll-locked");
-				if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
-					lastFocusedElement.focus();
-				}
-			};
+			});
 
 			const step = (delta) => {
 				if (!shots.length) return;
@@ -266,7 +272,7 @@ const lightboxLabels = {
 
 				// Calculate wrapped index for boundary cases
 				const newIndex = atEnd ? 0 : atStart ? shots.length - 1 : current + delta;
-				showImage(newIndex);
+				showImage(newIndex, delta);
 			};
 
 			// Allow external refresh of shots (after new content loads)
@@ -277,7 +283,7 @@ const lightboxLabels = {
 
 				// If we were at the end and new items were added, show the next one
 				if (current === oldLength - 1 && shots.length > oldLength) {
-					showImage(current + 1);
+					showImage(current + 1, 1);
 				} else {
 					// No new content, just hide loading
 					setLoading(false);
@@ -285,20 +291,22 @@ const lightboxLabels = {
 			});
 
 			// Event listeners
-			closeButtons.forEach((btn) => btn.addEventListener("click", close));
+			closeButtons.forEach((btn) => btn.addEventListener("click", () => dialog.close()));
+			retryBtn.addEventListener("click", () => showImage(current));
 			prevBtn?.addEventListener("click", () => step(-1));
 			nextBtn?.addEventListener("click", () => step(1));
 
 			dialog.addEventListener("click", (event) => {
-				if (event.target === dialog) close();
+				if (event.target === dialog) dialog.close();
 			});
 
-			document.addEventListener("keydown", (event) => {
-				if (!dialog.open) return;
-				switch (event.key) {
-					case "Escape": close(); break;
-					case "ArrowLeft": step(-1); break;
-					case "ArrowRight": step(1); break;
+			dialog.addEventListener("keydown", (event) => {
+				// Keep page shortcuts (including the trip player) behind the modal.
+				event.stopPropagation();
+				if (event.altKey || event.ctrlKey || event.metaKey) return;
+				if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+					event.preventDefault();
+					step(event.key === "ArrowLeft" ? -1 : 1);
 				}
 			});
 
@@ -333,6 +341,29 @@ const lightboxLabels = {
 	.lightbox::backdrop {
 		background: var(--color-backdrop);
 		backdrop-filter: blur(6px);
+	}
+
+	.lightbox [hidden] {
+		display: none;
+	}
+
+	.lightbox__error {
+		text-align: center;
+		color: var(--color-overlay-light-90);
+	}
+
+	.lightbox__error p {
+		margin: 0;
+	}
+
+	.lightbox__error button {
+		margin-top: var(--space-2);
+		padding: var(--space-2) var(--space-4);
+		border: 1px solid var(--color-overlay-light-50);
+		border-radius: var(--radius-md);
+		background: var(--color-overlay-dark-40);
+		color: inherit;
+		cursor: pointer;
 	}
 
 	.lightbox__backdrop {
