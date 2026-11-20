@@ -12,6 +12,7 @@ const { entry } = Astro.props;
         <h3>{entry.name}</h3>
         <a class="from-here play-action" href={`${basePath}/play#${entry.anchor}`} data-trip-map-stop-play={tripId} data-trip-map-stop={entry.anchor} aria-label={`从${entry.name}回放`} title="从这里回放"><Fragment set:html={renderIcon("play")} /></a>
     </div>
+    {entry.transit && <p class="transit">{entry.transit}</p>}
     {entry.images.length > 0 && <div class:list={["photo-grid", {single: entry.images.length === 1}]}>
         {entry.images.map((photo, index) => (
             <a href={photo.src} data-photo-url={photo.src} data-caption={photo.alt} aria-label={photo.alt} hidden={index >= 4}>
@@ -27,6 +28,7 @@ const { entry } = Astro.props;
 .entry-header { display:flex;align-items:center;justify-content:space-between; gap:.5rem; margin-bottom:.4rem; }
 .entry h3 { font: 650 1rem/1.4 system-ui,sans-serif; margin:0; }
 .entry p { margin:.5rem 0 0; font-size:.93rem; line-height:1.6; }
+.entry .transit { color:var(--color-tx-2); font-size:.85rem; }
 .from-here { display:grid;place-items:center;color:var(--color-tx-2);width:2rem;height:2rem;border-radius:50%;background:var(--color-inline); }
 .from-here :global(svg) { width:1rem;height:1rem; }
 .photo-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;overflow:hidden;border-radius:.65rem; }

@@ -1,5 +1,12 @@
 ---
 import JourneyEntry from "../../../components/travel/JourneyEntry.astro";
-import { entries, markers } from "../../../data/japan-trip";
+import { basePath, entries, markers } from "../../../data/japan-trip";
 ---
-{markers.map(place => <template data-trip-map-place={place.id}>{entries.filter(entry => entry.locations[0].id === place.id).map(entry => <JourneyEntry entry={entry} />)}</template>)}
+{markers.map(place => (
+    <template data-trip-map-place={place.id}>
+        {entries.filter(entry => entry.locations.some(point => point.id === place.id)).map(entry =>
+            entry.destination.id === place.id ? <JourneyEntry entry={entry} /> :
+                <p>{entry.dateKey} · {entry.transit} <a class="article-link" href={`${basePath}/play#${entry.anchor}`}>回放这段行程</a></p>
+        )}
+    </template>
+))}

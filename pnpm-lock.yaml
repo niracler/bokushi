@@ -41,6 +41,9 @@ overrides:
   ws: '>=8.21.0'
   yaml: '>=2.8.3'
 
+patchedDependencies:
+  '@hyoban/trip-map@0.1.0': 4b1b4be5cf72c5135ba3febb1c2e711112b032799f42643ce9053c496093ee66
+
 importers:
 
   .:
@@ -62,7 +65,7 @@ importers:
         version: 3.7.4
       '@hyoban/trip-map':
         specifier: file:vendor/hyoban/trip-map-257dff2.tgz
-        version: file:vendor/hyoban/trip-map-257dff2.tgz(sharp@0.35.5(@types/node@25.5.2))
+        version: file:vendor/hyoban/trip-map-257dff2.tgz(patch_hash=4b1b4be5cf72c5135ba3febb1c2e711112b032799f42643ce9053c496093ee66)(sharp@0.35.5(@types/node@25.5.2))
       '@iconify-json/ri':
         specifier: ^1.2.10
         version: 1.2.10
@@ -4541,7 +4544,7 @@ snapshots:
 
   '@fortawesome/fontawesome-free@6.7.2': {}
 
-  '@hyoban/trip-map@file:vendor/hyoban/trip-map-257dff2.tgz(sharp@0.35.5(@types/node@25.5.2))':
+  '@hyoban/trip-map@file:vendor/hyoban/trip-map-257dff2.tgz(patch_hash=4b1b4be5cf72c5135ba3febb1c2e711112b032799f42643ce9053c496093ee66)(sharp@0.35.5(@types/node@25.5.2))':
     dependencies:
       '@mapbox/mapbox-gl-language': 1.0.1(mapbox-gl@3.33.0)
       '@types/geojson': 7946.0.16

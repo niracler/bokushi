@@ -32,7 +32,7 @@ const brand = { name: "Niracler" };
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta name="description" content="按天翻阅《日本七日记》的旅行照片，在地图上回放从广州出发、经澳门回深圳的行程。" />
+        <meta name="description" content="按天翻阅《日本七日记》的旅行照片，在地图上回放从深圳出发、经广州前往日本，再经澳门和珠海回深圳的行程。" />
         <link rel="canonical" href={new URL(basePath, Astro.site)} />
         <title>日本七日记 · 旅程回放</title>
     </head>
@@ -51,14 +51,14 @@ const brand = { name: "Niracler" };
             </nav>
             <aside class="side" data-trip-map-trip-details aria-labelledby="diary-title">
                 <header class="side-header">
-                    <div><small data-trip-map-trip-details-eyebrow>2025 年 9 月 28 日 — 10 月 7 日</small><h1 id="diary-title" data-trip-map-trip-details-title>日本七日记</h1></div>
+                    <div><small data-trip-map-trip-details-eyebrow>{new Intl.DateTimeFormat("zh-CN", { dateStyle: "long", timeZone: "UTC" }).formatRange(new Date(trip.start), new Date(trip.end))}</small><h1 id="diary-title" data-trip-map-trip-details-title>日本七日记</h1></div>
                     <button type="button" class="map-only" aria-label="只看地图" title="只看地图" data-trip-map-trip-details-close>×</button>
                 </header>
                 <div class="side-content" data-drawer-content data-trip-map-trip-details-content data-trip-map-trip-details-trip={tripId}>
                     <div class="cover-grid" aria-hidden="true">{covers.map((photo, i) => <img src={photo.thumbnail} alt="" fetchpriority={i===0 ? "high" : undefined} />)}</div>
                     <div class="figures"><span><b>{trip.dayCount}</b> 天</span><span><b>{entries.length}</b> 站</span><span><b>{trip.photoCount}</b> 张照片</span></div>
                     <a href={basePath + "/play"} class="play-trip play-action" data-trip-map-stop-play={tripId}><Fragment set:html={renderIcon("play")} />回放旅程</a>
-                    <p class="route-note">地图按游览顺序连接各站。</p>
+                    <p class="route-note">铁路和巴士沿线路绘制，车站与游览点之间沿步行路网连接。具体换乘和步行路线为推定。</p>
                     {dates.map(date => {
                         const visits=entries.filter(entry => entry.dateKey===date);
                         return <section class="diary-day">
@@ -67,6 +67,7 @@ const brand = { name: "Niracler" };
                             <a href={visits[0].article} target="_top" class="article-link">读当天游记 ↗</a>
                         </section>;
                     })}
+                    <p class="route-note">日本国土交通省 <a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-2025.html">铁路（2025）</a>、<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N07-2022.html">巴士路线</a>及<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-P11-2022.html">站点（2022）</a>，按 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> 裁剪、简化。道路数据 © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap 贡献者</a> · <a href="https://routing.openstreetmap.de/about.html">FOSSGIS 路径规划</a> · <a href="https://www.openstreetmap.org/fixthemap">纠正地图</a></p>
                 </div>
             </aside>
             <aside class="side" data-trip-map-drawer hidden aria-labelledby="place-title">
