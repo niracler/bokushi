@@ -72,7 +72,10 @@ async function mount(page: HTMLElement) {
         urls,
         brand: { name: "Niracler" },
         siteLine: "niracler.com",
-        messages: { viewDayMoments: "查看照片或当天游记" },
+        messages: {
+            viewDayLink: "本站无配图 · 阅读当天游记 ↗",
+            viewDayMoments: "查看照片或当天游记",
+        },
     });
     window.addEventListener(
         "pagehide",
