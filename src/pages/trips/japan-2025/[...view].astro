@@ -1,0 +1,86 @@
+---
+import {
+    renderIcon,
+    renderShortcuts,
+    renderTripPanel,
+    renderTripStage,
+    toScriptJson,
+    zhCN,
+} from "@hyoban/trip-map";
+import "@hyoban/trip-map/styles.css";
+import Lightbox from "../../../components/Lightbox.astro";
+import JourneyEntry from "../../../components/travel/JourneyEntry.astro";
+import {
+    basePath,
+    covers,
+    dates,
+    entries,
+    markers,
+    summary,
+    trip,
+    tripId,
+} from "../../../data/japan-trip";
+import "../../../styles/japan-trip.css";
+
+export const getStaticPaths = () =>
+    [undefined, "play", "map"].map((view) => ({ params: { view } }));
+const token = import.meta.env.VITE_MAPBOX_TOKEN || "";
+const brand = { name: "Niracler" };
+---
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="description" content="按天翻阅《日本七日记》的旅行照片，在地图上回放从广州出发、经澳门回深圳的行程。" />
+        <link rel="canonical" href={new URL(basePath, Astro.site)} />
+        <title>日本七日记 · 旅程回放</title>
+    </head>
+    <body>
+        <main class="trip-map-page" data-trip-map data-trip-map-token={token} data-no-map={!token || undefined}>
+            <div data-trip-map-canvas aria-label="日本旅行地图"></div>
+            <div class="map-status" data-trip-map-loading hidden={!token}>正在加载地图…</div>
+            <div class="map-status" data-trip-map-fallback hidden={Boolean(token)}>
+                <span data-trip-map-fallback-message>地图暂未配置，可以继续翻阅照片。</span>
+                <button type="button" data-trip-map-fallback-retry hidden>重新加载</button>
+                {Astro.params.view && <a href={basePath}>浏览照片时间线</a>}
+            </div>
+            <nav class="toolbar" aria-label="旅程视图">
+                <a class="back-timeline" href={basePath} target="_self">照片时间线</a>
+                <button type="button" id="fullscreen">全屏</button>
+            </nav>
+            <aside class="side" data-trip-map-trip-details aria-labelledby="diary-title">
+                <header class="side-header">
+                    <div><small data-trip-map-trip-details-eyebrow>2025 年 9 月 28 日 — 10 月 7 日</small><h1 id="diary-title" data-trip-map-trip-details-title>日本七日记</h1></div>
+                    <button type="button" class="map-only" aria-label="只看地图" title="只看地图" data-trip-map-trip-details-close>×</button>
+                </header>
+                <div class="side-content" data-drawer-content data-trip-map-trip-details-content data-trip-map-trip-details-trip={tripId}>
+                    <div class="cover-grid" aria-hidden="true">{covers.map((photo, i) => <img src={photo.thumbnail} alt="" fetchpriority={i===0 ? "high" : undefined} />)}</div>
+                    <div class="figures"><span><b>{trip.dayCount}</b> 天</span><span><b>{entries.length}</b> 站</span><span><b>{trip.photoCount}</b> 张照片</span></div>
+                    <a href={basePath + "/play"} class="play-trip play-action" data-trip-map-stop-play={tripId}><Fragment set:html={renderIcon("play")} />回放旅程</a>
+                    <p class="route-note">地图按游览顺序连接各站。</p>
+                    {dates.map(date => {
+                        const visits=entries.filter(entry => entry.dateKey===date);
+                        return <section class="diary-day">
+                            <h2><time datetime={date}>{date.slice(5).replace("-", " / ")}</time> {visits[0].dayTitle}</h2>
+                            {visits.map(entry => <JourneyEntry entry={entry} />)}
+                            <a href={visits[0].article} target="_top" class="article-link">读当天游记 ↗</a>
+                        </section>;
+                    })}
+                </div>
+            </aside>
+            <aside class="side" data-trip-map-drawer hidden aria-labelledby="place-title">
+                <header class="side-header"><div><small data-trip-map-drawer-eyebrow></small><h2 id="place-title" data-trip-map-drawer-title></h2></div><button data-trip-map-drawer-close aria-label="关闭地点">×</button></header>
+                <div class="side-content" data-drawer-content data-trip-map-drawer-content></div>
+            </aside>
+            <div class="trip-map-stage" data-trip-map-stage set:html={renderTripStage({brand,messages:zhCN})}></div>
+            <section class="trip-map-panel" data-trip-map-panel hidden aria-label="旅程播放器" set:html={renderTripPanel({messages:zhCN,trip})}></section>
+            <dialog class="trip-map-shortcuts" data-trip-map-shortcuts aria-label="键盘快捷键" set:html={renderShortcuts(zhCN)}></dialog>
+            <script type="application/json" is:inline data-trip-map-places set:html={toScriptJson(markers)}></script>
+            <script type="application/json" is:inline data-trip-map-trips set:html={toScriptJson([summary])}></script>
+            <script type="application/json" is:inline data-trip-map-trip set:html={toScriptJson(trip)}></script>
+            <Lightbox id="trip-lightbox" selector=".side:not([hidden]) [data-photo-url], [data-trip-map-active] [data-trip-map-trip-details] [data-photo-url]" showFullSizeLink />
+        </main>
+        <script src="../../../scripts/japan-trip.ts"></script>
+    </body>
+</html>

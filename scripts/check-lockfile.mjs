@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { copyFile, mkdtemp, rm } from "node:fs/promises";
+import { copyFile, cp, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -10,6 +10,8 @@ try {
     for (const filename of ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml"]) {
         await copyFile(new URL(filename, projectRoot), join(testRoot, filename));
     }
+
+    await cp(new URL("vendor/", projectRoot), join(testRoot, "vendor"), { recursive: true });
 
     const result = spawnSync("pnpm", ["install", "--frozen-lockfile", "--ignore-scripts"], {
         cwd: testRoot,

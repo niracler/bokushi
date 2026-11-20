@@ -12,11 +12,15 @@
                 "photos": [
                     {
                         "key": "d46ade065865e3f0bd05",
-                        "caption": "第一段航程，机翼下还能辨出地面"
+                        "caption": "第一段航程，机翼下还能辨出地面",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "3be17670e7661e10b2eb",
-                        "caption": "机翼穿过积云"
+                        "caption": "机翼穿过积云",
+                        "width": 3024,
+                        "height": 4032
                     }
                 ]
             },
@@ -28,13 +32,18 @@
                 "photos": [
                     {
                         "key": "400ba171f35a16d86de1",
-                        "caption": "傍晚的云层"
+                        "caption": "傍晚的云层",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "c961aacfa5844e42e890",
-                        "caption": "天色暗下来，云层下方亮起城市的灯"
+                        "caption": "天色暗下来，云层下方亮起城市的灯",
+                        "width": 3024,
+                        "height": 4032
                     }
-                ]
+                ],
+                "arrivedBy": "plane"
             },
             {
                 "name": "关西国际机场",
@@ -44,24 +53,32 @@
                 "photos": [
                     {
                         "key": "234cb1921033da8476d4",
-                        "caption": "落地后的人流"
+                        "caption": "落地后的人流",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "78c961a3fd148df91c49",
-                        "caption": "进城前看到的站牌"
+                        "caption": "进城前看到的站牌",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "30a9446e9481dab252a0",
-                        "caption": "进城的第一张车票，票面是 1,180 日元"
+                        "caption": "进城的第一张车票，票面是 1,180 日元",
+                        "width": 3024,
+                        "height": 4032
                     }
-                ]
+                ],
+                "arrivedBy": "plane"
             },
             {
                 "name": "新今宫站",
                 "lat": 34.65,
                 "lng": 135.502,
                 "note": "从关西机场搭车进城，再换车去心斋桥。",
-                "photos": []
+                "photos": [],
+                "arrivedBy": "train"
             },
             {
                 "name": "心斋桥",
@@ -85,11 +102,15 @@
                 "photos": [
                     {
                         "key": "984a986c4c5a57e7c686",
-                        "caption": "浴室墙上的马桶控制面板"
+                        "caption": "浴室墙上的马桶控制面板",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "a9afe3f8c76a758cf153",
-                        "caption": "第二天出门前拍下的小浴室"
+                        "caption": "第二天出门前拍下的小浴室",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             },
@@ -101,19 +122,27 @@
                 "photos": [
                     {
                         "key": "4d5a16f31024be0913e9",
-                        "caption": "穿过拱门"
+                        "caption": "穿过拱门",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "9e3c91774a2e0b22139f",
-                        "caption": "蓝色地球前喷起一圈白雾"
+                        "caption": "蓝色地球前喷起一圈白雾",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "c9dcce1778c7efb9657e",
-                        "caption": "透明顶棚下，撑伞的人正往园里走"
+                        "caption": "透明顶棚下，撑伞的人正往园里走",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "0539e60bc107a55e9c00",
-                        "caption": "雨天的园区街道和两旁的棕榈树"
+                        "caption": "雨天的园区街道和两旁的棕榈树",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             },
@@ -125,19 +154,27 @@
                 "photos": [
                     {
                         "key": "beec92cdf17e7260b71e",
-                        "caption": "从挂着野猪剪影的拱门走进去"
+                        "caption": "从挂着野猪剪影的拱门走进去",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "f0c1ff710386cd2e9d80",
-                        "caption": "人群上方的霍格沃茨"
+                        "caption": "人群上方的霍格沃茨",
+                        "width": 8255,
+                        "height": 5503
                     },
                     {
                         "key": "0aee2765f2092d1c3e3f",
-                        "caption": "霍格莫德村屋顶的积雪和烟囱"
+                        "caption": "霍格莫德村屋顶的积雪和烟囱",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "b0dfc160521e24e7efb9",
-                        "caption": "路边栏杆上的一杯黄油啤酒"
+                        "caption": "路边栏杆上的一杯黄油啤酒",
+                        "width": 3024,
+                        "height": 4032
                     }
                 ]
             },
@@ -149,31 +186,45 @@
                 "photos": [
                     {
                         "key": "6b8ca5ebf2b3259b703e",
-                        "caption": "赛车场陈列的金杯"
+                        "caption": "赛车场陈列的金杯",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "d008b563e94cb9c7e4f9",
-                        "caption": "赛车道具旁摊开的大书"
+                        "caption": "赛车道具旁摊开的大书",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "6f2b7bbeb453d56a447d",
-                        "caption": "板栗仔、炸弹兵和一屋子木箱"
+                        "caption": "板栗仔、炸弹兵和一屋子木箱",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "985f41dd73c5e5f019e7",
-                        "caption": "蓝天下粉色的桃花公主城堡"
+                        "caption": "蓝天下粉色的桃花公主城堡",
+                        "width": 5245,
+                        "height": 7867
                     },
                     {
                         "key": "86d673659cee2f20ca4e",
-                        "caption": "仰头能看见金币和问号砖块"
+                        "caption": "仰头能看见金币和问号砖块",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "4166484a9b43c2d701ea",
-                        "caption": "积木、绿管和城堡"
+                        "caption": "积木、绿管和城堡",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "3fcac3476a56c83a3ef4",
-                        "caption": "木桶旁的白胡子猩猩"
+                        "caption": "木桶旁的白胡子猩猩",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             },
@@ -185,11 +236,15 @@
                 "photos": [
                     {
                         "key": "21cf85a6e4db34459429",
-                        "caption": "一天玩到傍晚，坐下来吃汉堡和薯条"
+                        "caption": "一天玩到傍晚，坐下来吃汉堡和薯条",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "ccd51dede97b15c7518e",
-                        "caption": "桌边亮起的小小点唱机"
+                        "caption": "桌边亮起的小小点唱机",
+                        "width": 3024,
+                        "height": 4032
                     }
                 ]
             },
@@ -201,7 +256,9 @@
                 "photos": [
                     {
                         "key": "ba55ef3d0f9cab47de6a",
-                        "caption": "玩了一天，晚上回来洗衣服"
+                        "caption": "玩了一天，晚上回来洗衣服",
+                        "width": 4284,
+                        "height": 5712
                     }
                 ]
             }
@@ -220,31 +277,45 @@
                 "photos": [
                     {
                         "key": "45f9ea4487e30a700ca5",
-                        "caption": "隔着屋顶看到黄色的摩天轮"
+                        "caption": "隔着屋顶看到黄色的摩天轮",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "89227f69866ded1efa50",
-                        "caption": "离开大街，穿过窄窄的巷子"
+                        "caption": "离开大街，穿过窄窄的巷子",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "df646e9a641078def306",
-                        "caption": "窄巷里的灯笼与供台"
+                        "caption": "窄巷里的灯笼与供台",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "0d6ef6573d7eef463603",
-                        "caption": "从桥上看运河"
+                        "caption": "从桥上看运河",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "571b6aa339f60a99c844",
-                        "caption": "刚摊上铁板，还没抹上酱汁"
+                        "caption": "刚摊上铁板，还没抹上酱汁",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "f90590d3db7ac4252f17",
-                        "caption": "两份大阪烧上了铁板"
+                        "caption": "两份大阪烧上了铁板",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "59367622586b605f0494",
-                        "caption": "餐馆门前排开的招牌与菜单"
+                        "caption": "餐馆门前排开的招牌与菜单",
+                        "width": 4284,
+                        "height": 5712
                     }
                 ]
             },
@@ -256,31 +327,45 @@
                 "photos": [
                     {
                         "key": "20a274c4fb26433020d1",
-                        "caption": "车厢里的出租车司机招聘广告"
+                        "caption": "车厢里的出租车司机招聘广告",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "764c4dae0e877ba5e597",
-                        "caption": "楼顶红色摩天轮露出半个圈"
+                        "caption": "楼顶红色摩天轮露出半个圈",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "d2f0a5950d6fcc7fc438",
-                        "caption": "书店里拿起住野夜的小说"
+                        "caption": "书店里拿起住野夜的小说",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "74ce50ec5752bf853a71",
-                        "caption": "玻璃柜后的一排漫画和卡片"
+                        "caption": "玻璃柜后的一排漫画和卡片",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "744d259f9b4e18161632",
-                        "caption": "书架上翻到绿谷出久的封面"
+                        "caption": "书架上翻到绿谷出久的封面",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "b5e5d1b6048c03122953",
-                        "caption": "柜里一盒《艾尔登法环：黑夜君临》"
+                        "caption": "柜里一盒《艾尔登法环：黑夜君临》",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "8ca9cdc07d8f294eef3f",
-                        "caption": "店里的漫画签绘"
+                        "caption": "店里的漫画签绘",
+                        "width": 4284,
+                        "height": 5712
                     }
                 ]
             },
@@ -292,11 +377,15 @@
                 "photos": [
                     {
                         "key": "51ca30cfe4245e12bda4",
-                        "caption": "高架桥和街头招牌"
+                        "caption": "高架桥和街头招牌",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "26b481734f5e2ebe744b",
-                        "caption": "红墙上的 Nintendo OSAKA 标识"
+                        "caption": "红墙上的 Nintendo OSAKA 标识",
+                        "width": 4284,
+                        "height": 5712
                     }
                 ]
             },
@@ -308,7 +397,9 @@
                 "photos": [
                     {
                         "key": "551b60e5b3f57a6d6694",
-                        "caption": "玻璃柜里的草帽路飞"
+                        "caption": "玻璃柜里的草帽路飞",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             },
@@ -320,11 +411,15 @@
                 "photos": [
                     {
                         "key": "1b7f63dee0f1826edd9a",
-                        "caption": "从人行横道回望商场入口"
+                        "caption": "从人行横道回望商场入口",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "cc4204b070ae696d94d0",
-                        "caption": "拍下阪急电车兑换券上的使用说明"
+                        "caption": "拍下阪急电车兑换券上的使用说明",
+                        "width": 3024,
+                        "height": 4032
                     }
                 ]
             },
@@ -333,7 +428,8 @@
                 "lat": 35.011,
                 "lng": 135.768,
                 "note": "晚上抵达京都，接下来几天把出门的时间往后调了调。",
-                "photos": []
+                "photos": [],
+                "arrivedBy": "train"
             }
         ]
     },
@@ -350,35 +446,51 @@
                 "photos": [
                     {
                         "key": "9948811c5b34f9fa6dad",
-                        "caption": "上午安静的小巷"
+                        "caption": "上午安静的小巷",
+                        "width": 5323,
+                        "height": 3101
                     },
                     {
                         "key": "ac48a3bc8cfa129c3912",
-                        "caption": "街道尽头的一道木门"
+                        "caption": "街道尽头的一道木门",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "7f2dc5b161b509df33da",
-                        "caption": "屋顶后方，云团像要翻过来"
+                        "caption": "屋顶后方，云团像要翻过来",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "97421356f6bdb5a67b5d",
-                        "caption": "蓝天和大团白云下的寺院屋顶"
+                        "caption": "蓝天和大团白云下的寺院屋顶",
+                        "width": 7858,
+                        "height": 5239
                     },
                     {
                         "key": "796afa13ed137534ac84",
-                        "caption": "临街橱窗展示着好几张面具"
+                        "caption": "临街橱窗展示着好几张面具",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "c0a9445b303410cfe8f5",
-                        "caption": "云层中的京都塔"
+                        "caption": "云层中的京都塔",
+                        "width": 5135,
+                        "height": 7702
                     },
                     {
                         "key": "9b6d646b867a3cccfbab",
-                        "caption": "街边像积木一样的彩色门柱"
+                        "caption": "街边像积木一样的彩色门柱",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "7761127642856ccbdc11",
-                        "caption": "扭蛋机上印着一台迷你相机"
+                        "caption": "扭蛋机上印着一台迷你相机",
+                        "width": 3024,
+                        "height": 4032
                     }
                 ]
             },
@@ -390,11 +502,15 @@
                 "photos": [
                     {
                         "key": "456f1ef0bd6dd1e3654d",
-                        "caption": "午市摊头的烤串"
+                        "caption": "午市摊头的烤串",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "60ba6ce72574c9d9a342",
-                        "caption": "刚买到手的那一串"
+                        "caption": "刚买到手的那一串",
+                        "width": 4424,
+                        "height": 2420
                     }
                 ]
             },
@@ -406,35 +522,51 @@
                 "photos": [
                     {
                         "key": "b6e4a07c53aed542212b",
-                        "caption": "木架上的手写绘马"
+                        "caption": "木架上的手写绘马",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "c811e0752f85f607966b",
-                        "caption": "书架上的漫画"
+                        "caption": "书架上的漫画",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "73d3f63ae04196bcd9fb",
-                        "caption": "书架上并排放着 Ave Mujica 和 MyGO!!!! 的预约卡"
+                        "caption": "书架上并排放着 Ave Mujica 和 MyGO!!!! 的预约卡",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "77bfae261c0ae8de7ddf",
-                        "caption": "挂在网架上、装进透明袋的景品"
+                        "caption": "挂在网架上、装进透明袋的景品",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "5fd32470fb97227a24be",
-                        "caption": "陈列柜里的手办"
+                        "caption": "陈列柜里的手办",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "9412c2647549ae353ceb",
-                        "caption": "架上亮红色的 Switch 2 展示区"
+                        "caption": "架上亮红色的 Switch 2 展示区",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "b3f02b33406308ceb55f",
-                        "caption": "烤盘上几块肉刚翻过面"
+                        "caption": "烤盘上几块肉刚翻过面",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "a402263b3f19b09b2dfa",
-                        "caption": "逛完街，甜点撒了一层抹茶粉"
+                        "caption": "逛完街，甜点撒了一层抹茶粉",
+                        "width": 4032,
+                        "height": 3024
                     }
                 ]
             },
@@ -446,19 +578,27 @@
                 "photos": [
                     {
                         "key": "0b6dafed40306f18463a",
-                        "caption": "夜色里，从鸟居下往里看"
+                        "caption": "夜色里，从鸟居下往里看",
+                        "width": 5504,
+                        "height": 8256
                     },
                     {
                         "key": "4ab6243d04d80abc6727",
-                        "caption": "入夜的朱红色楼门"
+                        "caption": "入夜的朱红色楼门",
+                        "width": 7213,
+                        "height": 4725
                     },
                     {
                         "key": "ba2552e31177bfec977d",
-                        "caption": "舞殿亮起一排排灯笼"
+                        "caption": "舞殿亮起一排排灯笼",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "a61a24fbb975d2f003b8",
-                        "caption": "离开神社后，车灯照亮了街道"
+                        "caption": "离开神社后，车灯照亮了街道",
+                        "width": 8235,
+                        "height": 5490
                     }
                 ]
             }
@@ -477,15 +617,21 @@
                 "photos": [
                     {
                         "key": "6a429cdf9dd4c8f9edb1",
-                        "caption": "透过车站的大窗，先看见一片蓝天"
+                        "caption": "透过车站的大窗，先看见一片蓝天",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "cea6d16cbcdef6be5bbf",
-                        "caption": "走过服部医院，街边的诊疗时间看板"
+                        "caption": "走过服部医院，街边的诊疗时间看板",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "8e1db44d424fa95133b1",
-                        "caption": "门口一大一小两只狸猫摆件"
+                        "caption": "门口一大一小两只狸猫摆件",
+                        "width": 4032,
+                        "height": 3024
                     }
                 ]
             },
@@ -504,7 +650,9 @@
                 "photos": [
                     {
                         "key": "bb37ba428b6585aaa932",
-                        "caption": "松树、雕像和河面"
+                        "caption": "松树、雕像和河面",
+                        "width": 8023,
+                        "height": 5349
                     }
                 ]
             },
@@ -516,19 +664,27 @@
                 "photos": [
                     {
                         "key": "2dac54f61caa7029f401",
-                        "caption": "凤凰堂的正面与倒影"
+                        "caption": "凤凰堂的正面与倒影",
+                        "width": 8064,
+                        "height": 5376
                     },
                     {
                         "key": "59f560e3766c8c2336c8",
-                        "caption": "朱红钟楼里的梵钟"
+                        "caption": "朱红钟楼里的梵钟",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "f0c575b36a9600b84c00",
-                        "caption": "从绿树间往下看庭园的小径"
+                        "caption": "从绿树间往下看庭园的小径",
+                        "width": 8242,
+                        "height": 5495
                     },
                     {
                         "key": "3eb1d04408e7c66d413f",
-                        "caption": "凤凰堂之外，池塘另一侧的树影"
+                        "caption": "凤凰堂之外，池塘另一侧的树影",
+                        "width": 4032,
+                        "height": 3024
                     }
                 ]
             },
@@ -540,19 +696,27 @@
                 "photos": [
                     {
                         "key": "010de9bd346b5c083f05",
-                        "caption": "红帘下的拉面店，门口立着动漫立牌"
+                        "caption": "红帘下的拉面店，门口立着动漫立牌",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "307054a2a7c456e845de",
-                        "caption": "抹茶素面上桌"
+                        "caption": "抹茶素面上桌",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "416dd8399d557ec48dc1",
-                        "caption": "桌上放着甜点吃法的图解"
+                        "caption": "桌上放着甜点吃法的图解",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "c149d2d3acb926d33205",
-                        "caption": "竹筒里的茶味甜点"
+                        "caption": "竹筒里的茶味甜点",
+                        "width": 3024,
+                        "height": 4032
                     }
                 ]
             },
@@ -564,31 +728,45 @@
                 "photos": [
                     {
                         "key": "8debd7a84f3e57905934",
-                        "caption": "从商店街抬头，就能望见远山"
+                        "caption": "从商店街抬头，就能望见远山",
+                        "width": 4672,
+                        "height": 3287
                     },
                     {
                         "key": "06fa3c9336ce31962d73",
-                        "caption": "河水越过一道矮堰，翻出白色的水花"
+                        "caption": "河水越过一道矮堰，翻出白色的水花",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "49255d8cec3cf48337ff",
-                        "caption": "河堤与远山倒映在水里"
+                        "caption": "河堤与远山倒映在水里",
+                        "width": 8233,
+                        "height": 5489
                     },
                     {
                         "key": "0983b8a2ff0cb2505a43",
-                        "caption": "临窗的角色立牌"
+                        "caption": "临窗的角色立牌",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "28881d61ea5c5125bfda",
-                        "caption": "停在瓦顶的苍鹭"
+                        "caption": "停在瓦顶的苍鹭",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "ca37717bc18cfe1f0006",
-                        "caption": "路牌一边指向宇治神社，一边指向福寿园"
+                        "caption": "路牌一边指向宇治神社，一边指向福寿园",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "1764e5a49949cf2d90c8",
-                        "caption": "朱红鸟居伸过树梢"
+                        "caption": "朱红鸟居伸过树梢",
+                        "width": 8256,
+                        "height": 5504
                     }
                 ]
             },
@@ -600,19 +778,27 @@
                 "photos": [
                     {
                         "key": "f3a62c7a0755687fbbbb",
-                        "caption": "路口的鸟居和宇治上神社石碑"
+                        "caption": "路口的鸟居和宇治上神社石碑",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "5fee99b7ebdc93022b5f",
-                        "caption": "到展望台前，穿过这段树林"
+                        "caption": "到展望台前，穿过这段树林",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "484554ca9290f6a60ca4",
-                        "caption": "夕光下俯瞰宇治"
+                        "caption": "夕光下俯瞰宇治",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "3a6a973c32b9bb9860d2",
-                        "caption": "亭子里看风景的人"
+                        "caption": "亭子里看风景的人",
+                        "width": 4032,
+                        "height": 3024
                     }
                 ]
             },
@@ -624,7 +810,9 @@
                 "photos": [
                     {
                         "key": "298140dba76dbf99b951",
-                        "caption": "傍晚回到街上，车灯和萨莉亚的招牌都亮了"
+                        "caption": "傍晚回到街上，车灯和萨莉亚的招牌都亮了",
+                        "width": 4032,
+                        "height": 3024
                     }
                 ]
             }
@@ -643,19 +831,27 @@
                 "photos": [
                     {
                         "key": "483a97ac59b92f70593e",
-                        "caption": "田野后的山谷压着一层低云"
+                        "caption": "田野后的山谷压着一层低云",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "6ff71c2627d393da10b4",
-                        "caption": "田埂边一丛红色彼岸花"
+                        "caption": "田埂边一丛红色彼岸花",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "2f8c90a64648aa2accb8",
-                        "caption": "木牌上列着附近各座寺院的方向"
+                        "caption": "木牌上列着附近各座寺院的方向",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "08b7ba82e3bbbada4062",
-                        "caption": "路过一组坐在松树下的铜像"
+                        "caption": "路过一组坐在松树下的铜像",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             },
@@ -667,39 +863,57 @@
                 "photos": [
                     {
                         "key": "63a5f47a7c41591abbdf",
-                        "caption": "树根在青苔间铺开"
+                        "caption": "树根在青苔间铺开",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "95cb3cc21753e7270746",
-                        "caption": "围墙旁的松枝横向伸展开"
+                        "caption": "围墙旁的松枝横向伸展开",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "39a6f16c9f053d1a5ca2",
-                        "caption": "一块嵌在石上的浮雕"
+                        "caption": "一块嵌在石上的浮雕",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "49ff32f81ae88903b56a",
-                        "caption": "绿叶间的一抹红"
+                        "caption": "绿叶间的一抹红",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "fdad589724a04aa8da87",
-                        "caption": "树梢间的多宝塔"
+                        "caption": "树梢间的多宝塔",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "498f99c02871f09604f9",
-                        "caption": "手上的导览图标出了寺内各处"
+                        "caption": "手上的导览图标出了寺内各处",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "8d1cc998858d597da1da",
-                        "caption": "登高后，树丛外露出一片市街"
+                        "caption": "登高后，树丛外露出一片市街",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "fd18400f94938459b6ac",
-                        "caption": "沿小路走到林间的石塔"
+                        "caption": "沿小路走到林间的石塔",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "efedf95739e9802b69e7",
-                        "caption": "水面上方的一块石头也长满了青苔"
+                        "caption": "水面上方的一块石头也长满了青苔",
+                        "width": 8256,
+                        "height": 5504
                     }
                 ]
             },
@@ -711,23 +925,33 @@
                 "photos": [
                     {
                         "key": "4363bb6a92ec3175ad0e",
-                        "caption": "石灯笼围着庭院里的石塔"
+                        "caption": "石灯笼围着庭院里的石塔",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "e13843d67f1c94b9bcc7",
-                        "caption": "树干穿过起伏的苔庭"
+                        "caption": "树干穿过起伏的苔庭",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "c32f321623ad8cc0c21a",
-                        "caption": "从树影里望向下方的台阶"
+                        "caption": "从树影里望向下方的台阶",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "27f39531bf8954907a4f",
-                        "caption": "一截树桩上的小菌菇"
+                        "caption": "一截树桩上的小菌菇",
+                        "width": 8256,
+                        "height": 5504
                     },
                     {
                         "key": "af8bccf0a59e9878f026",
-                        "caption": "架子上摆着一小盆一小盆的苔"
+                        "caption": "架子上摆着一小盆一小盆的苔",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             },
@@ -739,23 +963,33 @@
                 "photos": [
                     {
                         "key": "06a49adba4541c32c600",
-                        "caption": "小游园里空着一架蓝色滑梯"
+                        "caption": "小游园里空着一架蓝色滑梯",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "6d6f06a11bd84a008a4b",
-                        "caption": "抬头看竹梢之间的光"
+                        "caption": "抬头看竹梢之间的光",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "ae45100e9c2269c742fa",
-                        "caption": "走出竹林后，路旁庭园的池石"
+                        "caption": "走出竹林后，路旁庭园的池石",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "3c2be18d79625f0cd4c5",
-                        "caption": "逛到店门口，遇见一只大史努比"
+                        "caption": "逛到店门口，遇见一只大史努比",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "5850f5f4e384f21720ee",
-                        "caption": "河水铺满画面，远处是低低的山脊"
+                        "caption": "河水铺满画面，远处是低低的山脊",
+                        "width": 4284,
+                        "height": 5712
                     }
                 ]
             },
@@ -781,11 +1015,15 @@
                 "photos": [
                     {
                         "key": "05040f5dcda94f9f301c",
-                        "caption": "出发前的酒店早餐"
+                        "caption": "出发前的酒店早餐",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "88dc807b6dc515bcef98",
-                        "caption": "雨滴后面的街景"
+                        "caption": "雨滴后面的街景",
+                        "width": 4032,
+                        "height": 3024
                     }
                 ]
             },
@@ -797,9 +1035,12 @@
                 "photos": [
                     {
                         "key": "51d8b22c2ecba2b6e75d",
-                        "caption": "抵达东京后吃的这碗拉面"
+                        "caption": "抵达东京后吃的这碗拉面",
+                        "width": 5712,
+                        "height": 4284
                     }
-                ]
+                ],
+                "arrivedBy": "train"
             },
             {
                 "name": "新宿",
@@ -809,35 +1050,51 @@
                 "photos": [
                     {
                         "key": "d1b30b2fe7d4fa7186f8",
-                        "caption": "相机店招牌和街上的雨伞"
+                        "caption": "相机店招牌和街上的雨伞",
+                        "width": 5118,
+                        "height": 3533
                     },
                     {
                         "key": "5e2b5d00b48005cf3461",
-                        "caption": "站前广场对面的小田急招牌"
+                        "caption": "站前广场对面的小田急招牌",
+                        "width": 8021,
+                        "height": 5347
                     },
                     {
                         "key": "7285098fac36bea590cd",
-                        "caption": "雨后的路口，斑马线一直伸向街角"
+                        "caption": "雨后的路口，斑马线一直伸向街角",
+                        "width": 7877,
+                        "height": 5251
                     },
                     {
                         "key": "0eaec0e1a351b0837c60",
-                        "caption": "两栋楼之间驶过一列电车"
+                        "caption": "两栋楼之间驶过一列电车",
+                        "width": 8184,
+                        "height": 5456
                     },
                     {
                         "key": "41ed2ab5936bae39210a",
-                        "caption": "楼前横杆上落着一只黑鸟"
+                        "caption": "楼前横杆上落着一只黑鸟",
+                        "width": 4833,
+                        "height": 3222
                     },
                     {
                         "key": "158bd55dbc485c327b74",
-                        "caption": "广告把整栋街角大楼包了起来"
+                        "caption": "广告把整栋街角大楼包了起来",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "0176f7ba9b1e8812fa88",
-                        "caption": "街口的红色拱门"
+                        "caption": "街口的红色拱门",
+                        "width": 8114,
+                        "height": 5410
                     },
                     {
                         "key": "2955dc9bc9b7bfe6f88f",
-                        "caption": "抬头正赶上街头大屏换画面"
+                        "caption": "抬头正赶上街头大屏换画面",
+                        "width": 4032,
+                        "height": 3024
                     }
                 ]
             },
@@ -849,35 +1106,51 @@
                 "photos": [
                     {
                         "key": "b3777c2d7cecaeef28e7",
-                        "caption": "从西口的站名牌开始这一段"
+                        "caption": "从西口的站名牌开始这一段",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "ec24ffdc0cfaa7c1bee7",
-                        "caption": "拐过街角，在阴天里亮起来的一栋楼"
+                        "caption": "拐过街角，在阴天里亮起来的一栋楼",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "c9a882001ad54be48820",
-                        "caption": "店里排开的漫画与周边"
+                        "caption": "店里排开的漫画与周边",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "f7b20c5736f9d4055b3c",
-                        "caption": "一排标着 GAME MUSIC 的唱片架"
+                        "caption": "一排标着 GAME MUSIC 的唱片架",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "2bd1620baf49af191fb4",
-                        "caption": "《蔚蓝档案》动画第一卷的蓝光封套"
+                        "caption": "《蔚蓝档案》动画第一卷的蓝光封套",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "cf82c3df360edf677eac",
-                        "caption": "汤面上铺了好几片叉烧"
+                        "caption": "汤面上铺了好几片叉烧",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "3a5299ca118e601a7192",
-                        "caption": "货架前拿起一瓶柠檬饮料"
+                        "caption": "货架前拿起一瓶柠檬饮料",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "9fe9d7f5738e630da52b",
-                        "caption": "书架上并排的新书与手写推荐卡"
+                        "caption": "书架上并排的新书与手写推荐卡",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             },
@@ -889,11 +1162,15 @@
                 "photos": [
                     {
                         "key": "bfa589309cafb98ad4c5",
-                        "caption": "站台的电子牌还亮着晚班车次"
+                        "caption": "站台的电子牌还亮着晚班车次",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "658fd34eca165682e970",
-                        "caption": "把当天买的周边摊开"
+                        "caption": "把当天买的周边摊开",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             }
@@ -912,43 +1189,63 @@
                 "photos": [
                     {
                         "key": "349c85f0001b52bdf388",
-                        "caption": "在书店翻到一本《水着彼女》"
+                        "caption": "在书店翻到一本《水着彼女》",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "659cb666057f01eb220b",
-                        "caption": "楼层表边立着等身角色立牌"
+                        "caption": "楼层表边立着等身角色立牌",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "a6876799985d3f5eea0e",
-                        "caption": "角色立牌沿着店铺外墙排开"
+                        "caption": "角色立牌沿着店铺外墙排开",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "02810c78aa9952d7ffb4",
-                        "caption": "从街口望向楼上的招牌"
+                        "caption": "从街口望向楼上的招牌",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "b341fcc45ea677c582e3",
-                        "caption": "亮黄色背板衬着一排手办"
+                        "caption": "亮黄色背板衬着一排手办",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "f52e73834c410f5629ec",
-                        "caption": "特价牌后的玩偶"
+                        "caption": "特价牌后的玩偶",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "8ba9219b2234d4b70229",
-                        "caption": "四个小小的乐队人偶挂在一起"
+                        "caption": "四个小小的乐队人偶挂在一起",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "929ac599ccf02ed76ede",
-                        "caption": "橱窗里一排戴眼罩的小玩偶"
+                        "caption": "橱窗里一排戴眼罩的小玩偶",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "2c2f6455deebc53e738f",
-                        "caption": "把白子的小画框拿起来看，回家又拍了一次"
+                        "caption": "把白子的小画框拿起来看，回家又拍了一次",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "903a8e1ee6099ff28f5e",
-                        "caption": "蓝绿色双马尾的初音未来"
+                        "caption": "蓝绿色双马尾的初音未来",
+                        "width": 4284,
+                        "height": 5712
                     }
                 ]
             },
@@ -960,35 +1257,51 @@
                 "photos": [
                     {
                         "key": "a63b145ed8b4c02c8751",
-                        "caption": "浅草观音通的红色招牌亮起来了"
+                        "caption": "浅草观音通的红色招牌亮起来了",
+                        "width": 5168,
+                        "height": 7752
                     },
                     {
                         "key": "85a7430843d5de9d1ad9",
-                        "caption": "人群从雷门的大灯笼下面穿过"
+                        "caption": "人群从雷门的大灯笼下面穿过",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "49b17e7186dc91c05716",
-                        "caption": "从仲见世通向宝藏门望去"
+                        "caption": "从仲见世通向宝藏门望去",
+                        "width": 7495,
+                        "height": 4419
                     },
                     {
                         "key": "72d8cda85b4b15f439bb",
-                        "caption": "隔着两列楼房看到亮灯的晴空塔"
+                        "caption": "隔着两列楼房看到亮灯的晴空塔",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "fa0c16790a3c69fddab7",
-                        "caption": "一排印着店名的灯笼，沿参道亮过去"
+                        "caption": "一排印着店名的灯笼，沿参道亮过去",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "bbdcd0bb7f3fe79d5413",
-                        "caption": "亮灯的五重塔"
+                        "caption": "亮灯的五重塔",
+                        "width": 5504,
+                        "height": 8256
                     },
                     {
                         "key": "32ee8a56c5f025863783",
-                        "caption": "宝藏门守护像的面孔和手臂"
+                        "caption": "宝藏门守护像的面孔和手臂",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "8725c80dd7cf41fcfadf",
-                        "caption": "从雷门内侧仰看灯笼上的墨字"
+                        "caption": "从雷门内侧仰看灯笼上的墨字",
+                        "width": 3024,
+                        "height": 4032
                     }
                 ]
             },
@@ -1000,35 +1313,51 @@
                 "photos": [
                     {
                         "key": "d481d2464006d07a56f6",
-                        "caption": "回到电器街，窄巷两边的楼都亮了"
+                        "caption": "回到电器街，窄巷两边的楼都亮了",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "cafd50485f8c7112139d",
-                        "caption": "在 TRADER 拿起的那盒《HENPRI》"
+                        "caption": "在 TRADER 拿起的那盒《HENPRI》",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "4321083013951856b163",
-                        "caption": "拿在手里翻看的盒装游戏"
+                        "caption": "拿在手里翻看的盒装游戏",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "88b032dda67e8d55da20",
-                        "caption": "层层叠叠的中古 PC 游戏盒"
+                        "caption": "层层叠叠的中古 PC 游戏盒",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "5dac072dfecf01e68234",
-                        "caption": "逛到最后，拍下骏河屋各层的卖场指南"
+                        "caption": "逛到最后，拍下骏河屋各层的卖场指南",
+                        "width": 4284,
+                        "height": 5093
                     },
                     {
                         "key": "4741d90e1dbff4bde4d9",
-                        "caption": "结束前再抬头看一眼夜里的招牌"
+                        "caption": "结束前再抬头看一眼夜里的招牌",
+                        "width": 3024,
+                        "height": 4032
                     },
                     {
                         "key": "174e3c7cad243b4f3276",
-                        "caption": "漫画和画册摆到了走道旁的矮架上"
+                        "caption": "漫画和画册摆到了走道旁的矮架上",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "58db5b493a454730b23b",
-                        "caption": "蓝色双马尾挂件随着背包一起走"
+                        "caption": "蓝色双马尾挂件随着背包一起走",
+                        "width": 3024,
+                        "height": 4032
                     }
                 ]
             }
@@ -1047,15 +1376,21 @@
                 "photos": [
                     {
                         "key": "0f1d740b479df4ad7ebd",
-                        "caption": "临回国，桌上还剩几枚日元"
+                        "caption": "临回国，桌上还剩几枚日元",
+                        "width": 4032,
+                        "height": 3024
                     },
                     {
                         "key": "05ebd83a84533763dd41",
-                        "caption": "登机前的烤鱼定食"
+                        "caption": "登机前的烤鱼定食",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "8b6d7d5d0536e6dfe4ea",
-                        "caption": "小桌板上摊开的返程飞机餐"
+                        "caption": "小桌板上摊开的返程飞机餐",
+                        "width": 5712,
+                        "height": 4284
                     }
                 ]
             },
@@ -1067,13 +1402,18 @@
                 "photos": [
                     {
                         "key": "4d78f3caaf521fcff580",
-                        "caption": "晚上到澳门，抬头看到的灯光"
+                        "caption": "晚上到澳门，抬头看到的灯光",
+                        "width": 4284,
+                        "height": 5712
                     },
                     {
                         "key": "a9d311fc9d7633c03268",
-                        "caption": "返程途中的夜间大厅"
+                        "caption": "返程途中的夜间大厅",
+                        "width": 4284,
+                        "height": 5712
                     }
-                ]
+                ],
+                "arrivedBy": "plane"
             },
             {
                 "name": "深中通道",
@@ -1090,13 +1430,18 @@
                 "photos": [
                     {
                         "key": "c662adc4e6a817c453c2",
-                        "caption": "摊开带回来的小物"
+                        "caption": "摊开带回来的小物",
+                        "width": 5712,
+                        "height": 4284
                     },
                     {
                         "key": "864124164c0dbb85841f",
-                        "caption": "手信礼盒排成一列"
+                        "caption": "手信礼盒排成一列",
+                        "width": 4106,
+                        "height": 5711
                     }
-                ]
+                ],
+                "dateKey": "2025-10-07"
             }
         ]
     }
