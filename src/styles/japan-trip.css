@@ -1,0 +1,295 @@
+@import "./tokens.css";
+:root {
+    color-scheme: light;
+    --color-bg: #fffefa;
+    --color-tx: #252722;
+    --color-tx-2: #565951;
+    --color-tx-3: #696c65;
+    --color-inline: #f2f2ed;
+    --color-border: #dddfd6;
+    --font-mono: ui-monospace, monospace;
+    font:
+        16px / 1.45 -apple-system,
+        BlinkMacSystemFont,
+        system-ui,
+        sans-serif;
+}
+* {
+    box-sizing: border-box;
+}
+[hidden] {
+    display: none !important;
+}
+body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-tx);
+}
+button,
+select {
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+.side-header button,
+.toolbar button {
+    background: none;
+    border: none;
+}
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid #477466;
+    outline-offset: 2px;
+}
+.trip-map-page {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: 100%;
+    height: 100dvh;
+    background: #e6e9df;
+}
+.toolbar,
+.map-status {
+    position: absolute;
+    z-index: 5;
+    left: 0.8rem;
+    top: 0.8rem;
+}
+.toolbar {
+    display: flex;
+    gap: 0.45rem;
+}
+.toolbar :is(a, button),
+.map-status {
+    background: var(--color-bg);
+    border-radius: 1.1rem;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.82rem;
+    box-shadow: 0 2px 12px #0002;
+}
+.map-status {
+    top: 3.3rem;
+    max-width: calc(100% - 2rem);
+}
+.trip-map-page:has([data-trip-map-trip-details]:not([hidden])) .back-timeline {
+    display: none;
+}
+.side,
+.trip-map-panel {
+    position: absolute;
+    z-index: 8;
+    overflow: hidden;
+    border-radius: 0.85rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    box-shadow: 0 0.8rem 3rem #0002;
+}
+.side {
+    --drawer-inset: 0.8rem;
+    inset: 0.8rem 0.8rem 0.8rem auto;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    width: min(26rem, 43%);
+}
+.side-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 1.05rem;
+    border-bottom: 1px solid var(--color-border);
+}
+.side-header :is(h1, h2) {
+    margin: 0;
+    font-size: 1.13rem;
+}
+.side-header small,
+.route-note {
+    color: var(--color-tx-3);
+    font-size: 0.78rem;
+}
+.side-header :is(button, a) {
+    padding: 0.3rem 0.5rem;
+    font-size: 1.2rem;
+}
+.side-content {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    min-height: 0;
+    padding: 0.85rem 1.05rem calc(1.4rem + var(--sheet-hidden, 0px));
+    scrollbar-width: thin;
+}
+.cover-grid {
+    flex: none;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 3px;
+    aspect-ratio: 1.65;
+    overflow: hidden;
+    border-radius: 0.65rem;
+}
+.cover-grid img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.cover-grid img:first-child {
+    grid-row: span 2;
+}
+.figures {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0.1rem;
+    font-size: 0.84rem;
+}
+.figures b {
+    font-size: 1.35rem;
+}
+.play-trip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.65rem;
+    border-radius: 2rem;
+    color: white;
+    background: #282b26;
+    font-weight: 600;
+}
+.play-trip svg {
+    width: 1rem;
+    height: 1rem;
+}
+.route-note {
+    text-align: center;
+    margin: 0.6rem auto 1rem;
+}
+.diary-day {
+    padding-block: 0.1rem 1rem;
+    border-top: 1px solid var(--color-border);
+}
+.diary-day h2 {
+    width: fit-content;
+    margin: 1.25rem auto;
+    padding: 0.3rem 0.8rem;
+    background: var(--color-inline);
+    color: var(--color-tx-2);
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: center;
+}
+.article-link {
+    color: var(--color-tx-2);
+    font-size: 0.82rem;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+}
+.trip-map-panel {
+    bottom: 1rem;
+    left: 1rem;
+    width: min(22rem, calc(100% - 2rem));
+    max-height: calc(100% - 5rem);
+    display: flex;
+    flex-direction: column;
+}
+.trip-map-shortcuts {
+    border: 1px solid var(--color-border);
+    border-radius: 0.85rem;
+    background: var(--color-bg);
+    color: var(--color-tx);
+    max-height: 85dvh;
+}
+.trip-map-page[data-trip-map-active] .toolbar {
+    display: none;
+}
+/* Local connections have no recorded mode or mileage. Mark their progress with a dot. */
+.trip-map-head svg[data-icon="car-front"] {
+    border-radius: 50%;
+    background: currentColor;
+    width: 0.7rem;
+    height: 0.7rem;
+}
+.trip-map-head svg[data-icon="car-front"] path,
+.trip-map-head svg[data-icon="car-front"] circle {
+    display: none;
+}
+[data-no-map] .map-only,
+[data-no-map] .back-timeline,
+[data-no-map] .play-action,
+.trip-map-page:has([data-trip-map-fallback]:not([hidden])) .play-action {
+    display: none;
+}
+[data-no-map] .side {
+    left: 50%;
+    top: 3.4rem;
+    width: min(40rem, 96%);
+    transform: translateX(-50%);
+}
+[data-no-map] .map-status {
+    top: 0.8rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+}
+@media (max-width: 48rem) {
+    .side {
+        inset: auto 0.65rem 0.65rem;
+        width: auto;
+        height: min(60dvh, 36rem);
+        --drawer-inset: 0.65rem;
+    }
+    .side[data-snap-points] {
+        top: 0.65rem;
+        height: auto;
+    }
+    .trip-map-panel {
+        inset: auto 0.65rem 0.65rem;
+        width: auto;
+        max-height: calc(100% - 1.3rem);
+    }
+    [data-no-map] .side {
+        height: auto;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .side-content {
+        scroll-behavior: auto;
+    }
+}
+
+/* The diary remains readable to the edge below its fixed heading. */
+@supports (container-type: scroll-state) {
+    .side-content {
+        container-type: scroll-state;
+    }
+    .side-content::before {
+        content: "";
+        position: sticky;
+        top: -0.85rem;
+        z-index: 1;
+        display: block;
+        flex: none;
+        height: 0.6rem;
+        margin-bottom: -0.6rem;
+        pointer-events: none;
+        opacity: 0;
+        background: linear-gradient(#1a241822, transparent);
+    }
+    @container scroll-state(scrollable: block-start) {
+        .side-content::before {
+            opacity: 1;
+        }
+    }
+}

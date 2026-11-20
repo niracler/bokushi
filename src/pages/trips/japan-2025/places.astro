@@ -1,0 +1,5 @@
+---
+import JourneyEntry from "../../../components/travel/JourneyEntry.astro";
+import { entries, markers } from "../../../data/japan-trip";
+---
+{markers.map(place => <template data-trip-map-place={place.id}>{entries.filter(entry => entry.locations[0].id === place.id).map(entry => <JourneyEntry entry={entry} />)}</template>)}

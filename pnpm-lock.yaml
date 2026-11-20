@@ -60,6 +60,9 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.7.4
         version: 3.7.4
+      '@hyoban/trip-map':
+        specifier: file:vendor/hyoban/trip-map-257dff2.tgz
+        version: file:vendor/hyoban/trip-map-257dff2.tgz(sharp@0.35.5(@types/node@25.5.2))
       '@iconify-json/ri':
         specifier: ^1.2.10
         version: 1.2.10
@@ -762,6 +765,19 @@ packages:
     resolution: {integrity: sha512-JUOtgFW6k9u4Y+xeIaEiLr3+cjoUPiAuLXoyKOJSia6Duzb7pq+A76P9ZdPDoAoxHdHzq6gE9/jKBGXlZT8FbA==}
     engines: {node: '>=6'}
 
+  '@hyoban/trip-map@file:vendor/hyoban/trip-map-257dff2.tgz':
+    resolution: {integrity: sha512-PNyiPjLlDoQtJuU44OKb3yf5jeiru937o3yS/wsE/P7xFO3GjiA7zRQYZ33V7JUbJvDxLngUsj8zzbECReDr/A==, tarball: file:vendor/hyoban/trip-map-257dff2.tgz}
+    version: 0.1.0
+    engines: {node: '>=20'}
+    peerDependencies:
+      sharp: ^0.35.5
+      three: '>=0.160.0'
+    peerDependenciesMeta:
+      sharp:
+        optional: true
+      three:
+        optional: true
+
   '@iconify-json/ri@1.2.10':
     resolution: {integrity: sha512-WWMhoncVVM+Xmu9T5fgu2lhYRrKTEWhKk3Com0KiM111EeEsRLiASjpsFKnC/SrB6covhUp95r2mH8tGxhgd5Q==}
 
@@ -954,6 +970,11 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@mapbox/mapbox-gl-language@1.0.1':
+    resolution: {integrity: sha512-gL58ojl7gaWLfbSISoB2QJEfTK3j+NKvPH9og0r+c3bd5BNqhY19Eb4OPfDc5+dGmjW03LhtZBc4n2b7Xn8kjA==}
+    peerDependencies:
+      mapbox-gl: '>=0.29.0'
 
   '@mdx-js/mdx@3.1.1':
     resolution: {integrity: sha512-f6ZO2ifpwAQIpzGWaBQT2TXxPv6z3RBzQKpVftEWN78Vl/YweF1uwussDx8ECAXVtr3Rs89fKyG9YlzUs9DyGQ==}
@@ -2272,6 +2293,9 @@ packages:
     resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
     engines: {node: '>=12'}
 
+  esm-env@1.2.2:
+    resolution: {integrity: sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==}
+
   estree-util-attach-comments@3.0.0:
     resolution: {integrity: sha512-cKUwm/HUcTDsYh/9FgnuFqpfquUbwIqwKM26BVCGDPVgvaCl/nDCCjUfiLlx6lsEZ3Z4RFxNbOQ60pkaEwFxGw==}
 
@@ -2587,6 +2611,9 @@ packages:
     deprecated: Accidentally published with breaking changes. Use 0.19.0 instead.
     hasBin: true
 
+  kdbush@4.1.0:
+    resolution: {integrity: sha512-e9vurzrXJQrFX6ckpHP3bvj5l+9CnYzkxDNnNQ1h2QTqdWsUAJgXiKdGNcOa1EY85dU8KbQ+z/FdQdB7P+9yfQ==}
+
   khroma@2.1.0:
     resolution: {integrity: sha512-Ls993zuzfayK269Svk9hzpeGUKob/sIgZzyHYdjQoAdQetRKpOLj+k/QQQ/6Qi0Yz65mlROrfd+Ev+1+7dz9Kw==}
 
@@ -2720,6 +2747,9 @@ packages:
 
   magicast@0.5.5:
     resolution: {integrity: sha512-UicdXN8zQ3JHlxVq+28afMXPr1z7WNY6+7EJnzTdQWkTAlMLF5fNCCKxJHBQwGaNGR11581EiQmQzx73+MvszA==}
+
+  mapbox-gl@3.33.0:
+    resolution: {integrity: sha512-2HpIrVedccHedolZyMVG/7FXdpgmsLTENgEDsX71x3/gKDGfYMf1FCRY0prntknkn/JXcraUKXlBTv7vkr0EXg==}
 
   markdown-extensions@2.0.0:
     resolution: {integrity: sha512-o5vL7aDWatOTX8LzaS1WMoaoxIiLRQJuIKKe2wAw6IeULDHaqbiqiggmx+pKvZDb1Sj+pE46Sn1T7lCqfFtg1Q==}
@@ -3012,6 +3042,9 @@ packages:
 
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
+
+  number-flow@0.6.2:
+    resolution: {integrity: sha512-MCnImG4Q5vPwhSXnov56nOuyyKn6LC+Qd7II1UiKc+ACRtug5iAtn0+CwXNxM38AC5lSowEY+oYEtZX2qMnUyw==}
 
   obug@2.1.4:
     resolution: {integrity: sha512-4a+OsYv9UktOJKE+l1A4OufDgdRF9PifWj+tJnHURo/P+WOxpG4GzUFL9qCalmWauao6ogiG+QvnCovwPoyAWA==}
@@ -3421,6 +3454,9 @@ packages:
 
   stylis@4.4.0:
     resolution: {integrity: sha512-5Z9ZpRzfuH6l/UAvCPAPUo3665Nk2wLaZU3x+TLHKVzIz33+sbJqbtrYoC3KD4/uVOr2Zp+L0LySezP9OHV9yA==}
+
+  supercluster@9.1.0:
+    resolution: {integrity: sha512-WMhsJPm8Tf9f5mKxJ1D0mB5tbCMOFi8wTrm/LGnsJHGg8xkeNT/TWDZuFauOGRISnclbYgnxD7g3xJAfQO3FLg==}
 
   supports-color@10.2.2:
     resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
@@ -4505,6 +4541,16 @@ snapshots:
 
   '@fortawesome/fontawesome-free@6.7.2': {}
 
+  '@hyoban/trip-map@file:vendor/hyoban/trip-map-257dff2.tgz(sharp@0.35.5(@types/node@25.5.2))':
+    dependencies:
+      '@mapbox/mapbox-gl-language': 1.0.1(mapbox-gl@3.33.0)
+      '@types/geojson': 7946.0.16
+      mapbox-gl: 3.33.0
+      number-flow: 0.6.2
+      supercluster: 9.1.0
+    optionalDependencies:
+      sharp: 0.35.5(@types/node@25.5.2)
+
   '@iconify-json/ri@1.2.10':
     dependencies:
       '@iconify/types': 2.0.0
@@ -4650,6 +4696,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
+
+  '@mapbox/mapbox-gl-language@1.0.1(mapbox-gl@3.33.0)':
+    dependencies:
+      mapbox-gl: 3.33.0
 
   '@mdx-js/mdx@3.1.1(supports-color@10.2.2)':
     dependencies:
@@ -5945,6 +5995,8 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
+  esm-env@1.2.2: {}
+
   estree-util-attach-comments@3.0.0:
     dependencies:
       '@types/estree': 1.0.10
@@ -6332,6 +6384,8 @@ snapshots:
     dependencies:
       commander: 15.0.0
 
+  kdbush@4.1.0: {}
+
   khroma@2.1.0: {}
 
   kleur@4.1.5: {}
@@ -6462,6 +6516,8 @@ snapshots:
       '@babel/parser': 7.29.14
       '@babel/types': 7.29.14
       source-map-js: 1.2.2
+
+  mapbox-gl@3.33.0: {}
 
   markdown-extensions@2.0.0: {}
 
@@ -7089,6 +7145,10 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
+  number-flow@0.6.2:
+    dependencies:
+      esm-env: 1.2.2
+
   obug@2.1.4: {}
 
   obug@3.0.0: {}
@@ -7683,6 +7743,11 @@ snapshots:
       inline-style-parser: 0.2.9
 
   stylis@4.4.0: {}
+
+  supercluster@9.1.0:
+    dependencies:
+      '@types/geojson': 7946.0.16
+      kdbush: 4.1.0
 
   supports-color@10.2.2: {}
 
