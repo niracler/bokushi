@@ -41,9 +41,10 @@ database_id = "f95ebf0a-500e-4096-86fb-9e7edfde7679"
 binding = "TRIP_PHOTOS"
 bucket_name = "nini-image"
 
-# Wrangler provisions a private bucket on first deployment and reuses the binding thereafter.
+# CI binds the existing private bucket. Bucket creation is managed separately.
 [[r2_buckets]]
 binding = "CHANNEL_MEDIA"
+bucket_name = "bokushi-channel-media"
 
 [[durable_objects.bindings]]
 name = "CHANNEL_ARCHIVE"
