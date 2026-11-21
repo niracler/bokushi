@@ -65,7 +65,7 @@ const distRows = totalTyped
         </span>
 
         <div class="rail__avatar">
-            <img src={channelAvatar} alt={channelTitle} class="rail__av" referrerpolicy="no-referrer" />
+            {channelAvatar && <img src={channelAvatar} alt={channelTitle} class="rail__av" referrerpolicy="no-referrer" />}
             <div class="rail__info">
                 <b>{channelTitle}</b>
                 {sinceLabel && <small>{sinceLabel}</small>}

@@ -9,6 +9,7 @@
  * @author Niracler
  */
 
+import { env } from "cloudflare:workers";
 import BaseHead from "../../components/BaseHead.astro";
 import ChannelDayDivider from "../../components/channel/ChannelDayDivider.astro";
 import ChannelRail from "../../components/channel/ChannelRail.astro";
@@ -16,54 +17,33 @@ import PostCard from "../../components/channel/PostCard.astro";
 import Footer from "../../components/Footer.astro";
 import Header from "../../components/Header.astro";
 import Lightbox from "../../components/Lightbox.astro";
+import { archive, CHANNEL as CHANNEL_USERNAME, isChannelCursor } from "../../lib/channel/client";
 import type { TelegramChannel } from "../../utils/telegram";
-import {
-    collectForwardSources,
-    fetchTelegramChannel,
-    groupPostsByDay,
-    tallyByType,
-} from "../../utils/telegram";
+import { collectForwardSources, groupPostsByDay, tallyByType } from "../../utils/telegram";
 
 // Enable server-side rendering for this dynamic route
 export const prerender = false;
 
 const { cursor } = Astro.params;
-const CHANNEL_USERNAME = "tomoko_channel";
+const key = cursor ?? "home";
+if (!isChannelCursor(key) || cursor === "home") return new Response(null, { status: 404 });
 
-function parseCursor(cursor: string | undefined): {
-    type: "before" | "after" | null;
-    value: string | undefined;
-} {
-    if (!cursor) return { type: null, value: undefined };
-    if (cursor.startsWith("before-")) return { type: "before", value: cursor.slice(7) };
-    if (cursor.startsWith("after-")) return { type: "after", value: cursor.slice(6) };
-    return { type: null, value: undefined };
-}
-
-const { type: cursorType, value: cursorValue } = parseCursor(cursor);
-
-let channelData: TelegramChannel | undefined;
+let channelData: (TelegramChannel & { firstId?: string; lastId?: string }) | undefined;
 let error: string | null = null;
-
 try {
-    const options: { before?: string; after?: string; minPosts?: number } = { minPosts: 40 };
-    if (cursorType === "before" && cursorValue) {
-        options.before = cursorValue;
-    } else if (cursorType === "after" && cursorValue) {
-        options.after = cursorValue;
-    }
-
-    channelData = await fetchTelegramChannel(CHANNEL_USERNAME, options);
+    const snapshot = await archive(env).page(key);
+    if (!snapshot) return new Response(null, { status: 404 });
+    channelData = snapshot;
 } catch (e) {
-    error = e instanceof Error ? e.message : "Failed to load channel";
-    console.error("Error loading Telegram channel:", e);
+    error = "暂时无法加载频道";
+    console.error("Error reading channel snapshot:", e);
 }
 
-const firstPostId = channelData?.posts?.[0]?.id;
-const lastPostId = channelData?.posts?.[channelData.posts.length - 1]?.id;
+const firstPostId = channelData?.firstId;
+const lastPostId = channelData?.lastId;
 
-const hasNewerPosts = cursorType === "before" || cursorType === "after";
-const hasOlderPosts = channelData?.posts && channelData.posts.length > 0;
+const hasNewerPosts = Boolean(cursor);
+const hasOlderPosts = Boolean(lastPostId);
 
 // Never cache the rendered error fallback as a successful channel page.
 if (error) Astro.response.status = 502;

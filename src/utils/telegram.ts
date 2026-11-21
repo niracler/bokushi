@@ -96,6 +96,8 @@ export interface TelegramVideoInfo {
     postUrl: string;
     thumbUrl?: string;
     videoUrl?: string;
+    /** Current upstream URL used only while preparing a media copy. */
+    sourceUrl?: string;
     duration?: string;
     paddingTopPct?: number;
     notSupported?: boolean;
@@ -121,6 +123,7 @@ export interface TelegramPost {
     hashtags?: string[];
     photos?: TelegramPhotoItem[];
     albumAspectRatio?: number;
+    missingPhoto?: boolean;
     video?: TelegramVideoInfo;
     views?: string;
     edited?: boolean;
@@ -309,8 +312,8 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
     const avatar = getProxiedImageUrl(avatarSrc);
 
     const posts: TelegramPost[] = [];
-    $(".tgme_widget_message_wrap").each((_index, element) => {
-        const $message = $(element).find(".tgme_widget_message");
+    $(".tgme_widget_message[data-post]").each((_index, element) => {
+        const $message = $(element);
 
         // Skip service messages (e.g. "Channel pinned «...»")
         if ($message.hasClass("service_message")) return;
@@ -318,7 +321,7 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
         const id = $message.attr("data-post")?.replace(`${channelUsername}/`, "") || "";
 
         // Skip if no valid ID
-        if (!id) return;
+        if (!/^[1-9]\d*$/.test(id)) return;
 
         // Get datetime
         const datetime = $message.find(".tgme_widget_message_date time").attr("datetime") || "";
@@ -406,6 +409,7 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
         const images: string[] = [];
         const photos: TelegramPhotoItem[] = [];
         let albumAspectRatio: number | undefined;
+        let missingPhoto = false;
 
         const $groupedLayer = $message.find(".tgme_widget_message_grouped_layer").first();
         if ($groupedLayer.length) {
@@ -419,7 +423,10 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
                 const $photo = $(photo);
                 const style = $photo.attr("style") || "";
                 const match = style.match(/url\(['"]?([^'")]+)['"]?\)/i);
-                if (!match?.[1]) return;
+                if (!match?.[1]) {
+                    missingPhoto = true;
+                    return;
+                }
                 const proxiedUrl = getProxiedImageUrl(match[1]);
                 images.push(proxiedUrl);
 
@@ -451,7 +458,10 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
                 const $photo = $(photo);
                 const style = $photo.attr("style") || "";
                 const match = style.match(/url\(['"]?([^'")]+)['"]?\)/i);
-                if (!match?.[1]) return;
+                if (!match?.[1]) {
+                    missingPhoto = true;
+                    return;
+                }
                 const proxiedUrl = getProxiedImageUrl(match[1]);
                 images.push(proxiedUrl);
 
@@ -492,7 +502,7 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
             video = {
                 postUrl,
                 ...(thumbUrl && { thumbUrl }),
-                ...(videoUrl && { videoUrl }),
+                ...(videoUrl && { videoUrl, sourceUrl: rawVideoUrl }),
                 ...(duration && { duration }),
                 ...(!Number.isNaN(paddingTop) && { paddingTopPct: paddingTop }),
                 notSupported,
@@ -629,6 +639,7 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
             ...(hashtags.length > 0 && { hashtags }),
             ...(photos.length > 0 && { photos }),
             ...(albumAspectRatio && { albumAspectRatio }),
+            missingPhoto: missingPhoto || undefined,
             ...(video && { video }),
             ...(views && { views }),
             ...(edited && { edited }),
@@ -637,6 +648,32 @@ function parseChannelHtml(html: string, channelUsername: string): ParsedBatch {
     });
 
     return { title, description, avatar, posts };
+}
+
+/** Only the explicit missing-post message on a successful embed confirms removal. */
+export async function fetchTelegramPost(channel: string, id: string, fetcher = fetch) {
+    const response = await fetcher(`https://t.me/${channel}/${id}?embed=1&mode=tme`, {
+        redirect: "manual",
+        signal: AbortSignal.timeout(8_000),
+    });
+    if (!response.ok) throw new Error(`Telegram embed returned ${response.status}`);
+    const html = await response.text();
+    const post = parseChannelHtml(html, channel).posts.find((item) => item.id === id);
+    if (post?.datetime && (post.text || post.photos?.length || post.video || post.linkPreview))
+        return post;
+    const message = cheerio.load(html)(".tgme_widget_message_error").text().trim();
+    if (message !== "Post not found") throw new Error("Unrecognized Telegram embed");
+
+    // A private/unavailable channel can make every embed disappear. Require a readable
+    // public feed from this channel before retiring a previously published copy.
+    const channelPage = await fetcher(`https://t.me/s/${channel}?before=${Number(id) + 1}`, {
+        signal: AbortSignal.timeout(8_000),
+        redirect: "manual",
+    });
+    if (!channelPage.ok) throw new Error("Could not confirm the public channel");
+    const nearby = parseChannelHtml(await channelPage.text(), channel);
+    if (!nearby.title) throw new Error("Could not confirm the public channel");
+    return nearby.posts.find((item) => item.id === id) ?? null;
 }
 
 /**

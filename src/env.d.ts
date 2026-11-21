@@ -9,6 +9,8 @@ declare module "virtual:site-stats" {
 // Cloudflare bindings type declarations
 
 interface Env {
+    CHANNEL_ARCHIVE: DurableObjectNamespace;
+    CHANNEL_MEDIA: R2Bucket;
     TRIP_PHOTOS: R2Bucket;
     LIKES: KVNamespace;
     SESSIONS: KVNamespace;

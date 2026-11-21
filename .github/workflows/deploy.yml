@@ -44,3 +44,6 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Warm the public channel homepage
+        run: curl --fail --silent --show-error --retry 2 --max-time 90 --output /dev/null https://niracler.com/channel
