@@ -199,3 +199,22 @@ test("stale fallback does not mask redirects, missing pages or personalized fail
     );
     assert.equal(privateResponse.status, 502);
 });
+
+test("a snapshot revision change cannot serve fresh or fallback HTML from the previous revision", async () => {
+    const f = fixture();
+    let version = 1;
+    const run = (render) =>
+        cachedChannelPage(
+            new Request("https://niracler.com/channel"),
+            render,
+            async () => f.cache,
+            () => 0,
+            async () => version,
+        );
+    assert.equal((await run(f.next)).headers.get("X-Channel-Cache"), "MISS");
+    assert.equal((await run(f.next)).headers.get("X-Channel-Cache"), "HIT");
+    version++;
+    const failure = await run(async () => new Response(null, { status: 502 }));
+    assert.equal(failure.status, 502);
+    assert.equal(await (await run(f.next)).text(), "render 2");
+});

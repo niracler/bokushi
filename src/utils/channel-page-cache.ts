@@ -1,6 +1,7 @@
 /** Cache only public channel HTML, before Telegram parsing and SSR run. */
 export const CHANNEL_CACHE_SECONDS = 3 * 24 * 60 * 60;
 export const CHANNEL_STALE_SECONDS = 7 * 24 * 60 * 60;
+const REVISION_HEADER = "X-Channel-Revision";
 const STORED_AT_HEADER = "X-Channel-Stored-At";
 
 type PageCache = {
@@ -25,6 +26,7 @@ function clientResponse(response: Response, status: string): Response {
     result.headers.set("Cache-Control", "public, max-age=0, must-revalidate");
     result.headers.set("X-Channel-Cache", status);
     result.headers.delete(STORED_AT_HEADER);
+    result.headers.delete(REVISION_HEADER);
     if (status === "STALE") result.headers.set("Cache-Control", "no-store");
     return result;
 }
@@ -34,17 +36,20 @@ export async function cachedChannelPage(
     next: () => Promise<Response>,
     openCache: () => Promise<PageCache>,
     now: () => number = Date.now,
+    getRevision: () => Promise<number> = async () => 0,
 ): Promise<Response> {
     if (!isCacheableRequest(request)) return next();
 
     const key = new Request(request.url);
     let cache: PageCache;
+    let revision: string;
     let fallback: Response | undefined;
     try {
+        revision = String(await getRevision());
         cache = await openCache();
         const cached = await cache.match(key);
         const storedAt = cached?.headers.get(STORED_AT_HEADER);
-        if (cached && storedAt !== null && storedAt !== undefined) {
+        if (cached?.headers.get(REVISION_HEADER) === revision && storedAt != null) {
             const age = (now() - Number(storedAt)) / 1000;
             if (age >= 0 && age < CHANNEL_CACHE_SECONDS) return clientResponse(cached, "HIT");
             if (age >= 0 && age < CHANNEL_CACHE_SECONDS + CHANNEL_STALE_SECONDS) fallback = cached;
@@ -87,6 +92,7 @@ export async function cachedChannelPage(
         "Cache-Control",
         `public, max-age=${CHANNEL_CACHE_SECONDS + CHANNEL_STALE_SECONDS}`,
     );
+    stored.headers.set(REVISION_HEADER, revision);
     stored.headers.set(STORED_AT_HEADER, String(now()));
     try {
         // Await the write so it finishes even without an execution context.

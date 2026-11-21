@@ -2,11 +2,8 @@
 # Migrated from Pages to Workers (2026-04)
 # Ref: https://developers.cloudflare.com/workers/framework-guides/web-apps/astro/
 #
-# NOTE: "main" is intentionally omitted — the Astro build auto-generates
-# dist/server/wrangler.json with the correct entry point. Wrangler uses
-# that redirected config at deploy time.
-
 name = "bokushi"
+main = "src/worker.ts"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
@@ -43,3 +40,18 @@ database_id = "f95ebf0a-500e-4096-86fb-9e7edfde7679"
 [[r2_buckets]]
 binding = "TRIP_PHOTOS"
 bucket_name = "nini-image"
+
+# Wrangler provisions a private bucket on first deployment and reuses the binding thereafter.
+[[r2_buckets]]
+binding = "CHANNEL_MEDIA"
+
+[[durable_objects.bindings]]
+name = "CHANNEL_ARCHIVE"
+class_name = "ChannelArchive"
+
+[[migrations]]
+tag = "channel-archive-v1"
+new_sqlite_classes = ["ChannelArchive"]
+
+[triggers]
+crons = ["0 * * * *"]
