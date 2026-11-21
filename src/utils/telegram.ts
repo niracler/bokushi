@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import sanitizeHtml from "sanitize-html";
+import { CHANNEL_FALLBACK_TIME_ZONE, channelDay, channelDayFormatter } from "./channel-time.ts";
 
 /** Maximum input length for numbered list conversion to prevent ReDoS. */
 const MAX_NUMBERED_LIST_INPUT = 50_000;
@@ -777,6 +778,8 @@ interface DayGroup {
     date: string;
     /** Local month anchor id, e.g. "m-2026-04" */
     monthAnchor: string;
+    /** Year-dot-month label, e.g. "2026·04" */
+    monthLabel: string;
     /** Day of month, zero-padded, e.g. "19" */
     day: string;
     /** Month-dot-day label, e.g. "04·19" */
@@ -786,35 +789,23 @@ interface DayGroup {
     posts: TelegramPost[];
 }
 
-const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"] as const;
-
-/**
- * Group posts by calendar day (in UTC for determinism between SSR runs).
- * Posts without a valid datetime are collected under an "undated" bucket.
- */
-export function groupPostsByDay(posts: TelegramPost[]): DayGroup[] {
+/** Group posts by calendar day in the same time zone as the post captions. */
+export function groupPostsByDay(
+    posts: TelegramPost[],
+    timeZone = CHANNEL_FALLBACK_TIME_ZONE,
+): DayGroup[] {
+    const formatter = channelDayFormatter(timeZone);
     const groups = new Map<string, DayGroup>();
 
     for (const post of posts) {
         const parsed = post.datetime ? new Date(post.datetime) : null;
         if (!parsed || Number.isNaN(parsed.getTime())) continue;
 
-        const year = parsed.getUTCFullYear();
-        const month = String(parsed.getUTCMonth() + 1).padStart(2, "0");
-        const day = String(parsed.getUTCDate()).padStart(2, "0");
-        const date = `${year}-${month}-${day}`;
-
-        let group = groups.get(date);
+        const day = channelDay(formatter, parsed);
+        let group = groups.get(day.date);
         if (!group) {
-            group = {
-                date,
-                monthAnchor: `m-${year}-${month}`,
-                day,
-                dayLabel: `${month}·${day}`,
-                weekday: WEEKDAYS[parsed.getUTCDay()],
-                posts: [],
-            };
-            groups.set(date, group);
+            group = { ...day, posts: [] };
+            groups.set(day.date, group);
         }
         group.posts.push(post);
     }

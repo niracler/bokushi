@@ -18,6 +18,7 @@ import Footer from "../../components/Footer.astro";
 import Header from "../../components/Header.astro";
 import Lightbox from "../../components/Lightbox.astro";
 import { archive, CHANNEL as CHANNEL_USERNAME, isChannelCursor } from "../../lib/channel/client";
+import { CHANNEL_FALLBACK_TIME_ZONE, channelClockFormatter } from "../../utils/channel-time";
 import type { TelegramChannel } from "../../utils/telegram";
 import { collectForwardSources, groupPostsByDay, tallyByType } from "../../utils/telegram";
 
@@ -49,6 +50,7 @@ const hasOlderPosts = Boolean(lastPostId);
 if (error) Astro.response.status = 502;
 Astro.response.headers.set("Cache-Control", error ? "no-store" : "public, max-age=0");
 
+const timeFormatter = channelClockFormatter(CHANNEL_FALLBACK_TIME_ZONE);
 const posts = channelData?.posts ?? [];
 const dayGroups = groupPostsByDay(posts);
 const typeCounts = tallyByType(posts);
@@ -65,11 +67,7 @@ const dayGroupsWithAnchor = dayGroups.map((group) => {
 
 // Eyebrow "YYYY·MM" — latest month present in this slice
 const latestPost = posts[0];
-const latestDate = latestPost?.datetime ? new Date(latestPost.datetime) : null;
-const currentMonthLabel =
-    latestDate && !Number.isNaN(latestDate.getTime())
-        ? `${latestDate.getUTCFullYear()}·${String(latestDate.getUTCMonth() + 1).padStart(2, "0")}`
-        : undefined;
+const currentMonthLabel = dayGroups[0]?.monthLabel;
 ---
 
 <!doctype html>
@@ -121,7 +119,12 @@ const currentMonthLabel =
                     />
                     <div class="feed">
                       {group.posts.map((post) => (
-                        <PostCard post={post} channelUsername={CHANNEL_USERNAME} firstPost={post === latestPost} />
+                        <PostCard
+                          post={post}
+                          channelUsername={CHANNEL_USERNAME}
+                          timeFormatter={timeFormatter}
+                          firstPost={post === latestPost}
+                        />
                       ))}
                     </div>
                   </section>
@@ -163,6 +166,10 @@ const currentMonthLabel =
 </html>
 
 <script>
+  import { localizeChannelDates } from "../../scripts/channel-local-time";
+
+  localizeChannelDates();
+
   const intro = document.querySelector<HTMLDetailsElement>('.channel-intro');
   if (intro) {
     const desktop = matchMedia('(width > 900px)');

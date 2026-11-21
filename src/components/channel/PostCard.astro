@@ -7,18 +7,19 @@ import ReplyQuote from "./ReplyQuote.astro";
 interface Props {
     post: TelegramPost;
     channelUsername: string;
+    timeFormatter: Intl.DateTimeFormat;
     firstPost?: boolean;
     /** Override the auto-detected type if you need a specific visual variant. */
     variant?: CardType;
 }
 
-const { post, channelUsername, firstPost = false, variant } = Astro.props;
+const { post, channelUsername, timeFormatter, firstPost = false, variant } = Astro.props;
 
 const cardType: CardType = variant ?? detectCardType(post);
 const parsedDate = post.datetime ? new Date(post.datetime) : null;
 const timeLabel =
     parsedDate && !Number.isNaN(parsedDate.getTime())
-        ? `${String(parsedDate.getUTCHours()).padStart(2, "0")}:${String(parsedDate.getUTCMinutes()).padStart(2, "0")}`
+        ? timeFormatter.format(parsedDate)
         : undefined;
 
 const photos = post.photos ?? [];
