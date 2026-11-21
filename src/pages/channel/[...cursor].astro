@@ -117,6 +117,18 @@ const currentMonthLabel =
       ) : channelData ? (
         <>
           <div class="channel-layout">
+            <details class="channel-intro">
+              <summary><strong>{channelData.title}</strong><span>频道介绍</span></summary>
+              <ChannelRail
+                channelTitle={channelData.title}
+                channelAvatar={channelData.avatar}
+                username={CHANNEL_USERNAME}
+                currentMonthLabel={currentMonthLabel}
+                description={channelData.description}
+                typeCounts={typeCounts}
+                forwardSources={forwardSources}
+              />
+            </details>
             <section class="channel-main">
               <div class="day-list">
                 {dayGroupsWithAnchor.map((group) => (
@@ -129,7 +141,7 @@ const currentMonthLabel =
                     />
                     <div class="feed">
                       {group.posts.map((post) => (
-                        <PostCard post={post} channelUsername={CHANNEL_USERNAME} />
+                        <PostCard post={post} channelUsername={CHANNEL_USERNAME} firstPost={post === latestPost} />
                       ))}
                     </div>
                   </section>
@@ -161,16 +173,6 @@ const currentMonthLabel =
                 )}
               </nav>
             </section>
-
-            <ChannelRail
-              channelTitle={channelData.title}
-              channelAvatar={channelData.avatar}
-              username={CHANNEL_USERNAME}
-              currentMonthLabel={currentMonthLabel}
-              description={channelData.description}
-              typeCounts={typeCounts}
-              forwardSources={forwardSources}
-            />
           </div>
         </>
       ) : null}
@@ -181,6 +183,14 @@ const currentMonthLabel =
 </html>
 
 <script>
+  const intro = document.querySelector<HTMLDetailsElement>('.channel-intro');
+  if (intro) {
+    const desktop = matchMedia('(width > 900px)');
+    const syncIntro = () => { intro.open = desktop.matches; };
+    syncIntro();
+    desktop.addEventListener('change', syncIntro);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.card__content img').forEach((element) => {
       const img = element as HTMLImageElement;
@@ -290,13 +300,42 @@ const currentMonthLabel =
   .channel-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 17rem;
+    grid-template-areas: "feed intro";
     gap: var(--space-8);
     align-items: start;
     max-width: 55rem;
     margin-inline: auto;
   }
 
+  .channel-intro {
+    grid-area: intro;
+    position: sticky;
+    top: 5rem;
+    min-width: 0;
+  }
+
+  .channel-intro > summary {
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  .channel-intro > summary span {
+    float: inline-end;
+    margin-inline-start: var(--space-3);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  @media (width > 900px) {
+    .channel-intro[open] > summary { display: none; }
+  }
+
   .channel-main {
+    grid-area: feed;
     min-width: 0;
     width: 100%;
     max-width: 34rem;
@@ -306,15 +345,21 @@ const currentMonthLabel =
   @media (max-width: 900px) {
     .channel-layout {
       grid-template-columns: 1fr;
+      grid-template-areas: "intro" "feed";
+      gap: var(--space-4);
     }
 
-    .channel-layout > :global(.rail) {
+    .channel-intro {
       position: static;
-      max-height: none;
-      order: -1;
       max-width: 34rem;
       width: 100%;
       margin-inline: auto;
+    }
+
+    .channel-intro :global(.rail) {
+      position: static;
+      max-height: none;
+      margin-top: var(--space-3);
     }
   }
 

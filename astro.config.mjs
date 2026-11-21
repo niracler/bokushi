@@ -1,5 +1,6 @@
 // @ts-check
 
+import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import cloudflare from "@astrojs/cloudflare";
 import { unified } from "@astrojs/markdown-remark";
@@ -92,6 +93,8 @@ export default defineConfig({
     },
 
     vite: {
+        // Cached channel HTML references CSS and scripts from this build only.
+        define: { "import.meta.env.CHANNEL_BUILD_ID": JSON.stringify(randomUUID()) },
         plugins: [
             siteStatsPlugin(),
             tailwindcss(),
