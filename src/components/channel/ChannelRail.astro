@@ -61,7 +61,7 @@ const distRows = totalTyped
     <div class="rail__card">
         <span class="rail__eyebrow">
             <i class="rail__status-dot" aria-hidden="true"></i>
-            {username}{currentMonthLabel && <> · {currentMonthLabel}</>}
+            {username}{currentMonthLabel && <span data-channel-month>{` · ${currentMonthLabel}`}</span>}
         </span>
 
         <div class="rail__avatar">
